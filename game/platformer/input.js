@@ -36,3 +36,4 @@ function initializeMouseInput(mouse, ctx) {
     mouseHandler(mouse, ctx, e);
     });
 }
+
