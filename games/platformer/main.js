@@ -18,7 +18,6 @@ function clearScene(scene) {
 }
 
 function setScene(scene, file_url) {
-
 	scene.objects.push(Matter.Bodies.rectangle(300, 200, 80, 80));
 	scene.objects.push(Matter.Bodies.rectangle(400, 200, 80, 80));
 	scene.objects.push(Matter.Bodies.rectangle(250, 300, 100, 30, {
@@ -27,7 +26,6 @@ function setScene(scene, file_url) {
 	scene.objects.push(Matter.Bodies.rectangle(400, 800, 700, 30, {
 		isStatic: true
 	}));
-
 	//for (let i = 0; i < level.rectangle_bodies.length; i++)
 	//scene.objects.push(Matter.Bodies.rectangle(...level.rectangle_bodies[i]));
 }
