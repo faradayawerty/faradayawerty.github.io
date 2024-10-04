@@ -3,7 +3,8 @@
 
 #### faw_tds
 a 2D game about running around shooting zombies
-play here --> https://faradayawerty.github.io/games/tds/main.html
+
+play here → https://faradayawerty.github.io/games/tds/main.html
 
 #### faw_platformer (WIP)
 a 2D game about running on platforms avoiding monsters
