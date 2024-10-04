@@ -6,7 +6,7 @@ function getEnemies() {
   return {
     size: 12,
     number: 0,
-    speed: 5,
+    speed: 3,
     max_hp: 200,
     damage: 2,
     xs: [],
