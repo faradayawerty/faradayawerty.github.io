@@ -17,9 +17,9 @@
 		}
 
 		#canvas {
-			position:absolute;
-			width:100%;
-			height:100%;
+			position: absolute;
+			width: 100%;
+			height: 100%;
 			border: 1px solid;
 			display: block;
 			image-rendering: pixelated;
@@ -35,14 +35,23 @@
 		let ctx = canvas.getContext("2d");
 		let input = getInput();
 
+		function zoomOutMobile() {
+			var viewport = document.querySelector('meta[name="viewport"]');
+			if (viewport) {
+				viewport.content = "initial-scale=0.1";
+				viewport.content = "width=1200";
+			}
+		}
+
+		zoomOutMobile();
+
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
 			ctx.strokeStyle = 'red';
-			if(input.mouse.leftButtonPressed) {
+			if (input.mouse.leftButtonPressed) {
 				ctx.fillStyle = 'green';
 				ctx.strokeRect(input.mouse.x, input.mouse.y, cvs.width / 16, cvs.height / 9);
-			}
-			else if(input.touch.exists) {
+			} else if (input.touch.exists) {
 				ctx.fillStyle = 'yellow';
 				ctx.strokeRect(input.touch.x, input.touch.y, cvs.width / 16, cvs.height / 9);
 			} else
@@ -66,4 +75,3 @@
 </body>
 
 </html>
-
