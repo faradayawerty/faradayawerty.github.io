@@ -12,8 +12,8 @@ function keyHandler(keys, e) {
 
 function mouseHandler(mouse, ctx, e) {
 	mouse.x = (e.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
-  mouse.y = (e.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
-  mouse.leftButtonPressed = e.buttons === 1 ? true : false;
+	mouse.y = (e.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
+	mouse.leftButtonPressed = e.buttons === 1 ? true : false;
 }
 
 function initializeKeyboardInput(keys) {

@@ -28,9 +28,14 @@
 	<canvas id="canvas" width=1000 height=1000 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
 	<script type="text/javascript" src="input.js"></script>
 	<script>
+		let input = getInput();
 
 		function animate(lastUpdateTime) {
-			ctx.clearRect(0, 0, 1000, 1000);
+			if(input.mouse.leftButtonPressed)
+				ctx.fillStyle = 'green';
+			else
+				ctx.fillStyle = 'black';
+			ctx.fillRect(0, 0, 1000, 1000);
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
@@ -39,7 +44,6 @@
 		function main() {
 			let cvs = document.getElementById("canvas");
 			let ctx = canvas.getContext("2d");
-			let input1 = getInput();
 			ctx.imageSmoothingEnabled = false;
 			initializeKeyboardInput(input1.keys);
 			initializeMouseInput(input1.mouse, ctx);
