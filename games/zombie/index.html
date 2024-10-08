@@ -13,8 +13,8 @@
 			position: center;
 			left: 0%;
 			top: 0%;
-			width: 1000;
-			height: 1000;
+			width: 800;
+			height: 600;
 			border: 1px solid;
 			margin-left: auto;
 			margin-right: auto;
@@ -25,28 +25,32 @@
 </head>
 
 <body>
-	<canvas id="canvas" width=1000 height=1000 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
+	<canvas id="canvas" style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
 	<script type="text/javascript" src="input.js"></script>
 	<script>
+		let cvs = document.getElementById("canvas");
+		let ctx = canvas.getContext("2d");
 		let input = getInput();
 
 		function animate(lastUpdateTime) {
+			ctx.clearRect(0, 0, cvs.width, cvs.height);
 			if(input.mouse.leftButtonPressed)
 				ctx.fillStyle = 'green';
+			if(input.touch.exists)
+				ctx.fillStyle = 'yellow';
 			else
 				ctx.fillStyle = 'black';
-			ctx.fillRect(0, 0, 1000, 1000);
+			ctx.fillRect(0, 0, cvs.width / 2, cvs.height / 2);
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
 		}
 
 		function main() {
-			let cvs = document.getElementById("canvas");
-			let ctx = canvas.getContext("2d");
 			ctx.imageSmoothingEnabled = false;
 			initializeKeyboardInput(input.keys);
 			initializeMouseInput(input.mouse, ctx);
+			initializeTouchInput(input.touch, ctx);
 			animate(Date.now());
 		}
 
