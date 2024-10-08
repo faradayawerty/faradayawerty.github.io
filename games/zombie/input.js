@@ -18,10 +18,10 @@ function mouseHandler(mouse, ctx, e) {
 }
 
 function touchHandler(touch, ctx, e) {
-	e.preventDefault();
 	touch.exists = e.touches.length > 0 ? true : false;
 	touch.x = (e.touches[0].clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
 	touch.y = (e.touches[0].clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
+	e.preventDefault();
 }
 
 function initializeTouchInput(touch, ctx) {
