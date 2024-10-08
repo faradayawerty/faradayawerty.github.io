@@ -39,16 +39,6 @@
 		let ctx = canvas.getContext("2d");
 		let input = getInput();
 
-		function zoomOutMobile() {
-			var viewport = document.querySelector('meta[name="viewport"]');
-			if (viewport) {
-				viewport.content = "initial-scale=0.1";
-				viewport.content = "width=1200";
-			}
-		}
-
-		zoomOutMobile();
-
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
 			ctx.strokeStyle = 'red';
