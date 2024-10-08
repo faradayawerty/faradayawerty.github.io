@@ -37,7 +37,7 @@
 			ctx.strokeStyle = 'red';
 			if(input.mouse.leftButtonPressed) {
 				ctx.fillStyle = 'green';
-				ctx.strokeRect(mouse.x, mouse.y, 100, 100);
+				ctx.strokeRect(input.mouse.x, input.mouse.y, 100, 100);
 			}
 			else if(input.touch.exists)
 				ctx.fillStyle = 'yellow';
