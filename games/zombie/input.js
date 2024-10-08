@@ -1,5 +1,5 @@
 
-function getInputHandler() {
+function getInput() {
   return {
     keys: {},
     mouse: {}

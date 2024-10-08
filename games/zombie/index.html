@@ -1,4 +1,54 @@
-
 <html>
+
+<head>
+	<meta charset="utf-8">
+	<title>faw_zombie</title>
+	<link rel="icon" href="icon.png">
+	<style>
+		body {
+			background-color: gray;
+		}
+
+		#canvas {
+			position: center;
+			left: 0%;
+			top: 0%;
+			width: 1000;
+			height: 1000;
+			border: 1px solid;
+			margin-left: auto;
+			margin-right: auto;
+			display: block;
+			image-rendering: pixelated;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="canvas" width=1000 height=1000 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
+	<script type="text/javascript" src="input.js"></script>
+	<script>
+
+		function animate(lastUpdateTime) {
+			ctx.clearRect(0, 0, 1000, 1000);
+			window.requestAnimationFrame(function() {
+				animate(Date.now());
+			});
+		}
+
+		function main() {
+			let cvs = document.getElementById("canvas");
+			let ctx = canvas.getContext("2d");
+			let input1 = getInput();
+			ctx.imageSmoothingEnabled = false;
+			initializeKeyboardInput(input1.keys);
+			initializeMouseInput(input1.mouse, ctx);
+			animate(Date.now());
+		}
+
+		main()
+	</script>
+</body>
+
 </html>
 
