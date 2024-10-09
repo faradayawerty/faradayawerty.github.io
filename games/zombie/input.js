@@ -18,6 +18,7 @@ function mouseHandler(mouse, ctx, e) {
 }
 
 function touchHandler(touch, ctx, e) {
+	e.preventDefault();
 	while(touch.length > 0)
 		touch.pop();
 	for(let i = 0; i < e.touches.length; i++) {
@@ -26,7 +27,6 @@ function touchHandler(touch, ctx, e) {
 		t.y = (e.touches[i].clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
 		touch.push(t);
 	}
-	e.preventDefault();
 }
 
 function initializeTouchInput(touch, ctx) {
