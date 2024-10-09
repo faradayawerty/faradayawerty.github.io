@@ -18,7 +18,7 @@ function mouseHandler(mouse, ctx, e) {
 }
 
 function touchHandler(touch, ctx, e) {
-	//touch = []
+	touch.splice(0, touch.length)
 	for(let i = 0; i < e.touches.length; i++) {
 		t = {}
 		t.x = (e.touches[i].clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
