@@ -58,7 +58,7 @@
 			} else
 				ctx.fillStyle = 'black';
 			ctx.fillRect(0, 0, cvs.width / 2, cvs.height / 2);
-			drawText(ctx, 100, 100, input.touch.length)
+			drawText(ctx, 100, 100, input.touch)
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
