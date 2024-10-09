@@ -32,6 +32,25 @@ function touchHandler(touch, joystick, ctx, e) {
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
 
+	for(let i = 0; i < touch.length; i++) {
+		if(touch[i].x < w / 2 && touch[i].y > h / 2) {
+			joystick.left.dx = -joystick.left.x + touch[i].x;
+			joystick.left.dy = -joystick.left.y + touch[i].y;
+			joystick.left.offset = Math.sqrt(joystick.left.dx*joystick.left.dx + joystick.left.dy*joystick.left.dy);
+		}
+		if(input.touch[i].x > w / 2 && touch[i].y > h / 2) {
+			joystick.right.dx = -joystick.right.x + touch[i].x;
+			joystick.right.dy = -joystick.right.y + touch[i].y;
+			joystick.right.offset = Math.sqrt(joystick.right.dx*joystick.right.dx + joystick.right.dy*joystick.right.dy);
+		}
+	}
+}
+
+function initializeTouchInput(touch, joystick, ctx) {
+
+	let w = ctx.canvas.width;
+	let h = ctx.canvas.height;
+
 	joystick.radius = Math.min(w/16, h/16);
 
 	joystick.left = {}
@@ -49,21 +68,6 @@ function touchHandler(touch, joystick, ctx, e) {
 	joystick.right.dy = 0;
 	joystick.right.offset = 0;
 
-	for(let i = 0; i < touch.length; i++) {
-		if(touch[i].x < w / 2 && touch[i].y > h / 2) {
-			joystick.left.dx = -joystick.left.x + touch[i].x;
-			joystick.left.dy = -joystick.left.y + touch[i].y;
-			joystick.left.offset = Math.sqrt(joystick.left.dx*joystick.left.dx + joystick.left.dy*joystick.left.dy);
-		}
-		if(input.touch[i].x > w / 2 && touch[i].y > h / 2) {
-			joystick.right.dx = -joystick.right.x + touch[i].x;
-			joystick.right.dy = -joystick.right.y + touch[i].y;
-			joystick.right.offset = Math.sqrt(joystick.right.dx*joystick.right.dx + joystick.right.dy*joystick.right.dy);
-		}
-	}
-}
-
-function initializeTouchInput(touch, joystick, ctx) {
 	window.addEventListener('touchstart', function(e) {
 		touchHandler(touch, joystick, ctx, e);
 	});
