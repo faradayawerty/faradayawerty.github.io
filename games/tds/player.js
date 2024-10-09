@@ -33,9 +33,9 @@ function updatePlayer(dt, p, input) {
 		p.vx = p.speed;
   else
 		p.vx = 0;
-  if(input.keys['w'] || input.joystick.left.dy > 0)
+  if(input.keys['w'] || input.joystick.left.dy < 0)
 		p.vy = -p.speed;
-	else if(input.keys['s'] || input.joystick.left.dy < 0)
+	else if(input.keys['s'] || input.joystick.left.dy > 0)
 		p.vy = p.speed;
   else
 		p.vy = 0;
