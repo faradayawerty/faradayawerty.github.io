@@ -3,7 +3,7 @@ function getInput() {
 	return {
 		keys: {},
 		mouse: {},
-		joystick: {}
+		joystick: {},
 		touch: []
 	};
 }
