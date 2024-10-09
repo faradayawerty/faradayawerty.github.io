@@ -35,8 +35,6 @@
 		let cvs = document.getElementById("canvas");
 		let ctx = canvas.getContext("2d");
 		let input = getInput();
-		let ux = 10 * cvs.height / 1000;
-		let uy = 10 * cvs.width / 1000;
 
 		function drawText(ctx, x, y, text) {
 			  ctx.font="14px verdana";
@@ -44,10 +42,6 @@
 			  ctx.fillText(text, x, y);
 			  ctx.fillStyle = 'white';
 			  ctx.fillText(text, x + 1, y + 1);
-		}
-
-		function drawTouch(ctx, input) {
-			
 		}
 
 		function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
@@ -64,10 +58,6 @@
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
 			ctx.canvas.width  = window.innerWidth;
 			ctx.canvas.height = window.innerHeight;
-			drawText(ctx, 100, 20, ctx.canvas.width);
-			drawText(ctx, 100, 40, ctx.canvas.clientWidth);
-			drawText(ctx, 100, 80, ctx.canvas.height);
-			drawText(ctx, 100, 100, ctx.canvas.clientHeight);
 			if (input.mouse.leftButtonPressed)
 				drawCircle(ctx, input.mouse.x, input.mouse.y, 2 * ux, 'green', 'yellow')
 			else if (input.touch.length > 0)
