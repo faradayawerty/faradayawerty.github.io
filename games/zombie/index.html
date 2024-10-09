@@ -53,12 +53,12 @@
 				ctx.strokeRect(input.mouse.x, input.mouse.y, 0.3 * ux, 0.3 * uy);
 			} else if (input.touch.length > 0) {
 				ctx.fillStyle = 'yellow';
-				for(let i = 0; i < input.touch.length; i++)
-					ctx.strokeRect(input.touch[i].x, input.touch[i].y, 0.3 * ux, 0.3 * uy);
+				//for(let i = 0; i < input.touch.length; i++)
+				ctx.strokeRect(input.touch.x, input.touch.y, 0.3 * ux, 0.3 * uy);
 			} else
 				ctx.fillStyle = 'black';
 			ctx.fillRect(0, 0, cvs.width / 2, cvs.height / 2);
-			drawText(ctx, 100, 100, input.touch)
+			drawText(ctx, 100, 100, input.touch.length)
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
