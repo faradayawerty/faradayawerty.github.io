@@ -3,7 +3,7 @@ function getInput() {
 	return {
 		keys: {},
 		mouse: {},
-		touch: {}
+		touch: []
 	};
 }
 
@@ -18,9 +18,13 @@ function mouseHandler(mouse, ctx, e) {
 }
 
 function touchHandler(touch, ctx, e) {
-	touch.exists = e.touches.length > 0 ? true : false;
-	touch.x = (e.touches[0].clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
-	touch.y = (e.touches[0].clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
+	touch = []
+	for(let i = 0; i < e.touches.length; i++) {
+		t = {}
+		t.x = (e.touches[i].clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
+		t.y = (e.touches[i].clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
+		touch.push(t);
+	}
 	e.preventDefault();
 }
 

@@ -1,8 +1,7 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
 	<title>faw_zombie</title>
 	<link rel="icon" href="icon.png">
 	<style>
@@ -13,12 +12,10 @@
 			margin-right: 0px;
 			padding: 0;
 		}
-
 		body {
 			background-color: gray;
 			overscroll-behavior: contain;
 		}
-
 		#canvas {
 			position: absolute;
 			width: 100%;
@@ -37,16 +34,18 @@
 		let cvs = document.getElementById("canvas");
 		let ctx = canvas.getContext("2d");
 		let input = getInput();
+		let ux = 100 * cvs.width / cvs.height;
+		let uy = 100 * cvs.height / cvs.width;
 
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
 			ctx.strokeStyle = 'red';
 			if (input.mouse.leftButtonPressed) {
 				ctx.fillStyle = 'green';
-				ctx.strokeRect(input.mouse.x, input.mouse.y, cvs.width / 16, cvs.height / 9);
+				ctx.strokeRect(input.mouse.x, input.mouse.y, ux, uy);
 			} else if (input.touch.exists) {
 				ctx.fillStyle = 'yellow';
-				ctx.strokeRect(input.touch.x, input.touch.y, cvs.width / 16, cvs.height / 9);
+				ctx.strokeRect(input.touch.x, input.touch.y, ux, uy);
 			} else
 				ctx.fillStyle = 'black';
 			ctx.fillRect(0, 0, cvs.width / 2, cvs.height / 2);
@@ -68,3 +67,4 @@
 </body>
 
 </html>
+
