@@ -64,11 +64,11 @@
 			for(let i = 0; i < input.touch.length; i++) {
 				if(input.touch[i].x < w / 2 && input.touch[i].y > 2 * h / 3) {
 					drawCircle(ctx, w / 4, 5 * h / 6, w/32, 'gray', 'black')
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/32, 'red', 'blue')
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/16, 'red', 'blue')
 				}
 				if(input.touch[i].x > w / 2 && input.touch[i].y > 2 * h / 3) {
 					drawCircle(ctx, 3 * w / 4, 5 * h / 6, w/32, 'gray', 'black')
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/32, 'purple', 'cyan')
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/16, 'purple', 'cyan')
 				}
 			}
 
