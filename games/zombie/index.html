@@ -55,9 +55,9 @@
 			ctx.canvas.height = window.innerHeight;
 			drawJoysticks(ctx, input.joystick);
 
-			player.x += input.joystick.right.dx * 0.05;
-			player.y += input.joystick.right.dy * 0.05;
-			drawCircle(ctx, player.x, player.y, 100, 'yellow', 'purple');
+			player.x += input.joystick.right.dx * 10;
+			player.y += input.joystick.right.dy * 10;
+			drawCircle(ctx, player.x, player.y, 20, 'yellow', 'purple');
 
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
