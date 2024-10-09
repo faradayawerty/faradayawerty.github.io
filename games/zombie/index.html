@@ -37,6 +37,14 @@
 		let ux = 100 * cvs.width / 1000;
 		let uy = 100 * cvs.height / 1000;
 
+		function drawText(ctx, x, y, text) {
+			  ctx.font="14px verdana";
+			  ctx.fillStyle = 'black';
+			  ctx.fillText(text, x, y);
+			  ctx.fillStyle = 'white';
+			  ctx.fillText(text, x + 1, y + 1);
+		}
+
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
 			ctx.strokeStyle = 'red';
@@ -50,6 +58,7 @@
 			} else
 				ctx.fillStyle = 'black';
 			ctx.fillRect(0, 0, cvs.width / 2, cvs.height / 2);
+			drawText(ctx, 100, 100, input.touch.length)
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
