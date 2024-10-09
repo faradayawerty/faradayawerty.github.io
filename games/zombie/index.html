@@ -34,18 +34,18 @@
 		let cvs = document.getElementById("canvas");
 		let ctx = canvas.getContext("2d");
 		let input = getInput();
-		let ux = 100 * cvs.width / cvs.height;
-		let uy = 100 * 1;
+		let ux = 100 * cvs.width / 1000;
+		let uy = 100 * cvs.height / 1000;
 
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
 			ctx.strokeStyle = 'red';
 			if (input.mouse.leftButtonPressed) {
 				ctx.fillStyle = 'green';
-				ctx.strokeRect(input.mouse.x, input.mouse.y, 0.1 * ux, 0.1 * uy);
+				ctx.strokeRect(input.mouse.x, input.mouse.y, 0.3 * ux, 0.3 * uy);
 			} else if (input.touch.exists) {
 				ctx.fillStyle = 'yellow';
-				ctx.strokeRect(input.touch.x, input.touch.y, 0.1 * ux, 0.1 * uy);
+				ctx.strokeRect(input.touch.x, input.touch.y, 0.3 * ux, 0.3 * uy);
 			} else
 				ctx.fillStyle = 'black';
 			ctx.fillRect(0, 0, cvs.width / 2, cvs.height / 2);
