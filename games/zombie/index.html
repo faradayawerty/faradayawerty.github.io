@@ -56,13 +56,16 @@
 
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
-			ctx.canvas.width  = window.innerWidth;
-			ctx.canvas.height = window.innerHeight;
-			if (input.mouse.leftButtonPressed)
-				drawCircle(ctx, input.mouse.x, input.mouse.y, 100, 'green', 'yellow')
-			else if (input.touch.length > 0)
-				for(let i = 0; i < input.touch.length; i++)
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, 100, 'red', 'blue')
+			w = window.innerWidth;
+			h = window.innerHeight;
+			ctx.canvas.width  = w;
+			ctx.canvas.height = h;
+
+			for(let i = 0; i < input.touch.length; i++) {
+				if(input.touch[i].x < w / 2 && input.touch[i].y > h / 2)
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/8, 'red', 'blue')
+			}
+
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
