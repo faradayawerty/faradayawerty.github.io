@@ -55,7 +55,6 @@
 				for(let i = 0; i < input.touch.length; i++)
 					ctx.strokeRect(input.touch[i].x, input.touch[i].y, 0.3 * ux, 0.3 * uy);
 			}
-			drawText(ctx, 100, 100, input.touch.length)
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
