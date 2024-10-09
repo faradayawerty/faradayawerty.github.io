@@ -62,6 +62,8 @@
 
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
+			ctx.canvas.width  = window.innerWidth;
+			ctx.canvas.height = window.innerHeight;
 			drawText(ctx, 100, 20, ctx.canvas.width);
 			drawText(ctx, 100, 40, ctx.canvas.clientWidth);
 			drawText(ctx, 100, 60, ctx.clientWidth);
@@ -76,7 +78,6 @@
 		}
 
 		function main() {
-			cvs.requestFullscreen()
 			ctx.imageSmoothingEnabled = false;
 			initializeKeyboardInput(input.keys);
 			initializeMouseInput(input.mouse, ctx);
