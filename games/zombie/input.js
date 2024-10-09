@@ -122,11 +122,11 @@ function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
 }
 
 function drawJoysticks(ctx, joystick) {
-	if(joystick.left.dx > 0 || joystick.left.dy > 0) {
+	if(Math.abs(joystick.left.dx) > 0 || Math.abs(joystick.left.dy) > 0) {
 		drawCircle(ctx, joystick.left.x, joystick.left.y , joystick.radius, 'gray', 'black');
 		drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left.dx, joystick.left.y + joystick.radius * joystick.left.dy, joystick.radius / 4, 'black', 'white');
 	}
-	if(joystick.right.dx > 0 || joystick.right.dy > 0) {
+	if(Math.abs(joystick.right.dx) > 0 || Math.abs(joystick.right.dy) > 0) {
 		drawCircle(ctx, joystick.right.x, joystick.right.y, joystick.radius, 'gray', 'black');
 		drawCircle(ctx, joystick.right.x + joystick.radius * joystick.right.dx, joystick.right.y + joystick.radius * joystick.right.dy, joystick.radius / 4, 'black', 'white');
 	}
