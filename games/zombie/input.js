@@ -54,7 +54,7 @@ function touchHandler(touch, joystick, ctx, e) {
 			joystick.left.dx = joystick.left.dx / offset;
 			joystick.left.dy = joystick.left.dy / offset;
 		}
-		if(input.touch[i].x > w / 2 && touch[i].y > h / 2) {
+		if(touch[i].x > w / 2 && touch[i].y > h / 2) {
 			joystick.right.dx = -joystick.right.x + touch[i].x;
 			joystick.right.dy = -joystick.right.y + touch[i].y;
 			offset = Math.sqrt(joystick.right.dx*joystick.right.dx + joystick.right.dy*joystick.right.dy);
