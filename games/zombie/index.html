@@ -59,24 +59,14 @@
 			ctx.canvas.width = window.innerWidth;
 			ctx.canvas.height = window.innerHeight;
 
-			drawText(ctx, 100, 20, input.joystick.left.x);
-			drawText(ctx, 100, 40, input.joystick.left.y);
-			drawText(ctx, 100, 60, input.joystick.left.dx);
-			drawText(ctx, 100, 80, input.joystick.left.dy);
-			drawCircle(ctx, input.joystick.left.x, input.joystick.left.y , input.joystick.radius, 'gray', 'black');
-
 			if(input.joystick.left.offset > 0) {
+				drawCircle(ctx, input.joystick.left.x, input.joystick.left.y , input.joystick.radius, 'gray', 'black');
 				drawCircle(ctx, input.joystick.left.x + input.joystick.radius * input.joystick.left.dx / input.joystick.left.offset,
 					input.joystick.left.y + input.joystick.radius * input.joystick.left.dy / input.joystick.left.offset, input.joystick.radius / 4, 'red', 'blue');
 			}
 
-			drawText(ctx, 200, 20, input.joystick.right.x);
-			drawText(ctx, 200, 40, input.joystick.right.y);
-			drawText(ctx, 200, 60, input.joystick.right.dx);
-			drawText(ctx, 200, 80, input.joystick.right.dy);
-			drawCircle(ctx, input.joystick.right.x, input.joystick.right.y, input.joystick.radius, 'gray', 'black');
-
 			if(input.joystick.right.offset > 0) {
+				drawCircle(ctx, input.joystick.right.x, input.joystick.right.y, input.joystick.radius, 'gray', 'black');
 				drawCircle(ctx, input.joystick.right.x + input.joystick.radius * input.joystick.right.dx / input.joystick.right.offset,
 					input.joystick.right.y + input.joystick.radius * input.joystick.right.dy / input.joystick.right.offset, input.joystick.radius / 4, 'purple', 'cyan');
 			}
