@@ -77,6 +77,7 @@ function animate(g, ctx, input, lastUpdateTime) {
   ctx.clearRect(0, 0, 1000, 1000);
   drawBackground(ctx);
   drawGame(ctx, g, input);
+  drawJoysticks(ctx, input.joystick);
   drawText(ctx, 15, 60, 'best survival time: ' + Math.round(bestScore / 1000.0));
   window.requestAnimationFrame(function() {
     animate(g, ctx, input, lastUpdateTime);

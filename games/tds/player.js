@@ -27,15 +27,15 @@ function setPlayerPosition(p, x, y) {
 function updatePlayer(dt, p, input) {
   if(p == null)
     return;
-	if(input.keys['a'] || input.joystick.left.dx < 0)
+	if(input.keys['a'] || input.joystick.left.dx < -0.1)
 		p.vx = -p.speed;
-	else if(input.keys['d'] || input.joystick.left.dx > 0)
+	else if(input.keys['d'] || input.joystick.left.dx > 0.1)
 		p.vx = p.speed;
   else
 		p.vx = 0;
-  if(input.keys['w'] || input.joystick.left.dy < 0)
+  if(input.keys['w'] || input.joystick.left.dy < -0.1)
 		p.vy = -p.speed;
-	else if(input.keys['s'] || input.joystick.left.dy > 0)
+	else if(input.keys['s'] || input.joystick.left.dy > 0.1)
 		p.vy = p.speed;
   else
 		p.vy = 0;
