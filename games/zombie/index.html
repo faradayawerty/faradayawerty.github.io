@@ -71,18 +71,18 @@
 
 			for(let i = 0; i < input.touch.length; i++) {
 				if(input.touch[i].x < w / 2 && input.touch[i].y > h / 2) {
-					left_joystick_dx = left_joystick_x - input.touch[i].x;
-					left_joystick_dy = left_joystick_y - input.touch[i].y;
+					left_joystick_dx = -left_joystick_x + input.touch[i].x;
+					left_joystick_dy = -left_joystick_y + input.touch[i].y;
 					left_joystick_offset = Math.sqrt(left_joystick_dx*left_joystick_dx + left_joystick_dy*left_joystick_dy);
 					drawCircle(ctx, left_joystick_x, left_joystick_y , joystick_radius, 'gray', 'black')
-					drawCircle(ctx, left_joystick_x + joystick_radius / 3 * left_joystick_dx / left_joystick_offset, left_joystick_y + joystick_radius / 3 * left_joystick_dy / left_joystick_offset, joystick_radius / 3, 'red', 'blue')
+					drawCircle(ctx, left_joystick_x + joystick_radius * left_joystick_dx / left_joystick_offset, left_joystick_y + joystick_radius * left_joystick_dy / left_joystick_offset, joystick_radius / 4, 'red', 'blue')
 				}
 				if(input.touch[i].x > w / 2 && input.touch[i].y > h / 2) {
-					right_joystick_dx = right_joystick_x - input.touch[i].x;
-					right_joystick_dy = right_joystick_y - input.touch[i].y;
+					right_joystick_dx = -right_joystick_x + input.touch[i].x;
+					right_joystick_dy = -right_joystick_y + input.touch[i].y;
 					right_joystick_offset = Math.sqrt(right_joystick_dx*right_joystick_dx + right_joystick_dy*right_joystick_dy);
 					drawCircle(ctx, right_joystick_x, right_joystick_y, joystick_radius, 'gray', 'black')
-					drawCircle(ctx, right_joystick_x + joystick_radius / 3 * right_joystick_dx / right_joystick_offset, right_joystick_y + joystick_radius / 3 * right_joystick_dy / right_joystick_offset, joystick_radius / 3, 'purple', 'cyan')
+					drawCircle(ctx, right_joystick_x + joystick_radius * right_joystick_dx / right_joystick_offset, right_joystick_y + joystick_radius * right_joystick_dy / right_joystick_offset, joystick_radius / 4, 'purple', 'cyan')
 				}
 			}
 
