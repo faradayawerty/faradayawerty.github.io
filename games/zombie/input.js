@@ -67,6 +67,13 @@ function initializeTouchInput(touch, joystick, ctx) {
 	joystick.left = {}
 	joystick.right = {}
 
+	joystick.left.dx = 0;
+	joystick.left.dy = 0;
+	joystick.left.offset = 0;
+	joystick.right.dx = 0;
+	joystick.right.dy = 0;
+	joystick.right.offset = 0;
+
 	window.addEventListener('touchstart', function(e) {
 		touchHandler(touch, joystick, ctx, e);
 	});
