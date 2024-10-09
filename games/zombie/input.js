@@ -29,12 +29,10 @@ function touchHandler(touch, joystick, ctx, e) {
 		touch.push(t);
 	}
 
-	//let w = window.innerWidth;
-	//let h = window.innerHeight;
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
 
-	joystick.radius = Math.min(w/16, h/16);
+	joystick.radius = Math.min(w/12, h/12);
 
 	joystick.left.x = w / 4;
 	joystick.left.y = 5 * h / 6;
@@ -43,21 +41,27 @@ function touchHandler(touch, joystick, ctx, e) {
 
 	joystick.left.dx = 0;
 	joystick.left.dy = 0;
-	joystick.left.offset = 0;
 	joystick.right.dx = 0;
 	joystick.right.dy = 0;
-	joystick.right.offset = 0;
 
 	for(let i = 0; i < touch.length; i++) {
 		if(touch[i].x < w / 2 && touch[i].y > h / 2) {
 			joystick.left.dx = -joystick.left.x + touch[i].x;
 			joystick.left.dy = -joystick.left.y + touch[i].y;
-			joystick.left.offset = Math.sqrt(joystick.left.dx*joystick.left.dx + joystick.left.dy*joystick.left.dy);
+			offset = Math.sqrt(joystick.left.dx*joystick.left.dx + joystick.left.dy*joystick.left.dy);
+			if(offset <= 0)
+				continue;
+			joystick.left.dx = joystick.left.dx / offset;
+			joystick.left.dy = joystick.left.dy / offset;
 		}
 		if(input.touch[i].x > w / 2 && touch[i].y > h / 2) {
 			joystick.right.dx = -joystick.right.x + touch[i].x;
 			joystick.right.dy = -joystick.right.y + touch[i].y;
-			joystick.right.offset = Math.sqrt(joystick.right.dx*joystick.right.dx + joystick.right.dy*joystick.right.dy);
+			offset = Math.sqrt(joystick.right.dx*joystick.right.dx + joystick.right.dy*joystick.right.dy);
+			if(offset <= 0)
+				continue;
+			joystick.right.dx = joystick.right.dx / offset;
+			joystick.right.dy = joystick.right.dy / offset;
 		}
 	}
 }
@@ -69,10 +73,8 @@ function initializeTouchInput(touch, joystick, ctx) {
 
 	joystick.left.dx = 0;
 	joystick.left.dy = 0;
-	joystick.left.offset = 0;
 	joystick.right.dx = 0;
 	joystick.right.dy = 0;
-	joystick.right.offset = 0;
 
 	window.addEventListener('touchstart', function(e) {
 		touchHandler(touch, joystick, ctx, e);
@@ -120,15 +122,13 @@ function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
 }
 
 function drawJoysticks(ctx, joystick) {
-	if(joystick.left.offset > 0) {
+	if(joystick.left.dx > 0 || joystick.left.dy > 0) {
 		drawCircle(ctx, joystick.left.x, joystick.left.y , joystick.radius, 'gray', 'black');
-		drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left.dx / joystick.left.offset,
-			joystick.left.y + joystick.radius * joystick.left.dy / joystick.left.offset, joystick.radius / 4, 'red', 'blue');
+		drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left.dx, joystick.left.y + joystick.radius * joystick.left.dy, joystick.radius / 4, 'red', 'blue');
 	}
-	if(joystick.right.offset > 0) {
+	if(joystick.right.dx > 0 || joystick.right.dy > 0) {
 		drawCircle(ctx, joystick.right.x, joystick.right.y, joystick.radius, 'gray', 'black');
-		drawCircle(ctx, joystick.right.x + joystick.radius * joystick.right.dx / joystick.right.offset,
-			joystick.right.y + joystick.radius * joystick.right.dy / joystick.right.offset, joystick.radius / 4, 'purple', 'cyan');
+		drawCircle(ctx, joystick.right.x + joystick.radius * joystick.right.dx, joystick.right.y + joystick.radius * joystick.right.dy, joystick.radius / 4, 'red', 'blue');
 	}
 }
 
