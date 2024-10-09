@@ -46,16 +46,27 @@
 			  ctx.fillText(text, x + 1, y + 1);
 		}
 
+		function drawTouch(ctx, input) {
+			
+		}
+
+		function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
+			context.beginPath();
+			context.arc(x, y, r, 0, 2 * Math.PI, false);
+			context.fillStyle = fill_color;
+			context.fill();
+			context.lineWidth = 5;
+			context.strokeStyle = stroke_color;
+			context.stroke();
+		}
+
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
-			if (input.mouse.leftButtonPressed) {
-				ctx.strokeStyle = 'green';
-				ctx.strokeRect(input.mouse.x, input.mouse.y, 0.3 * ux, 0.3 * uy);
-			} else if (input.touch.length > 0) {
-				ctx.strokeStyle = 'yellow';
+			if (input.mouse.leftButtonPressed)
+				drawCircle(ctx, input.mouse.x, input.mouse.y, ux, 'green', 'yellow')
+			} else if (input.touch.length > 0)
 				for(let i = 0; i < input.touch.length; i++)
-					ctx.strokeRect(input.touch[i].x, input.touch[i].y, 0.3 * ux, 0.3 * uy);
-			}
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, ux, 'red', 'blue')
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
