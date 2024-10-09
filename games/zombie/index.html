@@ -51,13 +51,13 @@
 		}
 
 		function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
-			context.beginPath();
-			context.arc(x, y, r, 0, 2 * Math.PI, false);
-			context.fillStyle = fill_color;
-			context.fill();
-			context.lineWidth = 5;
-			context.strokeStyle = stroke_color;
-			context.stroke();
+			ctx.beginPath();
+			ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+			ctx.fillStyle = fill_color;
+			ctx.fill();
+			ctx.lineWidth = 5;
+			ctx.strokeStyle = stroke_color;
+			ctx.stroke();
 		}
 
 		function animate(lastUpdateTime) {
