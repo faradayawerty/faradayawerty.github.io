@@ -66,8 +66,12 @@
 			let right_joystick_x = 3 * w / 4;
 			let right_joystick_y = 5 * h / 6;
 			let joystick_radius = Math.min(w/16, h/16);
-			let left_joystick_dx = 0, left_joystick_dy = 0, left_joystick_offset = 0;
-			let right_joystick_dx = 0, right_joystick_dy = 0, right_joystick_offset = 0;;
+			let left_joystick_dx = 0,
+				left_joystick_dy = 0,
+				left_joystick_offset = 0,
+				right_joystick_dx = 0,
+				right_joystick_dy = 0,
+				right_joystick_offset = 0;;
 
 			for(let i = 0; i < input.touch.length; i++) {
 				if(input.touch[i].x < w / 2 && input.touch[i].y > h / 2) {
