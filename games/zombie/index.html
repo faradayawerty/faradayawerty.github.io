@@ -45,7 +45,7 @@
 				ctx.strokeRect(input.mouse.x, input.mouse.y, 0.3 * ux, 0.3 * uy);
 			} else if (input.touch.length > 0) {
 				ctx.fillStyle = 'yellow';
-				for(let i = 0; i < touch.length; i++)
+				for(let i = 0; i < input.touch.length; i++)
 					ctx.strokeRect(input.touch[i].x, input.touch[i].y, 0.3 * ux, 0.3 * uy);
 			} else
 				ctx.fillStyle = 'black';
