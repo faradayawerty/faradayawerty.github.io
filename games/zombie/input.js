@@ -29,8 +29,10 @@ function touchHandler(touch, joystick, ctx, e) {
 		touch.push(t);
 	}
 
-	let w = window.innerWidth;
-	let h = window.innerHeight;
+	//let w = window.innerWidth;
+	//let h = window.innerHeight;
+	let w = ctx.canvas.width;
+	let h = ctx.canvas.height;
 
 	joystick.radius = Math.min(w/16, h/16);
 
@@ -98,5 +100,28 @@ function initializeMouseInput(mouse, ctx) {
 	window.addEventListener('mouseup', function(e) {
 		mouseHandler(mouse, ctx, e);
 	});
+}
+
+function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
+	ctx.beginPath();
+	ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+	ctx.fillStyle = fill_color;
+	ctx.fill();
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = stroke_color;
+	ctx.stroke();
+}
+
+function drawJoysticks(ctx, joystick) {
+	if(joystick.left.offset > 0) {
+		drawCircle(ctx, joystick.left.x, joystick.left.y , joystick.radius, 'gray', 'black');
+		drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left.dx / joystick.left.offset,
+			joystick.left.y + joystick.radius * joystick.left.dy / joystick.left.offset, joystick.radius / 4, 'red', 'blue');
+	}
+	if(joystick.right.offset > 0) {
+		drawCircle(ctx, joystick.right.x, joystick.right.y, joystick.radius, 'gray', 'black');
+		drawCircle(ctx, joystick.right.x + joystick.radius * joystick.right.dx / joystick.right.offset,
+			joystick.right.y + joystick.radius * joystick.right.dy / joystick.right.offset, joystick.radius / 4, 'purple', 'cyan');
+	}
 }
 
