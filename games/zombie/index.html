@@ -64,8 +64,8 @@
 			player.y += input.joystick.right.dy * 10;
 			drawCircle(ctx, player.x, player.y, 20, 'yellow', 'purple');
 
-			player1.x += input.joystick.right.dx * 10;
-			player1.y += input.joystick.right.dy * 10;
+			player1.x += input.joystick.left.dx * 10;
+			player1.y += input.joystick.left.dy * 10;
 			drawCircle(ctx, player1.x, player1.y, 20, 'cyan', 'red');
 
 			window.requestAnimationFrame(function() {
