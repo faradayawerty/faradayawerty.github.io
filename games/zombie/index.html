@@ -59,10 +59,10 @@
 			ctx.canvas.width  = window.innerWidth;
 			ctx.canvas.height = window.innerHeight;
 			if (input.mouse.leftButtonPressed)
-				drawCircle(ctx, input.mouse.x, input.mouse.y, 2 * ux, 'green', 'yellow')
+				drawCircle(ctx, input.mouse.x, input.mouse.y, 100, 'green', 'yellow')
 			else if (input.touch.length > 0)
 				for(let i = 0; i < input.touch.length; i++)
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, ux, 'red', 'blue')
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, 100, 'red', 'blue')
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
 			});
