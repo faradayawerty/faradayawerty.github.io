@@ -59,12 +59,14 @@
 			ctx.canvas.width = window.innerWidth;
 			ctx.canvas.height = window.innerHeight;
 
+			drawText(ctx, 100, 20, input.joystick.left.offset);
 			if(input.joystick.left.offset > 0) {
 				drawCircle(ctx, input.joystick.left.x, input.joystick.left.y , input.joystick.radius, 'gray', 'black');
 				drawCircle(ctx, input.joystick.left.x + input.joystick.radius * input.joystick.left.dx / input.joystick.left.offset,
 					input.joystick.left.y + input.joystick.radius * input.joystick.left.dy / input.joystick.left.offset, input.joystick.radius / 4, 'red', 'blue');
 			}
 
+			drawText(ctx, 100, 40, input.joystick.right.offset);
 			if(input.joystick.right.offset > 0) {
 				drawCircle(ctx, input.joystick.right.x, input.joystick.right.y, input.joystick.radius, 'gray', 'black');
 				drawCircle(ctx, input.joystick.right.x + input.joystick.radius * input.joystick.right.dx / input.joystick.right.offset,
