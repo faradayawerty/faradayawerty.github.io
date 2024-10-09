@@ -61,14 +61,20 @@
 			ctx.canvas.width  = w;
 			ctx.canvas.height = h;
 
+			let left_joystick_x = w / 4;
+			let left_joystick_y = 5 * h / 6;
+			let right_joystick_x = 3 * w / 4;
+			let right_joystick_y = 5 * h / 6;
+			let joystick_radius = Math.min(w/16, h/16);
+
 			for(let i = 0; i < input.touch.length; i++) {
 				if(input.touch[i].x < w / 2 && input.touch[i].y > 2 * h / 3) {
-					drawCircle(ctx, w / 4, 5 * h / 6, w/16, 'gray', 'black')
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/64, 'red', 'blue')
+					drawCircle(ctx, left_joystick_x, left_joystick_y , joystick_radius, 'gray', 'black')
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, joystick_radius / 3, 'red', 'blue')
 				}
 				if(input.touch[i].x > w / 2 && input.touch[i].y > 2 * h / 3) {
-					drawCircle(ctx, 3 * w / 4, 5 * h / 6, w/16, 'gray', 'black')
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/64, 'purple', 'cyan')
+					drawCircle(ctx, right_joystick_x, right_joystick_y, joystick_radius, 'gray', 'black')
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, joystick_radius / 3, 'purple', 'cyan')
 				}
 			}
 
