@@ -80,7 +80,7 @@
 			ctx.imageSmoothingEnabled = false;
 			initializeKeyboardInput(input.keys);
 			initializeMouseInput(input.mouse, ctx);
-			initializeTouchInput(input.touch, joystick, ctx);
+			initializeTouchInput(input.touch, input.joystick, ctx);
 			animate(Date.now());
 		}
 
