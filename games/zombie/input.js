@@ -32,6 +32,13 @@ function touchHandler(touch, joystick, ctx, e) {
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
 
+	joystick.left.dx = 0;
+	joystick.left.dy = 0;
+	joystick.left.offset = 0;
+	joystick.right.dx = 0;
+	joystick.right.dy = 0;
+	joystick.right.offset = 0;
+
 	for(let i = 0; i < touch.length; i++) {
 		if(touch[i].x < w / 2 && touch[i].y > h / 2) {
 			joystick.left.dx = -joystick.left.x + touch[i].x;
