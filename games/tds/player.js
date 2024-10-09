@@ -55,8 +55,8 @@ function drawPlayer(ctx, p, input) {
 	ctx.strokeStyle = 'black';
 	ctx.beginPath();
 	ctx.moveTo(p.x, p.y);
-	let gx = input.mouse.x - p.x + (input.mouse.leftButtonPressed ? 1 : 0) * 64 * (Math.random() * 2 - 1);
-	let gy = input.mouse.y - p.y + (input.mouse.leftButtonPressed ? 1 : 0) * 64 * (Math.random() * 2 - 1);
+	let gx = (input.mouse.x ? input.mouse.x : p.x + 256 * input.joystick.right.dx) - p.x + (input.mouse.leftButtonPressed ? 1 : 0) * 64 * (Math.random() * 2 - 1);
+	let gy = (input.mouse.y ? input.mouse.y : p.y + 256 * input.joystick.right.dy) - p.y + (input.mouse.leftButtonPressed ? 1 : 0) * 64 * (Math.random() * 2 - 1);
 	let g = Math.sqrt(gx * gx + gy * gy);
 	ctx.lineTo(p.x + p.gun_length * gx / g, p.y + p.gun_length * gy / g);
 	ctx.lineWidth = 6;
