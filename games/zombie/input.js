@@ -34,9 +34,6 @@ function touchHandler(touch, joystick, ctx, e) {
 
 	joystick.radius = Math.min(w/16, h/16);
 
-	joystick.left = {}
-	joystick.right = {}
-
 	joystick.left.x = w / 4;
 	joystick.left.y = 5 * h / 6;
 	joystick.right.x = 3 * w / 4;
@@ -64,6 +61,10 @@ function touchHandler(touch, joystick, ctx, e) {
 }
 
 function initializeTouchInput(touch, joystick, ctx) {
+
+	joystick.left = {}
+	joystick.right = {}
+
 	window.addEventListener('touchstart', function(e) {
 		touchHandler(touch, joystick, ctx, e);
 	});
