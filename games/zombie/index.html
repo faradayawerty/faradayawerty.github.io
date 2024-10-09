@@ -62,10 +62,10 @@
 			ctx.canvas.height = h;
 
 			for(let i = 0; i < input.touch.length; i++) {
-				if(input.touch[i].x < w / 2 && input.touch[i].y > h / 2)
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/8, 'red', 'blue')
-				if(input.touch[i].x > w / 2 && input.touch[i].y > h / 2)
-					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/8, 'purple', 'cyan')
+				if(input.touch[i].x < w / 2 && input.touch[i].y > h / 3)
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/32, 'red', 'blue')
+				if(input.touch[i].x > w / 2 && input.touch[i].y > h / 3)
+					drawCircle(ctx, input.touch[i].x, input.touch[i].y, w/32, 'purple', 'cyan')
 			}
 
 			window.requestAnimationFrame(function() {
