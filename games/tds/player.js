@@ -27,9 +27,11 @@ function setPlayerPosition(p, x, y) {
 function updatePlayer(dt, p, input) {
   if(p == null)
     return;
-	if(input.keys['a'])
-		p.vx = -p.speed;
-	else if(input.keys['d'])
+  p.vx = input.joystick.left.dx * p.speed;
+  p.vy = input.joystick.left.dy * p.speed;
+  if(input.keys['a'])
+	p.vx = -p.speed;
+  else if(input.keys['d'])
 		p.vx = p.speed;
   else
 		p.vx = 0;
@@ -39,8 +41,6 @@ function updatePlayer(dt, p, input) {
 		p.vy = p.speed;
   else
 		p.vy = 0;
-	p.vx = input.joystick.left.dx * p.speed;
-	p.vy = input.joystick.left.dy * p.speed;
 	p.x += p.vx * p.vsx;
 	p.y += p.vy * p.vsy;
 	p.survivalTime += dt;
