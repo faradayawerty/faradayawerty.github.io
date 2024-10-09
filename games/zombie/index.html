@@ -56,11 +56,11 @@
 
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
-			ctx.canvas.width  = window.innerWidth;
+			ctx.canvas.width = window.innerWidth;
 			ctx.canvas.height = window.innerHeight;
 
-			let w = ctx.canvas.width;
-			let h = ctx.canvas.height;
+			let w = window.innerWidth;
+			let h = window.innerHeight;
 			let left_joystick_x = w / 4;
 			let left_joystick_y = 5 * h / 6;
 			let right_joystick_x = 3 * w / 4;
