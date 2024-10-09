@@ -62,8 +62,9 @@
 
 		function animate(lastUpdateTime) {
 			ctx.clearRect(0, 0, cvs.width, cvs.height);
-			drawText(ctx, 100, 100, cvs.width);
-			drawText(ctx, 100, 200, cvs.clientWidth);
+			drawText(ctx, 100, 100, cvs.canvas.width);
+			drawText(ctx, 100, 200, cvs.canvas.clientWidth);
+			drawText(ctx, 100, 300, cvs.clientWidth);
 			if (input.mouse.leftButtonPressed)
 				drawCircle(ctx, input.mouse.x, input.mouse.y, 2 * ux, 'green', 'yellow')
 			else if (input.touch.length > 0)
