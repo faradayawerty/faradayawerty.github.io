@@ -21,8 +21,8 @@ function createBullet(b, p, input) {
 		return;
 	b.xs.push(p.x);
 	b.ys.push(p.y);
-	let dirx = input.mouse.leftButtonPressed ? input.mouse.x : p.x + 32 * input.joystick.right.dx;
-	let diry = input.mouse.leftButtonPressed ? input.mouse.y : p.y + 32 * input.joystick.right.dy;
+	let dirx = input.mouse.leftButtonPressed ? input.mouse.x : p.x + 256 * input.joystick.right.dx;
+	let diry = input.mouse.leftButtonPressed ? input.mouse.y : p.y + 256 * input.joystick.right.dy;
 	let vx = dirx - p.x + 32 * (Math.random() * 2 - 1);
 	let vy = diry - p.y + 32 * (Math.random() * 2 - 1);
 	let v = Math.sqrt(vx * vx + vy * vy);
