@@ -41,6 +41,11 @@
 			y: 100
 		}
 
+		let player1 = {
+			x: 200,
+			y: 100
+		}
+
 		function drawText(ctx, x, y, text) {
 			  ctx.font="14px verdana";
 			  ctx.fillStyle = 'black';
@@ -58,6 +63,10 @@
 			player.x += input.joystick.right.dx * 10;
 			player.y += input.joystick.right.dy * 10;
 			drawCircle(ctx, player.x, player.y, 20, 'yellow', 'purple');
+
+			player1.x += input.joystick.right.dx * 10;
+			player1.y += input.joystick.right.dy * 10;
+			drawCircle(ctx, player1.x, player1.y, 20, 'cyan', 'red');
 
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
