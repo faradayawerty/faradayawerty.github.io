@@ -1,7 +1,7 @@
 
 function player_create(g, x, y) {
 	let p = {
-		speed: 1,
+		speed: 0.2,
 		body: Matter.Bodies.rectangle(x, y, 2, 2, {inertia: Infinity})
 	};
 	Matter.Composite.add(engine.world, p.body);
