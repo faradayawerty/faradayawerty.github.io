@@ -14,12 +14,14 @@ function player_update(g, p, dt) {
 
 function player_draw(g, p, ctx) {
 	ctx.fillStyle = 'red';
-	ctx.fillRect(p.x, p.y, 2, 2);
+	ctx.fillRect(p.x - p.w/2, p.y - p.h/2, p.w, p.h);
 }
 
 function player_create(g, x_, y_) {
 	let p = {
 		speed: 0.3,
+		w: 2,
+		h: 2,
 		x: x_,
 		y: y_
 	};

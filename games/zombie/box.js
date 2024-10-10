@@ -3,10 +3,8 @@ function box_update(g, b, dt) {
 }
 
 function box_draw(g, b, ctx) {
-	ctx.fillStyle = 'black';
-	ctx.fillRect(b.x, b.y, 1, 1);
 	ctx.fillStyle = 'yellow';
-	ctx.fillRect(b.x + 0.1, b.y + 0.1, 0.8, 0.8);
+	ctx.fillRect(b.x, b.y, 1, 1);
 }
 
 function box_create(g, x_, y_) {
