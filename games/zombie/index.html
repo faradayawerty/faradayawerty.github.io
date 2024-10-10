@@ -96,10 +96,10 @@
 			engine.world.gravity.y = 0;
 
 			iplayer = player_create(game, 3, 4);
-			platform_create(game, 0, 0, 32, 1);
-			platform_create(game, 0, 32, 32, 1);
-			platform_create(game, 0, 0, 1, 32);
-			platform_create(game, 32, 0, 1, 32);
+			platform_create(game, 0, 16, 32, 1);
+			platform_create(game, 0, -16, 32, 1);
+			platform_create(game, 16, 0, 1, 32);
+			platform_create(game, -16, 0, 1, 32);
 			box_create(game, 5, 6);
 			box_create(game, 5, 7);
 			box_create(game, 6, 9);
