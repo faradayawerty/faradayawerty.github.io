@@ -1,4 +1,3 @@
-
 function menu_create(input_) {
 	let m = {
 		input: input_,
@@ -8,7 +7,7 @@ function menu_create(input_) {
 }
 
 function menu_destroy_all_buttons(m) {
-	for(let i = 0; i < m.buttons.length; i++)
+	for (let i = 0; i < m.buttons.length; i++)
 		m.buttons.pop();
 }
 
@@ -25,11 +24,10 @@ function menu_button_create(m, x_, y_, w_, h_, text_, func_action) {
 	return m.buttons.length - 1;
 }
 
-function menu_update(m, dt) {
-}
+function menu_update(m, dt) {}
 
 function menu_draw(m, ctx) {
-	for(let i = 0; i < m.buttons.length; i++)
+	for (let i = 0; i < m.buttons.length; i++)
 		menu_draw_button(m.buttons[i], ctx);
 }
 
@@ -38,4 +36,3 @@ function menu_draw_button(b, ctx) {
 	ctx.fillRect(b.x, b.y, b.w, b.h);
 	drawText(ctx, b.x + b.w / 4, b.y + b.h / 2, b.text);
 }
-

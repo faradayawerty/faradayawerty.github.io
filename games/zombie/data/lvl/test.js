@@ -1,4 +1,3 @@
-
 function game_begin_level_test(g) {
 	game_destroy_all_objects(g);
 	g.ifollow = player_create(g, 3, 4);
@@ -17,4 +16,3 @@ function game_begin_level_test(g) {
 	box_create(g, 10, 7, 3, 20);
 	box_create(g, 6, 13, 5, 5);
 }
-
