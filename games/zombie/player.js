@@ -1,7 +1,7 @@
 
 function player_create(g, x, y) {
 	let p = {
-		speed: 0.2,
+		speed: 0.4,
 		body: Matter.Bodies.rectangle(x, y, 2, 2, {inertia: Infinity})
 	};
 	Matter.Composite.add(engine.world, p.body);
@@ -23,6 +23,6 @@ function player_update(g, p, dt) {
 }
 
 function player_draw(g, p, ctx) {
-	drawMatterBody(ctx, p.body, 'red')
+	fillMatterBody(ctx, p.body, 'red')
 }
 

@@ -66,6 +66,17 @@
 			ctx.stroke();
 		}
 
+		function fillMatterBody(ctx, b, color) {
+			ctx.beginPath();
+			let vertices = b.vertices;
+			ctx.moveTo(vertices[0].x, vertices[0].y);
+			for (let j = 1; j < vertices.length; j += 1)
+				ctx.lineTo(vertices[j].x, vertices[j].y);
+			ctx.lineTo(vertices[0].x, vertices[0].y);
+			ctx.fillStyle = color;
+			ctx.fill();
+		}
+
 		function animate(lastUpdateTime) {
 			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
 			ctx1.canvas.width = window.innerWidth;
