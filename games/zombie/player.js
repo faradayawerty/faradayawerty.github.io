@@ -1,30 +1,28 @@
 
+function player_create(g, x, y) {
+	let p = {
+		speed: 1,
+		body: Matter.Bodies.rectangle(x, y, 2, 2)
+	};
+	Matter.Composite.add(engine.world, p.body);
+	return game_object_create(g, player_update, player_draw, p);
+}
+
 function player_update(g, p, dt) {
-	p.x += p.speed * g.input.joystick.left.dx;
-	p.y += p.speed * g.input.joystick.left.dy;
+	let vel = Matter.Vector.create(0, 0);
 	if(g.input.keys['a'])
-		p.x -= p.speed;
-	else if(g.input.keys['d'])
-		p.x += p.speed;
+		vel = Matter.Vector.add(vel, Matter.Vector.create(-p.speed, 0));
+	if(g.input.keys['d'])
+		vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
 	if(g.input.keys['w'])
-		p.y -= p.speed;
-	else if(g.input.keys['s'])
-		p.y += p.speed;
+		vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
+	if(g.input.keys['s'])
+		vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
+	vel = Matter.Vector.create(p.speed * g.input.joystick.right.dx, p.speed * g.input.joystick.right.dy);
+	Matter.Body.setVelocity(p.body, vel);
 }
 
 function player_draw(g, p, ctx) {
-	ctx.fillStyle = 'red';
-	ctx.fillRect(p.x - p.w/2, p.y - p.h/2, p.w, p.h);
-}
-
-function player_create(g, x_, y_) {
-	let p = {
-		speed: 0.3,
-		w: 2,
-		h: 2,
-		x: x_,
-		y: y_
-	};
-	return game_object_create(g, player_update, player_draw, p);
+	drawMatterBody(ctx, p.body, 'red')
 }
 
