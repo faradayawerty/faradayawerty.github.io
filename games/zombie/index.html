@@ -95,9 +95,9 @@
 
 			dt = Date.now() - lastUpdateTime;
 			lastUpdateTime = Date.now();
+
 			Matter.Engine.update(engine, dt);
 			game_update(game, dt);
-			console.log(dt);
 
 			window.requestAnimationFrame(function() {
 				animate(lastUpdateTime);
