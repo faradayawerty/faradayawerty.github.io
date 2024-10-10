@@ -11,6 +11,6 @@ function platform_update(g, p, dt) {
 }
 
 function platform_draw(g, p, ctx) {
-	drawMatterBody(ctx, p.body, 'green')
+	drawMatterBody(ctx, p.body, 'black')
 }
 

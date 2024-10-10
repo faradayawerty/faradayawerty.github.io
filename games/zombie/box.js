@@ -1,13 +1,16 @@
 
-function box_create(g, x_, y_) {
-	let b = {
+function box_create(g, x, y) {
+	let p = {
+		body: Matter.Bodies.rectangle(x, y, 1, 1)
 	};
-	return game_object_create(g, box_update, box_draw, b);
+	Matter.Composite.add(engine.world, p.body);
+	return game_object_create(g, box_update, box_draw, p);
 }
 
-function box_update(g, b, dt) {
+function box_update(g, p, dt) {
 }
 
-function box_draw(g, b, ctx) {
+function box_draw(g, p, ctx) {
+	drawMatterBody(ctx, p.body, 'yellow')
 }
 
