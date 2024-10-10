@@ -44,6 +44,9 @@ function touchHandler(touch, joystick, ctx, e) {
 	joystick.right.dx = 0;
 	joystick.right.dy = 0;
 
+	if(!joystick.enabled)
+		return;
+
 	for(let i = 0; i < touch.length; i++) {
 		if(touch[i].x < w / 2 && touch[i].y > h / 2) {
 			joystick.left.dx = -joystick.left.x + touch[i].x;
@@ -75,6 +78,8 @@ function initializeTouchInput(touch, joystick, ctx) {
 	joystick.left.dy = 0;
 	joystick.right.dx = 0;
 	joystick.right.dy = 0;
+
+	joystick.enabled = true;
 
 	window.addEventListener('touchstart', function(e) {
 		touchHandler(touch, joystick, ctx, e);
@@ -122,13 +127,17 @@ function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
 }
 
 function drawJoysticks(ctx, joystick) {
+	if(!joystick.enabled)
+		return;
 	if(Math.abs(joystick.left.dx) > 0 || Math.abs(joystick.left.dy) > 0) {
 		drawCircle(ctx, joystick.left.x, joystick.left.y , joystick.radius, 'gray', 'black');
-		drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left.dx, joystick.left.y + joystick.radius * joystick.left.dy, joystick.radius / 4, 'black', 'white');
+		drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left.dx,
+			joystick.left.y + joystick.radius * joystick.left.dy, joystick.radius / 4, 'black', 'white');
 	}
 	if(Math.abs(joystick.right.dx) > 0 || Math.abs(joystick.right.dy) > 0) {
 		drawCircle(ctx, joystick.right.x, joystick.right.y, joystick.radius, 'gray', 'black');
-		drawCircle(ctx, joystick.right.x + joystick.radius * joystick.right.dx, joystick.right.y + joystick.radius * joystick.right.dy, joystick.radius / 4, 'black', 'white');
+		drawCircle(ctx, joystick.right.x + joystick.radius * joystick.right.dx,
+			joystick.right.y + joystick.radius * joystick.right.dy, joystick.radius / 4, 'black', 'white');
 	}
 }
 
