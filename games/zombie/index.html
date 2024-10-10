@@ -33,6 +33,7 @@
 	<script type="text/javascript" src="input.js"></script>
 	<script type="text/javascript" src="game.js"></script>
 	<script type="text/javascript" src="player.js"></script>
+	<script type="text/javascript" src="box.js"></script>
 	<script>
 
 		let cvs1 = document.getElementById("canvas");
@@ -40,6 +41,8 @@
 
 		let input1 = getInput();
 		let game = game_create(input1);
+
+		let iplayer = -1;
 
 		function drawText(ctx, x, y, text) {
 			  ctx.font="14px verdana";
@@ -56,7 +59,13 @@
 			drawJoysticks(ctx1, input1.joystick);
 
 			game_update(game, Date.now() - lastUpdateTime);
+
+			ctx1.save();
+			ctx1.translate(ctx1.canvas.width / 2, ctx1.canvas.height / 2);
+			ctx1.scale(32, 32);
+			ctx1.translate(-game.objects[iplayer].data.x, -game.objects[iplayer].data.y);
 			game_draw(game, ctx1);
+			ctx1.restore();
 
 			window.requestAnimationFrame(function() {
 				animate(Date.now());
@@ -69,7 +78,10 @@
 			initializeMouseInput(input1.mouse, ctx1);
 			initializeTouchInput(input1.touch, input1.joystick, ctx1);
 
-			player_create(game, 100, 100);
+			box_create(game, 4, 5);
+			box_create(game, 5, 8);
+			box_create(game, 7, 5);
+			iplayer = player_create(game, 3, 2.5);
 
 			animate(Date.now());
 		}
