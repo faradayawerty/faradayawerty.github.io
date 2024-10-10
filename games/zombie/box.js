@@ -11,6 +11,7 @@ function box_update(g, p, dt) {
 }
 
 function box_draw(g, p, ctx) {
-	drawMatterBody(ctx, p.body, 'yellow')
+	fillMatterBody(ctx, p.body, 'yellow')
+	drawMatterBody(ctx, p.body, 'black')
 }
 
