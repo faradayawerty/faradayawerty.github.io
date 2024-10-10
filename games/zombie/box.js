@@ -1,10 +1,10 @@
 
 function box_create(g, x, y) {
-	let p = {
+	let b = {
 		body: Matter.Bodies.rectangle(x, y, 1, 1)
 	};
-	Matter.Composite.add(engine.world, p.body);
-	return game_object_create(g, box_update, box_draw, p);
+	Matter.Composite.add(engine.world, b.body);
+	return game_object_create(g, box_update, box_draw, b);
 }
 
 function box_update(g, p, dt) {
