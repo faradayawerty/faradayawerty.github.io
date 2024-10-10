@@ -54,14 +54,14 @@
 			  ctx.fillText(text, x + 1, y + 1);
 		}
 
-		function drawMatterBody(ctx, b, color) {
+		function drawMatterBody(ctx, b, color, w) {
 			ctx.beginPath();
 			let vertices = b.vertices;
 			ctx.moveTo(vertices[0].x, vertices[0].y);
 			for (let j = 1; j < vertices.length; j += 1)
 				ctx.lineTo(vertices[j].x, vertices[j].y);
 			ctx.lineTo(vertices[0].x, vertices[0].y);
-			ctx.lineWidth = 0.1;
+			ctx.lineWidth = w;
 			ctx.strokeStyle = color;
 			ctx.stroke();
 		}
@@ -84,9 +84,12 @@
 			drawJoysticks(ctx1, input1.joystick);
 
 			ctx1.save();
-			ctx1.translate(ctx1.canvas.width / 2, ctx1.canvas.height / 2);
+			ctx1.translate(ctx1.canvas.width / 2,
+				ctx1.canvas.height / 2);
 			ctx1.scale(unit, unit);
-			ctx1.translate(-game.objects[iplayer].data.body.vertices[0].x, -game.objects[iplayer].data.body.vertices[0].y);
+			ctx1.translate(
+				-game.objects[iplayer].data.body.vertices[0].x,
+				-game.objects[iplayer].data.body.vertices[0].y);
 			game_draw(game, ctx1);
 			ctx1.restore();
 
@@ -109,11 +112,19 @@
 			iplayer = player_create(game, 3, 4);
 			platform_create(game, 0, 16, 32, 1);
 			platform_create(game, 0, -16, 32, 1);
-			platform_create(game, 16, 0, 1, 32);
 			platform_create(game, -16, 0, 1, 32);
-			box_create(game, 5, 6);
-			box_create(game, 5, 7);
-			box_create(game, 6, 9);
+			platform_create(game, 16, 32, 1, 32);
+			platform_create(game, 16, -32, 1, 32);
+			platform_create(game, 64 + 16, 48, 128, 1);
+			platform_create(game, 64 + 16, -48, 128, 1);
+			platform_create(game, 128, 0, 1, 32);
+			platform_create(game, 96, 0, 1, 16);
+			platform_create(game, 64, 0, 1, 32);
+			platform_create(game, 128 + 16, 0, 1, 128 - 32);
+
+			box_create(game, 5, 6, 1, 1);
+			box_create(game, 10, 7, 3, 20);
+			box_create(game, 6, 13, 5, 5);
 
 			animate(Date.now());
 		}

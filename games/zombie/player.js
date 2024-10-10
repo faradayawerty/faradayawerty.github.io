@@ -10,7 +10,8 @@ function player_create(g, x, y) {
 
 function player_update(g, p, dt) {
 	let vel = Matter.Vector.create(0, 0);
-	vel = Matter.Vector.create(p.speed * g.input.joystick.right.dx, p.speed * g.input.joystick.right.dy);
+	vel = Matter.Vector.create(p.speed * g.input.joystick.right.dx,
+		p.speed * g.input.joystick.right.dy);
 	if(g.input.keys['a'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(-p.speed, 0));
 	if(g.input.keys['d'])
