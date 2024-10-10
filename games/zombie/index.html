@@ -1,9 +1,10 @@
+
 <html>
 
 <head>
 	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
 	<title>faw_zombie</title>
-	<link rel="icon" href="icon.png">
+	<link rel="icon" href="data/img/icon.png">
 	<style>
 		* {
 			margin-top: 0px; 
@@ -32,9 +33,11 @@
 	<canvas id="canvas" width=1600 height=1200 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
 	<script type="text/javascript" src="input.js"></script>
 	<script type="text/javascript" src="game.js"></script>
+	<script type="text/javascript" src="menu.js"></script>
 	<script type="text/javascript" src="player.js"></script>
 	<script type="text/javascript" src="box.js"></script>
-	<script type="text/javascript" src="platform.js"></script>
+	<script type="text/javascript" src="wall.js"></script>
+	<script type="text/javascript" src="data/lvl/test.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.js" type="text/javascript"></script>
 	<script>
 
@@ -42,7 +45,6 @@
 		let ctx1 = cvs1.getContext("2d");
 		let input1 = getInput();
 		let game = game_create(input1);
-		let unit = 16;
 		let iplayer = -1;
 		let engine = Matter.Engine.create();
 
@@ -54,19 +56,7 @@
 			  ctx.fillText(text, x + 1, y + 1);
 		}
 
-		function drawMatterBody(ctx, b, color, w) {
-			ctx.beginPath();
-			let vertices = b.vertices;
-			ctx.moveTo(vertices[0].x, vertices[0].y);
-			for (let j = 1; j < vertices.length; j += 1)
-				ctx.lineTo(vertices[j].x, vertices[j].y);
-			ctx.lineTo(vertices[0].x, vertices[0].y);
-			ctx.lineWidth = w;
-			ctx.strokeStyle = color;
-			ctx.stroke();
-		}
-
-		function fillMatterBody(ctx, b, color) {
+		function drawMatterBody(ctx, b, color) {
 			ctx.beginPath();
 			let vertices = b.vertices;
 			ctx.moveTo(vertices[0].x, vertices[0].y);
@@ -81,21 +71,16 @@
 			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
 			ctx1.canvas.width = window.innerWidth;
 			ctx1.canvas.height = window.innerHeight;
+
+			// draw game
 			drawJoysticks(ctx1, input1.joystick);
-
-			ctx1.save();
-			ctx1.translate(ctx1.canvas.width / 2,
-				ctx1.canvas.height / 2);
-			ctx1.scale(unit, unit);
-			ctx1.translate(
-				-game.objects[iplayer].data.body.vertices[0].x,
-				-game.objects[iplayer].data.body.vertices[0].y);
 			game_draw(game, ctx1);
-			ctx1.restore();
 
+			// calculate delta time
 			dt = Date.now() - lastUpdateTime;
 			lastUpdateTime = Date.now();
 
+			// update game
 			Matter.Engine.update(engine, dt);
 			game_update(game, dt);
 
@@ -105,30 +90,12 @@
 		}
 
 		function main() {
+			engine.world.gravity.y = 0;
 			ctx1.imageSmoothingEnabled = false;
 			initializeKeyboardInput(input1.keys);
 			initializeMouseInput(input1.mouse, ctx1);
 			initializeTouchInput(input1.touch, input1.joystick, ctx1);
-
-			engine.world.gravity.y = 0;
-
-			iplayer = player_create(game, 3, 4);
-			platform_create(game, 0, 16, 32, 1);
-			platform_create(game, 0, -16, 32, 1);
-			platform_create(game, -16, 0, 1, 32);
-			platform_create(game, 16, 32, 1, 32);
-			platform_create(game, 16, -32, 1, 32);
-			platform_create(game, 64 + 16, 48, 128, 1);
-			platform_create(game, 64 + 16, -48, 128, 1);
-			platform_create(game, 128, 0, 1, 32);
-			platform_create(game, 96, 0, 1, 16);
-			platform_create(game, 64, 0, 1, 32);
-			platform_create(game, 128 + 16, 0, 1, 128 - 32);
-
-			box_create(game, 5, 6, 1, 1);
-			box_create(game, 10, 7, 3, 20);
-			box_create(game, 6, 13, 5, 5);
-
+			game_begin_level_test(game);
 			animate(Date.now());
 		}
 

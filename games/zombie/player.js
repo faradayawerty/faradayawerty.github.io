@@ -24,6 +24,6 @@ function player_update(g, p, dt) {
 }
 
 function player_draw(g, p, ctx) {
-	fillMatterBody(ctx, p.body, 'red')
+	drawMatterBody(ctx, p.body, 'red')
 }
 
