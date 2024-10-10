@@ -93,11 +93,14 @@
 			game_draw(game, ctx1);
 			ctx1.restore();
 
-			Matter.Engine.update(engine, 1000 / 60);
-			game_update(game, Date.now() - lastUpdateTime);
+			dt = Date.now() - lastUpdateTime;
+			lastUpdateTime = Date.now();
+			Matter.Engine.update(engine, dt);
+			game_update(game, dt);
+			console.log(dt);
 
 			window.requestAnimationFrame(function() {
-				animate(Date.now());
+				animate(lastUpdateTime);
 			});
 		}
 
