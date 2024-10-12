@@ -1,3 +1,4 @@
+
 <html>
 
 <head>
@@ -33,6 +34,7 @@
 <body>
 	<canvas id="canvas" width=1600 height=1200 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
 	<script type="text/javascript" src="util.js"></script>
+	<script type="text/javascript" src="enemy.js"></script>
 	<script type="text/javascript" src="input.js"></script>
 	<script type="text/javascript" src="game.js"></script>
 	<script type="text/javascript" src="menu.js"></script>
@@ -55,8 +57,8 @@
 			ctx1.canvas.height = window.innerHeight;
 
 			// draw game
-			drawJoysticks(ctx1, input1.joystick);
 			game_draw(game, ctx1);
+			drawJoysticks(ctx1, input1.joystick);
 
 			// calculate delta time
 			dt = Date.now() - lastUpdateTime;
@@ -86,3 +88,4 @@
 </body>
 
 </html>
+

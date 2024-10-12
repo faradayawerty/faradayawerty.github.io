@@ -1,3 +1,4 @@
+
 function game_create(input_) {
 	let g = {
 		shown: true,
@@ -42,3 +43,4 @@ function game_destroy_all_objects(g) {
 	for (let i = 0; i < g.objects.length; i++)
 		g.objects.pop();
 }
+

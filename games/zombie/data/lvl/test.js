@@ -1,6 +1,9 @@
 function game_begin_level_test(g) {
 	game_destroy_all_objects(g);
-	g.ifollow = player_create(g, 3, 4);
+ 	let iplayer = player_create(g, 3, 4);
+	g.ifollow = iplayer;
+	for(let i = 0; i < 12; i++)
+		enemy_create(g, 10 + 2 * i, 3, iplayer);
 	wall_create(g, 0, 16, 32, 1);
 	wall_create(g, 0, -16, 32, 1);
 	wall_create(g, -16, 0, 1, 32);
