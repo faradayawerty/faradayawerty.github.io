@@ -20,9 +20,15 @@ function player_update(g, p, dt) {
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
 	if (g.input.keys['s'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
+	if(g.input.mouse.leftButtonPressed) {
+		bullet_create(g, p.body.vertices[0].x, p.body.vertices[0].y, g.input.mouse.x, g.input.mouse.y);
+		console.log(g.input.mouse.x);
+		console.log(g.input.mouse.y);
+	}
 	Matter.Body.setVelocity(p.body, vel);
 }
 
 function player_draw(g, p, ctx) {
 	drawMatterBody(ctx, p.body, 'red')
 }
+
