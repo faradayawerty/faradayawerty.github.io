@@ -23,9 +23,11 @@ function player_update(g, p, dt) {
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
 	if (g.input.keys['s'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
-	if(g.input.mouse.leftButtonPressed)
+	if(g.input.mouse.leftButtonPressed) {
+		console.log(window.innerWidth);
+		console.log(window.innerHeight);
 		bullet_create(g, p.body.position.x, p.body.position.y, g.input.mouse.x - window.innerWidth / 2, g.input.mouse.y - window.innerHeight / 2);
-	if (Math.abs(g.input.joystick.left.dx) > 0 || Math.abs(g.input.joystick.left.dy) > 0)
+	} if (Math.abs(g.input.joystick.left.dx) > 0 || Math.abs(g.input.joystick.left.dy) > 0)
 		bullet_create(g, p.body.position.x, p.body.position.y, g.input.joystick.left.dx, g.input.joystick.left.dy);
 	Matter.Body.setVelocity(p.body, vel);
 }
