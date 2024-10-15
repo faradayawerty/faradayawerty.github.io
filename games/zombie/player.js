@@ -1,7 +1,10 @@
 function player_create(g, x, y) {
+	let w_ = 2, h_ = 2;
 	let p = {
+		w: w_,
+		h: h_,
 		speed: 0.3,
-		body: Matter.Bodies.rectangle(x, y, 2, 2, {
+		body: Matter.Bodies.rectangle(x, y, w_, h_, {
 			inertia: Infinity
 		})
 	};
@@ -21,7 +24,7 @@ function player_update(g, p, dt) {
 	if (g.input.keys['s'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
 	if(g.input.mouse.leftButtonPressed) {
-		bullet_create(g, p.body.vertices[0].x, p.body.vertices[0].y, g.input.mouse.x, g.input.mouse.y);
+		bullet_create(g, p.body.vertices[0].x, p.body.vertices[0].y, g.input.mouse.x - window.innerWidth / 2, g.input.mouse.y - window.innerHeight / 2);
 		console.log(g.input.mouse.x);
 		console.log(g.input.mouse.y);
 	}

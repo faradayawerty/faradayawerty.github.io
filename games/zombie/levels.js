@@ -25,7 +25,6 @@ let lab1 = function(g) {
 	game_destroy_all_objects(g);
 	let iplayer = player_create(g, 3, 4);
 	g.ifollow = iplayer;
-	for(let i = 0; i < 0; i++)
-		enemy_create(g, 10 + 2 * i, 3, iplayer);
+	box_create(g, 5, 6, 1, 1);
 }
 

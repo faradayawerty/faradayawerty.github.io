@@ -22,7 +22,7 @@ function game_draw(g, ctx) {
 	ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
 	ctx.scale(g.unit, g.unit);
 	if (0 <= g.ifollow && g.ifollow < g.objects.length)
-		ctx.translate(-g.objects[g.ifollow].data.body.vertices[0].x, -g.objects[g.ifollow].data.body.vertices[0].y);
+		ctx.translate(-g.objects[g.ifollow].data.body.position.x, -g.objects[g.ifollow].data.body.position.y);
 	for (let i = 0; i < g.objects.length; i++)
 		g.objects[i].draw(g, g.objects[i].data, ctx);
 	ctx.restore();
