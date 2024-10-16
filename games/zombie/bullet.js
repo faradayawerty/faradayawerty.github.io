@@ -13,5 +13,5 @@ function bullet_create(g, x, y, dx, dy) {
 function bullet_update(g, b, dt) {}
 
 function bullet_draw(g, b, ctx) {
-	drawMatterBody(ctx, b.body, 'yellow')
+	fillMatterBody(ctx, b.body, 'yellow')
 }

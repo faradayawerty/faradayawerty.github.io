@@ -21,5 +21,5 @@ function enemy_update(g, e, dt) {
 }
 
 function enemy_draw(g, e, ctx) {
-	drawMatterBody(ctx, e.body, 'green')
+	fillMatterBody(ctx, e.body, 'green')
 }

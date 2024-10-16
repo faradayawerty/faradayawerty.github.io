@@ -10,5 +10,6 @@ function box_create(g, x, y, size, mass) {
 function box_update(g, b, dt) {}
 
 function box_draw(g, b, ctx) {
-	drawMatterBody(ctx, b.body, 'yellow')
+	fillMatterBody(ctx, b.body, 'orange')
+	drawMatterBodyFull(ctx, b.body, 'black')
 }
