@@ -39,8 +39,9 @@ function player_update(g, p, dt) {
 		dy = g.input.joystick.left.dy;
 	}
 	if(p.weapon != null && dx*dx + dy*dy != 0) {
-		p.shot_cooldown = weapons_shoot(g, p.weapon, p.body.position.x, p.body.position.y, dx, dy, p.shot_cooldown) - dt;
+		p.shot_cooldown = weapons_shoot(g, p.weapon, p.body.position.x, p.body.position.y, dx, dy, p.shot_cooldown);
 	}
+	p.shot_cooldown -= dt;
 	Matter.Body.setVelocity(p.body, vel);
 }
 

@@ -1,11 +1,12 @@
 
-function game_create(input_, engine_) {
+function game_create(input_, engine_, audio_) {
 	let g = {
 		unit: 12,
 		shown: true,
 		running: false,
 		paused: false,
 		follow: null,
+		audio: audio_,
 		input: input_,
 		engine: engine_,
 		objects: []
