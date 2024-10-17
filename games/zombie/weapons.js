@@ -10,7 +10,6 @@ function weapons_get() {
 				bullet_create(g, x, y, dx + 0.5 * (Math.random() - 0.5), dy + 0.5 * (Math.random() - 0.5), 2.5 + Math.random());
 				let audio = new Audio('data/sfx/gunshot.ogg');
 				audio.play();
-				delete audio;
 			return 750 // cooldown millis
 		}
 	};
