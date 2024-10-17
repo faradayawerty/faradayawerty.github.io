@@ -1,12 +1,13 @@
 
-function game_create(input_) {
+function game_create(input_, engine_) {
 	let g = {
+		unit: 12,
 		shown: true,
 		running: false,
 		paused: false,
-		ifollow: -1,
-		unit: 12,
+		follow: null,
 		input: input_,
+		engine: engine_,
 		objects: []
 	};
 	return g;
@@ -14,17 +15,26 @@ function game_create(input_) {
 
 function game_update(g, dt) {
 	for (let i = 0; i < g.objects.length; i++)
-		g.objects[i].update(g, g.objects[i].data, dt);
+		if(g.objects[i] != null && g.objects[i].data != null)
+			g.objects[i].update(g, g.objects[i].data, dt);
+	g.objects = g.objects.filter(function (x) {
+		if(!x.data.destroy)
+			return x;
+	});
 }
 
 function game_draw(g, ctx) {
 	ctx.save();
 	ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
 	ctx.scale(g.unit, g.unit);
-	if (0 <= g.ifollow && g.ifollow < g.objects.length)
-		ctx.translate(-g.objects[g.ifollow].data.body.position.x, -g.objects[g.ifollow].data.body.position.y);
-	for (let i = 0; i < g.objects.length; i++)
-		g.objects[i].draw(g, g.objects[i].data, ctx);
+	let ifollow = -1;
+	if(g.follow != null)
+		ifollow = g.objects.indexOf(g.follow);
+	if (0 <= ifollow && ifollow < g.objects.length)
+		ctx.translate(-g.objects[ifollow].data.body.position.x, -g.objects[ifollow].data.body.position.y);
+	for (let i = g.objects.length - 1; i > -1; i--)
+		if(g.objects[i] != null && g.objects[i].data != null)
+			g.objects[i].draw(g, g.objects[i].data, ctx);
 	ctx.restore();
 }
 
@@ -35,11 +45,11 @@ function game_object_create(g, func_update, func_draw, obj_data) {
 		draw: func_draw // draw(game, data, ctx)
 	};
 	g.objects.push(o);
-	return g.objects.length - 1;
+	return o;
 }
 
 function game_destroy_all_objects(g) {
-	Matter.Composite.clear(engine.world);
+	Matter.Composite.clear(g.engine.world);
 	for (let i = 0; i < g.objects.length; i++)
 		g.objects.pop();
 }

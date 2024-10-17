@@ -1,18 +1,19 @@
-function enemy_create(g, x, y, itarget_) {
+function enemy_create(g, x, y, target_) {
 	let e = {
-		itarget: itarget_,
+		target: target_,
 		speed: 0.25,
 		body: Matter.Bodies.rectangle(x, y, 1, 1)
 	};
-	Matter.Composite.add(engine.world, e.body);
+	Matter.Composite.add(g.engine.world, e.body);
 	return game_object_create(g, enemy_update, enemy_draw, e);
 }
 
 function enemy_update(g, e, dt) {
-	if (!g.objects[e.itarget].data.body)
+	itarget = g.objects.indexOf(e.target);
+	if (!g.objects[itarget].data.body)
 		return;
-	let tx = g.objects[e.itarget].data.body.vertices[0].x;
-	let ty = g.objects[e.itarget].data.body.vertices[0].y;
+	let tx = g.objects[itarget].data.body.vertices[0].x;
+	let ty = g.objects[itarget].data.body.vertices[0].y;
 	let x = e.body.vertices[0].x;
 	let y = e.body.vertices[0].y;
 	let r = Math.sqrt((tx - x) * (tx - x) + (ty - y) * (ty - y));

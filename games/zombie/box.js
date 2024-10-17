@@ -3,7 +3,7 @@ function box_create(g, x, y, size, mass) {
 		body: Matter.Bodies.rectangle(x, y, size, size)
 	};
 	Matter.Body.setMass(b.body, mass);
-	Matter.Composite.add(engine.world, b.body);
+	Matter.Composite.add(g.engine.world, b.body);
 	return game_object_create(g, box_update, box_draw, b);
 }
 

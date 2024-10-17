@@ -4,7 +4,7 @@ function wall_create(g, x, y, w, h) {
 			isStatic: true
 		})
 	};
-	Matter.Composite.add(engine.world, data.body);
+	Matter.Composite.add(g.engine.world, data.body);
 	return game_object_create(g, wall_update, wall_draw, data);
 }
 
