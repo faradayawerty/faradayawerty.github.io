@@ -2,9 +2,11 @@
 function levels_get() {
 	let l = {
 		test: function(g) {
+			let weapons1 = weapons_get(g);
 			game_destroy_all_objects(g);
 			let p = player_create(g, 3, 4);
 			g.follow = p;
+			p.data.weapon = weapons1.shotgun;
 			for(let i = 0; i < 12; i++)
 				enemy_create(g, 10 + 2 * i, 3, p);
 			wall_create(g, 128, 0, 1, 32);

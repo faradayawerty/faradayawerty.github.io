@@ -1,12 +1,14 @@
 
-function game_create(input_, engine_, audio_) {
+function game_create(input_, engine_, images_, audio_) {
 	let g = {
-		unit: 12,
+		unit: 32,
 		shown: true,
 		running: false,
 		paused: false,
+		draw_invisible: false,
 		follow: null,
 		audio: audio_,
+		images: images_,
 		input: input_,
 		engine: engine_,
 		objects: []
@@ -25,6 +27,7 @@ function game_update(g, dt) {
 }
 
 function game_draw(g, ctx) {
+	ctx.imageSmoothingEnabled = false;
 	ctx.save();
 	ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
 	ctx.scale(g.unit, g.unit);

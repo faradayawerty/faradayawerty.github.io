@@ -46,6 +46,8 @@ function player_update(g, p, dt) {
 }
 
 function player_draw(g, p, ctx) {
-	fillMatterBody(ctx, p.body, 'red')
+	if(g.draw_invisible)
+		drawMatterBody(ctx, p.body, 'red')
+	ctx.drawImage(g.images.player, p.body.position.x - p.w/2, p.body.position.y - p.h/2, p.w, p.h);
 }
 
