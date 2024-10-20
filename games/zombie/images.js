@@ -1,4 +1,3 @@
-
 function images_get() {
 	let im = {
 		player: new Image(),
@@ -8,4 +7,3 @@ function images_get() {
 	im.enemy.src = 'data/img/zombie.png';
 	return im;
 }
-

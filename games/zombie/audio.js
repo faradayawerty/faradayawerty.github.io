@@ -1,4 +1,3 @@
-
 function audio_get() {
 	let a = {
 		gunshot: 'data/sfx/gunshot.ogg'

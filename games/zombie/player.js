@@ -1,7 +1,10 @@
-
 function player_create(g, x, y) {
-	let w_ = 2, h_ = 2;
+	let w_ = 2,
+		h_ = 2;
 	let p = {
+		destroy: false,
+		max_hp: 200,
+		hp: 200,
 		shot_cooldown: 0,
 		w: w_,
 		h: h_,
@@ -16,8 +19,11 @@ function player_create(g, x, y) {
 }
 
 function player_update(g, p, dt) {
+	if(p.hp <= 0)
+		return player_destroy(g, p);
+	p.shot_cooldown -= dt;
 	// can't control object if game camera doesn't follow it
-	if(g.follow == null || g.follow.data != p)
+	if (g.follow == null || g.follow.data != p)
 		return;
 	let vel = Matter.Vector.create(0, 0);
 	vel = Matter.Vector.create(p.speed * g.input.joystick.right.dx, p.speed * g.input.joystick.right.dy);
@@ -29,8 +35,9 @@ function player_update(g, p, dt) {
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
 	if (g.input.keys['s'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
-	let dx = 0, dy = 0;
-	if(g.input.mouse.leftButtonPressed) {
+	let dx = 0,
+		dy = 0;
+	if (g.input.mouse.leftButtonPressed) {
 		dx = g.input.mouse.x - window.innerWidth / 2;
 		dy = g.input.mouse.y - window.innerHeight / 2;
 	}
@@ -38,16 +45,25 @@ function player_update(g, p, dt) {
 		dx = g.input.joystick.left.dx;
 		dy = g.input.joystick.left.dy;
 	}
-	if(p.weapon != null && dx*dx + dy*dy != 0) {
+	if (p.weapon != null && dx * dx + dy * dy != 0) {
 		p.shot_cooldown = weapons_shoot(g, p.weapon, p.body.position.x, p.body.position.y, dx, dy, p.shot_cooldown);
 	}
-	p.shot_cooldown -= dt;
 	Matter.Body.setVelocity(p.body, vel);
 }
 
 function player_draw(g, p, ctx) {
-	if(g.draw_invisible)
+	if (g.draw_invisible)
 		drawMatterBody(ctx, p.body, 'red')
-	ctx.drawImage(g.images.player, p.body.position.x - p.w/2, p.body.position.y - p.h/2, p.w, p.h);
+	ctx.drawImage(g.images.player, p.body.position.x - p.w / 2, p.body.position.y - p.h / 2, p.w, p.h);
+	ctx.fillStyle = 'red';
+	ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - p.h / 1.5, p.w, 0.05);
+	ctx.fillStyle = 'lime';
+	ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - p.h / 1.5, p.w * (p.hp / p.max_hp), 0.05);
 }
 
+function player_destroy(g, p) {
+	Matter.Composite.remove(g.engine.world, p.body);
+	delete p.body;
+	p.destroy = true;
+	return 0;
+}
