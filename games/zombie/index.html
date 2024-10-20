@@ -33,6 +33,7 @@
 <body>
 	<canvas id="canvas" width=1600 height=1200 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
 	<script type="text/javascript" src="util.js"></script>
+	<script type="text/javascript" src="decorative.js"></script>
 	<script type="text/javascript" src="weapons.js"></script>
 	<script type="text/javascript" src="enemy.js"></script>
 	<script type="text/javascript" src="input.js"></script>
@@ -58,7 +59,7 @@
 		let game = game_create(input1, engine1, images1, audio1);
 
 		function animate(lastUpdateTime) {
-			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
+			//ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
 			ctx1.canvas.width = window.innerWidth;
 			ctx1.canvas.height = window.innerHeight;
 

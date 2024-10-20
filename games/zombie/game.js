@@ -33,9 +33,11 @@ function game_draw(g, ctx) {
 	let ifollow = -1;
 	if (g.follow != null)
 		ifollow = g.objects.indexOf(g.follow);
-	if (0 <= ifollow && ifollow < g.objects.length)
+	if (0 <= ifollow && ifollow < g.objects.length) {
 		ctx.translate(-g.objects[ifollow].data.body.position.x, -g.objects[ifollow].data.body.position.y);
-	for (let i = g.objects.length - 1; i > -1; i--)
+		decorative_draw_grass(ctx, g.objects[ifollow].data.body.position.x, g.objects[ifollow].data.body.position.y);
+	}
+	for (let i = 0; i < g.objects.length; i++)
 		if (g.objects[i] != null && g.objects[i].data != null)
 			g.objects[i].draw(g, g.objects[i].data, ctx);
 	ctx.restore();

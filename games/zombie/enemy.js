@@ -4,7 +4,7 @@ function enemy_create(g, x, y, target_) {
 	let e = {
 		max_hp: 100,
 		hp: 100,
-		damage: 1,
+		damage: 0.1, // per delta time
 		w: w_,
 		h: h_,
 		target: target_,
@@ -33,7 +33,7 @@ function enemy_update(g, e, dt) {
 	if (!g.objects[itarget].data.hp)
 		return;
 	if(Matter.Collision.collides(e.body, g.objects[itarget].data.body) != null)
-		g.objects[itarget].data.hp -= e.damage;
+		g.objects[itarget].data.hp -= e.damage * dt;
 }
 
 function enemy_draw(g, e, ctx) {

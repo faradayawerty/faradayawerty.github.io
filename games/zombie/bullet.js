@@ -1,3 +1,4 @@
+
 function bullet_create(g, x, y, dx, dy, speed_, damage_) {
 	let r = Math.sqrt(dx * dx + dy * dy)
 	let b = {
@@ -28,7 +29,7 @@ function bullet_update(g, b, dt) {
 	});
 	for(let i = 0; i < hittable_objects.length; i++)
 		if(Matter.Collision.collides(b.body, hittable_objects[i].data.body) != null)
-			hittable_objects[i].data.hp -= b.damage;
+			hittable_objects[i].data.hp -= b.damage * dt;
 	b.lifetime -= dt;
 	if (b.lifetime < 0)
 		return bullet_destroy(g, b);
