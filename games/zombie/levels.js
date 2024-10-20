@@ -6,9 +6,9 @@ function levels_get() {
 			let p = player_create(g, 3, 4);
 			g.follow = p;
 			p.data.weapon = weapons1.shotgun;
-			for (let i = 0; i < 32; i++) {
+			for (let i = 0; i < 256; i++) {
 				let alpha = Math.random() * 314;
-				enemy_create(g, 10 + Math.cos(alpha) * 256, 10 + Math.sin(alpha) * 256, p);
+				enemy_create(g, 10 + Math.cos(alpha) * 512, 10 + Math.sin(alpha) * 512, p);
 			}
 			for (let i = 0; i < 12; i++)
 				wall_create(g, 64 + 64 * i, 0, 8, 32);
