@@ -8,7 +8,7 @@ function levels_get() {
 			p.data.weapon = weapons1.shotgun;
 			for (let i = 0; i < 32; i++) {
 				let alpha = Math.random() * 314;
-				enemy_create(g, 10 + Math.cos(alpha) * 30, 10 + Math.sin(alpha) * 30, p);
+				enemy_create(g, 10 + Math.cos(alpha) * 256, 10 + Math.sin(alpha) * 256, p);
 			}
 			for (let i = 0; i < 12; i++)
 				wall_create(g, 64 + 64 * i, 0, 8, 32);
