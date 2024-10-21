@@ -43,6 +43,8 @@ function game_draw(g, ctx) {
 		if (g.objects[i] != null && g.objects[i].data != null)
 			g.objects[i].draw(g, g.objects[i].data, ctx);
 	ctx.restore();
+	if (0 <= ifollow && ifollow < g.objects.length)
+		drawText(ctx, 100, 100, g.objects[ifollow].data.body.position.x + ':' + g.objects[ifollow].data.body.position.y);
 }
 
 function game_object_create(g, func_update, func_draw, obj_data) {

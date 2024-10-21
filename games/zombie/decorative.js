@@ -18,6 +18,11 @@ function decorative_draw_grass(ctx, g, follow_object_x, follow_object_y) {
 
 function decorative_draw_trees(ctx, g, follow_object_x, follow_object_y) {
 	for(let i = 0; i < g.decorative.trees.length; i++) {
+		if(g.decorative.trees[i].x - follow_object_x > window.innerWidth / g.unit / 1.5 ||
+			g.decorative.trees[i].x - follow_object_x < -window.innerWidth / g.unit / 1.5 ||
+			g.decorative.trees[i].y - follow_object_y > window.innerHeight / g.unit / 1.5 ||
+			g.decorative.trees[i].y - follow_object_y < -window.innerHeight / g.unit / 1.5)
+			continue;
 		ctx.fillStyle = 'green';
 		ctx.fillRect(g.decorative.trees[i].x - 1.5, g.decorative.trees[i].y - 1.5, 3, 2);
 		ctx.fillStyle = 'brown';
