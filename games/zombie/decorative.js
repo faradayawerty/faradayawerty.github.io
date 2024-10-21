@@ -1,12 +1,21 @@
 
 function decorative_get() {
 	let d = {
+		draw_background: decorative_draw_background_grass,
 		trees: [] // [{x, y}, {x, y}, ...]
 	};
 	return d;
 }
 
-function decorative_draw_grass(ctx, g, follow_object_x, follow_object_y) {
+function decorative_draw_background(ctx, g, follow_object_x, follow_object_y) {
+	g.decorative.draw_background(ctx, g, follow_object_x, follow_object_y);
+}
+
+function decorative_draw_decorations(ctx, g, follow_object_x, follow_object_y) {
+	decorative_draw_trees(ctx, g, follow_object_x, follow_object_y);
+}
+
+function decorative_draw_background_grass(ctx, g, follow_object_x, follow_object_y) {
 	for (let i = -window.innerWidth / g.unit / 1.5; i < window.innerWidth / g.unit / 1.5; i++)
 		for (let j = -window.innerHeight / g.unit / 1.5; j < window.innerHeight / g.unit / 1.5; j++) {
 			colors = [ '#010', '#020', '#021', '#030', '#031', '#032', '#121', '#130', '#131', '#132', '#140', '#141', '#142' ];

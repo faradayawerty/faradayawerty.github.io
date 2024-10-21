@@ -36,8 +36,8 @@ function game_draw(g, ctx) {
 		ifollow = g.objects.indexOf(g.follow);
 	if (0 <= ifollow && ifollow < g.objects.length) {
 		ctx.translate(-g.objects[ifollow].data.body.position.x, -g.objects[ifollow].data.body.position.y);
-		decorative_draw_grass(ctx, g, g.objects[ifollow].data.body.position.x, g.objects[ifollow].data.body.position.y);
-		decorative_draw_trees(ctx, g, g.objects[ifollow].data.body.position.x, g.objects[ifollow].data.body.position.y);
+		decorative_draw_background(ctx, g, g.objects[ifollow].data.body.position.x, g.objects[ifollow].data.body.position.y);
+		decorative_draw_decorations(ctx, g, g.objects[ifollow].data.body.position.x, g.objects[ifollow].data.body.position.y);
 	}
 	for (let i = 0; i < g.objects.length; i++)
 		if (g.objects[i] != null && g.objects[i].data != null)
