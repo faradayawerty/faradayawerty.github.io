@@ -2,15 +2,15 @@ function enemy_create(g, x, y, target_) {
 	let w_ = 1 + 1.5 * Math.random(),
 		h_ = w_;
 	let e = {
-		max_hp: 100,
-		hp: 100,
+		max_hp: 100 * w_,
+		hp: 100 * w_,
 		damage: 0.1, // per delta time
 		w: w_,
 		h: h_,
 		target: target_,
 		can_be_hit: true,
 		destroy: false,
-		speed: 0.15 + 0.15 * Math.random(),
+		speed: 0.15 + 0.15 * Math.random() / w_,
 		body: Matter.Bodies.rectangle(x, y, w_, h_)
 	};
 	Matter.Composite.add(g.engine.world, e.body);

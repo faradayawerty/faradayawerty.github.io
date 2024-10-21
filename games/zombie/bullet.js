@@ -7,7 +7,7 @@ function bullet_create(g, x, y, dx, dy, speed_, damage_) {
 		damage: damage_,
 		lifetime: 1000,
 		//body: Matter.Bodies.rectangle(x + 2.5 * dx / r, y + 2.5 * dy / r, 0.35, 0.35)
-		body: Matter.Bodies.rectangle(x, y, 0.35, 0.35)
+		body: Matter.Bodies.rectangle(x, y, 0.15, 0.15)
 	};
 	let vel = Matter.Vector.create(b.speed * dx / r, b.speed * dy / r);
 	Matter.Body.setVelocity(b.body, vel);
@@ -36,6 +36,6 @@ function bullet_update(g, b, dt) {
 }
 
 function bullet_draw(g, b, ctx) {
-	fillMatterBody(ctx, b.body, 'yellow');
-	drawMatterBody(ctx, b.body, 'orange');
+	fillMatterBody(ctx, b.body, 'orange');
+	drawMatterBody(ctx, b.body, 'yellow');
 }

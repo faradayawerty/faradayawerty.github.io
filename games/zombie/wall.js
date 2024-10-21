@@ -11,5 +11,6 @@ function wall_create(g, x, y, w, h) {
 function wall_update(g, w, dt) {}
 
 function wall_draw(g, w, ctx) {
-	drawMatterBody(ctx, w.body, 'blue')
+	if(g.draw_invisible)
+		drawMatterBody(ctx, w.body, 'blue')
 }

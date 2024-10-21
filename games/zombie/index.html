@@ -56,7 +56,8 @@
 		let levels = levels_get();
 		let audio1 = audio_get();
 		let images1 = images_get();
-		let game = game_create(input1, engine1, images1, audio1);
+		let decorative1 = decorative_get();
+		let game = game_create(input1, engine1, images1, audio1, decorative1);
 
 		function animate(lastUpdateTime) {
 			//ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
@@ -85,7 +86,7 @@
 			initializeKeyboardInput(input1.keys);
 			initializeMouseInput(input1.mouse, ctx1);
 			initializeTouchInput(input1.touch, input1.joystick, ctx1);
-			level_start(game, levels.test);
+			level_start(game, levels.forest);
 			animate(Date.now());
 		}
 
