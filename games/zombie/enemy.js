@@ -4,7 +4,7 @@ function enemy_create(g, x, y, target_) {
 	let e = {
 		max_hp: 100 * w_,
 		hp: 100 * w_,
-		damage: 0.1, // per delta time
+		damage: 0.05 * w_, // per delta time
 		w: w_,
 		h: h_,
 		target: target_,

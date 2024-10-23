@@ -1,14 +1,19 @@
 function weapons_get() {
 	let w = {
 		assault_rifle: function(g, x, y, dx, dy) {
-			bullet_create(g, x, y, dx + 0.1 * (Math.random() - 0.5), dy + 0.1 * (Math.random() - 0.5), 1 + 1.5 * Math.random(), 0.4 * Math.random());
-			return 20; // cooldown millis
+			bullet_create(g, x + dx, y + dy, dx + 0.2 * (Math.random() - 0.5), dy + 0.2 * (Math.random() - 0.5), 0.5 + 2 * Math.random(), 1.5 * Math.random());
+			return 50; // cooldown millis
 		},
 		shotgun: function(g, x, y, dx, dy) {
 			audio_play(g.audio.gunshot);
 			for (let i = 0; i < 10 + 10 * Math.random(); i++)
-				bullet_create(g, x, y, dx + 0.5 * (Math.random() - 0.5), dy + 0.5 * (Math.random() - 0.5), 2.5 + Math.random(), 0.15 + 0.15 * Math.random());
+				bullet_create(g, x + dx, y + dy, dx + 0.6 * (Math.random() - 0.5), dy + 0.6 * (Math.random() - 0.5), 1 + 0.5 * Math.random(), 0.5 + 0.5 * Math.random());
 			return 750; // cooldown millis
+		},
+		pistol: function(g, x, y, dx, dy) {
+			audio_play(g.audio.gunshot);
+			bullet_create(g, x + dx, y + dy, dx + 0.1 * (Math.random() - 0.5), dy + 0.1 * (Math.random() - 0.5), 0.5 + 0.5 * Math.random(), 2 + 0.5 * Math.random());
+			return 500; // cooldown millis
 		}
 	};
 	return w;

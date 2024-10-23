@@ -5,7 +5,7 @@ function levels_get() {
 			let weapons1 = weapons_get(g);
 			let p = player_create(g, 3, 4);
 			g.follow = p;
-			p.data.weapon = weapons1.assault_rifle;
+			p.data.weapon = weapons1.shotgun;
 			for (let i = 0; i < 256; i++) {
 				let alpha = Math.random() * 314;
 				enemy_create(g, 10 + Math.cos(alpha) * 400, 10 + Math.sin(alpha) * 400, p);
