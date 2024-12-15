@@ -13,5 +13,6 @@ a 2D game about running on platforms avoiding monsters
 a 3D game about travelling through liminal spaces solving puzzles
 
 #### faw_zombie (WIP)
-an open world isometric 2D game about killing zombies in apocalytic cities and crafting stuff
+an open world 2D game about killing zombies with shotgun
 
+play here → https://faradayawerty.github.io/games/zombie
