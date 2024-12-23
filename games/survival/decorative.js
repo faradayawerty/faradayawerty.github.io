@@ -37,8 +37,8 @@ function decorative_text_draw(t, ctx) {
 
 function decorative_building_create(g, x, y, w, h) {
 	let A = 64;
-	decorative_rectangle_create(g, x, y, w, h, "#333333", "#555555");
 	decorative_rectangle_create(g, x + w/A, y + h/A, w - 2*w/A, h - 2*h/A, "#555555", "#555555");
+	decorative_rectangle_create(g, x, y, w, h, "#333333", "#555555");
 }
 
 function decorative_grass_create(g, x, y, w, h) {
