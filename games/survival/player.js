@@ -27,6 +27,7 @@ function player_update(p, dt) {
 }
 
 function player_draw(p, ctx) {
-	drawMatterBody(ctx, p.body, p.color);
+	fillMatterBody(ctx, p.body, p.color);
+	drawMatterBody(ctx, p.body, "white");
 }
 
