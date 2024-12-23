@@ -2,8 +2,7 @@
 function game_create(input_, engine_) {
 	let g = {
 		settings: {
-			player_color: "red",
-			scale: 64
+			player_color: "red"
 		},
 		level: "0x0",
 		objects: [],
