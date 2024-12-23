@@ -5,7 +5,7 @@ function game_create(input_, engine_) {
 			player_color: "red",
 			scale: 64
 		},
-		level: null,
+		level: "0x0",
 		objects: [],
 		camera_target: null,
 		input: input_,
