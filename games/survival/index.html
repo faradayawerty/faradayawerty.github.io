@@ -73,9 +73,7 @@
 			} else if(input1.keys['Escape']) {
 				menu1.shown = true;
 			} else if(menu1.want_new_game) {
-				game1 = null;
-				game1 = game_create(input1, engine1);
-				levels_set(game1, "0x0");
+				game_new(game1);
 				menu1.want_new_game = false;
 			} else {
 				game_update(game1, dt);
