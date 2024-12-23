@@ -32,7 +32,7 @@ function game_object_create(g, name_, data_, func_update, func_draw) {
 function game_update(g, dt) {
 	if(g.camera_target == null) {
 		let target = g.objects.find((obj) => obj.name == "player").data;
-		if(target != null
+		if(target != null)
 		   g.camera_target = target;
 	} else {
 		let level_x = Number(g.level.split("x")[0]);
