@@ -58,8 +58,6 @@ function game_draw(g, ctx) {
 	for(let i = 0; i < g.objects.length; i++) {
 		let obj = g.objects[i];
 		obj.draw(obj.data, ctx);
-		if(obj.name == g.settings.camera_target_name && obj.data.body)
-			g.camera_target = obj.data;
 	}
 	ctx.restore();
 	if(g.camera_target != null) {
