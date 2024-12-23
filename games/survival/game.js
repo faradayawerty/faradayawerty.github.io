@@ -5,13 +5,18 @@ function game_create(input_, engine_) {
 			player_color: "red",
 			scale: 64
 		},
-		level: "0x0",
+		level: null,
 		objects: [],
 		camera_target: null,
 		input: input_,
 		engine: engine_
 	};
 	return g;
+}
+
+function game_new(g) {
+	game_destroy_all_objects(g);
+	player_create(g, 1250, 1250);
 }
 
 function game_object_create(g, name_, data_, func_update, func_draw) {
@@ -26,7 +31,9 @@ function game_object_create(g, name_, data_, func_update, func_draw) {
 
 function game_update(g, dt) {
 	if(g.camera_target == null) {
-		g.camera_target = g.objects.find((obj) => obj.name == "player").data;
+		let target = g.objects.find((obj) => obj.name == "player").data;
+		if(target != null
+		   g.camera_target = target;
 	} else {
 		let level_x = Number(g.level.split("x")[0]);
 		let level_y = Number(g.level.split("x")[1]);
