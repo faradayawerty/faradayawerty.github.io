@@ -86,6 +86,7 @@ function game_update_settings(g) {
 }
 
 function game_destroy_all_objects(g) {
+	g.camera_target = null;
 	Matter.Composite.clear(g.engine.world);
 	g.objects = [];
 }
