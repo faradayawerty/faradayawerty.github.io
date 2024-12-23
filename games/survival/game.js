@@ -17,6 +17,7 @@ function game_create(input_, engine_) {
 function game_new(g) {
 	game_destroy_all_objects(g);
 	player_create(g, 1250, 1250);
+	levels_set(g, "0x0");
 }
 
 function game_object_create(g, name_, data_, func_update, func_draw) {
