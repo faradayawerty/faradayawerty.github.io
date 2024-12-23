@@ -8,7 +8,7 @@ function menu_create() {
 		want_player_color: "red",
 		iselected: 0,
 		main_menu_buttons: ["continue game", "start new game", "settings"],
-		settings_buttons: ["player color", "scale", "main menu"],
+		settings_buttons: ["player color", "main menu"],
 		player_color_selection_menu: ["set player color to red",
 			"set player color to lime",
 			"set player color to blue",
