@@ -35,9 +35,9 @@ function player_update(p, dt) {
 		if(p.input.keys['a'])
 			Matter.Body.rotate(p.car.body, -0.003 * p.speed);
 		if(p.input.keys['w'])
-			vel = Matter.Vector.create(p.speed * Math.cos(p.car.body.angle), p.speed * Math.sin(p.car.body.angle));
+			vel = Matter.Vector.create(p.speed * Math.cos(p.car.body.angle), p.car.speed * Math.sin(p.car.body.angle));
 		if(p.input.keys['s'])
-			vel = Matter.Vector.create(-p.speed * Math.cos(p.car.body.angle), -p.speed * Math.sin(p.car.body.angle));
+			vel = Matter.Vector.create(-p.speed * Math.cos(p.car.body.angle), -p.car.speed * Math.sin(p.car.body.angle));
 		Matter.Body.setVelocity(p.car.body, vel);
 	} else {
 		if(p.input.keys['d'])
