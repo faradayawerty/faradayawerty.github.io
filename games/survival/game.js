@@ -78,3 +78,8 @@ function game_destroy_level(g) {
 	g.objects = g.objects.filter((obj) => (obj.name != "decorative" && obj.name != "wall"));
 }
 
+function game_object_move_to_top(g, i) {
+	let obj = g.objects[i];
+	g.objects.splice(g.objects, i);
+	return g.object.push(obj) - 1;
+}
