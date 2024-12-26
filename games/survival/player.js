@@ -6,6 +6,7 @@ function player_create(g, x, y) {
 		color: g.settings.player_color,
 		want_level: g.level,
 		in_car: true,
+		car_angle: 0,
 		body: Matter.Bodies.rectangle(x, y, 40, 40, {
 			inertia: Infinity
 		})
@@ -30,14 +31,14 @@ function player_update(p, dt) {
 	let vel = Matter.Vector.create(0, 0);
 	if (p.in_car) {
 		if(p.input.keys['d'])
-			Matter.Body.rotate(p.body, 0.001 * p.speed);
+			p.car_angle += 2 * dt;
 		if(p.input.keys['a'])
-			Matter.Body.rotate(p.body, 0.001 * p.speed);
+			p.car_angle -= 2 * dt;
 		if(p.input.keys['w'])
-			vel = p.speed * Matter.Vector.create(Math.cos(p.body.angle), Math.sin(p.body.angle));
+			vel = p.speed * Matter.Vector.create(Math.cos(p.car_angle), Math.sin(p.car_angle));
 		if(p.input.keys['s'])
-			vel = -p.speed * Matter.Vector.create(Math.cos(p.body.angle), Math.sin(p.body.angle));
-		concole.log(vel);
+			vel = -p.speed * Matter.Vector.create(Math.cos(p.car_angle), Math.sin(p.car_angle));
+		console.log(vel);
 	} else {
 		if(p.input.keys['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
