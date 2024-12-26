@@ -55,3 +55,8 @@ function decorative_parkinglot_create(g, x, y, w, h) {
 	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 }
 
+function decorative_tree_create(g, x, y) {
+	decorative_rectangle_create(g, x - 15 - 50, y, 100, 10, "line", "green");
+	decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "black");
+}
+
