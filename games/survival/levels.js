@@ -28,7 +28,7 @@ function levels_set(g, level) {
 		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	} else {
-		N = 8;
+		N = 6;
 		for(let i = 0; i < N; i++)
 			for(let j = 0; j < N; j++)
 				decorative_tree_create(g, Ox + 100 + i * 2300 / N + Math.random() * 1150 / N, 
