@@ -37,6 +37,8 @@ function game_update(g, dt) {
 		if(obj.name == "player") {
 			if(obj.data.want_level != g.level)
 				levels_set(g, obj.data.want_level);
+			g.offset_x = obj.data.body.position.x;
+			g.offset_y = obj.data.body.position.y;
 		}
 	}
 }
