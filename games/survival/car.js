@@ -8,7 +8,7 @@ function car_create(g, x, y) {
 		})
   };
 	Matter.Composite.add(g.engine.world, c.body);
-	return game_object_create(g, "car", c, car_update, car_draw);
+	return game_object_move_to_top(game_object_create(g, "car", c, car_update, car_draw));
 }
 
 function car_update(c, dt) {
