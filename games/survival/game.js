@@ -49,7 +49,7 @@ function game_draw(g, ctx) {
 		obj.draw(obj.data, ctx);
 	}
 	ctx.restore();
-	drawText(ctx, 40, 40, Math.round(g.offset_x) + ":" + Math.round(g.offset_.y));
+	drawText(ctx, 40, 40, Math.round(g.offset_x) + ":" + Math.round(g.offset_y));
 	drawText(ctx, 40, 60, g.level);
 }
 
