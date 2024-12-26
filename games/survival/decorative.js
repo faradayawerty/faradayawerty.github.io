@@ -65,8 +65,8 @@ function decorative_tree_create(g, x, y) {
 function decorative_road_create(g, x, y, w, h) {
 	N = 8.0;
 	for(let i = 0; i < N && w > h; i++)
-		decorative_rectangle_create(g, x + i * w / N, y + h / 2 - 0.05 * h, 0.5 * w / N, 0.1 * h, "#ffffff", "#ffffff");
+		decorative_rectangle_create(g, x + (i + 0.5) * w / N, y + h / 2 - 0.05 * h, 0.5 * w / N, 0.1 * h, "#ffffff", "#ffffff");
 	for(let i = 0; i < N && h > w; i++)
-		decorative_rectangle_create(g, x + w / 2 - 0.05 * w, y + i * h / N, 0.1 * w, 0.5 * h / N, "#ffffff", "#ffffff");
+		decorative_rectangle_create(g, x + w / 2 - 0.05 * w, y + (i + 0.5) * h / N, 0.1 * w, 0.5 * h / N, "#ffffff", "#ffffff");
 	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 }
