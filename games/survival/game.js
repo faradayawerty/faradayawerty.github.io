@@ -1,13 +1,15 @@
 
 function game_create(input_, engine_) {
-	let g = {
+	let g = {	
+		input: input_,
+		engine: engine_,
+		
+		objects: [],
 		settings: {
 			player_color: "red"
 		},
+		
 		level: "0x0",
-		objects: [],
-		input: input_,
-		engine: engine_,
 		offset_x: 0,
 		offset_y: 0
 	};
