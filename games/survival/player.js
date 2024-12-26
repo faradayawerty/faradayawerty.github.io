@@ -20,7 +20,7 @@ function player_update(p, dt) {
 	let Oy = 2500 * level_y;
 	if(p.body.position.x < Ox)
 		p.want_level = (level_x - 1) + "x" + level_y;
-	else if(pbody.position.x > Ox + 2500)
+	else if(p.body.position.x > Ox + 2500)
 		p.want_level = (level_x + 1) + "x" + level_y;
 	if(p.body.position.y < Oy)
 		p.want_level = level_x + "x" + (level_y - 1);
