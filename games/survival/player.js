@@ -30,9 +30,9 @@ function player_update(p, dt) {
 	let vel = Matter.Vector.create(0, 0);
 	if (p.in_car) {
 		if(p.input.keys['d'])
-			Matter.Body.rotate(p.body, 0.1 * p.speed);
+			Matter.Body.rotate(p.body, 0.01 * p.speed);
 		if(p.input.keys['a'])
-			Matter.Body.rotate(p.body, 0.1 * p.speed);
+			Matter.Body.rotate(p.body, 0.01 * p.speed);
 		if(p.input.keys['w'])
 			vel = p.speed * Matter.Vector.create(Math.cos(p.body.angle), Math.sin(p.body.angle));
 		if(p.input.keys['s'])
