@@ -14,6 +14,18 @@ function player_create(g, x, y) {
 }
 
 function player_update(p, dt) {
+	let level_x = Number(p.want_level.split("x")[0]);
+	let level_y = Number(p.want_level.split("x")[1]);
+	let Ox = 2500 * level_x;
+	let Oy = 2500 * level_y;
+	if(p.body.position.x < Ox)
+		p.want_level = (level_x - 1) + "x" + level_y;
+	else if(pbody.position.x > Ox + 2500)
+		p.want_level = (level_x + 1) + "x" + level_y;
+	if(p.body.position.y < Oy)
+		p.want_level = level_x + "x" + (level_y - 1);
+	else if(p.body.position.y > Oy + 2500)
+		p.want_level = level_x + "x" + (level_y + 1);
 	let vel = Matter.Vector.create(0, 0);
 	if(p.input.keys['d'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
