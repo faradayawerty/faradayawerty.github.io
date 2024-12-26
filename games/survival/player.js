@@ -53,9 +53,7 @@ function player_update(p, dt) {
 }
 
 function player_draw(p, ctx) {
-	if(p.car) {
-		car_draw(ctx, car);
-	} else {
+	if(!p.car) {
 		fillMatterBody(ctx, p.body, p.color);
 		drawMatterBody(ctx, p.body, "white");
 	}
