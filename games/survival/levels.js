@@ -2,7 +2,7 @@
 function levels_set(g, level) {
 	g.level = level;
 	game_destroy_level(g);
-	let  = Number(level.split("x")[0]);
+	let level_x = Number(level.split("x")[0]);
 	let level_y = Number(level.split("x")[1]);
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
