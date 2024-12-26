@@ -28,6 +28,8 @@ function levels_set(g, level) {
 		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	} else {
+		for(let i = 0; i < Math.random() * 20 + 5; i++)
+			decorative_tree_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500)
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 2420);
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	}
