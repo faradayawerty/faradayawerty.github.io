@@ -29,7 +29,7 @@ function game_object_create(g, name_, data_, func_update, func_draw) {
 		update: func_update,
 		draw: func_draw
 	};
-	return g.objects.unshift(obj) - 1;
+	return 0;
 }
 
 function game_update(g, dt) {
@@ -78,7 +78,7 @@ function game_destroy_level(g) {
 	g.objects = g.objects.filter((obj) => (obj.name != "decorative" && obj.name != "wall"));
 }
 
-function game_object_move_to_top(g, i) {
+function game_object_make_last(g, i) {
 	let obj = g.objects[i];
 	g.objects.splice(i, 1);
 	return g.objects.push(obj) - 1;
