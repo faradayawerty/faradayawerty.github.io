@@ -5,7 +5,7 @@ function player_create(g, x, y) {
 		speed: 10,
 		color: g.settings.player_color,
 		want_level: g.level,
-		in_car: true,
+		car: null,
 		body: Matter.Bodies.rectangle(x, y, 40, 40, {
 			inertia: Infinity
 		})
@@ -28,15 +28,17 @@ function player_update(p, dt) {
 	else if(p.body.position.y > Oy + 2500)
 		p.want_level = level_x + "x" + (level_y + 1);
 	let vel = Matter.Vector.create(0, 0);
-	if (p.in_car) {
+	if (p.car) {
+		Matter.Body.setPosition(p.body, p.car.body.position)
 		if(p.input.keys['d'])
-			Matter.Body.rotate(p.body, 0.001 * p.speed);
+			Matter.Body.rotate(p.car.body, 0.003 * p.speed);
 		if(p.input.keys['a'])
-			Matter.Body.rotate(p.body, -0.001 * p.speed);
+			Matter.Body.rotate(p.car.body, -0.003 * p.speed);
 		if(p.input.keys['w'])
-			vel = Matter.Vector.create(p.speed * Math.cos(p.body.angle), p.speed * Math.sin(p.body.angle));
+			vel = Matter.Vector.create(p.speed * Math.cos(p.car.body.angle), p.speed * Math.sin(p.car.body.angle));
 		if(p.input.keys['s'])
-			vel = Matter.Vector.create(-p.speed * Math.cos(p.body.angle), -p.speed * Math.sin(p.body.angle));
+			vel = Matter.Vector.create(-p.speed * Math.cos(p.car.body.angle), -p.speed * Math.sin(p.car.body.angle));
+		Matter.Body.setVelocity(p.car.body, vel);
 	} else {
 		if(p.input.keys['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
@@ -46,12 +48,16 @@ function player_update(p, dt) {
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
 		if(p.input.keys['w'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
+		Matter.Body.setVelocity(p.body, vel);
 	}
-	Matter.Body.setVelocity(p.body, vel);
 }
 
 function player_draw(p, ctx) {
-	fillMatterBody(ctx, p.body, p.color);
-	drawMatterBody(ctx, p.body, "white");
+	if(p.car) {
+		car_draw(ctx, car);
+	} else {
+		fillMatterBody(ctx, p.body, p.color);
+		drawMatterBody(ctx, p.body, "white");
+	}
 }
 
