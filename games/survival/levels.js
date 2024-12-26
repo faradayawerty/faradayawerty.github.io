@@ -30,10 +30,9 @@ function levels_set(g, level) {
 	} else {
 		N = 8;
 		for(let i = 0; i < N; i++)
-			for(let i = 0; j < N; j++)
-				decorative_tree_create(g,
-						       Ox + i * 2500 / N + Math.random() * 1250 / N, 
-						       Oy + i * 2500 / N + Math.random() * 1250 / N);
+			for(let j = 0; j < N; j++)
+				decorative_tree_create(g, Ox + i * 2500 / N + Math.random() * 1250 / N, 
+					Oy + i * 2500 / N + Math.random() * 1250 / N);
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 2420);
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	}
