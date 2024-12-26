@@ -31,14 +31,13 @@ function player_update(p, dt) {
 	let vel = Matter.Vector.create(0, 0);
 	if (p.in_car) {
 		if(p.input.keys['d'])
-			p.car_angle += 2 * dt;
+			Matter.Body.rotate(p.body, 0.0001 * p.speed);
 		if(p.input.keys['a'])
-			p.car_angle -= 2 * dt;
+			Matter.Body.rotate(p.body, -0.0001 * p.speed);
 		if(p.input.keys['w'])
-			vel = p.speed * Matter.Vector.create(Math.cos(p.car_angle), Math.sin(p.car_angle));
+			vel = Matter.Vector.create(p.speed * Math.cos(p.car_angle), p.speed * Math.sin(p.car_angle));
 		if(p.input.keys['s'])
-			vel = -p.speed * Matter.Vector.create(Math.cos(p.car_angle), Math.sin(p.car_angle));
-		console.log(vel);
+			vel = Matter.Vector.create(-p.speed * Math.cos(p.car_angle), -p.speed * Math.sin(p.car_angle));
 	} else {
 		if(p.input.keys['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
