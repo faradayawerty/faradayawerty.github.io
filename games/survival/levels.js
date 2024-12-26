@@ -31,13 +31,13 @@ function levels_set(g, level) {
 		N = 6;
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 2420);
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
-		for(let i = 0; i < N; i++) {
-			for(let j = 0; j < N; j++)
+		for(let i = 0; i < N; i++)
+			for(let j = 0; j < N; j++) {
 				let x1 = Ox + 100 + i * 2300 / N + Math.random() * 1150 / N;
 				let y1 = Oy + 100 + j * 2300 / N + Math.random() * 1150 / N;
 				wall_create(g, x1, y1 + 15, 30, 50);
 				decorative_tree_create(g, x1, y1);
-		}
+			}
 	}
 }
 
