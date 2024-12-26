@@ -22,7 +22,6 @@ function levels_set(g, level) {
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 1410, 1050, 1050);
-		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
 		decorative_rectangle_create(g, Ox, Oy + 1150, 2500, 200, "#222222", "#222222");
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	} else if (level_y == "0"){
@@ -31,10 +30,9 @@ function levels_set(g, level) {
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 1410, 1050, 1050);
 		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
-		decorative_rectangle_create(g, Ox, Oy + 1150, 2500, 200, "#222222", "#222222");
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	} else {
-		decorative_grass_create(g, Ox + 40, Oy + 40, 2460, 2460);
+		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 2420);
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	}
 }
