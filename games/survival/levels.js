@@ -31,7 +31,7 @@ function levels_set(g, level) {
 		N = 6;
 		for(let i = 0; i < N; i++)
 			for(let j = 0; j < N; j++)
-				decorative_tree_create(g, x1, y1);
+				decorative_tree_create(g, Ox + 100 + i * 2300 / N + Math.random() * 1150 / N, Oy + 100 + j * 2300 / N + Math.random() * 1150 / N);
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 2420);
 		decorative_rectangle_create(g, Ox, Oy, 2500, 2500, "gray", "white");
 	}
