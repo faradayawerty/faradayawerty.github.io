@@ -62,7 +62,7 @@ function decorative_tree_create(g, x, y) {
 	decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "black");
 }
 
-function decorative_read_create(g, x, y, w, h) {
+function decorative_road_create(g, x, y, w, h) {
 	N = 8;
 	for(let i = 0; i < N && w > h; i++) {
 		decorative_rectangle_create(g, x + i * w / N, y - h / 2, 0.5 * w / N, 0.1 * h, "#ffffff", "#ffffff");
