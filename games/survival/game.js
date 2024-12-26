@@ -10,8 +10,8 @@ function game_create(input_, engine_) {
 		},
 		
 		level: "0x0",
-		offset_x: 0,
-		offset_y: 0
+		offset_x: 1250,
+		offset_y: 1250
 	};
 	return g;
 }
