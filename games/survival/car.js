@@ -1,6 +1,8 @@
 
 function car_create(g, x, y, color_, ridable_) {
   let c = {
+	health: 100,
+	fuel: 100,
 	color: color_,
 	ridable: ridable_,
 	speed: 20,
