@@ -23,10 +23,10 @@ function decorative_text_create(g, text_, x_, y_, size_, color_) {
 }
 
 function decorative_rectangle_draw(r, ctx) {
-	ctx.strokeStyle = r.color_outline;
-	ctx.strokeRect(r.x, r.y, r.w, r.h);
 	ctx.fillStyle = r.color_fill;
 	ctx.fillRect(r.x, r.y, r.w, r.h);
+	ctx.strokeStyle = r.color_outline;
+	ctx.strokeRect(r.x, r.y, r.w, r.h);
 }
 
 function decorative_text_draw(t, ctx) {
