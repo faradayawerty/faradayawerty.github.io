@@ -56,17 +56,20 @@ function player_update(p, dt) {
 		if(p.game.input.keys['w'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
 		if(p.game.input.keys['f'] && p.car_cooldown >= 200) {
-			let iclosest = -1;
+			let car_closest = null;
 			for(let i = 0; i < p.game.objects.length; i++) {
-				if(p.game.objects[i].name.substring(0, 3) == "car"
-				&& p.game.objects[i].data.ridable
-				&& dist(p.game.objects[i].data.body.position, p.body.position) < 200
-				&& (iclosest < 0 || dist(p.game.objects[i].data.body.position, p.body.position)
-					< dist(p.game.objects[iclosest].data.body.position, p.body.position)))
-					iclosest = i;
+				let car = null;
+				if(p.game.objects[i].name.substring(0, 3) == "car")
+					car = p.game.objects[i].data;
+				else
+					continue;
+				if(!car_closest && car.ridable && dist(car.body.position, p.body.position) < 200)
+					car_closest = car;
+				if(car_closest && dist(car.body.position, p.body.position) < dist(car_closest.body.position, p.body.position)))
+					car_closest = car;
 			}
-			if(iclosest > -1) {
-				p.car = p.game.objects[iclosest].data;
+			if(car_closest) {
+				p.car = car_closest;
 				p.car_cooldown = 0;
 			}
 		}
