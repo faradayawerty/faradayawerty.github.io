@@ -1,6 +1,7 @@
 
 function player_create(g, x, y) {
 	let p = {
+		game: g,
 		speed: 10,
 		want_level: g.level,
 		car: null,
