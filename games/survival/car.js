@@ -1,8 +1,9 @@
 
-function car_create(g, x, y) {
+function car_create(g, x, y, color_, ridable_) {
   let c = {
+	color: color_,
+	ridable: ridable,
 	speed: 20,
-	color: "#dd7722",
 	body: Matter.Bodies.rectangle(x, y, 200, 110, {
 			mass: 1000.5,
 			collisionFilter: {
