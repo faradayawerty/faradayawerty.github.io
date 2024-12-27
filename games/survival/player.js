@@ -1,10 +1,7 @@
 
 function player_create(g, x, y) {
 	let p = {
-		game: g,
-		input: g.input,
 		speed: 10,
-		color: g.settings.player_color,
 		want_level: g.level,
 		car: null,
 		car_cooldown: 200,
@@ -32,32 +29,32 @@ function player_update(p, dt) {
 	let vel = Matter.Vector.create(0, 0);
 	if (p.car) {
 		p.body.collisionFilter.mask = -3;
-		if(p.input.keys['d'])
+		if(p.game.input.keys['d'])
 			Matter.Body.rotate(p.car.body, 0.003 * p.speed);
-		if(p.input.keys['a'])
+		if(p.game.input.keys['a'])
 			Matter.Body.rotate(p.car.body, -0.003 * p.speed);
-		if(p.input.keys['w'])
+		if(p.game.input.keys['w'])
 			vel = Matter.Vector.create(p.car.speed * Math.cos(p.car.body.angle), p.car.speed * Math.sin(p.car.body.angle));
-		if(p.input.keys['s'])
+		if(p.game.input.keys['s'])
 			vel = Matter.Vector.create(-p.car.speed * Math.cos(p.car.body.angle), -p.car.speed * Math.sin(p.car.body.angle));
 		Matter.Body.setVelocity(p.car.body, vel);
 		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car.body.position, Matter.Vector.create(0, 0)));
-		if(p.input.keys['f'] && p.car_cooldown >= 200) {
+		if(p.game.input.keys['f'] && p.car_cooldown >= 200) {
 			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car.body.position, Matter.Vector.create(150, 0)));
 			p.car = null;
 			p.car_cooldown = 0;
 		}
 	} else {
 		p.body.collisionFilter.mask = -1;
-		if(p.input.keys['d'])
+		if(p.game.input.keys['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
-		if(p.input.keys['a'])
+		if(p.game.input.keys['a'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(-p.speed, 0));
-		if(p.input.keys['s'])
+		if(p.game.input.keys['s'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
-		if(p.input.keys['w'])
+		if(p.game.input.keys['w'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
-		if(p.input.keys['f'] && p.car_cooldown >= 200) {
+		if(p.game.input.keys['f'] && p.car_cooldown >= 200) {
 			let iclosest = -1;
 			for(let i = 0; i < p.game.objects.length; i++) {
 				if(p.game.objects[i].name.substring(0, 3) == "car"
@@ -80,7 +77,7 @@ function player_update(p, dt) {
 
 function player_draw(p, ctx) {
 	if(!p.car) {
-		fillMatterBody(ctx, p.body, p.color);
+		fillMatterBody(ctx, p.body, p.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");
 	}
 }
