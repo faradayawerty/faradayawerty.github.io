@@ -29,7 +29,6 @@ function game_object_create(g, name_, data_, func_update, func_draw) {
 		update: func_update,
 		draw: func_draw
 	};
-	g.data.game = g;
 	g.objects.unshift(obj);
 	return 0;
 }
