@@ -61,6 +61,7 @@ function player_update(p, dt) {
 			let iclosest = -1;
 			for(let i = 0; i < p.game.objects.length; i++) {
 				if(p.game.objects[i].name.substring(0, 3) == "car"
+				&& p.game.objects[i].data.ridable
 				&& dist(p.game.objects[i].data.body.position, p.body.position) < 200
 				&& (iclosest < 0 || dist(p.game.objects[i].data.body.position, p.body.position)
 					< dist(p.game.objects[iclosest].data.body.position, p.body.position)))
