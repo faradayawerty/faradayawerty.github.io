@@ -65,7 +65,7 @@ function player_update(p, dt) {
 					continue;
 				if(!car_closest && car.ridable && dist(car.body.position, p.body.position) < 200)
 					car_closest = car;
-				if(car_closest && dist(car.body.position, p.body.position) < dist(car_closest.body.position, p.body.position)))
+				if(car_closest && dist(car.body.position, p.body.position) < dist(car_closest.body.position, p.body.position))
 					car_closest = car;
 			}
 			if(car_closest) {
