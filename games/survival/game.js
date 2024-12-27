@@ -11,7 +11,7 @@ function game_create(input_, engine_) {
 		
 		level: "0x0",
 		offset_x: 1250,
-		offset_y: 1250
+		offset_y: 1250,
 	};
 	return g;
 }
@@ -29,6 +29,7 @@ function game_object_create(g, name_, data_, func_update, func_draw) {
 		update: func_update,
 		draw: func_draw
 	};
+	g.objects.unshift(obj);
 	return 0;
 }
 
@@ -83,3 +84,4 @@ function game_object_make_last(g, i) {
 	g.objects.splice(i, 1);
 	return g.objects.push(obj) - 1;
 }
+

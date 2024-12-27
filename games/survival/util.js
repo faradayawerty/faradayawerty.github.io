@@ -37,3 +37,8 @@ function drawMatterBody(ctx, b, color) {
 	ctx.strokeStyle = color;
 	ctx.stroke();
 }
+
+function dist(v1, v2) {
+	return Matter.Vector.magnitude(Matter.Vector.sub(v1, v2));
+}
+

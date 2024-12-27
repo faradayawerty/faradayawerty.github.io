@@ -1,14 +1,19 @@
 
 function car_create(g, x, y) {
   let c = {
-	speed: 15,
+	speed: 20,
 	color: "#dd7722",
-	body: Matter.Bodies.rectangle(x, y, 225, 400, {
-			inertia: Infinity
+	body: Matter.Bodies.rectangle(x, y, 200, 110, {
+			mass: 1000.5,
+			collisionFilter: {
+				"group": 0,
+				"mask": -1,
+				"category": 2
+			}
 		})
   	};
 	Matter.Composite.add(g.engine.world, c.body);
-	return game_object_move_to_top(g, game_object_create(g, "car", c, car_update, car_draw));
+	return game_object_make_last(g, game_object_create(g, "car", c, car_update, car_draw));
 }
 
 function car_update(c, dt) {}

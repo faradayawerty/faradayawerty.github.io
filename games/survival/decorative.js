@@ -23,10 +23,10 @@ function decorative_text_create(g, text_, x_, y_, size_, color_) {
 }
 
 function decorative_rectangle_draw(r, ctx) {
-	ctx.fillStyle = r.color_fill;
-	ctx.fillRect(r.x, r.y, r.w, r.h);
 	ctx.strokeStyle = r.color_outline;
 	ctx.strokeRect(r.x, r.y, r.w, r.h);
+	ctx.fillStyle = r.color_fill;
+	ctx.fillRect(r.x, r.y, r.w, r.h);
 }
 
 function decorative_text_draw(t, ctx) {
@@ -56,10 +56,9 @@ function decorative_parkinglot_create(g, x, y, w, h) {
 }
 
 function decorative_tree_create(g, x, y) {
-	wall_create(g, x - 65, y, 160, 75);
-	wall_create(g, x, y + 75, 30, 100);
-	decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "black");
-	decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "black");
+	wall_create(g, x, y + 145, 30, 30);
+	game_object_make_last(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "black"));
+	game_object_make_last(g, decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "black"));
 }
 
 function decorative_road_create(g, x, y, w, h) {
