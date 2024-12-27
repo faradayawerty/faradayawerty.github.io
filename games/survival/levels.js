@@ -8,7 +8,7 @@ function levels_set(g, level) {
 	let Oy = 2500 * level_y;
 	if(level == "0x0") {
 		if(g.objects.filter((obj) => obj.name == "car0x0").length < 1)
-			g.objects[car_create(g, 600, 2000)].name = "car0x0";
+			g.objects[car_create(g, 600, 2000, "#ff1177", true)].name = "car0x0";
 		wall_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_building_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1960, 1050, 525);
