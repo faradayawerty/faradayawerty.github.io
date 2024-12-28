@@ -31,13 +31,13 @@ function player_update(p, dt) {
 	if (p.car) {
 		p.body.collisionFilter.mask = -3;
 		if(p.game.input.keys['d'])
-			Matter.Body.rotate(p.car.body, 0.003 * p.speed);
+			Matter.Body.rotate(p.car.body, 0.0015 * dt);
 		if(p.game.input.keys['a'])
-			Matter.Body.rotate(p.car.body, -0.003 * p.speed);
+			Matter.Body.rotate(p.car.body, -0.0015 * dt);
 		if(p.game.input.keys['w'])
 			vel = Matter.Vector.create(p.car.speed * Math.cos(p.car.body.angle), p.car.speed * Math.sin(p.car.body.angle));
 		if(p.game.input.keys['s'])
-			vel = Matter.Vector.create(-p.car.speed * Math.cos(p.car.body.angle), -p.car.speed * Math.sin(p.car.body.angle));
+			vel = Matter.Vector.create(-0.5 * p.car.speed * Math.cos(p.car.body.angle), -0.5 * p.car.speed * Math.sin(p.car.body.angle));
 		Matter.Body.setVelocity(p.car.body, vel);
 		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car.body.position, Matter.Vector.create(0, 0)));
 		if(p.game.input.keys['f'] && p.car_cooldown >= 200) {
@@ -59,7 +59,7 @@ function player_update(p, dt) {
 			let car_closest = null;
 			for(let i = 0; i < p.game.objects.length; i++) {
 				let car = null;
-				if(p.game.objects[i].name.substring(0, 3) == "car")
+				if(p.game.objects[i].name == "car")
 					car = p.game.objects[i].data;
 				else
 					continue;

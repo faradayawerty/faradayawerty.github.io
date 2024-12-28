@@ -8,7 +8,10 @@ function decorative_rectangle_create(g, x_, y_, w_, h_, color_fill_, color_outli
 		w: w_,
 		h: h_
 	};
-	return game_object_create(g, "decorative", r, function(){}, decorative_rectangle_draw);
+	let iobj = game_object_create(g, "decorative", r, function(){}, decorative_rectangle_draw);
+	let obj = g.objects[iobj];
+	obj.persistent = false;
+	return iobj;
 }
 
 function decorative_text_create(g, text_, x_, y_, size_, color_) {
@@ -19,7 +22,10 @@ function decorative_text_create(g, text_, x_, y_, size_, color_) {
 		size: Math.floor(size_),
 		color: color_
 	};
-	return game_object_create(g, "decorative", t, function(){}, decorative_text_draw);
+	let iobj = game_object_create(g, "decorative", t, function(){}, decorative_text_draw);
+	let obj = g.objects[iobj];
+	obj.persistent = false;
+	return iobj;
 }
 
 function decorative_rectangle_draw(r, ctx) {
@@ -42,7 +48,7 @@ function decorative_building_create(g, x, y, w, h) {
 }
 
 function decorative_grass_create(g, x, y, w, h) {
-	decorative_rectangle_create(g, x, y, w, h, "#117711", "#005500");
+	g.objects[decorative_rectangle_create(g, x, y, w, h, "#117711", "#005500")].name = "decorative_grass";
 }
 
 function decorative_parkinglot_create(g, x, y, w, h) {

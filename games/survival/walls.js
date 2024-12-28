@@ -6,7 +6,10 @@ function wall_create(g, x, y, w, h) {
 		})
 	};
 	Matter.Composite.add(g.engine.world, data.body);
-	return game_object_create(g, "wall", data, wall_update, wall_draw);
+	let iobj = game_object_create(g, "wall", data, wall_update, wall_draw);
+	let obj = g.objects[iobj];
+	obj.persistent = false;
+	return iobj;
 }
 
 function wall_update(w, dt) {}

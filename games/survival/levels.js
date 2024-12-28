@@ -7,8 +7,12 @@ function levels_set(g, level) {
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
 	if(level == "0x0") {
-		if(g.objects.filter((obj) => obj.name == "car0x0").length < 1)
-			g.objects[car_create(g, 600, 2000, "#ff1177", true)].name = "car0x0";
+		game_object_create_with_unique_name(g, "car_0x0_1", function() {
+			let icar = car_create(g, Ox + 1500, Oy + 2200, "#7711ff")
+			let car = g.objects[icar].data;
+			car.max_speed = 20;
+			return icar;
+		});
 		wall_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_building_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1960, 1050, 525);

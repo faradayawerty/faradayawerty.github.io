@@ -22,12 +22,15 @@ function game_new(g) {
 	levels_set(g, "0x0");
 }
 
-function game_object_create(g, name_, data_, func_update, func_draw) {
+function game_object_create(g, name_, data_, func_update, func_draw, func_destroy) {
 	let obj = {
 		name: name_,
 		data: data_,
 		update: func_update,
-		draw: func_draw
+		draw: func_draw,
+		destroy: func_destroy,
+		unique_name: null,
+		persistent: true
 	};
 	g.objects.unshift(obj);
 	return 0;
@@ -40,8 +43,14 @@ function game_update(g, dt) {
 		if(obj.name == "player") {
 			if(obj.data.want_level != g.level)
 				levels_set(g, obj.data.want_level);
-			g.offset_x = obj.data.body.position.x;
-			g.offset_y = obj.data.body.position.y;
+			if(g.offset_x - obj.data.body.position.x > 50)
+				g.offset_x = obj.data.body.position.x + 50
+			if(g.offset_y - obj.data.body.position.y > 50)
+				g.offset_y = obj.data.body.position.y + 50;
+			if(g.offset_x - obj.data.body.position.x < -50)
+				g.offset_x = obj.data.body.position.x - 50;
+			if(g.offset_y - obj.data.body.position.y < -50)
+				g.offset_y = obj.data.body.position.y - 50;
 		}
 	}
 }
@@ -76,12 +85,17 @@ function game_destroy_level(g) {
 		if(g.objects[i].name == "wall")
 			Matter.Composite.remove(g.engine.world, g.objects[i].data.body);
 	}
-	g.objects = g.objects.filter((obj) => (obj.name != "decorative" && obj.name != "wall"));
+	g.objects = g.objects.filter((obj) => obj.persistent);
 }
 
 function game_object_make_last(g, i) {
 	let obj = g.objects[i];
 	g.objects.splice(i, 1);
 	return g.objects.push(obj) - 1;
+}
+
+function game_object_create_with_unique_name(g, unique_name, func_create_object) {
+	if(g.objects.filter((obj) => obj.unique_name == unique_name).length < 1)
+		g.objects[func_create_object()].unique_name = unique_name;
 }
 
