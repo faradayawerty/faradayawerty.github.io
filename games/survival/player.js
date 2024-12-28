@@ -85,4 +85,3 @@ function player_draw(p, ctx) {
 		drawMatterBody(ctx, p.body, "white");
 	}
 }
-
