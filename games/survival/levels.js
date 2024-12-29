@@ -6,6 +6,10 @@ function levels_set(g, level) {
 	let level_y = Number(level.split("x")[1]);
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
+
+//	for(let i = 0; i < 25 * Math.random() - 0; i++)
+//		enemy_create(g, Ox + 2500 * Math.random(), Oy + 2500 * Math.random());
+
 	if(level == "0x0") {
 		game_object_create_with_unique_name(g, "car_0x0_1", function() {
 			let icar = car_create(g, Ox + 1500, Oy + 2200, "#7711ff")

@@ -33,7 +33,7 @@ function drawMatterBody(ctx, b, color) {
 	for (let j = 1; j < vertices.length; j += 1)
 		ctx.lineTo(vertices[j].x, vertices[j].y);
 	ctx.lineTo(vertices[0].x, vertices[0].y);
-	ctx.lineWidth = 0.1;
+	ctx.lineWidth = 1;
 	ctx.strokeStyle = color;
 	ctx.stroke();
 }

@@ -31,7 +31,7 @@ function car_update(c, dt) {
 		else
 			continue;
 		if(doRectsCollide(c.body.position.x, c.body.position.y, 0, 0, grass.x, grass.y, grass.w, grass.h)) {
-			c.speed = 0.33 * c.max_speed;
+			c.speed = 0.66 * c.max_speed;
 			break;
 		}
 	}

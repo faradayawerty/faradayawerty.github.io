@@ -22,6 +22,7 @@ function enemy_update(e, dt) {
 }
 
 function enemy_draw(e, ctx) {
-	drawMatterBody(ctx, e.body, 'green');
+	fillMatterBody(ctx, e.body, 'green');
+	drawMatterBody(ctx, e.body, 'white');
 }
 
