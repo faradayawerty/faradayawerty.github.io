@@ -109,8 +109,8 @@ function player_update(player_object, dt) {
 				player_object.game,
 				p.body.position.x,
 				p.body.position.y,
-				(0.5 + 0.5 * Math.random()) * (player_object.game.input.mouse.x - 0.5 * window.innerWidth),
-				(0.5 + 0.5 * Math.random()) * (player_object.game.input.mouse.y - 0.5 * window.innerHeight)
+				(0.9 + 0.1 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				(0.9 + 0.1 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight
 			);
 			p.shot_cooldown = 20;
 			if(Math.random() > 0.99)
@@ -161,8 +161,8 @@ function player_draw(player_object, ctx) {
 			ctx.moveTo(px, py);
 			let gx = 1, gy = 1;
 			if(player_object.game.input.mouse.leftButtonPressed) {
-				gx = (0.5 + Math.random() * 0.5) * (player_object.game.input.mouse.x - 0.5 * ctx.canvas.width);
-				gy = (0.5 + Math.random() * 0.5) * (player_object.game.input.mouse.y - 0.5 * ctx.canvas.height);
+				gx = (0.9 + Math.random() * 0.1) * player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
+				gy = (0.9 + Math.random() * 0.1) * player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
 			} else {
 				gx = player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
 				gy = player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;

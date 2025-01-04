@@ -4,6 +4,7 @@ function game_create(input_, engine_) {
 		level: "0x0",
 		offset_x: 1250,
 		offset_y: 1250,
+		scale: 1,
 		camera_target_body: null,
 		player_object: null,
 		objects: [],
@@ -11,6 +12,7 @@ function game_create(input_, engine_) {
 		input: input_,
 		engine: engine_,
 		settings: {
+			ui_scale: 1.0,
 			player_color: "red",
 			player_draw_gun: true,
 		},
@@ -22,7 +24,12 @@ function game_create(input_, engine_) {
 function game_new(g) {
 	game_destroy_all_gui_elements(g);
 	game_destroy_all_objects(g);
-	player_create(g, 1250, 1250);
+	let iplayer = player_create(g, 1250, 1250);
+	g.objects[iplayer].data.inventory_element.data.items[0][0] = ITEM_GUN;
+	g.objects[iplayer].data.inventory_element.data.items[0][1] = ITEM_HEALTH;
+	g.objects[iplayer].data.inventory_element.data.items[0][2] = ITEM_AMMO;
+	g.objects[iplayer].data.inventory_element.data.items[0][3] = ITEM_AMMO;
+	g.objects[iplayer].data.inventory_element.data.items[0][4] = ITEM_AMMO;
 	levels_set(g, "0x0");
 }
 
@@ -59,6 +66,10 @@ function game_gui_element_create(g, name_, data_, func_update, func_draw, func_d
 }
 
 function game_update(g, dt) {
+	if(isKeyDown(g.input, '=', true))
+		g.scale = g.scale / 0.875;
+	if(isKeyDown(g.input, '-', true))
+		g.scale = g.scale * 0.875;
 	g.objects = g.objects.filter((obj) => !obj.destroyed);
 	g.gui_elements = g.gui_elements.filter((elem) => !elem.destroyed);
 	for(let i = 0; i < g.objects.length; i++) {
@@ -77,7 +88,8 @@ function game_draw(g, ctx) {
 		g.offset_x = g.camera_target_body.position.x;
 		g.offset_y = g.camera_target_body.position.y;
 	}
-	ctx.translate(ctx.canvas.width / 2 - g.offset_x, ctx.canvas.height / 2 - g.offset_y);
+	ctx.scale(g.scale, g.scale);
+	ctx.translate(0.5 * ctx.canvas.width / g.scale - g.offset_x, 0.5 * ctx.canvas.height / g.scale - g.offset_y);
 	for(let i = 0; i < g.objects.length; i++)
 		if(!g.objects[i].destroyed)
 			g.objects[i].draw(g.objects[i], ctx);
