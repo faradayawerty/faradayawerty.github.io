@@ -56,6 +56,11 @@
 		let menu1 = menu_create();
 		let game1 = game_create(input1, engine1);
 
+		document.addEventListener("visibilitychange", function() {
+			if(document.hidden)
+				menu1.shown = true;
+		});
+
 		function animate(lastUpdateTime) {
 			ctx1.canvas.width = window.innerWidth;
 			ctx1.canvas.height = window.innerHeight;

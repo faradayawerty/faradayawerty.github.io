@@ -42,6 +42,7 @@ function decorative_rectangle_draw(rectangle_object, ctx) {
 	ctx.globalAlpha = r.transparency;
 	ctx.fillStyle = r.color_fill;
 	ctx.fillRect(r.x, r.y, r.w, r.h);
+	ctx.lineWidth = 2;
 	ctx.strokeStyle = r.color_outline;
 	ctx.strokeRect(r.x, r.y, r.w, r.h);
 	ctx.globalAlpha = 1.0;
