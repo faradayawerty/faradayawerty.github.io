@@ -25,9 +25,9 @@ function enemy_destroy(enemy_object) {
 function enemy_update(enemy_object, dt) {
 	let e = enemy_object.data;
 	let target_object = enemy_object.game.player_object;
-	if(target_object.data.car_object)
-		target_object = target_object.data.car_object;
 	if(target_object != null) {
+		if(target_object.data.car_object)
+			target_object = target_object.data.car_object;
 		let dx = target_object.data.body.position.x - e.body.position.x;
 		let dy = target_object.data.body.position.y - e.body.position.y;
 		let v = Math.sqrt(dx*dx + dy*dy);

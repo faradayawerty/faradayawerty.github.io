@@ -31,7 +31,7 @@ function car_create(g, x, y, color_) {
 }
 
 function car_destroy(car_object) {
-	if(car_object.game.player_object.data.car_object == car_object)
+	if(car_object.game.player_object && car_object.game.player_object.data.car_object == car_object)
 		car_object.game.player_object.data.car_object = null;
 	Matter.Composite.remove(car_object.game.engine.world, car_object.data.body);
 	car_object.destroyed = true;
