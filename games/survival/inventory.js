@@ -84,7 +84,6 @@ function inventory_drop_all_items(inventory_element) {
 
 function hotbar_create(g, inv) {
 	let hb = {
-		game: g,
 		iselected: 0,
 		row: inv.items[0],
 		slot_size: 30,
@@ -100,24 +99,28 @@ function hotbar_destroy(hotbar_element) {
 
 function hotbar_update(hotbar_element, dt) {
 	let hb = hotbar_element.data;
-	if(isKeyDown(hb.game.input, '1', true))
+	if(isKeyDown(hotbar_element.game.input, '1', true))
 		hb.iselected = 0;
-	if(isKeyDown(hb.game.input, '2', true))
+	if(isKeyDown(hotbar_element.game.input, '2', true))
 		hb.iselected = 1;
-	if(isKeyDown(hb.game.input, '3', true))
+	if(isKeyDown(hotbar_element.game.input, '3', true))
 		hb.iselected = 2;
-	if(isKeyDown(hb.game.input, '4', true))
+	if(isKeyDown(hotbar_element.game.input, '4', true))
 		hb.iselected = 3;
-	if(isKeyDown(hb.game.input, '5', true))
+	if(isKeyDown(hotbar_element.game.input, '5', true))
 		hb.iselected = 4;
-	if(isKeyDown(hb.game.input, '6', true))
+	if(isKeyDown(hotbar_element.game.input, '6', true))
 		hb.iselected = 5;
-	if(isKeyDown(hb.game.input, '7', true))
+	if(isKeyDown(hotbar_element.game.input, '7', true))
 		hb.iselected = 6;
-	if(isKeyDown(hb.game.input, '8', true))
+	if(isKeyDown(hotbar_element.game.input, '8', true))
 		hb.iselected = 7;
-	if(isKeyDown(hb.game.input, '9', true))
+	if(isKeyDown(hotbar_element.game.input, '9', true))
 		hb.iselected = 8;
+	if(isMouseWheelUp(hotbar_element.game.input))
+		hb.iselected = Math.min(8, hb.iselected + 1);
+	if(isMouseWheelDown(hotbar_element.game.input))
+		hb.iselected = Math.max(0, hb.iselected - 1);
 }
 
 function hotbar_draw(hotbar_object, ctx) {
