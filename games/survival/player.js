@@ -67,7 +67,7 @@ function player_update(player_object, dt) {
 	if(p.want_level != player_object.game.level)
 		levels_set(player_object.game, p.want_level);
 
-	p.infobox_element.data.lines.unshift(player_object.game.input.mouse.x + ":" + player_object.game.input.mouse.y);
+	p.infobox_element.data.lines.unshift(Math.round(player_object.game.input.mouse.x) + ":" + Math.round(player_object.game.input.mouse.y));
 	p.infobox_element.data.lines.unshift(player_object.game.level);
 	p.infobox_element.data.lines.unshift(Math.round(player_object.data.health));
 	p.infobox_element.data.lines.unshift(Math.round(p.body.position.x) + ":" + Math.round(p.body.position.y));
