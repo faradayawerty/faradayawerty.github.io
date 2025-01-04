@@ -33,11 +33,15 @@
 	<canvas id="canvas" width=1600 height=1200 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
 	<script src="menu.js" type="text/javascript"></script>
 	<script src="game.js" type="text/javascript"></script>
-	<script src="walls.js" type="text/javascript"></script>
+	<script src="bounds.js" type="text/javascript"></script>
 	<script src="levels.js" type="text/javascript"></script>
 	<script src="car.js" type="text/javascript"></script>
 	<script src="player.js" type="text/javascript"></script>
+	<script src="bullet.js" type="text/javascript"></script>
+	<script src="infobox.js" type="text/javascript"></script>
+	<script src="inventory.js" type="text/javascript"></script>
 	<script src="input.js" type="text/javascript"></script>
+	<script src="item.js" type="text/javascript"></script>
 	<script src="util.js" type="text/javascript"></script>
 	<script src="enemy.js" type="text/javascript"></script>
 	<script src="decorative.js" type="text/javascript"></script>
@@ -63,32 +67,34 @@
 			lastUpdateTime = Date.now();
 
 			// update game settings
-			if(menu1.want_player_color != game1.settings.player_color) {
+			if(menu1.want_player_color != game1.settings.player_color)
 				game1.settings.player_color = menu1.want_player_color;
-				game_update_settings(game1);
-			}
+			if(menu1.want_player_draw_gun != game1.settings.player_draw_gun)
+				game1.settings.player_draw_gun = menu1.want_player_draw_gun;
 
 			// update game if menu is not shown, else update menu
 			if(menu1.shown) {
 				menu_update(menu1, dt, input1);
-			} else if(input1.keys['Escape']) {
+			} else if(input1.keys.down['Escape']) {
 				menu1.shown = true;
+			} else if(game1.want_respawn_menu) {
+				menu1.shown = true;
+				menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf("continue game")] = "respawn and continue game";
+				game1.want_respawn_menu = false;
 			} else if(menu1.want_new_game) {
 				game_new(game1);
 				menu1.want_new_game = false;
+			} else if(menu1.want_player_respawn) {
+				player_create(game1, 1250, 1250);
+				menu1.want_player_respawn = false;
 			} else {
 				game_update(game1, dt);
 				Matter.Engine.update(engine1, dt);
 			}
 
 			game_draw(game1, ctx1);
-			if(menu1.shown) {
-				ctx1.globalAlpha = 0.75;
-				ctx1.fillStyle = "black";
-				ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
-				ctx1.globalAlpha = 1.0;
+			if(menu1.shown)
 				menu_draw(ctx1, menu1);
-			}
 
 			window.requestAnimationFrame(function() {
 				animate(lastUpdateTime);
@@ -108,3 +114,4 @@
 </body>
 
 </html>
+

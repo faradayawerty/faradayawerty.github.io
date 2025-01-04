@@ -1,14 +1,25 @@
 
 function input_create() {
 	return {
-		keys: {},
+		keys: {
+			down: []
+		},
 		mouse: {}
 	};
 }
 
+function isKeyDown(input, key, read_once=false) {
+	let val = input.keys.down[key];
+	if(read_once)
+		input.keys.down[key] = false;
+	return val;
+}
+
 function keyHandler(keys, e) {
-	//console.log(e.key);
-	keys[e.key] = e.type === 'keyup' ? false : true;
+	if(e.type === 'keyup')
+		keys.down[e.key] = false;
+	else
+		keys.down[e.key] = true;
 }
 
 function mouseHandler(mouse, ctx, e) {

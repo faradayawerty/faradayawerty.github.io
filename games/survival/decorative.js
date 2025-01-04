@@ -3,15 +3,20 @@ function decorative_rectangle_create(g, x_, y_, w_, h_, color_fill_, color_outli
 	let r = {
 		color_fill: color_fill_,
 		color_outline: color_outline_,
+		transparency: 1.0,
 		x: x_,
 		y: y_,
 		w: w_,
 		h: h_
 	};
-	let iobj = game_object_create(g, "decorative", r, function(){}, decorative_rectangle_draw);
+	let iobj = game_object_create(g, "decorative", r, function(){}, decorative_rectangle_draw, decorative_rectangle_destroy);
 	let obj = g.objects[iobj];
 	obj.persistent = false;
 	return iobj;
+}
+
+function decorative_rectangle_destroy(decorative_rectangle_object) {
+	decorative_rectangle_object.destroyed = true;
 }
 
 function decorative_text_create(g, text_, x_, y_, size_, color_) {
@@ -22,33 +27,52 @@ function decorative_text_create(g, text_, x_, y_, size_, color_) {
 		size: Math.floor(size_),
 		color: color_
 	};
-	let iobj = game_object_create(g, "decorative", t, function(){}, decorative_text_draw);
+	let iobj = game_object_create(g, "decorative", t, function(){}, decorative_text_draw, decorative_text_destroy);
 	let obj = g.objects[iobj];
 	obj.persistent = false;
 	return iobj;
 }
 
-function decorative_rectangle_draw(r, ctx) {
+function decorative_text_destroy(decorative_text_object) {
+	decorative_text_object.destroyed = true;
+}
+
+function decorative_rectangle_draw(rectangle_object, ctx) {
+	let r = rectangle_object.data;
+	ctx.globalAlpha = r.transparency;
 	ctx.fillStyle = r.color_fill;
 	ctx.fillRect(r.x, r.y, r.w, r.h);
 	ctx.strokeStyle = r.color_outline;
 	ctx.strokeRect(r.x, r.y, r.w, r.h);
+	ctx.globalAlpha = 1.0;
 }
 
-function decorative_text_draw(t, ctx) {
+function decorative_text_draw(text_object, ctx) {
+	let t = text_object.data;
 	ctx.font = t.size + "px verdana";
 	ctx.fillStyle = t.color;
 	ctx.fillText(t.text, t.x, t.y);
 }
 
+function decorative_wall_create(g, x, y, w, h) {
+	bound_create(g, x, y, w, h);
+	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h, "#333333", "#555555"), "decorative_wall");
+}
+
 function decorative_building_create(g, x, y, w, h) {
-	let A = 64;
-	decorative_rectangle_create(g, x + w/A, y + h/A, w - 2*w/A, h - 2*h/A, "#555555", "#555555");
-	decorative_rectangle_create(g, x, y, w, h, "#333333", "#555555");
+	decorative_roof_create(g, x + 0.01 * w, y + 0.01 * h, w * 0.98, h * 0.98);
+	decorative_wall_create(g, x, y, w, h * 0.05);
+	decorative_wall_create(g, x, y + 0.95 * h, w, h * 0.05);
+	decorative_wall_create(g, x, y, w * 0.05, h);
+	decorative_wall_create(g, x + 0.95 * w, y, w * 0.05, 0.4 * h);
+	decorative_wall_create(g, x + 0.95 * w, y + 0.55 * h, w * 0.05, 0.4 * h);
+	decorative_wall_create(g, x + 0.5 * w, y, w * 0.05, 0.75 * h);
+	decorative_wall_create(g, x, y + 0.4 * h, 0.4 * w, h * 0.05);
+	decorative_rectangle_create(g, x, y, w, h, "#555555", "#333333");
 }
 
 function decorative_grass_create(g, x, y, w, h) {
-	g.objects[decorative_rectangle_create(g, x, y, w, h, "#117711", "#005500")].name = "decorative_grass";
+	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h, "#117711", "#005500"), "decorative_grass");
 }
 
 function decorative_parkinglot_create(g, x, y, w, h) {
@@ -62,9 +86,9 @@ function decorative_parkinglot_create(g, x, y, w, h) {
 }
 
 function decorative_tree_create(g, x, y) {
-	wall_create(g, x, y + 145, 30, 30);
-	game_object_make_last(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "black"));
-	game_object_make_last(g, decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "black"));
+	bound_create(g, x, y + 145, 30, 30);
+	game_object_change_name(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "black"), "decorative_leaves");
+	game_object_change_name(g, decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "black"), "decorative_trunk");
 }
 
 function decorative_road_create(g, x, y, w, h) {
@@ -75,3 +99,27 @@ function decorative_road_create(g, x, y, w, h) {
 		decorative_rectangle_create(g, x + w / 2 - 0.05 * w, y + (i + 0.25) * h / N, 0.1 * w, 0.5 * h / N, "#ffffff", "#ffffff");
 	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 }
+
+function decorative_roof_create(g, x, y, w, h) {
+	let iroof = decorative_rectangle_create(g, x, y, w, h, "#555555", "#555555")
+	let roof = g.objects[iroof];
+	roof.update = decorative_roof_update;
+	game_object_change_name(g, iroof, "decorative_roof");
+}
+
+function decorative_roof_update(roof_object, dt) {
+	if(!roof_object.game.player_object)
+		return;
+	let r = roof_object.data;
+	let g = roof_object.game;
+	let p = g.player_object.data;
+	if(doRectsCollide(p.body.position.x, p.body.position.y, 0, 0, r.x, r.y, r.w, r.h))
+		r.transparency = 0.1;
+	else
+		r.transparency = 1.0;
+}
+
+function decorative_level_base_create(g, x, y) {
+	game_object_change_name(g, decorative_rectangle_create(g, x, y, 2500, 2500, "gray", "white"), "decorative_level_base");
+}
+

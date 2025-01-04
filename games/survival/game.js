@@ -1,22 +1,26 @@
 
 function game_create(input_, engine_) {
 	let g = {	
-		input: input_,
-		engine: engine_,
-		
-		objects: [],
-		settings: {
-			player_color: "red"
-		},
-		
 		level: "0x0",
 		offset_x: 1250,
 		offset_y: 1250,
+		camera_target_body: null,
+		player_object: null,
+		objects: [],
+		gui_elements: [],
+		input: input_,
+		engine: engine_,
+		settings: {
+			player_color: "red",
+			player_draw_gun: true,
+		},
+		want_respawn_menu: false
 	};
 	return g;
 }
 
 function game_new(g) {
+	game_destroy_all_gui_elements(g);
 	game_destroy_all_objects(g);
 	player_create(g, 1250, 1250);
 	levels_set(g, "0x0");
@@ -24,78 +28,127 @@ function game_new(g) {
 
 function game_object_create(g, name_, data_, func_update, func_draw, func_destroy) {
 	let obj = {
+		game: g,
 		name: name_,
+		unique_name: null,
 		data: data_,
 		update: func_update,
 		draw: func_draw,
 		destroy: func_destroy,
-		unique_name: null,
-		persistent: true
+		persistent: true,
+		destroyed: false
 	};
 	g.objects.unshift(obj);
-	return 0;
+	game_objects_arrange(g);
+	let iobj = g.objects.indexOf(obj);
+	return iobj;
+}
+
+function game_gui_element_create(g, name_, data_, func_update, func_draw, func_destroy) {
+	let elem = {
+		game: g,
+		name: name_,
+		data: data_,
+		update: func_update,  
+		draw: func_draw,      
+		destroy: func_destroy,
+		shown: false,
+		destroyed: false
+	};
+	return g.gui_elements.push(elem) - 1;
 }
 
 function game_update(g, dt) {
+	g.objects = g.objects.filter((obj) => !obj.destroyed);
+	g.gui_elements = g.gui_elements.filter((elem) => !elem.destroyed);
 	for(let i = 0; i < g.objects.length; i++) {
-		let obj = g.objects[i];
-		obj.update(obj.data, dt);
-		if(obj.name == "player") {
-			if(obj.data.want_level != g.level)
-				levels_set(g, obj.data.want_level);
-			if(g.offset_x - obj.data.body.position.x > 50)
-				g.offset_x = obj.data.body.position.x + 50
-			if(g.offset_y - obj.data.body.position.y > 50)
-				g.offset_y = obj.data.body.position.y + 50;
-			if(g.offset_x - obj.data.body.position.x < -50)
-				g.offset_x = obj.data.body.position.x - 50;
-			if(g.offset_y - obj.data.body.position.y < -50)
-				g.offset_y = obj.data.body.position.y - 50;
-		}
+		if(!g.objects[i].destroyed)
+			g.objects[i].update(g.objects[i], dt);
+	}
+	for(let i = 0; i < g.gui_elements.length; i++) {
+		if(!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
+			g.gui_elements[i].update(g.gui_elements[i], dt);
 	}
 }
 
 function game_draw(g, ctx) {
 	ctx.save();
-	ctx.translate(ctx.canvas.width / 2 - g.offset_x, ctx.canvas.height / 2 - g.offset_y);
-	for(let i = 0; i < g.objects.length; i++) {
-		let obj = g.objects[i];
-		obj.draw(obj.data, ctx);
+	if(g.camera_target_body) {
+		g.offset_x = g.camera_target_body.position.x;
+		g.offset_y = g.camera_target_body.position.y;
 	}
+	ctx.translate(ctx.canvas.width / 2 - g.offset_x, ctx.canvas.height / 2 - g.offset_y);
+	for(let i = 0; i < g.objects.length; i++)
+		if(!g.objects[i].destroyed)
+			g.objects[i].draw(g.objects[i], ctx);
 	ctx.restore();
-	drawText(ctx, 40, 40, Math.round(g.offset_x) + ":" + Math.round(g.offset_y));
-	drawText(ctx, 40, 60, g.level);
-}
-
-function game_update_settings(g) {
-	for(let i = 0; i < g.objects.length; i++) {
-		let obj = g.objects[i];
-		if(obj.name == "player" && obj.data.color != g.settings.player_color)
-			obj.data.color = g.settings.player_color;
+	for(let i = 0; i < g.gui_elements.length; i++) {
+		if(!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
+			g.gui_elements[i].draw(g.gui_elements[i], ctx);
 	}
 }
 
 function game_destroy_all_objects(g) {
+	for(let i = 0; i < g.objects.length; i++)
+		g.objects[i].destroy(g.objects[i]);
 	Matter.Composite.clear(g.engine.world);
 	g.objects = [];
 }
 
+function game_destroy_all_gui_elements(g) {
+	for(let i = 0; i < g.gui_elements.length; i++)
+		g.gui_elements[i].destroy(g.gui_elements[i]);
+	g.gui_elements = [];
+}
+
 function game_destroy_level(g) {
+	for(let i = 0; i < g.objects.length; i++)
+		if(!g.objects[i].persistent)
+			g.objects[i].destroy(g.objects[i]);
+}
+
+function game_object_find_closest(g, x, y, name, radius) {
+	let pos = Matter.Vector.create(x, y);
+	let closest = null;
 	for(let i = 0; i < g.objects.length; i++) {
-		if(g.objects[i].name == "wall")
-			Matter.Composite.remove(g.engine.world, g.objects[i].data.body);
+		let obj = null;
+		if(g.objects[i].name == name)
+			obj = g.objects[i];
+		else
+			continue;
+		if(radius >= 0 && !closest && dist(obj.data.body.position, pos) < radius)
+			closest = obj;
+		if(closest && dist(obj.data.body.position, pos) < dist(closest.data.body.position, pos))
+			closest = obj;
 	}
-	g.objects = g.objects.filter((obj) => obj.persistent);
+	return closest;
 }
 
-function game_object_make_last(g, i) {
-	let obj = g.objects[i];
-	g.objects.splice(i, 1);
-	return g.objects.push(obj) - 1;
+function game_objects_arrange(g) {
+	let arrangement = [
+		"decorative_roof",
+		"decorative_leaves",
+		"decorative_trunk",
+		"bullet",
+		"car",
+		"player",
+		"item",
+		"enemy",
+		"decorative_wall",
+		"decorative",
+		"decorative_grass",
+		"decorative_level_base"
+	];
+	let objects_new = [];
+	let leftover = g.objects.filter((obj) => !arrangement.includes(obj.name));
+	for(let i = 0; i < arrangement.length; i++)
+		objects_new = g.objects.filter((obj) => obj.name == arrangement[i]).concat(objects_new);
+	objects_new = leftover.concat(objects_new);
+	g.objects = objects_new;
 }
 
-function game_object_create_with_unique_name(g, unique_name, func_create_object) {
-	if(g.objects.filter((obj) => obj.unique_name == unique_name).length < 1)
-		g.objects[func_create_object()].unique_name = unique_name;
+function game_object_change_name(g, i, name) {
+	g.objects[i].name = name;
+	game_objects_arrange(g);
 }
 

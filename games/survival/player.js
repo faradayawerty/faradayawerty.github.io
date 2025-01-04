@@ -1,20 +1,57 @@
 
 function player_create(g, x, y) {
+	let width = 40, height = 40;
 	let p = {
-		game: g,
+		health: 100,
+		max_health: 100,
 		speed: 10,
+		shot_cooldown: 0,
 		want_level: g.level,
-		car: null,
-		car_cooldown: 200,
-		body: Matter.Bodies.rectangle(x, y, 40, 40, {
+		w: width,
+		h: height,
+		infobox_element: null,
+		inventory_element: null,
+		hotbar_element: null,
+		car_object: null,
+		body: Matter.Bodies.rectangle(x, y, width, height, {
 			inertia: Infinity
 		})
 	};
+	p.infobox_element = g.gui_elements[infobox_create(g, 40, 100, 4)];
+	p.inventory_element = g.gui_elements[inventory_create(g)];
+	p.hotbar_element = g.gui_elements[hotbar_create(g, p.inventory_element.data)];
 	Matter.Composite.add(g.engine.world, p.body);
-	return game_object_create(g, "player", p, player_update, player_draw);
+	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
+	g.player_object = g.objects[iplayer];
+	return iplayer;
 }
 
-function player_update(p, dt) {
+function player_destroy(player_object) {
+	Matter.Composite.remove(player_object.game.engine.world, player_object.data.body);
+	infobox_destroy(player_object.data.infobox_element);
+	inventory_destroy(player_object.data.inventory_element);
+	hotbar_destroy(player_object.data.hotbar_element);
+	player_object.destroyed = true;
+	player_object.game.player_object = null;
+	if(player_object.game.camera_target_body == player_object.data.body)
+		player_object.game.camera_target_body = null;
+}
+
+function player_die(player_object) {
+	inventory_drop_all_items(player_object.data.inventory_element);
+	player_object.game.want_respawn_menu = true;
+	player_destroy(player_object);
+}
+
+function player_update(player_object, dt) {
+
+	let p = player_object.data;
+	if(player_object.data.health <= 0)
+		player_die(player_object);
+	if(p.shot_cooldown > 0)
+		p.shot_cooldown -= dt;
+
+	// choose level based on coordinates
 	let level_x = Number(p.want_level.split("x")[0]);
 	let level_y = Number(p.want_level.split("x")[1]);
 	let Ox = 2500 * level_x;
@@ -27,61 +64,119 @@ function player_update(p, dt) {
 		p.want_level = level_x + "x" + (level_y - 1);
 	else if(p.body.position.y > Oy + 2500)
 		p.want_level = level_x + "x" + (level_y + 1);
+	if(p.want_level != player_object.game.level)
+		levels_set(player_object.game, p.want_level);
+
+	p.infobox_element.data.lines.unshift(player_object.game.input.mouse.x + ":" + player_object.game.input.mouse.y);
+	p.infobox_element.data.lines.unshift(player_object.game.level);
+	p.infobox_element.data.lines.unshift(Math.round(player_object.data.health));
+	p.infobox_element.data.lines.unshift(Math.round(p.body.position.x) + ":" + Math.round(p.body.position.y));
+
+	if(isKeyDown(player_object.game.input, 'o', true))
+		p.infobox_element.shown = !p.infobox_element.shown;
+
+	if(isKeyDown(player_object.game.input, 'i', true)) {
+		p.inventory_element.shown = !p.inventory_element.shown;
+		p.hotbar_element.shown = !p.hotbar_element.shown;
+	}
+
 	let vel = Matter.Vector.create(0, 0);
-	if (p.car) {
-		p.body.collisionFilter.mask = -3;
-		if(p.game.input.keys['d'])
-			Matter.Body.rotate(p.car.body, 0.0015 * dt);
-		if(p.game.input.keys['a'])
-			Matter.Body.rotate(p.car.body, -0.0015 * dt);
-		if(p.game.input.keys['w'])
-			vel = Matter.Vector.create(p.car.speed * Math.cos(p.car.body.angle), p.car.speed * Math.sin(p.car.body.angle));
-		if(p.game.input.keys['s'])
-			vel = Matter.Vector.create(-0.5 * p.car.speed * Math.cos(p.car.body.angle), -0.5 * p.car.speed * Math.sin(p.car.body.angle));
-		Matter.Body.setVelocity(p.car.body, vel);
-		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car.body.position, Matter.Vector.create(0, 0)));
-		if(p.game.input.keys['f'] && p.car_cooldown >= 200) {
-			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car.body.position, Matter.Vector.create(150, 0)));
-			p.car = null;
-			p.car_cooldown = 0;
-		}
-	} else {
+
+	if(!p.inventory_element.shown && !p.car_object) {
+		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
-		if(p.game.input.keys['d'])
+		if(player_object.game.input.keys.down['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
-		if(p.game.input.keys['a'])
+		if(player_object.game.input.keys.down['a'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(-p.speed, 0));
-		if(p.game.input.keys['s'])
+		if(player_object.game.input.keys.down['s'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
-		if(p.game.input.keys['w'])
+		if(player_object.game.input.keys.down['w'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
-		if(p.game.input.keys['f'] && p.car_cooldown >= 200) {
-			let car_closest = null;
-			for(let i = 0; i < p.game.objects.length; i++) {
-				let car = null;
-				if(p.game.objects[i].name == "car")
-					car = p.game.objects[i].data;
-				else
-					continue;
-				if(!car_closest && car.ridable && dist(car.body.position, p.body.position) < 200)
-					car_closest = car;
-				if(car_closest && dist(car.body.position, p.body.position) < dist(car_closest.body.position, p.body.position))
-					car_closest = car;
-			}
-			if(car_closest) {
-				p.car = car_closest;
-				p.car_cooldown = 0;
-			}
+		if(isKeyDown(player_object.game.input, 'f', true)) {
+			if(!item_pickup(p.inventory_element, game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100)))
+				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+		}
+		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_HEALTH && (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
+			p.health += Math.min(p.max_health - p.health, Math.random() * 20 + 5);
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		}
+		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_GUN
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.shot_cooldown <= 0
+			&& hotbar_find_item(p.hotbar_element, ITEM_AMMO) > -1) {
+			bullet_create(
+				player_object.game,
+				p.body.position.x,
+				p.body.position.y,
+				(0.5 + 0.5 * Math.random()) * (player_object.game.input.mouse.x - 0.5 * window.innerWidth),
+				(0.5 + 0.5 * Math.random()) * (player_object.game.input.mouse.y - 0.5 * window.innerHeight)
+			);
+			p.shot_cooldown = 20;
+			if(Math.random() > 0.99)
+				hotbar_clear_item(p.hotbar_element, ITEM_AMMO, 1);
 		}
 		Matter.Body.setVelocity(p.body, vel);
 	}
-	if(p.car_cooldown < 200)
-		p.car_cooldown += dt;
+
+	if(!p.inventory_element.shown && p.car_object) {
+		let rotatedir = 0;
+		player_object.game.camera_target_body = p.car_object.data.body;
+		p.body.collisionFilter.mask = -3;
+		if(player_object.game.input.keys.down['w']) {
+			vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
+			rotatedir = 1;
+		}
+		if(player_object.game.input.keys.down['s']) {
+			vel = Matter.Vector.create(-0.5 * p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), -0.5 * p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
+			rotatedir = -1;
+		}
+		if(player_object.game.input.keys.down['d'])
+			Matter.Body.rotate(p.car_object.data.body, rotatedir * 0.0015 * dt);
+		if(player_object.game.input.keys.down['a'])
+			Matter.Body.rotate(p.car_object.data.body, -rotatedir * 0.0015 * dt);
+		Matter.Body.setVelocity(p.car_object.data.body, vel);
+		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(0, 0)));
+		if(isKeyDown(player_object.game.input, 'f', true)) {
+			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
+			p.car_object = null;
+		}
+	} 
 }
 
-function player_draw(p, ctx) {
-	if(!p.car) {
-		fillMatterBody(ctx, p.body, p.game.settings.player_color);
+function player_draw(player_object, ctx) {
+	let p = player_object.data;
+	if(!p.car_object) {
+		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");
+		ctx.fillStyle = "red";
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.75 * p.h, p.w, 2);
+		ctx.fillStyle = "lime";
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.75 * p.h, p.w * p.health / p.max_health, 2);
+		if(player_object.game.settings.player_draw_gun && hotbar_get_selected_item(p.hotbar_element.data) == ITEM_GUN) {
+			ctx.strokeStyle = "black";
+			ctx.beginPath();
+			let px = p.body.position.x - 0.45 * p.w;
+			let py = p.body.position.y - 0.45 * p.h;
+			ctx.moveTo(px, py);
+			let gx = 1, gy = 1;
+			if(player_object.game.input.mouse.leftButtonPressed) {
+				gx = (0.5 + Math.random() * 0.5) * (player_object.game.input.mouse.x - 0.5 * ctx.canvas.width);
+				gy = (0.5 + Math.random() * 0.5) * (player_object.game.input.mouse.y - 0.5 * ctx.canvas.height);
+			} else {
+				gx = player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
+				gy = player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
+			}
+			let g = Math.sqrt(gx * gx + gy * gy);
+			ctx.lineTo(px + p.w * gx / g, py + p.h * gy / g);
+			ctx.lineWidth = 0.25 * p.w;
+			ctx.stroke();
+			ctx.lineWidth = 2;
+		} else if(hotbar_get_selected_item(p.hotbar_element.data) > 0) {
+			let px = p.body.position.x - 0.25 * p.w,
+				py = p.body.position.y - 0.25 * p.h;
+			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element.data), px, py, 0.5 * p.w, 0.5 * p.h);
+		}
 	}
 }
+
