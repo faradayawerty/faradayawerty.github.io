@@ -2,6 +2,8 @@
 let ITEM_GUN = 1;
 let ITEM_AMMO = 2;
 let ITEM_HEALTH = 3;
+let ITEM_FUEL = 4;
+let ITEM_MONEY = 5;
 
 function item_create(g, id_, x_, y_) {
 	if(id_ == 0)
@@ -31,7 +33,9 @@ function item_draw(item_object, ctx) {
 }
 
 function item_icon_draw(ctx, id, x, y, w, h) {
-	if(id == ITEM_GUN) {
+	if(id == 0) {
+		return
+	} else if(id == ITEM_GUN) {
 		ctx.fillStyle = "black";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 		ctx.strokeStyle = "gray";
@@ -43,6 +47,9 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 			ctx.fillStyle = "orange";
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.lineWidth = 0.5;
+			ctx.strokeStyle = "orange";
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 		}
 	} else if(id == ITEM_HEALTH) {
 		ctx.fillStyle = "white";
@@ -50,6 +57,34 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillStyle = "red";
 		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
+	} else if(id == ITEM_FUEL) {
+		ctx.fillStyle = "#ff1111";
+		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.05, h * 0.2);
+		ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.05, h * 0.2);
+		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.2, h * 0.05);
+		ctx.lineWidth = 0.5;
+		ctx.strokeStyle = "black";
+		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+		ctx.fillStyle = "yellow";
+		ctx.fillRect(x + w * 0.55, y + h * 0.15, w * 0.2, h * 0.05);
+		drawLine(ctx, x + w * 0.3, y + h * 0.3, x + w * 0.7, y + h * 0.7, "#cc1111", 0.05 * w);
+		drawLine(ctx, x + w * 0.7, y + h * 0.3, x + w * 0.3, y + h * 0.7, "#cc1111", 0.05 * w);
+		ctx.fillStyle = "#dd1111";
+		ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
+	} else if(id == ITEM_MONEY) {
+		ctx.fillStyle = "#11ff55";
+		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
+		ctx.strokeStyle = "#007733";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
+		drawCircle(ctx, x + w * 0.5, y + h * 0.5, w * 0.1, "#007733", "#007733", w * 0.025);
+	} else {
+		ctx.fillStyle = "#000000";
+		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		ctx.fillStyle = "#ff00ff";
+		ctx.fillRect(x + 0.5 * w, y + 0.1 * h, 0.4 * w, 0.4 * h);
+		ctx.fillRect(x + 0.1 * w, y + 0.5 * h, 0.4 * w, 0.4 * h);
 	}
 }
 

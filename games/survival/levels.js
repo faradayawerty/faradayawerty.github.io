@@ -10,11 +10,11 @@ function levels_set(g, level) {
 	for(let i = 0; i < Math.random() * 50 - 25; i++)
 		enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 	for(let i = 0; i < Math.random() * 50 - 25; i++)
-		item_create(g, Math.round(2 + 1 * Math.random()), Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		item_create(g, Math.floor(1.9 + 3.2 * Math.random()), Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 
 	if(level == "0x0") {
-		//car_create(g, Ox + 1500, Oy + 2200, "#1177ff");
-		//car_create(g, Ox + 2000, Oy + 2000, "#7711ff");
+		car_create(g, Ox + 1550, Oy + 2200, "#1177ff");
+		car_create(g, Ox + 1960, Oy + 2200, "#7711ff");
 		decorative_building_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1960, 1050, 525);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1410, 1050, 525);

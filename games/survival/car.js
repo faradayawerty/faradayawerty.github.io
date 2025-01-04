@@ -1,13 +1,18 @@
 
 function car_create(g, x, y, color_) {
+	let width = 200, height = 110;
 	let c = {
-		health: 100,
-		fuel: 100,
+		health: 1000,
+		max_health: 1000,
+		fuel: 200,
+		max_fuel: 200,
 		speed: 20,
 		max_speed: 20,
 		ridable: true,
 		color: color_,
-		body: Matter.Bodies.rectangle(x, y, 200, 110, {
+		w: width,
+		h: height,
+		body: Matter.Bodies.rectangle(x, y, width, height, {
 				angle: 3 * Math.PI / 2,
 				mass: 1000.5,
 				inertia: Infinity,
@@ -18,8 +23,11 @@ function car_create(g, x, y, color_) {
 				}
 			})
   	};
-	Matter.Composite.add(g.engine.world, c.body);
-	return game_object_create(g, "car", c, car_update, car_draw, car_destroy);
+	let icar = game_object_create(g, "car", c, car_update, car_draw, car_destroy,
+		"car_" + color_ + Math.round(x) + ":" + Math.round(y));
+	if(icar > -1)
+		Matter.Composite.add(g.engine.world, c.body);
+	return icar;
 }
 
 function car_destroy(car_object) {
@@ -43,7 +51,17 @@ function car_update(car_object, dt) {
 }
 
 function car_draw(car_object, ctx) {
-  	fillMatterBody(ctx, car_object.data.body, c.color);
+  	fillMatterBody(ctx, car_object.data.body, car_object.data.color);
 	drawMatterBody(ctx, car_object.data.body, "white");
+	ctx.fillStyle = "red";
+	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h, 0.5 * car_object.data.h, 2);
+	ctx.fillStyle = "lime";
+	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h,
+		0.5 * car_object.data.h * car_object.data.health / car_object.data.max_health, 2);
+	ctx.fillStyle = "red";
+	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.2 * car_object.data.h, 0.5 * car_object.data.h, 2);
+	ctx.fillStyle = "gray";
+	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.2 * car_object.data.h,
+		0.5 * car_object.data.h * car_object.data.fuel / car_object.data.max_fuel, 2);
 }
 

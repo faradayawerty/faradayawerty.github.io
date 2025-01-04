@@ -15,6 +15,7 @@ function game_create(input_, engine_) {
 			ui_scale: 1.0,
 			player_color: "red",
 			player_draw_gun: true,
+			enemies_spawn: true
 		},
 		want_respawn_menu: false
 	};
@@ -26,18 +27,19 @@ function game_new(g) {
 	game_destroy_all_objects(g);
 	let iplayer = player_create(g, 1250, 1250);
 	g.objects[iplayer].data.inventory_element.data.items[0][0] = ITEM_GUN;
-	g.objects[iplayer].data.inventory_element.data.items[0][1] = ITEM_HEALTH;
+	g.objects[iplayer].data.inventory_element.data.items[0][1] = ITEM_AMMO;
 	g.objects[iplayer].data.inventory_element.data.items[0][2] = ITEM_AMMO;
-	g.objects[iplayer].data.inventory_element.data.items[0][3] = ITEM_AMMO;
-	g.objects[iplayer].data.inventory_element.data.items[0][4] = ITEM_AMMO;
+	g.objects[iplayer].data.inventory_element.data.items[1][0] = ITEM_MONEY;
 	levels_set(g, "0x0");
 }
 
-function game_object_create(g, name_, data_, func_update, func_draw, func_destroy) {
+function game_object_create(g, name_, data_, func_update, func_draw, func_destroy, unique_name_=null) {
+	if(unique_name_ && g.objects.find((obj) => obj.unique_name == unique_name_))
+		return -1;
 	let obj = {
 		game: g,
 		name: name_,
-		unique_name: null,
+		unique_name: unique_name_,
 		data: data_,
 		update: func_update,
 		draw: func_draw,
@@ -67,9 +69,9 @@ function game_gui_element_create(g, name_, data_, func_update, func_draw, func_d
 
 function game_update(g, dt) {
 	if(isKeyDown(g.input, '=', true))
-		g.scale = g.scale / 0.875;
+		g.scale = g.scale / 0.9375;
 	if(isKeyDown(g.input, '-', true))
-		g.scale = g.scale * 0.875;
+		g.scale = g.scale * 0.9375;
 	g.objects = g.objects.filter((obj) => !obj.destroyed);
 	g.gui_elements = g.gui_elements.filter((elem) => !elem.destroyed);
 	for(let i = 0; i < g.objects.length; i++) {
@@ -141,11 +143,11 @@ function game_objects_arrange(g) {
 		"decorative_roof",
 		"decorative_leaves",
 		"decorative_trunk",
-		"bullet",
-		"car",
 		"player",
-		"item",
 		"enemy",
+		"item",
+		"car",
+		"bullet",
 		"decorative_wall",
 		"decorative",
 		"decorative_grass",

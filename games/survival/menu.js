@@ -6,6 +6,7 @@ function menu_create() {
 		want_player_respawn: false,
 		want_player_color: "red",
 		want_player_draw_gun: true,
+		want_enemies_spawn: true,
 		iselected: 0,
 		main_menu_buttons: [
 			"continue game",
@@ -15,6 +16,7 @@ function menu_create() {
 		settings_buttons: [
 			"player color",
 			"player draw gun",
+			"enemies spawn",
 			"main menu"
 		],
 		player_color_selection_menu: [
@@ -42,6 +44,8 @@ function menu_draw(ctx, m) {
 			text = text + ": " + m.want_player_color;
 		if(m.buttons[i] == "player draw gun")
 			text = text + ": " + m.want_player_draw_gun;
+		if(m.buttons[i] == "enemies spawn")
+			text = text + ": " + m.want_enemies_spawn;
 		if(m.iselected == i)
 			drawButton(ctx, 160, 140 + 60 * i, "[" + text + "]");
 		else
@@ -69,6 +73,8 @@ function menu_update(m, dt, input) {
 	} else if(m.buttons[m.iselected] == "main menu" && (isKeyDown(input, ' ', true) || isKeyDown(input, 'Enter', true))) {
 		m.buttons = m.main_menu_buttons;
 		m.iselected = 0;
+	} else if(m.buttons[m.iselected] == "enemies spawn" && (isKeyDown(input, ' ', true) || isKeyDown(input, 'Enter', true))) {
+		m.want_enemies_spawn = !m.want_enemies_spawn;
 	} else if(m.buttons[m.iselected] == "player color" && (isKeyDown(input, ' ', true) || isKeyDown(input, 'Enter', true))) {
 		m.buttons = m.player_color_selection_menu;
 		m.iselected = 0;

@@ -56,6 +56,8 @@ function inventory_draw(inventory_object, ctx) {
 				ctx.fillStyle = "cyan";
 			else if(inv.imove == i && inv.jmove == j)
 				ctx.fillStyle = "orange";
+			else if(i == 0)
+				ctx.fillStyle = "blue";
 			else
 				ctx.fillStyle = "blue";
 			ctx.fillRect(40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size);

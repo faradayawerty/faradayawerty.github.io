@@ -88,8 +88,8 @@ function decorative_parkinglot_create(g, x, y, w, h) {
 
 function decorative_tree_create(g, x, y) {
 	bound_create(g, x, y + 145, 30, 30);
-	game_object_change_name(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "black"), "decorative_leaves");
-	game_object_change_name(g, decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "black"), "decorative_trunk");
+	game_object_change_name(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "#224400"), "decorative_leaves");
+	game_object_change_name(g, decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "#442200"), "decorative_trunk");
 }
 
 function decorative_road_create(g, x, y, w, h) {

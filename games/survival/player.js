@@ -97,9 +97,18 @@ function player_update(player_object, dt) {
 			if(!item_pickup(p.inventory_element, game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100)))
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		}
-		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_HEALTH && (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
+		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_HEALTH
+			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
 			p.health += Math.min(p.max_health - p.health, Math.random() * 20 + 5);
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		}
+		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_FUEL
+			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
+			let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+			if(c) {
+				c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, Math.random() * 40 + 10);
+				p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			}
 		}
 		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_GUN
 			&& player_object.game.input.mouse.leftButtonPressed
@@ -123,12 +132,14 @@ function player_update(player_object, dt) {
 		let rotatedir = 0;
 		player_object.game.camera_target_body = p.car_object.data.body;
 		p.body.collisionFilter.mask = -3;
-		if(player_object.game.input.keys.down['w']) {
+		if(player_object.game.input.keys.down['w'] && p.car_object.data.fuel > 0) {
 			vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
+			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
 			rotatedir = 1;
 		}
-		if(player_object.game.input.keys.down['s']) {
+		if(player_object.game.input.keys.down['s'] && p.car_object.data.fuel > 0) {
 			vel = Matter.Vector.create(-0.5 * p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), -0.5 * p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
+			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
 			rotatedir = -1;
 		}
 		if(player_object.game.input.keys.down['d'])

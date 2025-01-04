@@ -1,6 +1,6 @@
 
 function bullet_create(g, x, y, dx, dy) {
-	let width = 10, height = 10;
+	let width = 6, height = 6;
 	let d = Math.sqrt(dx*dx + dy*dy);
 	let b = {
 		lifetime: 1000,

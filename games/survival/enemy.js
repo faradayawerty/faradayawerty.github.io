@@ -1,5 +1,7 @@
 
 function enemy_create(g, x, y) {
+	if(!g.settings.enemies_spawn)
+		return;
 	let width = 30, height = 30;
 	let e = {
 		health: 200,
