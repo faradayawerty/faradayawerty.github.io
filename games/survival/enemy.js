@@ -25,6 +25,8 @@ function enemy_destroy(enemy_object) {
 function enemy_update(enemy_object, dt) {
 	let e = enemy_object.data;
 	let target_object = enemy_object.game.player_object;
+	if(target_object.data.car_object)
+		target_object = target_object.data.car_object;
 	if(target_object != null) {
 		let dx = target_object.data.body.position.x - e.body.position.x;
 		let dy = target_object.data.body.position.y - e.body.position.y;
@@ -33,8 +35,12 @@ function enemy_update(enemy_object, dt) {
 		dy = e.speed * dy / v;
 		let vel = Matter.Vector.create(dx, dy);
 		Matter.Body.setVelocity(e.body, vel);
-		if(target_object.data.health && Matter.Collision.collides(e.body, target_object.data.body) != null)
+		if(target_object.data.health && Matter.Collision.collides(e.body, target_object.data.body) != null) {
 			target_object.data.health -= e.damage * dt;
+			if(target_object.name == "car"
+				&& Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.9 * target_object.data.max_speed)
+				enemy_object.data.health -= 10 * e.damage * dt;
+		}
 	}
 	if(enemy_object.data.health <= 0)
 		enemy_destroy(enemy_object);

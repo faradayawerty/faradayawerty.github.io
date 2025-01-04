@@ -27,9 +27,11 @@ function bullet_update(bullet_object, dt) {
 	else
 		bullet_object.data.lifetime -= dt;
 
-	for(let i = 0; i < bullet_object.game.objects.length; i++)
-		if(bullet_object.game.objects[i].name == "enemy" && Matter.Collision.collides(bullet_object.data.body, bullet_object.game.objects[i].data.body) != null)
+	for(let i = 0; i < bullet_object.game.objects.length; i++) {
+		if((bullet_object.game.objects[i].name == "enemy" || bullet_object.game.objects[i].name == "car")
+			&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.objects[i].data.body) != null)
 			bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
+	}
 }
 
 function bullet_draw(bullet_object, ctx) {

@@ -2,8 +2,8 @@
 function car_create(g, x, y, color_) {
 	let width = 200, height = 110;
 	let c = {
-		health: 1000,
-		max_health: 1000,
+		health: 2000,
+		max_health: 2000,
 		fuel: 200,
 		max_fuel: 200,
 		speed: 20,
@@ -31,6 +31,8 @@ function car_create(g, x, y, color_) {
 }
 
 function car_destroy(car_object) {
+	if(car_object.game.player_object.data.car_object == car_object)
+		car_object.game.player_object.data.car_object = null;
 	Matter.Composite.remove(car_object.game.engine.world, car_object.data.body);
 	car_object.destroyed = true;
 }
@@ -48,6 +50,8 @@ function car_update(car_object, dt) {
 			break;
 		}
 	}
+	if(car_object.data.health < 0)
+		car_destroy(car_object);
 }
 
 function car_draw(car_object, ctx) {
