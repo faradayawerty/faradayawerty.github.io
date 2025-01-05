@@ -24,6 +24,12 @@ function isMouseWheelDown(input) {
 	return val;
 }
 
+function isMouseLeftButtonPressed(input) {
+	let val = input.mouse.leftButtonPressed;
+	input.mouse.leftButtonPressed = false;
+	return val;
+}
+
 function isKeyDown(input, key, read_once=false) {
 	let val = input.keys.down[key];
 	if(read_once)
@@ -39,8 +45,6 @@ function keyHandler(keys, e) {
 }
 
 function mouseHandler(mouse, ctx, e) {
-	mouse.x = (e.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
-	mouse.y = (e.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
 	mouse.leftButtonPressed = e.buttons === 1 ? true : false;
 	if(e.deltaY && e.deltaY > 0)
 		mouse.wheelUp = true;
@@ -50,6 +54,11 @@ function mouseHandler(mouse, ctx, e) {
 		mouse.wheelDown = true;
 	else
 		mouse.wheelDown = false;
+}
+
+function mouseMoveHandler(mouse, ctx, e) {
+	mouse.x = (e.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
+	mouse.y = (e.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
 }
 
 function initializeKeyboardInput(keys) {
@@ -63,7 +72,7 @@ function initializeKeyboardInput(keys) {
 
 function initializeMouseInput(mouse, ctx) {
 	window.addEventListener('mousemove', function(e) {
-		mouseHandler(mouse, ctx, e);
+		mouseMoveHandler(mouse, ctx, e);
 	});
 	window.addEventListener('mousedown', function(e) {
 		mouseHandler(mouse, ctx, e);

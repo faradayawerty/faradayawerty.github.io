@@ -22,6 +22,26 @@ function inventory_destroy(inventory_element) {
 
 function inventory_update(inventory_element, dt) {
 	let inv = inventory_element.data;
+
+	for(let i = 0; i < inv.items.length; i++)
+		for(let j = 0; j < inv.items[i].length; j++)
+			if(doRectsCollide(inventory_element.game.input.mouse.x, inventory_element.game.input.mouse.y, 0, 0,
+				40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size)) {
+				inv.iselected = i;
+				inv.jselected = j;
+				if(isMouseLeftButtonPressed(inventory_element.game.input))
+					if(inv.imove < 0 && inv.jmove < 0) {
+						inv.imove = inv.iselected;
+						inv.jmove = inv.jselected;
+					} else {
+						let temp = inv.items[inv.iselected][inv.jselected];
+						inv.items[inv.iselected][inv.jselected] = inv.items[inv.imove][inv.jmove];
+						inv.items[inv.imove][inv.jmove] = temp;
+						inv.imove = -1;
+						inv.jmove = -1;
+					}
+			}
+
 	if(isKeyDown(inventory_element.game.input, 's', true) && inv.iselected < inv.items.length - 1)
 		inv.iselected++;
 	if(isKeyDown(inventory_element.game.input, 'w', true) && inv.iselected > 0)

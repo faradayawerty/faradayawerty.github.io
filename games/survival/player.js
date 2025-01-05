@@ -125,8 +125,10 @@ function player_update(player_object, dt) {
 			if(Math.random() > 0.99)
 				hotbar_clear_item(p.hotbar_element, ITEM_AMMO, 1);
 		}
-		Matter.Body.setVelocity(p.body, vel);
-	}
+			if(isKeyDown(player_object.game.input, 'q', true))
+				inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
+			Matter.Body.setVelocity(p.body, vel);
+		}
 
 	if(!p.inventory_element.shown && p.car_object) {
 		let rotatedir = 0;
