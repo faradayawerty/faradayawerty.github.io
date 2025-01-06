@@ -27,11 +27,6 @@ function game_new(g) {
 	game_destroy_all_gui_elements(g);
 	game_destroy_all_objects(g);
 	let iplayer = player_create(g, 1250, 1250);
-	//g.objects[iplayer].data.inventory_element.data.items[0][0] = ITEM_GUN;
-	//g.objects[iplayer].data.inventory_element.data.items[0][1] = ITEM_AMMO;
-	//g.objects[iplayer].data.inventory_element.data.items[0][2] = ITEM_AMMO;
-	//g.objects[iplayer].data.inventory_element.data.items[1][1] = ITEM_WATER;
-	//g.objects[iplayer].data.inventory_element.data.items[1][2] = ITEM_CANNED_MEAT;
 	levels_set(g, "0x0");
 }
 
@@ -49,7 +44,7 @@ function game_object_create(g, name_, data_, func_update, func_draw, func_destro
 		persistent: true,
 		destroyed: false
 	};
-	g.objects.unshift(obj);
+	g.objects.push(obj);
 	game_objects_arrange(g);
 	let iobj = g.objects.indexOf(obj);
 	return iobj;

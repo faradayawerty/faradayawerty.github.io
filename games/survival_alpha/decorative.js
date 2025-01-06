@@ -77,13 +77,13 @@ function decorative_grass_create(g, x, y, w, h) {
 }
 
 function decorative_parkinglot_create(g, x, y, w, h) {
+	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 	let R = 205;
+	decorative_rectangle_create(g, x + R/30, y + R/30, w - 2*R/30, h/161, "white", "white");
 	for(let i = 0; (i+1)*R < w - R/30; i++) {
 		decorative_rectangle_create(g, x + R/30 + i*R, y + R/30, w/161, h/2, "white", "white");
 		decorative_text_create(g, Math.floor(50 + Math.random() * 50), x + 8*R/30 + i*R, y + 12*R/30, R/5, "white");
 	}
-	decorative_rectangle_create(g, x + R/30, y + R/30, w - 2*R/30, h/161, "white", "white");
-	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 }
 
 function decorative_tree_create(g, x, y) {
@@ -93,12 +93,12 @@ function decorative_tree_create(g, x, y) {
 }
 
 function decorative_road_create(g, x, y, w, h) {
+	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 	N = 8.0;
 	for(let i = 0; i < N && w > h; i++)
 		decorative_rectangle_create(g, x + (i + 0.25) * w / N, y + h / 2 - 0.05 * h, 0.5 * w / N, 0.1 * h, "#ffffff", "#ffffff");
 	for(let i = 0; i < N && h > w; i++)
 		decorative_rectangle_create(g, x + w / 2 - 0.05 * w, y + (i + 0.25) * h / N, 0.1 * w, 0.5 * h / N, "#ffffff", "#ffffff");
-	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 }
 
 function decorative_roof_create(g, x, y, w, h) {

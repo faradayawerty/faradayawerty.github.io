@@ -1,5 +1,5 @@
 
-function player_create(g, x, y) {
+function player_create(g, x, y, respawn=false) {
 	let width = 40, height = 40;
 	let p = {
 		health: 100,
@@ -9,6 +9,7 @@ function player_create(g, x, y) {
 		hunger: 100,
 		max_hunger: 100,
 		speed: 10,
+		max_speed: 10,
 		shot_cooldown: 0,
 		want_level: g.level,
 		w: width,
@@ -23,14 +24,16 @@ function player_create(g, x, y) {
 	};
 	p.infobox_element = g.gui_elements[infobox_create(g, 40, 100, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
-	p.inventory_element.data.items[0][0] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_GUN;
-	p.inventory_element.data.items[0][1] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_AMMO;
-	p.inventory_element.data.items[0][2] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_WATER;
-	p.inventory_element.data.items[0][3] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_CANNED_MEAT;
 	p.hotbar_element = g.gui_elements[hotbar_create(g, p.inventory_element.data)];
 	Matter.Composite.add(g.engine.world, p.body);
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
 	g.player_object = g.objects[iplayer];
+	//if(respawn) {
+	//	p.inventory_element.data.items[1][0] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_GUN;
+	//	p.inventory_element.data.items[1][1] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_AMMO;
+	//	p.inventory_element.data.items[1][2] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_WATER;
+	//	p.inventory_element.data.items[1][3] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_CANNED_MEAT;
+	//}
 	return iplayer;
 }
 
@@ -68,6 +71,11 @@ function player_update(player_object, dt) {
 		p.hunger = Math.max(0, p.hunger - 0.001 * dt)
 	if(p.hunger <= 0)
 		p.health -= 0.05 * dt;
+
+	if(p.thirst < 0.25 * p.max_thirst || p.hunger < 0.1 * p.max_hunger)
+		p.speed = 0.5 * p.max_speed;
+	else
+		p.speed = p.max_speed;
 
 	// choose level based on coordinates
 	let level_x = Number(p.want_level.split("x")[0]);
@@ -149,8 +157,8 @@ function player_update(player_object, dt) {
 				(0.9 + 0.1 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
 				(0.9 + 0.1 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight
 			);
-			p.shot_cooldown = 80;
-			if(Math.random() > 0.99)
+			p.shot_cooldown = 100;
+			if(Math.random() > 0.85)
 				hotbar_clear_item(p.hotbar_element, ITEM_AMMO, 1);
 		}
 			if(isKeyDown(player_object.game.input, 'q', true))

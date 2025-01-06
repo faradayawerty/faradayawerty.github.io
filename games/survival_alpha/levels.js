@@ -25,16 +25,16 @@ function levels_set(g, level) {
 			item_create(g, ITEM_WATER, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 		for(let i = 0; i < Math.random() * 6 - 3; i++)
 			item_create(g, ITEM_CANNED_MEAT, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-		if(Math.random() > 0.99)
+		if(Math.random() > 0.95)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#1177ff");
-		if(Math.random() > 0.99)
+		else if(Math.random() > 0.95)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff7711");
-		if(Math.random() > 0.99)
+		else if(Math.random() > 0.95)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff1177");
+		if(Math.random() > 0.85)
+			item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 		if(Math.random() > 0.99)
 			item_create(g, ITEM_MONEY, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-		if(Math.random() > 0.99)
-			item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 	}
 
 	if(level == "0x0") {

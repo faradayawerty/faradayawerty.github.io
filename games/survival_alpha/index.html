@@ -92,7 +92,7 @@
 				game_new(game1);
 				menu1.want_new_game = false;
 			} else if(menu1.want_player_respawn) {
-				player_create(game1, 1250, 1250);
+				player_create(game1, 1250, 1250, true);
 				menu1.want_player_respawn = false;
 			} else {
 				game_update(game1, dt);

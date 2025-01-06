@@ -73,6 +73,9 @@ function menu_update(m, dt, input) {
 		} else if(m.buttons[m.iselected] == "start new game") {
 			m.shown = false;
 			m.want_new_game = true;
+			let icontinue = menu1.main_menu_buttons.indexOf("respawn and continue game");
+			if(icontinue > -1)
+				menu1.main_menu_buttons[icontinue] = "continue game";
 		} else if(m.buttons[m.iselected] == "settings" || m.buttons[m.iselected] == "back to settings") {
 			m.buttons = m.settings_buttons;
 			m.iselected = 0;
