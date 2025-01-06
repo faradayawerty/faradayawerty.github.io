@@ -1,5 +1,6 @@
 
 function levels_set(g, level) {
+
 	g.level = level;
 	game_destroy_level(g);
 	let level_x = Number(level.split("x")[0]);
@@ -7,13 +8,36 @@ function levels_set(g, level) {
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
 
-	for(let i = 0; i < Math.random() * 50 - 25; i++)
-		enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-	for(let i = 0; i < Math.random() * 50 - 25; i++)
-		item_create(g, Math.floor(1.9 + 3.2 * Math.random()), Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+	if(g.visited_levels.length > 40)
+		g.visited_levels = ["0x0"];
+
+	if(!g.visited_levels.includes(level)) {
+		g.visited_levels.push(level);
+		for(let i = 0; i < Math.random() * 30 - 10; i++)
+			enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		for(let i = 0; i < Math.random() * 2 - 1; i++)
+			item_create(g, ITEM_HEALTH, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		for(let i = 0; i < Math.random() * 4 - 2; i++)
+			item_create(g, ITEM_FUEL, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		for(let i = 0; i < Math.random() * 4 - 2; i++)
+			item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		for(let i = 0; i < Math.random() * 6 - 3; i++)
+			item_create(g, ITEM_WATER, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		for(let i = 0; i < Math.random() * 6 - 3; i++)
+			item_create(g, ITEM_CANNED_MEAT, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		if(Math.random() > 0.99)
+			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#1177ff");
+		if(Math.random() > 0.99)
+			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff7711");
+		if(Math.random() > 0.99)
+			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff1177");
+		if(Math.random() > 0.99)
+			item_create(g, ITEM_MONEY, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		if(Math.random() > 0.99)
+			item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+	}
 
 	if(level == "0x0") {
-		car_create(g, Ox + 1550, Oy + 2200, "#1177ff");
 		car_create(g, Ox + 1960, Oy + 2200, "#7711ff");
 		decorative_building_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1960, 1050, 525);

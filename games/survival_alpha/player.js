@@ -4,6 +4,10 @@ function player_create(g, x, y) {
 	let p = {
 		health: 100,
 		max_health: 100,
+		thirst: 100,
+		max_thirst: 100,
+		hunger: 100,
+		max_hunger: 100,
 		speed: 10,
 		shot_cooldown: 0,
 		want_level: g.level,
@@ -19,6 +23,10 @@ function player_create(g, x, y) {
 	};
 	p.infobox_element = g.gui_elements[infobox_create(g, 40, 100, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
+	p.inventory_element.data.items[0][0] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_GUN;
+	p.inventory_element.data.items[0][1] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_AMMO;
+	p.inventory_element.data.items[0][2] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_WATER;
+	p.inventory_element.data.items[0][3] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_CANNED_MEAT;
 	p.hotbar_element = g.gui_elements[hotbar_create(g, p.inventory_element.data)];
 	Matter.Composite.add(g.engine.world, p.body);
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
@@ -46,10 +54,20 @@ function player_die(player_object) {
 function player_update(player_object, dt) {
 
 	let p = player_object.data;
-	if(player_object.data.health <= 0)
-		player_die(player_object);
 	if(p.shot_cooldown > 0)
 		p.shot_cooldown -= dt;
+
+	if(player_object.data.health <= 0)
+		player_die(player_object);
+
+	if(p.thirst > 0)
+		p.thirst = Math.max(0, p.thirst - 0.001 * dt)
+	if(p.thirst <= 0)
+		p.health -= 0.05 * dt;
+	if(p.hunger > 0)
+		p.hunger = Math.max(0, p.hunger - 0.001 * dt)
+	if(p.hunger <= 0)
+		p.health -= 0.05 * dt;
 
 	// choose level based on coordinates
 	let level_x = Number(p.want_level.split("x")[0]);
@@ -100,6 +118,16 @@ function player_update(player_object, dt) {
 		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_HEALTH
 			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
 			p.health += Math.min(p.max_health - p.health, Math.random() * 20 + 5);
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		}
+		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_CANNED_MEAT
+			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
+			p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 20 + 5);
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		}
+		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_WATER
+			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
+			p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		}
 		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_FUEL
@@ -163,9 +191,17 @@ function player_draw(player_object, ctx) {
 		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");
 		ctx.fillStyle = "red";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.75 * p.h, p.w, 2);
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, 2);
 		ctx.fillStyle = "lime";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.75 * p.h, p.w * p.health / p.max_health, 2);
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w * p.health / p.max_health, 2);
+		ctx.fillStyle = "red";
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w, 2);
+		ctx.fillStyle = "cyan";
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w * p.thirst / p.max_thirst, 2);
+		ctx.fillStyle = "red";
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w, 2);
+		ctx.fillStyle = "orange";
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, 2);
 		if(player_object.game.settings.player_draw_gun && hotbar_get_selected_item(p.hotbar_element.data) == ITEM_GUN) {
 			ctx.strokeStyle = "black";
 			ctx.beginPath();

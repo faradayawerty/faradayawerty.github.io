@@ -1,10 +1,14 @@
 
 function car_create(g, x, y, color_) {
+	let cars = g.objects.filter((obj) => obj.name == "car");
+	if(cars.length > 10)
+		for(let i = 0; i < 5 * Math.random() + 1; i++)
+			cars[i].destroy(cars[i]);
 	let width = 200, height = 110;
 	let c = {
-		health: 2000,
-		max_health: 2000,
-		fuel: 200,
+		health: Math.random() * 1500 + 500,
+		max_health: Math.random() * 1000 + 2000,
+		fuel: Math.max(0, 500 * Math.random() - 400),
 		max_fuel: 200,
 		speed: 20,
 		max_speed: 20,

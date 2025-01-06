@@ -4,8 +4,14 @@ let ITEM_AMMO = 2;
 let ITEM_HEALTH = 3;
 let ITEM_FUEL = 4;
 let ITEM_MONEY = 5;
+let ITEM_WATER = 6;
+let ITEM_CANNED_MEAT = 7;
 
 function item_create(g, id_, x_, y_) {
+	let items = g.objects.filter((obj) => obj.name == "item");
+	if(items.length > 50)
+		for(let i = 0; i < 20 * Math.random() + 1; i++)
+			items[i].destroy(items[i]);
 	if(id_ == 0)
 		return;
 	let item = {
@@ -79,6 +85,16 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
 		drawCircle(ctx, x + w * 0.5, y + h * 0.5, w * 0.1, "#007733", "#007733", w * 0.025);
+	} else if(id == ITEM_CANNED_MEAT) {
+		ctx.fillStyle = "gray";
+		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
+		ctx.fillStyle = "brown";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_WATER) {
+		ctx.fillStyle = "#777777";
+		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
+		ctx.fillStyle = "#1177dd";
+		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	} else {
 		ctx.fillStyle = "#000000";
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);

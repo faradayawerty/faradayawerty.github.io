@@ -2,6 +2,7 @@
 function game_create(input_, engine_) {
 	let g = {	
 		level: "0x0",
+		visited_levels: ["0x0"],
 		offset_x: 1250,
 		offset_y: 1250,
 		scale: 1,
@@ -17,7 +18,7 @@ function game_create(input_, engine_) {
 			player_draw_gun: true,
 			enemies_spawn: true
 		},
-		want_respawn_menu: false
+		want_respawn_menu: false,
 	};
 	return g;
 }
@@ -26,10 +27,11 @@ function game_new(g) {
 	game_destroy_all_gui_elements(g);
 	game_destroy_all_objects(g);
 	let iplayer = player_create(g, 1250, 1250);
-	g.objects[iplayer].data.inventory_element.data.items[0][0] = ITEM_GUN;
-	g.objects[iplayer].data.inventory_element.data.items[0][1] = ITEM_AMMO;
-	g.objects[iplayer].data.inventory_element.data.items[0][2] = ITEM_AMMO;
-	g.objects[iplayer].data.inventory_element.data.items[1][0] = ITEM_MONEY;
+	//g.objects[iplayer].data.inventory_element.data.items[0][0] = ITEM_GUN;
+	//g.objects[iplayer].data.inventory_element.data.items[0][1] = ITEM_AMMO;
+	//g.objects[iplayer].data.inventory_element.data.items[0][2] = ITEM_AMMO;
+	//g.objects[iplayer].data.inventory_element.data.items[1][1] = ITEM_WATER;
+	//g.objects[iplayer].data.inventory_element.data.items[1][2] = ITEM_CANNED_MEAT;
 	levels_set(g, "0x0");
 }
 
