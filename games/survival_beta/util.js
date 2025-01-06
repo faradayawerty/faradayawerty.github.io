@@ -56,18 +56,13 @@ function drawLine(ctx, x1, y1, x2, y2, color, width) {
 	ctx.stroke();
 }
 
-// source: https://stackoverflow.com/questions/25095548/how-to-draw-a-circle-in-html5-canvas-using-javascript
-function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
-	  ctx.beginPath()
-	  ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
-	  if (fill) {
-		      ctx.fillStyle = fill
-		      ctx.fill()
-		    }
-	  if (stroke) {
-		      ctx.lineWidth = strokeWidth
-		      ctx.strokeStyle = stroke
-		      ctx.stroke()
-		    }
+function drawCircle(ctx, x, y, r, fill_color, stroke_color) {
+	ctx.beginPath();
+	ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+	ctx.fillStyle = fill_color;
+	ctx.fill();
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = stroke_color;
+	ctx.stroke();
 }
 
