@@ -210,18 +210,24 @@ function player_draw(player_object, ctx) {
 	if(!p.car_object) {
 		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");
-		ctx.fillStyle = "red";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, 2);
-		ctx.fillStyle = "lime";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w * p.health / p.max_health, 2);
-		ctx.fillStyle = "red";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w, 2);
-		ctx.fillStyle = "cyan";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w * p.thirst / p.max_thirst, 2);
-		ctx.fillStyle = "red";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w, 2);
-		ctx.fillStyle = "orange";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, 2);
+		if(player_object.game.settings.indicators["show player health"]) {
+			ctx.fillStyle = "red";
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, 2);
+			ctx.fillStyle = "lime";
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w * p.health / p.max_health, 2);
+		}
+		if(player_object.game.settings.indicators["show player thirst"]) {
+			ctx.fillStyle = "red";
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w, 2);
+			ctx.fillStyle = "cyan";
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w * p.thirst / p.max_thirst, 2);
+		}
+		if(player_object.game.settings.indicators["show player hunger"]) {
+			ctx.fillStyle = "red";
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w, 2);
+			ctx.fillStyle = "orange";
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, 2);
+		}
 		if(player_object.game.settings.player_draw_gun && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN) {
 			ctx.strokeStyle = "black";
 			ctx.beginPath();

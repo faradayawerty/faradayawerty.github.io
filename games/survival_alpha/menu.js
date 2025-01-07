@@ -7,6 +7,15 @@ function menu_create() {
 		want_player_color: "red",
 		want_player_draw_gun: true,
 		want_enemies_spawn: true,
+		want_indicators: {
+			"show player health": true,
+			"show player hunger": true,
+			"show player thirst": true,
+			"show enemy health": true,
+			"show enemy hunger": false,
+			"show car health": true,
+			"show car fuel": true
+		},
 		iselected: 0,
 		main_menu_buttons: [
 			"continue game",
@@ -17,6 +26,7 @@ function menu_create() {
 			"player color",
 			"player draw gun",
 			"enemies spawn",
+			"indicators",
 			"main menu"
 		],
 		player_color_selection_menu: [
@@ -24,6 +34,16 @@ function menu_create() {
 			"set player color to lime",
 			"set player color to blue",
 			"set player color to yellow",
+			"back to settings"
+		],
+		indicators_settings: [
+			"show player health",
+			"show player hunger",
+			"show player thirst",
+			"show enemy health",
+			"show enemy hunger",
+			"show car health",
+			"show car fuel",
 			"back to settings"
 		],
 		buttons: null
@@ -46,6 +66,8 @@ function menu_draw(ctx, m) {
 			text = text + ": " + m.want_player_draw_gun;
 		if(m.buttons[i] == "enemies spawn")
 			text = text + ": " + m.want_enemies_spawn;
+		if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
+			text = text + ": " + m.want_indicators[m.buttons[i]];
 		if(m.iselected == i)
 			drawButton(ctx, 160, 140 + 60 * i, "[" + text + "]");
 		else
@@ -87,6 +109,11 @@ function menu_update(m, dt, input) {
 		} else if(m.buttons[m.iselected] == "player color") {
 			m.buttons = m.player_color_selection_menu;
 			m.iselected = 0;
+		} else if(m.buttons[m.iselected] == "indicators") {
+			m.buttons = m.indicators_settings;
+			m.iselected = 0;
+		} else if(m.indicators_settings.includes(m.buttons[m.iselected])) {
+			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m.buttons[m.iselected]];
 		} else if(m.buttons[m.iselected] == "player draw gun") {
 			m.want_player_draw_gun = !m.want_player_draw_gun;
 		} else if(m.buttons[m.iselected] == "set player color to red") {

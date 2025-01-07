@@ -78,6 +78,8 @@
 				game1.settings.player_draw_gun = menu1.want_player_draw_gun;
 			if(menu1.want_enemies_spawn != game1.settings.enemies_spawn)
 				game1.settings.enemies_spawn = menu1.want_enemies_spawn;
+			if(menu1.want_indicators != game1.settings.indicators)
+				game1.settings.indicators = menu1.want_indicators;
 
 			// update game if menu is not shown, else update menu
 			if(isKeyDown(input1, 'Escape', true)) {

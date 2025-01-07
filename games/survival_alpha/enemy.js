@@ -73,13 +73,17 @@ function enemy_draw(enemy_object, ctx) {
 	let e = enemy_object.data;
 	fillMatterBody(ctx, e.body, 'green');
 	drawMatterBody(ctx, e.body, 'white');
-	ctx.fillStyle = "red";
-	ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w, 2);
-	ctx.fillStyle = "orange";
-	ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w * e.hunger / e.max_hunger, 2);
-	ctx.fillStyle = "red";
-	ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w, 2);
-	ctx.fillStyle = "lime";
-	ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w * e.health / e.max_health, 2);
+	if(enemy_object.game.settings.indicators["show enemy hunger"]) {
+		ctx.fillStyle = "red";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w, 2);
+		ctx.fillStyle = "orange";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w * e.hunger / e.max_hunger, 2);
+	}
+	if(enemy_object.game.settings.indicators["show enemy health"]) {
+		ctx.fillStyle = "red";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w, 2);
+		ctx.fillStyle = "lime";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w * e.health / e.max_health, 2);
+	}
 }
 

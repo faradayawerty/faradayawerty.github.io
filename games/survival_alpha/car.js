@@ -64,15 +64,19 @@ function car_update(car_object, dt) {
 function car_draw(car_object, ctx) {
   	fillMatterBody(ctx, car_object.data.body, car_object.data.color);
 	drawMatterBody(ctx, car_object.data.body, "white");
-	ctx.fillStyle = "red";
-	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h, 0.5 * car_object.data.h, 2);
-	ctx.fillStyle = "lime";
-	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h,
-		0.5 * car_object.data.h * car_object.data.health / car_object.data.max_health, 2);
-	ctx.fillStyle = "red";
-	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.2 * car_object.data.h, 0.5 * car_object.data.h, 2);
-	ctx.fillStyle = "gray";
-	ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.2 * car_object.data.h,
-		0.5 * car_object.data.h * car_object.data.fuel / car_object.data.max_fuel, 2);
+	if(car_object.game.settings.indicators["show car health"]) {
+		ctx.fillStyle = "red";
+		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h, 0.5 * car_object.data.h, 2);
+		ctx.fillStyle = "lime";
+		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h,
+			0.5 * car_object.data.h * car_object.data.health / car_object.data.max_health, 2);
+	}
+	if(car_object.game.settings.indicators["show car fuel"]) {
+		ctx.fillStyle = "red";
+		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.2 * car_object.data.h, 0.5 * car_object.data.h, 2);
+		ctx.fillStyle = "gray";
+		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.2 * car_object.data.h,
+			0.5 * car_object.data.h * car_object.data.fuel / car_object.data.max_fuel, 2);
+	}
 }
 

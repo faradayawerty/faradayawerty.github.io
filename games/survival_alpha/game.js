@@ -13,10 +13,18 @@ function game_create(input_, engine_) {
 		input: input_,
 		engine: engine_,
 		settings: {
-			ui_scale: 1.0,
 			player_color: "red",
 			player_draw_gun: true,
-			enemies_spawn: true
+			enemies_spawn: true,
+			indicators: {
+				"show player health": true,
+				"show player hunger": true,
+				"show player thirst": true,
+				"show enemy health": true,
+				"show enemy hunger": false,
+				"show car health": true,
+				"show car fuel": true
+			}
 		},
 		want_respawn_menu: false,
 		want_hide_inventory: false
