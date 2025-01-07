@@ -23,14 +23,7 @@ ITEMS_FOODS = [
 	ITEM_CANNED_MEAT,
 	ITEM_CANNED_MEAT,
 	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
 	ITEM_CHERRIES,
-	ITEM_CHERRIES,
-	ITEM_ORANGE,
 	ITEM_ORANGE,
 	ITEM_CHOCOLATE
 ];
@@ -40,16 +33,9 @@ ITEMS_DRINKS = [
 	ITEM_WATER,
 	ITEM_WATER,
 	ITEM_WATER,
-	ITEM_WATER,
-	ITEM_WATER,
-	ITEM_WATER,
-	ITEM_WATER,
-	ITEM_WATER,
 	ITEM_MILK,
 	ITEM_MILK,
-	ITEM_MILK,
-	ITEM_MILK,
-	ITEM_COLA,
+	ITEM_COLA
 	ITEM_COLA
 ];
 
@@ -68,7 +54,8 @@ function item_create(g, id_, x_, y_) {
 		})
 	};
 	Matter.Composite.add(g.engine.world, item.body);
-	return game_object_create(g, "item", item, item_update, item_draw, item_destroy);
+	return game_object_create(g, "item", item,
+		item_update, item_draw, item_destroy);
 }
 
 function item_create_from_list(g, list, x, y) {
