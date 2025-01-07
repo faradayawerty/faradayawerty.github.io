@@ -65,8 +65,10 @@ function inventory_update(inventory_element, dt) {
 		inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
 }
 
-function inventory_draw(inventory_object, ctx) {
-	let inv = inventory_object.data;
+function inventory_draw(inventory_element, ctx) {
+	if(inventory_element.game.want_hide_inventory)
+		return;
+	let inv = inventory_element.data;
 	for(let i = 0; i < inv.items.length; i++) {
 		for(let j = 0; j < inv.items[i].length; j++) {
 			ctx.globalAlpha = 0.9;

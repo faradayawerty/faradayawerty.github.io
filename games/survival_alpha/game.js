@@ -19,6 +19,7 @@ function game_create(input_, engine_) {
 			enemies_spawn: true
 		},
 		want_respawn_menu: false,
+		want_hide_inventory: false
 	};
 	return g;
 }

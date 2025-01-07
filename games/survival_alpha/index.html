@@ -80,10 +80,12 @@
 				game1.settings.enemies_spawn = menu1.want_enemies_spawn;
 
 			// update game if menu is not shown, else update menu
+			if(isKeyDown(input1, 'Escape', true)) {
+				menu1.shown = !menu1.shown;
+				game1.want_hide_inventory = true;
+			}
 			if(menu1.shown) {
 				menu_update(menu1, dt, input1);
-			} else if(input1.keys.down['Escape']) {
-				menu1.shown = true;
 			} else if(game1.want_respawn_menu) {
 				menu1.shown = true;
 				menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf("continue game")] = "respawn and continue game";

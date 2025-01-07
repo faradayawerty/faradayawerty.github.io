@@ -49,6 +49,7 @@ function player_destroy(player_object) {
 }
 
 function player_die(player_object) {
+	player_object.game.input.mouse.leftButtonPressed = false;
 	inventory_drop_all_items(player_object.data.inventory_element);
 	player_object.game.want_respawn_menu = true;
 	player_destroy(player_object);
@@ -107,6 +108,12 @@ function player_update(player_object, dt) {
 		p.hotbar_element.shown = !p.hotbar_element.shown;
 	}
 
+	if(player_object.game.want_hide_inventory) {
+		p.inventory_element.shown = false;
+		p.hotbar_element.shown = true;
+		player_object.game.want_hide_inventory = false;
+	}
+
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_FUEL
 		&& player_object.game.input.mouse.leftButtonPressed) {
 		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
@@ -122,13 +129,13 @@ function player_update(player_object, dt) {
 		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 	}
 
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_CANNED_MEAT
+	if(ITEMS_FOODS.includes(hotbar_get_selected_item(p.hotbar_element))
 		&& player_object.game.input.mouse.leftButtonPressed) {
 		p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 20 + 5);
 		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 	}
 
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_WATER
+	if(ITEMS_DRINKS.includes(hotbar_get_selected_item(p.hotbar_element))
 		&& player_object.game.input.mouse.leftButtonPressed) {
 		p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
 		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;

@@ -1,11 +1,57 @@
 
 let ITEM_GUN = 1;
+
 let ITEM_AMMO = 2;
 let ITEM_HEALTH = 3;
 let ITEM_FUEL = 4;
 let ITEM_MONEY = 5;
-let ITEM_WATER = 6;
+
 let ITEM_CANNED_MEAT = 7;
+let ITEM_ORANGE = 8;
+let ITEM_APPLE = 9;
+let ITEM_CHERRIES = 10;
+let ITEM_CHICKEN_LEG = 13;
+let ITEM_CHOCOLATE = 14;
+
+let ITEM_WATER = 6;
+let ITEM_COLA = 11;
+let ITEM_MILK = 12;
+
+ITEMS_FOODS = [
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CANNED_MEAT,
+	ITEM_CHERRIES,
+	ITEM_CHERRIES,
+	ITEM_ORANGE,
+	ITEM_ORANGE,
+	ITEM_CHOCOLATE
+];
+
+ITEMS_DRINKS = [
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_WATER,
+	ITEM_MILK,
+	ITEM_MILK,
+	ITEM_MILK,
+	ITEM_MILK,
+	ITEM_COLA,
+	ITEM_COLA
+];
 
 function item_create(g, id_, x_, y_) {
 	let items = g.objects.filter((obj) => obj.name == "item");
@@ -23,6 +69,13 @@ function item_create(g, id_, x_, y_) {
 	};
 	Matter.Composite.add(g.engine.world, item.body);
 	return game_object_create(g, "item", item, item_update, item_draw, item_destroy);
+}
+
+function item_create_from_list(g, list, x, y) {
+	let i = Math.floor(list.length * Math.random());
+	if(i == list.length)
+		i = 0;
+	item_create(g, list[i], x, y);
 }
 
 function item_destroy(item_object) {
@@ -95,6 +148,43 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
 		ctx.fillStyle = "#1177dd";
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+	} else if(id == ITEM_CHOCOLATE) {
+		ctx.fillStyle = "#553311";
+		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.85);
+		ctx.fillStyle = "#664422";
+		ctx.fillRect(x + w * 0.225, y + h * 0.15, w * 0.25, h * 0.15);
+		ctx.fillRect(x + w * 0.525, y + h * 0.15, w * 0.25, h * 0.15);
+		ctx.fillRect(x + w * 0.225, y + h * 0.35, w * 0.25, h * 0.15);
+		ctx.fillRect(x + w * 0.525, y + h * 0.35, w * 0.25, h * 0.15);
+		ctx.fillRect(x + w * 0.225, y + h * 0.55, w * 0.25, h * 0.15);
+		ctx.fillRect(x + w * 0.525, y + h * 0.55, w * 0.25, h * 0.15);
+		ctx.fillRect(x + w * 0.225, y + h * 0.75, w * 0.25, h * 0.15);
+		ctx.fillRect(x + w * 0.525, y + h * 0.75, w * 0.25, h * 0.15);
+	} else if(id == ITEM_COLA) {
+		ctx.fillStyle = "#777777";
+		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
+		ctx.fillStyle = "#dd1111";
+		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+	} else if(id == ITEM_MILK) {
+		ctx.fillStyle = "#113377";
+		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.4);
+		ctx.fillStyle = "#dddddd";
+		ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.6, h * 0.4);
+		ctx.strokeStyle = "black";
+		ctx.strokeRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
+	} else if(id == ITEM_ORANGE) {
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "orange", "#773311", 0.05 * w);
+	} else if(id == ITEM_APPLE) {
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "lime", "green", 0.05 * w);
+	} else if(id == ITEM_CHICKEN_LEG) {
+		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.5 * w, y + 0.9 * h, "gray", 0.075 * w)
+		ctx.fillStyle = "#aa7711";
+		ctx.fillRect(x + w * 0.3, y + h * 0.1, w * 0.4, h * 0.6);
+	} else if(id == ITEM_CHERRIES) {
+		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.35 * w, y + 0.75 * h, "#555511", 0.05 * w)
+		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.65 * w, y + 0.75 * h, "#555511", 0.05 * w)
+		drawCircle(ctx, x + 0.65 * w, y + 0.75 * h, 0.125 * w, "red", "black", 0.025 * w);
+		drawCircle(ctx, x + 0.35 * w, y + 0.75 * h, 0.125 * w, "red", "black", 0.025 * w);
 	} else {
 		ctx.fillStyle = "#000000";
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
