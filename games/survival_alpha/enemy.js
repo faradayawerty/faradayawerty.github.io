@@ -57,13 +57,13 @@ function enemy_update(enemy_object, dt) {
 		}
 	}
 	if(enemy_object.data.health <= 0) {
-		if(Math.random() > 0.5)
+		if(Math.random() > 0.85)
 			item_create_from_list(enemy_object.game, ITEMS_FOODS.concat(ITEMS_DRINKS), e.body.position.x, e.body.position.y);
-		else if(Math.random() > 0.5)
+		else if(Math.random() > 0.85)
 			item_create(enemy_object.game, ITEM_AMMO, e.body.position.x, e.body.position.y);
-		else if(Math.random() > 0.5)
+		else if(Math.random() > 0.85)
 			item_create(enemy_object.game, ITEM_HEALTH, e.body.position.x, e.body.position.y);
-		else if(Math.random() > 0.75)
+		else if(Math.random() > 0.85)
 			item_create(enemy_object.game, ITEM_FUEL, e.body.position.x, e.body.position.y);
 		enemy_destroy(enemy_object);
 	}
