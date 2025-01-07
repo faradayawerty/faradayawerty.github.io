@@ -7,6 +7,7 @@ function menu_create() {
 		want_player_color: "red",
 		want_player_draw_gun: true,
 		want_enemies_spawn: true,
+		want_language: "english",
 		want_indicators: {
 			"show player health": true,
 			"show player hunger": true,
@@ -20,7 +21,8 @@ function menu_create() {
 		main_menu_buttons: [
 			"continue game",
 			"start new game",
-			"settings"
+			"settings",
+			"language"
 		],
 		settings_buttons: [
 			"player color",
@@ -61,13 +63,17 @@ function menu_draw(ctx, m) {
 	for(let i = 0; i < m.buttons.length; i++) {
 		let text = m.buttons[i];
 		if(m.buttons[i] == "player color")
-			text = text + ": " + m.want_player_color;
-		if(m.buttons[i] == "player draw gun")
-			text = text + ": " + m.want_player_draw_gun;
-		if(m.buttons[i] == "enemies spawn")
-			text = text + ": " + m.want_enemies_spawn;
-		if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
-			text = text + ": " + m.want_indicators[m.buttons[i]];
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_color);
+		else if(m.buttons[i] == "player draw gun")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_draw_gun);
+		else if(m.buttons[i] == "enemies spawn")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
+		else if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_indicators[m.buttons[i]]);
+		else if(m.buttons[i] == "language")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_language);
+		else
+			text = menu_translate(m.want_language, text);
 		if(m.iselected == i)
 			drawButton(ctx, 160, 140 + 60 * i, "[" + text + "]");
 		else
@@ -78,7 +84,7 @@ function menu_draw(ctx, m) {
 function menu_update(m, dt, input) {
 
 	for(let i = 0; i < m.buttons.length; i++)
-		if(doRectsCollide(input.mouse.x, input.mouse.y, 0, 0, 140, 110 + 60 * i, 20 * m.buttons[i].length, 60))
+		if(doRectsCollide(input.mouse.x, input.mouse.y, 0, 0, 140, 110 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
 			m.iselected = i;
 
 	if((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) && m.iselected < m.buttons.length - 1) {
@@ -124,7 +130,74 @@ function menu_update(m, dt, input) {
 			m.want_player_color = "yellow";
 		} else if(m.buttons[m.iselected] == "set player color to blue") {
 			m.want_player_color = "blue";
+		} else if(m.buttons[m.iselected] == "language") {
+			if(m.want_language == "русский")
+				m.want_language = "english";
+			else if(m.want_language == "english")
+				m.want_language = "русский";
 		}
 	}
+}
+
+function menu_translate(lang, str) {
+	if(lang == "русский") {
+		if(str == "start new game")
+			return "начать новую игру";
+		else if(str == "settings")
+			return "настройки";
+		else if(str == "language")
+			return "язык";
+		else if(str == "continue game")
+			return "продолжить игру";
+		else if(str == "respawn and continue game")
+			return "возродиться и продолжить игру";
+		else if(String(str) == "true")
+			return "да";
+		else if(String(str) == "false")
+			return "нет";
+		else if(str == "player color")
+			return "цвет игрока";
+		else if(str == "red")
+			return "красный";
+		else if(str == "lime")
+			return "светло-зелёный";
+		else if(str == "yellow")
+			return "жёлтый";
+		else if(str == "blue")
+			return "синий";
+		else if(str == "set player color to red")
+			return "сделать игрока красным";
+		else if(str == "set player color to blue")
+			return "сделать игрока синим";
+		else if(str == "set player color to lime")
+			return "сделать игрока светло-зелёным";
+		else if(str == "set player color to yellow")
+			return "сделать игрока жёлтым";
+		else if(str == "indicators")
+			return "индикаторы";
+		else if(str == "back to settings")
+			return "назад к настройкам";
+		else if(str == "enemies spawn")
+			return "появление противников";
+		else if(str == "player draw gun")
+			return "показывать оружие у игрока";
+		else if(str == "main menu")
+			return "главное меню";
+		else if(str == "show player health")
+			return "показывать здоровье игрока";
+		else if(str == "show player hunger")
+			return "показывать значение сытости игрока";
+		else if(str == "show player thirst")
+			return "показывать значение жажды игрока";
+		else if(str == "show enemy health")
+			return "показывать здоровье противников";
+		else if(str == "show enemy hunger")
+			return "показывать значение сытости зомби";
+		else if(str == "show car health")
+			return "показывать значение сломанности автомобилей"
+		else if(str == "show car fuel")
+			return "показывать значение топлива автомобиля";
+	}
+	return str;
 }
 
