@@ -147,7 +147,7 @@ function player_update(player_object, dt) {
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
 		if(player_object.game.input.keys.down['w'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
-		if(isKeyDown(player_object.game.input, 'f', true)) {
+		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true)) {
 			if(!item_pickup(p.inventory_element, game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100)))
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		}
