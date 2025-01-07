@@ -191,7 +191,7 @@ function player_update(player_object, dt) {
 			Matter.Body.rotate(p.car_object.data.body, -rotatedir * 0.0015 * dt);
 		Matter.Body.setVelocity(p.car_object.data.body, vel);
 		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(0, 0)));
-		if(isKeyDown(player_object.game.input, 'f', true)) {
+		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true)) {
 			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
 			p.car_object = null;
 		}
