@@ -56,8 +56,19 @@ function enemy_update(enemy_object, dt) {
 				e.hunger = Math.min(e.max_hunger, e.hunger + 0.05 * dt)
 		}
 	}
-	if(enemy_object.data.health <= 0)
+	if(enemy_object.data.health <= 0) {
+		if(Math.random() > 0.85)
+			item_create(enemy_object.game, ITEM_WATER, e.body.position.x, e.body.position.y);
+		else if(Math.random() > 0.85)
+			item_create(enemy_object.game, ITEM_CANNED_MEAT, e.body.position.x, e.body.position.y);
+		else if(Math.random() > 0.95)
+			item_create(enemy_object.game, ITEM_AMMO, e.body.position.x, e.body.position.y);
+		else if(Math.random() > 0.95)
+			item_create(enemy_object.game, ITEM_HEALTH, e.body.position.x, e.body.position.y);
+		else if(Math.random() > 0.99)
+			item_create(enemy_object.game, ITEM_FUEL, e.body.position.x, e.body.position.y);
 		enemy_destroy(enemy_object);
+	}
 }
 
 function enemy_draw(enemy_object, ctx) {

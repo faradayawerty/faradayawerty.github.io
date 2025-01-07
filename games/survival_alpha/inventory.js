@@ -157,22 +157,27 @@ function hotbar_draw(hotbar_object, ctx) {
 	}
 }
 
-function hotbar_get_selected_item(hb) {
-	return hb.row[hb.iselected];
+function hotbar_get_selected_item(hotbar_element) {
+	if(!hotbar_element.shown)
+		return 0;
+	return hotbar_element.data.row[hotbar_element.data.iselected];
 }
 
-function hotbar_find_item(hotbar_element, id) {
-	for(let i = 0; i < hotbar_element.data.row.length; i++)
-		if(hotbar_element.data.row[i] == id)
-			return i;
-	return -1;
+function inventory_has_item(inventory_element, id) {
+	for(let i = 0; i < inventory_element.data.items.length; i++) {
+		for(let j = 0; j < inventory_element.data.items[i].length; j++)
+			if(inventory_element.data.items[i][j] == id)
+				return true;
+	}
+	return false;
 }
 
-function hotbar_clear_item(hotbar_element, id, count) {
-	for(let i = hotbar_element.data.row.length - 1; i >= 0 && count > 0; i--)
-		if(hotbar_element.data.row[i] == id) {
-			hotbar_element.data.row[i] = 0;
-			count--;
-		}
+function inventory_clear_item(inventory_element, id, count) {
+	for(let i = 0; i < inventory_element.data.items.length && count > 0; i++)
+		for(let j = 0; j < inventory_element.data.items[i].length && count > 0; j++)
+			if(inventory_element.data.items[i][j] == id) {
+				inventory_element.data.items[i][j] = 0;
+				count--;
+			}
 }
 

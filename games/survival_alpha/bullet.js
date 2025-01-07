@@ -8,7 +8,7 @@ function bullet_create(g, x, y, dx, dy) {
 		speed: 20,
 		w: width,
 		h: height,
-		body: Matter.Bodies.rectangle(x + 50 * dx/d, y + 50 * dy/d, width, height)
+		body: Matter.Bodies.rectangle(x + 25 * dx/d, y + 25 * dy/d, width, height)
 	};
 	Matter.Composite.add(g.engine.world, b.body);
 	let vel = Matter.Vector.create(b.speed * dx/d, b.speed * dy/d);

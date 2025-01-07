@@ -4,10 +4,10 @@ function player_create(g, x, y, respawn=false) {
 	let p = {
 		health: 100,
 		max_health: 100,
-		thirst: 100,
-		max_thirst: 100,
-		hunger: 100,
-		max_hunger: 100,
+		thirst: 150,
+		max_thirst: 150,
+		hunger: 150,
+		max_hunger: 150,
 		speed: 10,
 		max_speed: 10,
 		shot_cooldown: 0,
@@ -72,10 +72,11 @@ function player_update(player_object, dt) {
 	if(p.hunger <= 0)
 		p.health -= 0.05 * dt;
 
-	if(p.thirst < 0.25 * p.max_thirst || p.hunger < 0.1 * p.max_hunger)
-		p.speed = 0.5 * p.max_speed;
-	else
-		p.speed = p.max_speed;
+	p.speed = p.max_speed;
+	if(p.thirst < 0.5 * p.max_thirst)
+		p.speed = 0.75 * p.speed;
+	if(p.hunger < 0.25 * p.max_hunger)
+		p.speed = 0.5 * p.speed;
 
 	// choose level based on coordinates
 	let level_x = Number(p.want_level.split("x")[0]);
@@ -101,9 +102,36 @@ function player_update(player_object, dt) {
 	if(isKeyDown(player_object.game.input, 'o', true))
 		p.infobox_element.shown = !p.infobox_element.shown;
 
-	if(isKeyDown(player_object.game.input, 'i', true)) {
+	if(isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true)) {
 		p.inventory_element.shown = !p.inventory_element.shown;
 		p.hotbar_element.shown = !p.hotbar_element.shown;
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_FUEL
+		&& player_object.game.input.mouse.leftButtonPressed) {
+		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+		if(c) {
+			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, Math.random() * 40 + 10);
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		}
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HEALTH
+		&& player_object.game.input.mouse.leftButtonPressed) {
+		p.health += Math.min(p.max_health - p.health, Math.random() * 20 + 5);
+		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_CANNED_MEAT
+		&& player_object.game.input.mouse.leftButtonPressed) {
+		p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 20 + 5);
+		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_WATER
+		&& player_object.game.input.mouse.leftButtonPressed) {
+		p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
+		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 	}
 
 	let vel = Matter.Vector.create(0, 0);
@@ -123,43 +151,20 @@ function player_update(player_object, dt) {
 			if(!item_pickup(p.inventory_element, game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100)))
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		}
-		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_HEALTH
-			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
-			p.health += Math.min(p.max_health - p.health, Math.random() * 20 + 5);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_CANNED_MEAT
-			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
-			p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 20 + 5);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_WATER
-			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
-			p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_FUEL
-			&& (isKeyDown(player_object.game.input, 'e', true) || player_object.game.input.mouse.leftButtonPressed)) {
-			let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
-			if(c) {
-				c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, Math.random() * 40 + 10);
-				p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-			}
-		}
-		if(hotbar_get_selected_item(p.hotbar_element.data) == ITEM_GUN
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN
 			&& player_object.game.input.mouse.leftButtonPressed
 			&& p.shot_cooldown <= 0
-			&& hotbar_find_item(p.hotbar_element, ITEM_AMMO) > -1) {
+			&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
 			bullet_create(
 				player_object.game,
 				p.body.position.x,
 				p.body.position.y,
-				(0.9 + 0.1 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
-				(0.9 + 0.1 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight
+				player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				player_object.game.input.mouse.y - 0.5 * window.innerHeight
 			);
-			p.shot_cooldown = 100;
-			if(Math.random() > 0.85)
-				hotbar_clear_item(p.hotbar_element, ITEM_AMMO, 1);
+			p.shot_cooldown = 200;
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
 			if(isKeyDown(player_object.game.input, 'q', true))
 				inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
@@ -210,29 +215,24 @@ function player_draw(player_object, ctx) {
 		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w, 2);
 		ctx.fillStyle = "orange";
 		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, 2);
-		if(player_object.game.settings.player_draw_gun && hotbar_get_selected_item(p.hotbar_element.data) == ITEM_GUN) {
+		if(player_object.game.settings.player_draw_gun && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN) {
 			ctx.strokeStyle = "black";
 			ctx.beginPath();
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
 			ctx.moveTo(px, py);
 			let gx = 1, gy = 1;
-			if(player_object.game.input.mouse.leftButtonPressed) {
-				gx = (0.9 + Math.random() * 0.1) * player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
-				gy = (0.9 + Math.random() * 0.1) * player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
-			} else {
-				gx = player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
-				gy = player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
-			}
+			gx = player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
+			gy = player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
 			let g = Math.sqrt(gx * gx + gy * gy);
 			ctx.lineTo(px + p.w * gx / g, py + p.h * gy / g);
 			ctx.lineWidth = 0.25 * p.w;
 			ctx.stroke();
 			ctx.lineWidth = 2;
-		} else if(hotbar_get_selected_item(p.hotbar_element.data) > 0) {
+		} else if(hotbar_get_selected_item(p.hotbar_element) > 0) {
 			let px = p.body.position.x - 0.25 * p.w,
 				py = p.body.position.y - 0.25 * p.h;
-			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element.data), px, py, 0.5 * p.w, 0.5 * p.h);
+			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element), px, py, 0.5 * p.w, 0.5 * p.h);
 		}
 	}
 }
