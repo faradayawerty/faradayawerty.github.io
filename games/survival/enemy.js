@@ -1,13 +1,13 @@
 
 function enemy_create(g, x, y, make_boss=false, make_minion=false) {
+	if(!g.settings.enemies_spawn)
+		return;
 	let enemies = g.objects.filter((obj) => obj.name == "enemy");
 	if(enemies.length > 100)
 		for(let i = 0; i < 20 * Math.random() + 1; i++) {
 			if(!enemies[i].data.boss)
 				enemies[i].destroy(enemies[i]);
 		}
-	if(!g.settings.enemies_spawn)
-		return;
 	let width = 30, height = 30;
 	let boss = make_boss;
 	if(Math.random() > 0.99)

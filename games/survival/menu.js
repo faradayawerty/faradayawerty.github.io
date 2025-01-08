@@ -23,7 +23,6 @@ function menu_create() {
 			"continue game",
 			"start new game",
 			"settings",
-			"",
 			" 🇷🇺 ",
 			" 🇬🇧 "
 		],
