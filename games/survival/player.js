@@ -51,6 +51,7 @@ function player_destroy(player_object) {
 
 function player_die(player_object) {
 	player_object.game.input.mouse.leftButtonPressed = false;
+	player_object.game.deaths += 1;
 	inventory_drop_all_items(player_object.data.inventory_element);
 	player_object.game.want_respawn_menu = true;
 	player_destroy(player_object);

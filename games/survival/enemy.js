@@ -41,6 +41,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 		e.damage = 0.5;
 		e.health = 10000;
 		e.max_health = 10000;
+		e.hunger = 600;
+		e.max_hunger = 600;
 		e.speed = 4.5;
 		e.boss = true;
 		e.follow_range = 10000;
@@ -49,9 +51,11 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 		e.damage = 0.05;
 		e.health = 50;
 		e.max_health = 50;
+		e.hunger = 25;
+		e.max_hunger = 25;
 		e.speed = 9;
 		e.boss = false;
-		e.follow_range = 10000;
+		e.follow_range = 1000;
 	}
 	Matter.Composite.add(g.engine.world, e.body);
 	return game_object_create(g, "enemy", e, enemy_update, enemy_draw, enemy_destroy);
@@ -113,9 +117,10 @@ function enemy_update(enemy_object, dt) {
 		if(enemy_object.data.hit_by_player) {
 			let N = 1;
 			if(enemy_object.data.boss) {
-				N = 15 * Math.random() + 5;
-				if(enemy_object.data.hunger <= 1)
-					N = 0.25 * N;
+				if(enemy_object.data.hunger > 0)
+					N = 20 * Math.random() + 10;
+				else
+					N = 5 * Math.random() + 5;
 			}
 			for(let i = 0; i < N; i++) {
 				let theta = 2 * Math.PI * Math.random();

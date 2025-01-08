@@ -23,7 +23,7 @@ function game_create(input_, engine_) {
 				"show player hunger": true,
 				"show player thirst": true,
 				"show enemy health": true,
-				"show enemy hunger": false,
+				"show enemy hunger": true,
 				"show car health": true,
 				"show car fuel": true
 			}
@@ -34,7 +34,8 @@ function game_create(input_, engine_) {
 		max_survival_time: 0,
 		kills: 0,
 		boss_kills: 0,
-		show_gui: true
+		show_gui: true,
+		deaths: 0
 	};
 	return g;
 }
@@ -46,6 +47,7 @@ function game_new(g) {
 	g.max_survival_time = 0;
 	g.kills = 0;
 	g.boss_kills = 0;
+	g.deaths = 0;
 	levels_set(g, "0x0");
 }
 
@@ -133,6 +135,7 @@ function game_draw(g, ctx) {
 			+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
 		drawText(ctx, 50, 190, game_translate(g.settings.language, "killed")
 			+ ": " + Math.round(g.boss_kills) + " " + game_translate(g.settings.language, "bosses"));
+		drawText(ctx, 50, 220, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
 	}
 	ctx.restore();
 }
@@ -215,6 +218,8 @@ function game_translate(language, text) {
 			return "врагов";
 		if(text == "bosses")
 			return "боссов";
+		if(text == "player deaths")
+			return "смерти игрока";
 	}
 	return text;
 }

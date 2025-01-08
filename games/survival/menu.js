@@ -14,7 +14,7 @@ function menu_create() {
 			"show player hunger": true,
 			"show player thirst": true,
 			"show enemy health": true,
-			"show enemy hunger": false,
+			"show enemy hunger": true,
 			"show car health": true,
 			"show car fuel": true
 		},
