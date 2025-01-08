@@ -121,7 +121,7 @@ function enemy_update(enemy_object, dt) {
 					N = 20 * Math.random() + 10;
 					item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
 				} else
-					N = 5 * Math.random() + 5;
+					N = 10 * Math.random() + 5;
 			}
 			for(let i = 0; i < N; i++) {
 				let theta = 2 * Math.PI * Math.random();

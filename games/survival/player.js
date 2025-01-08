@@ -250,8 +250,11 @@ function player_draw(player_object, ctx) {
 			ctx.fillStyle = "orange";
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
 		}
-		if(player_object.game.settings.player_draw_gun && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN) {
+		if(player_object.game.settings.player_draw_gun &&
+			ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
 			ctx.strokeStyle = "black";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
+				ctx.strokeStyle = "brown";
 			ctx.beginPath();
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
