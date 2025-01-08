@@ -23,7 +23,9 @@ function menu_create() {
 			"continue game",
 			"start new game",
 			"settings",
-			"language"
+			"",
+			" 🇷🇺 ",
+			" 🇬🇧 "
 		],
 		settings_buttons: [
 			"player color",
@@ -31,6 +33,7 @@ function menu_create() {
 			"enemies spawn",
 			"show hints",
 			"indicators",
+			"language",
 			"main menu"
 		],
 		player_color_selection_menu: [
@@ -140,6 +143,10 @@ function menu_update(m, dt, input) {
 			m.want_player_color = "yellow";
 		} else if(m.buttons[m.iselected] == "set player color to blue") {
 			m.want_player_color = "blue";
+		} else if(m.buttons[m.iselected] == " 🇬🇧 ") {
+			m.want_language = "english";
+		} else if(m.buttons[m.iselected] == " 🇷🇺 ") {
+			m.want_language = "русский";
 		} else if(m.buttons[m.iselected] == "language") {
 			if(m.want_language == "русский")
 				m.want_language = "english";

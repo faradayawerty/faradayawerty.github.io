@@ -50,11 +50,14 @@
 
 		let cvs1 = document.getElementById("canvas");
 		let ctx1 = cvs1.getContext("2d");
-		let engine1 = Matter.Engine.create();
 
+		let engine1 = Matter.Engine.create();
 		let input1 = input_create();
 		let menu1 = menu_create();
 		let game1 = game_create(input1, engine1);
+
+		//let lines = new Image();
+		//lines.src = 'https://i.sstatic.net/QPN59.png';
 
 		document.addEventListener("visibilitychange", function() {
 			if(document.hidden)
@@ -62,15 +65,16 @@
 		});
 
 		function animate(lastUpdateTime) {
+
+			// calculate delta time
+			let dt = Date.now() - lastUpdateTime;
+			lastUpdateTime = Date.now();
+
 			ctx1.clearRect(0,0, cvs1.width, cvs1.height);
 			ctx1.canvas.width = window.innerWidth;
 			ctx1.canvas.height = window.innerHeight;
 			ctx1.fillStyle = "black";
 			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
-
-			// calculate delta time
-			dt = Date.now() - lastUpdateTime;
-			lastUpdateTime = Date.now();
 
 			// update game settings
 			if(menu1.want_player_color != game1.settings.player_color)
@@ -111,6 +115,7 @@
 			game_draw(game1, ctx1);
 			if(menu1.shown)
 				menu_draw(ctx1, menu1);
+			//ctx1.drawImage(lines, 0, 0, window.innerWidth, window.innerHeight);
 
 			window.requestAnimationFrame(function() {
 				animate(lastUpdateTime);

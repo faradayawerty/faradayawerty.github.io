@@ -8,7 +8,7 @@ function drawButton(ctx, x, y, text) {
 }
 
 function drawText(ctx, x, y, text) {
-	ctx.font = "14px verdana";
+	ctx.font = "18px verdana";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
 	ctx.fillStyle = 'white';
