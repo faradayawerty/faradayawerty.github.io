@@ -23,7 +23,7 @@ function player_create(g, x, y, respawn=false) {
 			inertia: Infinity
 		})
 	};
-	p.infobox_element = g.gui_elements[infobox_create(g, 40, 300, 4)];
+	p.infobox_element = g.gui_elements[infobox_create(g, 50, 300, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
 	p.hotbar_element = g.gui_elements[hotbar_create(g, p.inventory_element.data)];
 	Matter.Composite.add(g.engine.world, p.body);
