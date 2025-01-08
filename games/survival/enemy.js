@@ -110,10 +110,13 @@ function enemy_update(enemy_object, dt) {
 			e.spawn_minion_delay += Math.random() * dt;
 	}
 	if(enemy_object.data.health <= 0) {
-		if(enemy_object.data.hunger > 1) {
+		if(enemy_object.data.hit_by_player) {
 			let N = 1;
-			if(enemy_object.data.boss)
-				N = 20;
+			if(enemy_object.data.boss) {
+				N = 15 * Math.random() + 5;
+				if(enemy_object.data.hunger <= 1)
+					N = 0.25 * N;
+			}
 			for(let i = 0; i < N; i++) {
 				let theta = 2 * Math.PI * Math.random();
 				let x = e.body.position.x + 50 * Math.cos(theta);

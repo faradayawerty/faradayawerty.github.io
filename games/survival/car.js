@@ -3,7 +3,7 @@ function car_create(g, x, y, color_) {
 	let cars = g.objects.filter((obj) => obj.name == "car");
 	if(cars.length > 10)
 		for(let i = 0; i < 5 * Math.random() + 1; i++) {
-			if(g.player_object && g.player_object.data.car_object == cars[i] && i < cars.length)
+			if(g.player_object && g.player_object.data.car_object == cars[i] && i < cars.length - 1)
 				i++;
 			cars[i].destroy(cars[i]);
 		}
