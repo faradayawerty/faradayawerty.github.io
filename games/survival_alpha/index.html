@@ -62,6 +62,7 @@
 		});
 
 		function animate(lastUpdateTime) {
+			ctx1.clearRect(0,0, cvs1.width, cvs1.height);
 			ctx1.canvas.width = window.innerWidth;
 			ctx1.canvas.height = window.innerHeight;
 			ctx1.fillStyle = "black";
@@ -80,6 +81,10 @@
 				game1.settings.enemies_spawn = menu1.want_enemies_spawn;
 			if(menu1.want_indicators != game1.settings.indicators)
 				game1.settings.indicators = menu1.want_indicators;
+			if(menu1.want_hints != game1.settings.show_hints)
+				game1.settings.show_hints = menu1.want_hints;
+			if(menu1.want_language != game1.settings.language)
+				game1.settings.language = menu1.want_language;
 
 			// update game if menu is not shown, else update menu
 			if(isKeyDown(input1, 'Escape', true)) {

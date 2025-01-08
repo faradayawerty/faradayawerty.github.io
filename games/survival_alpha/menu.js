@@ -8,6 +8,7 @@ function menu_create() {
 		want_player_draw_gun: true,
 		want_enemies_spawn: true,
 		want_language: "english",
+		want_hints: false,
 		want_indicators: {
 			"show player health": true,
 			"show player hunger": true,
@@ -28,6 +29,7 @@ function menu_create() {
 			"player color",
 			"player draw gun",
 			"enemies spawn",
+			"show hints",
 			"indicators",
 			"main menu"
 		],
@@ -66,6 +68,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_color);
 		else if(m.buttons[i] == "player draw gun")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_draw_gun);
+		else if(m.buttons[i] == "show hints")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_hints);
 		else if(m.buttons[i] == "enemies spawn")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
 		else if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
@@ -122,6 +126,8 @@ function menu_update(m, dt, input) {
 			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m.buttons[m.iselected]];
 		} else if(m.buttons[m.iselected] == "player draw gun") {
 			m.want_player_draw_gun = !m.want_player_draw_gun;
+		} else if(m.buttons[m.iselected] == "show hints") {
+			m.want_hints = !m.want_hints;
 		} else if(m.buttons[m.iselected] == "set player color to red") {
 			m.want_player_color = "red";
 		} else if(m.buttons[m.iselected] == "set player color to lime") {
@@ -197,6 +203,8 @@ function menu_translate(lang, str) {
 			return "показывать значение сломанности автомобилей"
 		else if(str == "show car fuel")
 			return "показывать значение топлива автомобиля";
+		else if(str == "show hints")
+			return "подсказки";
 	}
 	return str;
 }

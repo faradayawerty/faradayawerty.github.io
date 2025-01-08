@@ -13,9 +13,11 @@ function game_create(input_, engine_) {
 		input: input_,
 		engine: engine_,
 		settings: {
+			language: "english",
 			player_color: "red",
 			player_draw_gun: true,
 			enemies_spawn: true,
+			show_hints: false,
 			indicators: {
 				"show player health": true,
 				"show player hunger": true,

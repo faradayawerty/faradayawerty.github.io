@@ -76,6 +76,38 @@ function item_update(item_object, dt) {}
 function item_draw(item_object, ctx) {
 	let item = item_object.data;
 	item_icon_draw(ctx, item.id, item.body.position.x - 20, item.body.position.y - 20, 40, 40);
+	if(item_object.game.settings.show_hints) {
+		let name = "item";
+		if(item.id == ITEM_AMMO)
+			name = "ammo";
+		if(item.id == ITEM_HEALTH)
+			name = "health";
+		if(item.id == ITEM_GUN)
+			name = "gun";
+		if(item.id == ITEM_FUEL)
+			name = "fuel";
+		if(item.id == ITEM_MONEY)
+			name = "money";
+		if(item.id == ITEM_CANNED_MEAT)
+			name = "canned meat";
+		if(item.id == ITEM_ORANGE)
+			name = "orange";
+		if(item.id == ITEM_APPLE)
+			name = "apple";
+		if(item.id == ITEM_CHERRIES)
+			name = "cherries";
+		if(item.id == ITEM_CHICKEN_LEG)
+			name = "chicken leg";
+		if(item.id == ITEM_CHOCOLATE)
+			name = "chocolate";
+		if(item.id == ITEM_WATER)
+			name = "water";
+		if(item.id == ITEM_COLA)
+			name = "cola";
+		if(item.id == ITEM_MILK)
+			name = "milk";
+		drawHint(ctx, item.body.position.x - 20, item.body.position.y - 20, item_name_translate(item_object.game.settings.language, name));
+	}
 }
 
 function item_icon_draw(ctx, id, x, y, w, h) {
@@ -85,6 +117,7 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillStyle = "black";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	} else if(id == ITEM_AMMO) {
 		let N = 4;
@@ -93,8 +126,8 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 			ctx.fillStyle = "orange";
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
-			ctx.lineWidth = 0.5;
 			ctx.strokeStyle = "orange";
+			ctx.lineWidth = 0.01 * w;
 			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 		}
 	} else if(id == ITEM_HEALTH) {
@@ -109,7 +142,7 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.05, h * 0.2);
 		ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.05, h * 0.2);
 		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.2, h * 0.05);
-		ctx.lineWidth = 0.5;
+		ctx.lineWidth = 0.01 * w;
 		ctx.strokeStyle = "black";
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 		ctx.fillStyle = "yellow";
@@ -157,6 +190,7 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.4);
 		ctx.fillStyle = "#dddddd";
 		ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.6, h * 0.4);
+		ctx.lineWidth = 0.05 * w;
 		ctx.strokeStyle = "black";
 		ctx.strokeRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
 	} else if(id == ITEM_ORANGE) {
@@ -194,5 +228,37 @@ function item_pickup(inventory_element, item_object) {
 				return true;
 			}
 	return false;
+}
+
+function item_name_translate(language, text) {
+	if(language == "русский") {
+		if(text == "gun")
+			return "пушка";
+		if(text == "item")
+			return "неизвестный предмет";
+		if(text == "ammo")
+			return "патроны";
+		if(text == "health")
+			return "аптечка";
+		if(text == "orange")
+			return "апельсин";
+		if(text == "water")
+			return "вода";
+		if(text == "milk")
+			return "молоко";
+		if(text == "cola")
+			return "кола";
+		if(text == "canned meat")
+			return "тушонка";
+		if(text == "money")
+			return "деньги";
+		if(text == "cherries")
+			return "вишни";
+		if(text == "chocolate")
+			return "шоколад";
+		if(text == "fuel")
+			return "топливо";
+	}
+	return text;
 }
 
