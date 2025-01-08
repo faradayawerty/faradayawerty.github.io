@@ -118,26 +118,26 @@ function player_update(player_object, dt) {
 		&& player_object.game.input.mouse.leftButtonPressed) {
 		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		if(c) {
-			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, Math.random() * 40 + 10);
+			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, Math.random() * 60 + 10);
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		}
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HEALTH
 		&& player_object.game.input.mouse.leftButtonPressed) {
-		p.health += Math.min(p.max_health - p.health, Math.random() * 15 + 5);
-		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-	}
-
-	if(ITEMS_FOODS.includes(hotbar_get_selected_item(p.hotbar_element))
-		&& player_object.game.input.mouse.leftButtonPressed) {
-		p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 25 + 10);
+		p.health += Math.min(p.max_health - p.health, Math.random() * 10 + 5);
 		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 	}
 
 	if(ITEMS_DRINKS.includes(hotbar_get_selected_item(p.hotbar_element))
 		&& player_object.game.input.mouse.leftButtonPressed) {
-		p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 30 + 15);
+		p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
+		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+	}
+
+	if(ITEMS_FOODS.includes(hotbar_get_selected_item(p.hotbar_element))
+		&& player_object.game.input.mouse.leftButtonPressed) {
+		p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 30 + 5);
 		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 	}
 
