@@ -15,8 +15,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 	if(make_minion)
 		boss = false;
 	if(boss) {
-		width = 100;
-		height = 100;
+		width = 80;
+		height = 80;
 	}
 	if(make_minion) {
 		width = 20;
@@ -117,9 +117,10 @@ function enemy_update(enemy_object, dt) {
 		if(enemy_object.data.hit_by_player) {
 			let N = 1;
 			if(enemy_object.data.boss) {
-				if(enemy_object.data.hunger > 0)
+				if(enemy_object.data.hunger > 0) {
 					N = 20 * Math.random() + 10;
-				else
+					item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
+				} else
 					N = 5 * Math.random() + 5;
 			}
 			for(let i = 0; i < N; i++) {
@@ -146,15 +147,15 @@ function enemy_draw(enemy_object, ctx) {
 	drawMatterBody(ctx, e.body, 'white');
 	if(enemy_object.game.settings.indicators["show enemy hunger"]) {
 		ctx.fillStyle = "red";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w, 2);
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w, e.h * 0.05);
 		ctx.fillStyle = "orange";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w * e.hunger / e.max_hunger, 2);
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w * e.hunger / e.max_hunger, e.h * 0.05);
 	}
 	if(enemy_object.game.settings.indicators["show enemy health"]) {
 		ctx.fillStyle = "red";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w, 2);
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w, e.h * 0.05);
 		ctx.fillStyle = "lime";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w * e.health / e.max_health, 2);
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w * e.health / e.max_health, e.h * 0.05);
 	}
 }
 

@@ -1,11 +1,11 @@
 
-function bullet_create(g, x, y, dx, dy) {
+function bullet_create(g, x, y, dx, dy, speed=20) {
 	let width = 6, height = 6;
 	let d = Math.sqrt(dx*dx + dy*dy);
 	let b = {
 		lifetime: 1000,
 		damage: 0.5,
-		speed: 20,
+		speed: speed,
 		w: width,
 		h: height,
 		body: Matter.Bodies.rectangle(x + 25 * dx/d, y + 25 * dy/d, width, height)

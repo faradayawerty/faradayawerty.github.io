@@ -56,9 +56,6 @@
 		let menu1 = menu_create();
 		let game1 = game_create(input1, engine1);
 
-		//let lines = new Image();
-		//lines.src = 'https://i.sstatic.net/QPN59.png';
-
 		document.addEventListener("visibilitychange", function() {
 			if(document.hidden)
 				menu1.shown = true;
@@ -117,7 +114,6 @@
 			game_draw(game1, ctx1);
 			if(menu1.shown)
 				menu_draw(ctx1, menu1);
-			//ctx1.drawImage(lines, 0, 0, window.innerWidth, window.innerHeight);
 
 			window.requestAnimationFrame(function() {
 				animate(lastUpdateTime);

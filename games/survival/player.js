@@ -12,6 +12,7 @@ function player_create(g, x, y, respawn=false) {
 		speed: 10,
 		max_speed: 10,
 		shot_cooldown: 0,
+		shotgun_cooldown: 0,
 		want_level: g.level,
 		w: width,
 		h: height,
@@ -62,6 +63,8 @@ function player_update(player_object, dt) {
 	let p = player_object.data;
 	if(p.shot_cooldown > 0)
 		p.shot_cooldown -= dt;
+	if(p.shotgun_cooldown > 0)
+		p.shotgun_cooldown -= dt;
 
 	if(player_object.data.health <= 0)
 		player_die(player_object);
@@ -175,10 +178,27 @@ function player_update(player_object, dt) {
 			if(Math.random() > 0.99)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
-			if(isKeyDown(player_object.game.input, 'q', true))
-				inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
-			Matter.Body.setVelocity(p.body, vel);
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.shotgun_cooldown <= 0
+			&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
+			for(let i = 0; i < Math.random() * 7 + 7; i++)
+				bullet_create(
+					player_object.game,
+					p.body.position.x,
+					p.body.position.y,
+					(0.8 + 0.4 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+					(0.8 + 0.4 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+					Math.random() * 10 + 10
+				);
+			p.shotgun_cooldown = 1000;
+			if(Math.random() > 0.85)
+				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
+		if(isKeyDown(player_object.game.input, 'q', true))
+			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
+		Matter.Body.setVelocity(p.body, vel);
+	}
 
 	if(!p.inventory_element.shown && p.car_object) {
 		let rotatedir = 0;
@@ -214,21 +234,21 @@ function player_draw(player_object, ctx) {
 		drawMatterBody(ctx, p.body, "white");
 		if(player_object.game.settings.indicators["show player health"]) {
 			ctx.fillStyle = "red";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, 2);
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, p.h * 0.05);
 			ctx.fillStyle = "lime";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w * p.health / p.max_health, 2);
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w * p.health / p.max_health, p.h * 0.05);
 		}
 		if(player_object.game.settings.indicators["show player thirst"]) {
 			ctx.fillStyle = "red";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w, 2);
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w, p.h * 0.05);
 			ctx.fillStyle = "cyan";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w * p.thirst / p.max_thirst, 2);
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 * p.h, p.w * p.thirst / p.max_thirst, p.h * 0.05);
 		}
 		if(player_object.game.settings.indicators["show player hunger"]) {
 			ctx.fillStyle = "red";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w, 2);
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w, p.h * 0.05);
 			ctx.fillStyle = "orange";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, 2);
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
 		}
 		if(player_object.game.settings.player_draw_gun && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN) {
 			ctx.strokeStyle = "black";

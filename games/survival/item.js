@@ -1,5 +1,6 @@
 
 let ITEM_GUN = 1;
+let ITEM_SHOTGUN = 15;
 
 let ITEM_AMMO = 2;
 let ITEM_HEALTH = 3;
@@ -84,6 +85,8 @@ function item_draw(item_object, ctx) {
 			name = "health";
 		if(item.id == ITEM_GUN)
 			name = "gun";
+		if(item.id == ITEM_SHOTGUN)
+			name = "shotgun";
 		if(item.id == ITEM_FUEL)
 			name = "fuel";
 		if(item.id == ITEM_MONEY)
@@ -115,6 +118,12 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		return
 	} else if(id == ITEM_GUN) {
 		ctx.fillStyle = "black";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_SHOTGUN) {
+		ctx.fillStyle = "brown";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
@@ -234,6 +243,8 @@ function item_name_translate(language, text) {
 	if(language == "русский") {
 		if(text == "gun")
 			return "пушка";
+		if(text == "shotgun")
+			return "дробовик";
 		if(text == "item")
 			return "неизвестный предмет";
 		if(text == "ammo")
