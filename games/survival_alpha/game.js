@@ -104,10 +104,13 @@ function game_draw(g, ctx) {
 		if(!g.objects[i].destroyed)
 			g.objects[i].draw(g.objects[i], ctx);
 	ctx.restore();
+	ctx.save()
+	ctx.scale(window.innerWidth / 1800, window.innerWidth / 1800);
 	for(let i = 0; i < g.gui_elements.length; i++) {
 		if(!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
 			g.gui_elements[i].draw(g.gui_elements[i], ctx);
 	}
+	ctx.restore();
 }
 
 function game_destroy_all_objects(g) {
