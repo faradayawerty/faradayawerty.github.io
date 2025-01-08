@@ -97,6 +97,7 @@
 			}
 			if(menu1.shown) {
 				menu_update(menu1, dt, input1);
+				game1.show_gui = false;
 			} else if(game1.want_respawn_menu) {
 				menu1.shown = true;
 				menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf("continue game")] = "respawn and continue game";
@@ -108,6 +109,7 @@
 				player_create(game1, 1250, 1250, true);
 				menu1.want_player_respawn = false;
 			} else {
+				game1.show_gui = true;
 				game_update(game1, dt);
 				Matter.Engine.update(engine1, dt);
 			}

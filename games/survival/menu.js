@@ -83,9 +83,9 @@ function menu_draw(ctx, m) {
 		else
 			text = menu_translate(m.want_language, text);
 		if(m.iselected == i)
-			drawButton(ctx, 160, 140 + 60 * i, "[" + text + "]");
+			drawButton(ctx, 300, 190 + 60 * i, "[" + text + "]");
 		else
-			drawButton(ctx, 140, 140 + 60 * i, text);
+			drawButton(ctx, 280, 190 + 60 * i, text);
 	}
 	ctx.restore();
 }
@@ -94,7 +94,7 @@ function menu_update(m, dt, input) {
 
 	for(let i = 0; i < m.buttons.length; i++)
 		if(doRectsCollide(input.mouse.x / window.innerWidth * 1800, input.mouse.y / window.innerWidth * 1800, 0, 0,
-			140, 110 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
+			280, 150 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
 			m.iselected = i;
 
 	if((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) && m.iselected < m.buttons.length - 1) {

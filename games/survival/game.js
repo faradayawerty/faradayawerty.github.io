@@ -33,7 +33,8 @@ function game_create(input_, engine_) {
 		survival_time: 0,
 		max_survival_time: 0,
 		kills: 0,
-		boss_kills: 0
+		boss_kills: 0,
+		show_gui: true
 	};
 	return g;
 }
@@ -113,6 +114,10 @@ function game_draw(g, ctx) {
 		if(!g.objects[i].destroyed)
 			g.objects[i].draw(g.objects[i], ctx);
 	ctx.restore();
+
+	if(!g.show_gui)
+		return;
+
 	ctx.save()
 	ctx.scale(window.innerWidth / 1800, window.innerWidth / 1800);
 	for(let i = 0; i < g.gui_elements.length; i++) {
