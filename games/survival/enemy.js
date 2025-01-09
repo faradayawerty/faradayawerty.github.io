@@ -13,14 +13,13 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 
 
 	if(g.player_object) {
-		let player_has_weapon = 0;
-		if(inventory_has_item(g.player_object.data.inventory_element, ITEM_GUN))
-			player_has_weapon = 1;
-		let m = player_has_weapon * 0.33 * (
+		let m = 0.33 * (
 			g.player_object.data.health / g.player_object.data.max_health
 			+ g.player_object.data.thirst / g.player_object.data.max_thirst
 			+ g.player_object.data.hunger / g.player_object.data.max_hunger
 		);
+		if(!g.player_object.shot_gun_once)
+			m *= 0.01;
 		if(!enemy_boss_exists(g) && Math.random() > 0.995 - 0.25 * m)
 			boss = true;
 	}

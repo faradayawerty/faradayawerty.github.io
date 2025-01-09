@@ -23,7 +23,8 @@ function player_create(g, x, y, respawn=false) {
 		car_object: null,
 		body: Matter.Bodies.rectangle(x, y, width, height, {
 			inertia: Infinity
-		})
+		}),
+		shot_gun_once: false
 	};
 	p.infobox_element = g.gui_elements[infobox_create(g, 50, 300, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
@@ -187,6 +188,7 @@ function player_update(player_object, dt) {
 			&& player_object.game.input.mouse.leftButtonPressed
 			&& p.shot_cooldown <= 0
 			&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
+			p.shot_gun_once = true;
 			bullet_create(
 				player_object.game,
 				p.body.position.x,
