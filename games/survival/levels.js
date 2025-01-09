@@ -27,7 +27,7 @@ function levels_set(g, level) {
 				enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 			for(let i = 0; i < Math.random() * (g.player_object.data.car_object ? 8 : 0) - 6; i++)
 				item_create(g, ITEM_FUEL, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-			for(let i = 0; i < Math.random() * 4 - 2 - 0.29 * inventory_count_item(g.player_object.data.inventory_element, ITEM_AMMO); i++)
+			for(let i = 0; i < Math.random() * 4 - 2 - 0.25 * inventory_count_item(g.player_object.data.inventory_element, ITEM_AMMO); i++)
 				item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 			for(let i = 0; i < Math.random() * 2 - 3 + Math.min(g.player_object.data.max_health / g.player_object.data.health, 3); i++)
 				item_create(g, ITEM_HEALTH, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
