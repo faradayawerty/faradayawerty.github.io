@@ -23,11 +23,11 @@ function levels_set(g, level) {
 			item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 
 		if(g.player_object) {
-			for(let i = 0; i < Math.random() * 2 - 2 + Math.min(g.player_object.data.max_health / g.player_object.data.health, 4); i++)
+			for(let i = 0; i < Math.random() * 2 - 3 + Math.min(g.player_object.data.max_health / g.player_object.data.health, 3); i++)
 				item_create(g, ITEM_HEALTH, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-			for(let i = 0; i < Math.random() * 8 - 4 + Math.min(g.player_object.data.max_hunger / g.player_object.data.hunger, 6); i++)
+			for(let i = 0; i < Math.random() * 2 - 3 + Math.min(g.player_object.data.max_hunger / g.player_object.data.hunger, 3); i++)
 				item_create_from_list(g, ITEMS_FOODS, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-			for(let i = 0; i < Math.random() * 8 - 4 + Math.min(g.player_object.data.max_thirst / g.player_object.data.thirst, 6); i++)
+			for(let i = 0; i < Math.random() * 2 - 3 + Math.min(g.player_object.data.max_thirst / g.player_object.data.thirst, 3); i++)
 				item_create_from_list(g, ITEMS_DRINKS, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 		}
 
