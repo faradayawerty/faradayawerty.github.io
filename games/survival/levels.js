@@ -17,17 +17,24 @@ function levels_set(g, level) {
 		for(let i = 0; i < Math.random() * 30 - 10; i++)
 			enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 
-		for(let i = 0; i < Math.random() * 2 - 1; i++)
-			item_create(g, ITEM_HEALTH, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 		for(let i = 0; i < Math.random() * 4 - 2; i++)
 			item_create(g, ITEM_FUEL, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 		for(let i = 0; i < Math.random() * 4 - 2; i++)
 			item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 
-		for(let i = 0; i < Math.random() * 8 - 4; i++)
-			item_create_from_list(g, ITEMS_FOODS.concat(ITEMS_DRINKS), Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-		for(let i = 0; i < Math.random() * 8 - 4; i++)
-			item_create_from_list(g, ITEMS_FOODS.concat(ITEMS_DRINKS), Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		if(g.player_object) {
+			for(let i = 0; i < Math.random() * 2 - 2 + Math.min(g.player_object.data.max_health / g.player_object.data.health, 4); i++)
+				item_create(g, ITEM_HEALTH, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+			for(let i = 0; i < Math.random() * 8 - 4 + Math.min(g.player_object.data.max_hunger / g.player_object.data.hunger, 6); i++)
+				item_create_from_list(g, ITEMS_FOODS, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+			for(let i = 0; i < Math.random() * 8 - 4 + Math.min(g.player_object.data.max_thirst / g.player_object.data.thirst, 6); i++)
+				item_create_from_list(g, ITEMS_DRINKS, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		}
+
+		if(Math.random() > 0.85)
+			item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		if(Math.random() > 0.99)
+			item_create(g, ITEM_MONEY, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 
 		if(Math.random() > 0.95)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#1177ff");
@@ -35,11 +42,6 @@ function levels_set(g, level) {
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff7711");
 		else if(Math.random() > 0.95)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff1177");
-
-		if(Math.random() > 0.85)
-			item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-		if(Math.random() > 0.99)
-			item_create(g, ITEM_MONEY, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 	}
 
 	if(level == "0x0") {

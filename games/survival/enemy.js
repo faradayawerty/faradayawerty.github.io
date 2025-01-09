@@ -10,8 +10,21 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 		}
 	let width = 30, height = 30;
 	let boss = make_boss;
-	if(Math.random() > 0.99)
-		boss = true;
+
+
+	if(g.player_object) {
+		let player_has_weapon = 0;
+		if(inventory_has_item(g.player_object.data.inventory_element, ITEM_GUN))
+			player_has_weapon = 1;
+		let m = player_has_weapon * 0.33 * (
+			g.player_object.data.health / g.player_object.data.max_health
+			+ g.player_object.data.thirst / g.player_object.data.max_thirst
+			+ g.player_object.data.hunger / g.player_object.data.max_hunger
+		);
+		if(!enemy_boss_exists(g) && Math.random() > 0.995 - 0.25 * m)
+			boss = true;
+	}
+
 	if(make_minion)
 		boss = false;
 	if(boss) {
@@ -160,5 +173,11 @@ function enemy_draw(enemy_object, ctx) {
 		ctx.fillStyle = "lime";
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w * e.health / e.max_health, e.h * 0.05);
 	}
+}
+
+function enemy_boss_exists(g) {
+	if(!g.objects.find((obj) => obj.name == "enemy" && obj.data.boss))
+		return false;
+	return true;
 }
 
