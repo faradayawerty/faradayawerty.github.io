@@ -159,10 +159,25 @@ function player_update(player_object, dt) {
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
 		if(player_object.game.input.keys.down['w'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
-		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true)) {
-			if(!item_pickup(p.inventory_element, game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100)))
-				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+
+		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
+		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
+		if(closest_item && closest_item.data.id == ITEM_AMMO) {
+			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down)
+				item_pickup(p.inventory_element, closest_item);
+		} else if(closest_item && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
+			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down)
+				item_pickup(p.inventory_element, closest_item);
+		} else if(closest_item && closest_item.data.id == ITEM_HEALTH) {
+			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down)
+				item_pickup(p.inventory_element, closest_item);
+		} else if(closest_item && closest_item.data.id == ITEM_FUEL) {
+			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down)
+				item_pickup(p.inventory_element, closest_item);
+		} else if(!item_pickup(p.inventory_element, closest_item) && f_down) {
+			p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		}
+
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN
 			&& player_object.game.input.mouse.leftButtonPressed
 			&& p.shot_cooldown <= 0

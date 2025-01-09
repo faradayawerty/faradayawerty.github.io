@@ -19,6 +19,12 @@ function menu_create() {
 			"show car health": true,
 			"show car fuel": true
 		},
+		want_auto_pickup: {
+			"automatically pickup food and drinks": false,
+			"automatically pickup fuel": false,
+			"automatically pickup health": false,
+			"automatically pickup ammo": false
+		},
 		iselected: 0,
 		main_menu_buttons: [
 			"continue game",
@@ -34,6 +40,7 @@ function menu_create() {
 			"show hints",
 			"ammo pickup in last slot",
 			"indicators",
+			"auto pickup",
 			"language",
 			"main menu"
 		],
@@ -52,6 +59,13 @@ function menu_create() {
 			"show enemy hunger",
 			"show car health",
 			"show car fuel",
+			"back to settings"
+		],
+		auto_pickup_settings: [
+			"automatically pickup food and drinks",
+			"automatically pickup fuel",
+			"automatically pickup health",
+			"automatically pickup ammo",
 			"back to settings"
 		],
 		buttons: null
@@ -82,6 +96,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
 		else if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_indicators[m.buttons[i]]);
+		else if(m.buttons[i] != "back to settings" && m.auto_pickup_settings.includes(m.buttons[i]))
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_auto_pickup[m.buttons[i]]);
 		else if(m.buttons[i] == "language")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_language);
 		else
@@ -132,8 +148,13 @@ function menu_update(m, dt, input) {
 		} else if(m.buttons[m.iselected] == "indicators") {
 			m.buttons = m.indicators_settings;
 			m.iselected = 0;
+		} else if(m.buttons[m.iselected] == "auto pickup") {
+			m.buttons = m.auto_pickup_settings;
+			m.iselected = 0;
 		} else if(m.indicators_settings.includes(m.buttons[m.iselected])) {
 			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m.buttons[m.iselected]];
+		} else if(m.auto_pickup_settings.includes(m.buttons[m.iselected])) {
+			m.want_auto_pickup[m.buttons[m.iselected]] = !m.want_auto_pickup[m.buttons[m.iselected]];
 		} else if(m.buttons[m.iselected] == "player draw gun") {
 			m.want_player_draw_gun = !m.want_player_draw_gun;
 		} else if(m.buttons[m.iselected] == "ammo pickup in last slot") {
@@ -223,6 +244,16 @@ function menu_translate(lang, str) {
 			return "подсказки";
 		else if(str == "ammo pickup in last slot")
 			return "собирать патроны в последний слот";
+		else if(str == "automatically pickup food and drinks")
+			return "автоматически подбирать еду и напитки"
+		else if(str == "automatically pickup fuel")
+			return "автоматически подбирать топливо"
+		else if(str == "automatically pickup health")
+			return "автоматически подбирать аптечки"
+		else if(str == "automatically pickup ammo")
+			return "автоматически подбирать патроны"
+		else if(str == "auto pickup")
+			return "автоматически подбирать предметы"
 	}
 	return str;
 }

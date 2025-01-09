@@ -93,8 +93,8 @@ function inventory_drop_item(inventory_element, i, j) {
 	if(inventory_element.data.items[i][j] == 0)
 		return;
 	item_create(inventory_element.game, inventory_element.data.items[i][j],
-		inventory_element.game.player_object.data.body.position.x + 100 * Math.cos(2 * Math.PI * Math.random()),
-		inventory_element.game.player_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()));
+		inventory_element.game.player_object.data.body.position.x + 150 * Math.cos(2 * Math.PI * Math.random()),
+		inventory_element.game.player_object.data.body.position.y + 150 * Math.sin(2 * Math.PI * Math.random()));
 	inventory_element.data.items[i][j] = 0;
 }
 

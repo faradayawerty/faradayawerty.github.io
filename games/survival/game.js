@@ -27,6 +27,12 @@ function game_create(input_, engine_) {
 				"show car health": true,
 				"show car fuel": true
 			},
+			auto_pickup: {
+				"automatically pickup food and drinks": false,
+				"automatically pickup fuel": false,
+				"automatically pickup health": false,
+				"automatically pickup ammo": false
+			},
 			ammo_pickup_last: true
 		},
 		want_respawn_menu: false,
