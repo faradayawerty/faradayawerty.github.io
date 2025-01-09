@@ -14,33 +14,39 @@ function levels_set(g, level) {
 	if(!g.visited_levels.includes(level)) {
 		g.visited_levels.push(level);
 
-		for(let i = 0; i < Math.random() * 30 - 10; i++)
-			enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-
-		for(let i = 0; i < Math.random() * 4 - 2; i++)
-			item_create(g, ITEM_FUEL, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-		for(let i = 0; i < Math.random() * 4 - 2; i++)
-			item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-
 		if(g.player_object) {
+			let m = 0.33 * (
+				g.player_object.data.health / g.player_object.data.max_health
+				+ g.player_object.data.thirst / g.player_object.data.max_thirst
+				+ g.player_object.data.hunger / g.player_object.data.max_hunger
+			);
+			let bd = enemy_boss_distance_to_player(g);
+			if(-1 < bd && bd < 5000)
+				m *= 0.45;
+			for(let i = 0; i < Math.random() * 60 * m - 10; i++)
+				enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+			for(let i = 0; i < Math.random() * (g.player_object.data.car_object ? 8 : 0) - 6; i++)
+				item_create(g, ITEM_FUEL, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+			for(let i = 0; i < Math.random() * 4 - 2 - 0.29 * inventory_count_item(g.player_object.data.inventory_element, ITEM_AMMO); i++)
+				item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 			for(let i = 0; i < Math.random() * 2 - 3 + Math.min(g.player_object.data.max_health / g.player_object.data.health, 3); i++)
 				item_create(g, ITEM_HEALTH, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 			for(let i = 0; i < Math.random() * 2 - 3 + Math.min(g.player_object.data.max_hunger / g.player_object.data.hunger, 3); i++)
 				item_create_from_list(g, ITEMS_FOODS, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 			for(let i = 0; i < Math.random() * 2 - 3 + Math.min(g.player_object.data.max_thirst / g.player_object.data.thirst, 3); i++)
 				item_create_from_list(g, ITEMS_DRINKS, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+			if(!inventory_has_item(g.player_object.data.inventory_element, ITEM_GUN) && Math.random() > 0.75)
+				item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 		}
 
-		if(Math.random() > 0.85)
-			item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
-		if(Math.random() > 0.99)
+		if(Math.random() > 0.999)
 			item_create(g, ITEM_MONEY, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 
-		if(Math.random() > 0.95)
+		if(Math.random() > 0.99)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#1177ff");
-		else if(Math.random() > 0.95)
+		else if(Math.random() > 0.99)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff7711");
-		else if(Math.random() > 0.95)
+		else if(Math.random() > 0.99)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff1177");
 	}
 

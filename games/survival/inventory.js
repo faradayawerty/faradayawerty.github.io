@@ -174,6 +174,16 @@ function inventory_has_item(inventory_element, id) {
 	return false;
 }
 
+function inventory_count_item(inventory_element, id) {
+	let ans = 0;
+	for(let i = 0; i < inventory_element.data.items.length; i++) {
+		for(let j = 0; j < inventory_element.data.items[i].length; j++)
+			if(inventory_element.data.items[i][j] == id)
+				ans++;
+	}
+	return ans;
+}
+
 function inventory_clear_item(inventory_element, id, count) {
 	for(let i = 0; i < inventory_element.data.items.length && count > 0; i++)
 		for(let j = 0; j < inventory_element.data.items[i].length && count > 0; j++)

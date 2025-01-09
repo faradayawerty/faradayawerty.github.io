@@ -11,7 +11,6 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 	let width = 30, height = 30;
 	let boss = make_boss;
 
-
 	if(g.player_object) {
 		let m = 0.33 * (
 			g.player_object.data.health / g.player_object.data.max_health
@@ -20,7 +19,12 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 		);
 		if(!g.player_object.data.shot_gun_once)
 			m *= 0.01;
-		if(!enemy_boss_exists(g) && Math.random() > 0.995 - 0.25 * m)
+		let bd = enemy_boss_distance_to_player(g);
+		if(-1 < bd && bd < 15000)
+			m *= 0.01;
+		if(g.player_object.data.defeated_boss)
+			m *= 0.5;
+		if(Math.random() > 1 - 0.25 * m)
 			boss = true;
 	}
 
@@ -76,9 +80,11 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 function enemy_destroy(enemy_object) {
 	let g = enemy_object.game;
 	if(enemy_object.data.hit_by_player)
-		if(enemy_object.data.boss)
+		if(enemy_object.data.boss) {
 			g.boss_kills += 1;
-		else
+			if(enemy_object.game.player_object)
+				enemy_object.game.player_object.data.defeated_boss = true;
+		} else
 			g.kills += 1;
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
 	enemy_object.destroyed = true;
@@ -178,5 +184,16 @@ function enemy_boss_exists(g) {
 	if(!g.objects.find((obj) => obj.name == "enemy" && obj.data.boss))
 		return false;
 	return true;
+}
+
+function enemy_boss_distance_to_player(g) {
+	let boss_objects = g.objects.filter((obj) => obj.name == "enemy" && obj.data.boss);
+	if(boss_objects.length < 1 || !g.player_object)
+		return -1;
+	let boss_closest = boss_objects[0];
+	for(let i = 1; i < boss_objects.length; i++)
+		if(dist(boss_closest.data.body.position, g.player_object.data.body.position) > dist(boss_objects[i].data.body.position, g.player_object.data.body.position))
+			boss_closest = boss_objects[i];
+	return dist(boss_closest.data.body.position, g.player_object.data.body.position);
 }
 
