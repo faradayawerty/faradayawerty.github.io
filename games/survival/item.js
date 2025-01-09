@@ -163,7 +163,7 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 	} else if(id == ITEM_HEALTH) {
 		ctx.fillStyle = "white";
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		ctx.fillStyle = "red";
+		ctx.fillStyle = "#1177ff";
 		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
 	} else if(id == ITEM_FUEL) {
