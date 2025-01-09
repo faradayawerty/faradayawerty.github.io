@@ -95,6 +95,8 @@ function item_draw(item_object, ctx) {
 			name = "gun";
 		if(item.id == ITEM_SHOTGUN)
 			name = "shotgun";
+		if(item.id == ITEM_MINIGUN)
+			name = "minigun";
 		if(item.id == ITEM_FUEL)
 			name = "fuel";
 		if(item.id == ITEM_MONEY)
@@ -293,6 +295,8 @@ function item_name_translate(language, text) {
 			return "шоколад";
 		if(text == "fuel")
 			return "топливо";
+		if(text == "minigun")
+			return "миниган";
 	}
 	return text;
 }

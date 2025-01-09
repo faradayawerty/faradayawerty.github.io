@@ -1,10 +1,10 @@
 
-function bullet_create(g, x, y, dx, dy, speed=20) {
+function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5) {
 	let width = 6, height = 6;
 	let d = Math.sqrt(dx*dx + dy*dy);
 	let b = {
 		lifetime: 1000,
-		damage: 0.5,
+		damage: damage,
 		speed: speed,
 		w: width,
 		h: height,

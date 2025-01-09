@@ -13,6 +13,7 @@ function player_create(g, x, y, respawn=false) {
 		max_speed: 10,
 		shot_cooldown: 0,
 		shotgun_cooldown: 0,
+		minigun_cooldown: 0,
 		want_level: g.level,
 		w: width,
 		h: height,
@@ -65,6 +66,8 @@ function player_update(player_object, dt) {
 		p.shot_cooldown -= dt;
 	if(p.shotgun_cooldown > 0)
 		p.shotgun_cooldown -= dt;
+	if(p.minigun_cooldown > 0)
+		p.minigun_cooldown -= dt;
 
 	if(player_object.data.health <= 0)
 		player_die(player_object);
@@ -206,7 +209,8 @@ function player_update(player_object, dt) {
 					p.body.position.y,
 					(0.8 + 0.4 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
 					(0.8 + 0.4 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight,
-					Math.random() * 10 + 10
+					Math.random() * 10 + 10,
+					Math.random() * 1.5 + 0.5
 				);
 			p.shotgun_cooldown = 1000;
 			if(Math.random() > 0.85)
@@ -214,7 +218,7 @@ function player_update(player_object, dt) {
 		}
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
 			&& player_object.game.input.mouse.leftButtonPressed
-			&& p.shotgun_cooldown <= 0
+			&& p.minigun_cooldown <= 0
 			&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
 			bullet_create(
 				player_object.game,
@@ -222,9 +226,10 @@ function player_update(player_object, dt) {
 				p.body.position.y,
 				(0.95 + 0.1 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
 				(0.95 + 0.1 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight,
-				Math.random() * 10 + 10
+				Math.random() * 10 + 10,
+				Math.random()
 			);
-			p.shotgun_cooldown = 50;
+			p.minigun_cooldown = 40;
 			if(Math.random() > 0.995)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
