@@ -129,11 +129,16 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	} else if(id == ITEM_SHOTGUN) {
-		ctx.fillStyle = "brown";
+		ctx.fillStyle = "#773311";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_CANNED_MEAT) {
+		ctx.fillStyle = "gray";
+		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
+		ctx.fillStyle = "#771111";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	} else if(id == ITEM_AMMO) {
 		let N = 4;
 		for(let i = 0; i < N; i++) {
@@ -173,11 +178,6 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
 		drawCircle(ctx, x + w * 0.5, y + h * 0.5, w * 0.1, "#007733", "#007733", w * 0.025);
-	} else if(id == ITEM_CANNED_MEAT) {
-		ctx.fillStyle = "gray";
-		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
-		ctx.fillStyle = "brown";
-		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	} else if(id == ITEM_WATER) {
 		ctx.fillStyle = "#777777";
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);

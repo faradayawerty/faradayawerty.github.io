@@ -271,7 +271,7 @@ function player_draw(player_object, ctx) {
 			ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
 			ctx.strokeStyle = "black";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
-				ctx.strokeStyle = "brown";
+				ctx.strokeStyle = "#773311";
 			ctx.beginPath();
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;

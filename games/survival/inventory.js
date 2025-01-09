@@ -89,19 +89,19 @@ function inventory_draw(inventory_element, ctx) {
 	}
 }
 
-function inventory_drop_item(inventory_element, i, j) {
+function inventory_drop_item(inventory_element, i, j, death=false) {
 	if(inventory_element.data.items[i][j] == 0)
 		return;
 	item_create(inventory_element.game, inventory_element.data.items[i][j],
 		inventory_element.game.player_object.data.body.position.x + 100 * Math.cos(2 * Math.PI * Math.random()),
-		inventory_element.game.player_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()), true);
+		inventory_element.game.player_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()), !death);
 	inventory_element.data.items[i][j] = 0;
 }
 
 function inventory_drop_all_items(inventory_element) {
 	for(let i = 0; i < inventory_element.data.items.length; i++)
 		for(let j = 0; j < inventory_element.data.items[i].length; j++)
-			inventory_drop_item(inventory_element, i, j);
+			inventory_drop_item(inventory_element, i, j, true);
 }
 
 function hotbar_create(g, inv) {
