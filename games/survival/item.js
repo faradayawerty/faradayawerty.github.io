@@ -45,7 +45,7 @@ ITEMS_DRINKS = [
 	ITEM_COLA
 ];
 
-function item_create(g, id_, x_, y_) {
+function item_create(g, id_, x_, y_, dropped=false) {
 	let items = g.objects.filter((obj) => obj.name == "item");
 	if(items.length > 50)
 		for(let i = 0; i < 20 * Math.random() + 1; i++)
@@ -57,7 +57,8 @@ function item_create(g, id_, x_, y_) {
 		body: Matter.Bodies.rectangle(x_, y_, 40, 40, {
 			inertia: Infinity,
 			mass: 1000.5
-		})
+		}),
+		dropped: dropped
 	};
 	Matter.Composite.add(g.engine.world, item.body);
 	return game_object_create(g, "item", item,

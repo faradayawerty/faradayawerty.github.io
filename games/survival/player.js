@@ -162,16 +162,16 @@ function player_update(player_object, dt) {
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
-		if(closest_item && closest_item.data.id == ITEM_AMMO) {
+		if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_AMMO) {
 			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
-		} else if(closest_item && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
+		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
 			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
-		} else if(closest_item && closest_item.data.id == ITEM_HEALTH) {
+		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_HEALTH) {
 			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
-		} else if(closest_item && closest_item.data.id == ITEM_FUEL) {
+		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) {
 			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
 		} else if(f_down) {
