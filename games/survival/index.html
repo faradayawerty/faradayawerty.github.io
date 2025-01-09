@@ -86,6 +86,8 @@
 				game1.settings.show_hints = menu1.want_hints;
 			if(menu1.want_language != game1.settings.language)
 				game1.settings.language = menu1.want_language;
+			if(menu1.want_ammo_pickup_last != game1.settings.ammo_pickup_last)
+				game1.settings.ammo_pickup_last = menu1.want_ammo_pickup_last;
 
 			// update game if menu is not shown, else update menu
 			if(isKeyDown(input1, 'Escape', true)) {

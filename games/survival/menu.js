@@ -9,6 +9,7 @@ function menu_create() {
 		want_enemies_spawn: true,
 		want_language: "english",
 		want_hints: false,
+		want_ammo_pickup_last: true,
 		want_indicators: {
 			"show player health": true,
 			"show player hunger": true,
@@ -31,6 +32,7 @@ function menu_create() {
 			"player draw gun",
 			"enemies spawn",
 			"show hints",
+			"ammo pickup in last slot",
 			"indicators",
 			"language",
 			"main menu"
@@ -72,6 +74,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_color);
 		else if(m.buttons[i] == "player draw gun")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_draw_gun);
+		else if(m.buttons[i] == "ammo pickup in last slot")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_ammo_pickup_last);
 		else if(m.buttons[i] == "show hints")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_hints);
 		else if(m.buttons[i] == "enemies spawn")
@@ -132,6 +136,8 @@ function menu_update(m, dt, input) {
 			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m.buttons[m.iselected]];
 		} else if(m.buttons[m.iselected] == "player draw gun") {
 			m.want_player_draw_gun = !m.want_player_draw_gun;
+		} else if(m.buttons[m.iselected] == "ammo pickup in last slot") {
+			m.want_ammo_pickup_last = !m.want_ammo_pickup_last;
 		} else if(m.buttons[m.iselected] == "show hints") {
 			m.want_hints = !m.want_hints;
 		} else if(m.buttons[m.iselected] == "set player color to red") {
@@ -215,6 +221,8 @@ function menu_translate(lang, str) {
 			return "показывать значение топлива автомобиля";
 		else if(str == "show hints")
 			return "подсказки";
+		else if(str == "ammo pickup in last slot")
+			return "собирать патроны в последний слот";
 	}
 	return str;
 }

@@ -26,7 +26,8 @@ function game_create(input_, engine_) {
 				"show enemy hunger": true,
 				"show car health": true,
 				"show car fuel": true
-			}
+			},
+			ammo_pickup_last: true
 		},
 		want_respawn_menu: false,
 		want_hide_inventory: false,
