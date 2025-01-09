@@ -166,6 +166,9 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillStyle = "#1177ff";
 		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
+		ctx.strokeStyle = "#1177ff";
+		ctx.lineWidth = h * 0.01;
+		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	} else if(id == ITEM_FUEL) {
 		ctx.fillStyle = "#ff1111";
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
