@@ -169,7 +169,7 @@ function player_update(player_object, dt) {
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
-		if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_AMMO) {
+		if(closest_item && !closest_item.data.dropped && [ITEM_AMMO, ITEM_PLASMA].includes(closest_item.data.id)) {
 			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
 		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
@@ -220,6 +220,28 @@ function player_update(player_object, dt) {
 			p.shotgun_cooldown = 1000;
 			if(Math.random() > 0.85)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		}
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.shot_cooldown <= 0
+			&& inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
+			bullet_create(
+				player_object.game,
+				p.body.position.x,
+				p.body.position.y,
+				player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+				10,
+				Math.random() * 10 + 20,
+				false,
+				15,
+				3000,
+				"blue",
+				"white"
+			);
+			p.shot_cooldown = 750;
+			if(Math.random() > 0.85)
+				inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
 		}
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
 			&& player_object.game.input.mouse.leftButtonPressed
@@ -301,10 +323,17 @@ function player_draw(player_object, ctx) {
 		if(player_object.game.settings.player_draw_gun &&
 			ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
 			ctx.strokeStyle = "black";
+			let lw = 0.25 * p.w;
+			let gl = 1;
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
 				ctx.strokeStyle = "#773311";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN)
 				ctx.strokeStyle = "#113377";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER) {
+				ctx.strokeStyle = "#331133";
+				lw *= 2.25;
+				gl *= 1.5;
+			}
 			ctx.beginPath();
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
@@ -313,8 +342,8 @@ function player_draw(player_object, ctx) {
 			gx = player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
 			gy = player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
 			let g = Math.sqrt(gx * gx + gy * gy);
-			ctx.lineTo(px + p.w * gx / g, py + p.h * gy / g);
-			ctx.lineWidth = 0.25 * p.w;
+			ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
+			ctx.lineWidth = lw;
 			ctx.stroke();
 			ctx.lineWidth = 2;
 		} else if(hotbar_get_selected_item(p.hotbar_element) > 0) {

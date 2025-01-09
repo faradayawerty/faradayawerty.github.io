@@ -2,8 +2,11 @@
 let ITEM_GUN = 1;
 let ITEM_SHOTGUN = 15;
 let ITEM_MINIGUN = 16;
+let ITEM_PLASMA_LAUNCHER = 17;
 
 let ITEM_AMMO = 2;
+let ITEM_PLASMA = 18;
+
 let ITEM_HEALTH = 3;
 let ITEM_FUEL = 4;
 let ITEM_MONEY = 5;
@@ -22,7 +25,8 @@ let ITEM_MILK = 12;
 ITEMS_GUNS = [
 	ITEM_GUN,
 	ITEM_SHOTGUN,
-	ITEM_MINIGUN
+	ITEM_MINIGUN,
+	ITEM_PLASMA_LAUNCHER
 ];
 
 ITEMS_FOODS = [
@@ -144,6 +148,12 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_PLASMA_LAUNCHER) {
+		ctx.fillStyle = "#331133";
+		ctx.fillRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.4);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.4);
 	} else if(id == ITEM_CANNED_MEAT) {
 		ctx.fillStyle = "gray";
 		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
@@ -158,6 +168,17 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
 			ctx.strokeStyle = "orange";
 			ctx.lineWidth = 0.01 * w;
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+		}
+	} else if(id == ITEM_PLASMA) {
+		let N = 3;
+		for(let i = 0; i < N; i++) {
+			ctx.fillStyle = "cyan";
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillStyle = "blue";
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.strokeStyle = "white";
+			ctx.lineWidth = 0.025 * w;
 			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 		}
 	} else if(id == ITEM_HEALTH) {
@@ -248,7 +269,7 @@ function item_pickup(inventory_element, item_object) {
 		return false;
 	let inv = inventory_element.data;
 	let item = item_object.data;
-	if(item_object.game.settings.ammo_pickup_last && item_object.data.id == ITEM_AMMO) {
+	if(item_object.game.settings.ammo_pickup_last && [ITEM_AMMO, ITEM_PLASMA].includes(item_object.data.id)) {
 		for(let i = inv.items.length - 1; i >= 0; i--)
 			for(let j = inv.items[i].length - 1; j >= 0; j--)
 				if(inv.items[i][j] == 0) {
