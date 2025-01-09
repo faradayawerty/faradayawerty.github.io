@@ -18,7 +18,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false) {
 			+ g.player_object.data.thirst / g.player_object.data.max_thirst
 			+ g.player_object.data.hunger / g.player_object.data.max_hunger
 		);
-		if(!g.player_object.shot_gun_once)
+		if(!g.player_object.data.shot_gun_once)
 			m *= 0.01;
 		if(!enemy_boss_exists(g) && Math.random() > 0.995 - 0.25 * m)
 			boss = true;
