@@ -174,8 +174,10 @@ function player_update(player_object, dt) {
 		} else if(closest_item && closest_item.data.id == ITEM_FUEL) {
 			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
-		} else if(!item_pickup(p.inventory_element, closest_item) && f_down) {
-			p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+		} else if(f_down) {
+			if(!item_pickup(p.inventory_element, closest_item))
+				p.car_object = game_object_find_closest(player_object.game,
+					p.body.position.x, p.body.position.y, "car", 200);
 		}
 
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN
