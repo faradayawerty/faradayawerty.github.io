@@ -119,7 +119,10 @@ function enemy_update(enemy_object, dt) {
 			if(enemy_object.data.boss) {
 				if(enemy_object.data.hunger > 0) {
 					N = 20 * Math.random() + 10;
-					item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
+					if(Math.random() > 0.33)
+						item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
+					else
+						item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y);
 				} else
 					N = 10 * Math.random() + 5;
 			}

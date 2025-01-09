@@ -212,6 +212,22 @@ function player_update(player_object, dt) {
 			if(Math.random() > 0.85)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.shotgun_cooldown <= 0
+			&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
+			bullet_create(
+				player_object.game,
+				p.body.position.x,
+				p.body.position.y,
+				(0.95 + 0.1 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				(0.95 + 0.1 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+				Math.random() * 10 + 10
+			);
+			p.shotgun_cooldown = 50;
+			if(Math.random() > 0.995)
+				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		}
 		if(isKeyDown(player_object.game.input, 'q', true))
 			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
 		Matter.Body.setVelocity(p.body, vel);
@@ -272,6 +288,8 @@ function player_draw(player_object, ctx) {
 			ctx.strokeStyle = "black";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
 				ctx.strokeStyle = "#773311";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN)
+				ctx.strokeStyle = "#113377";
 			ctx.beginPath();
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;

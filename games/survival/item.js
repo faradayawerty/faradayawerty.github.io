@@ -1,6 +1,7 @@
 
 let ITEM_GUN = 1;
 let ITEM_SHOTGUN = 15;
+let ITEM_MINIGUN = 16;
 
 let ITEM_AMMO = 2;
 let ITEM_HEALTH = 3;
@@ -20,7 +21,8 @@ let ITEM_MILK = 12;
 
 ITEMS_GUNS = [
 	ITEM_GUN,
-	ITEM_SHOTGUN
+	ITEM_SHOTGUN,
+	ITEM_MINIGUN
 ];
 
 ITEMS_FOODS = [
@@ -130,6 +132,12 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	} else if(id == ITEM_SHOTGUN) {
 		ctx.fillStyle = "#773311";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_MINIGUN) {
+		ctx.fillStyle = "#113377";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
