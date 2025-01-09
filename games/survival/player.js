@@ -87,7 +87,7 @@ function player_update(player_object, dt) {
 		p.speed = 0.875 * p.speed;
 	if(p.hunger < 0.25 * p.max_hunger)
 		p.speed = 0.75 * p.speed;
-	if(p.hunger > 0.85 * p.max_hunger && p.thirst > 0.85 * p.max_thirst)
+	if(p.hunger > 0.95 * p.max_hunger && p.thirst > 0.95 * p.max_thirst)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
 
 	// choose level based on coordinates
