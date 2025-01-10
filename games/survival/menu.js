@@ -76,7 +76,7 @@ function menu_create() {
 		],
 		buttons: null
 	};
-	m.buttons = m.main_menu_buttons;
+	m.buttons = m.language_selection_buttons;
 	return m;
 }
 
