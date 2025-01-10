@@ -37,6 +37,10 @@ function player_create(g, x, y, respawn=false) {
 	Matter.Composite.add(g.engine.world, p.body);
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
 	g.player_object = g.objects[iplayer];
+	if(respawn) {
+		p.hunger = 0.5 * p.max_hunger;
+		p.thirst = 0.5 * p.max_thirst;
+	}
 	//if(respawn) {
 	//	p.inventory_element.data.items[1][0] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_GUN;
 	//	p.inventory_element.data.items[1][1] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_AMMO;
