@@ -24,11 +24,15 @@ function player_create(g, x, y, respawn=false) {
 		body: Matter.Bodies.rectangle(x, y, width, height, {
 			inertia: Infinity
 		}),
-		shot_gun_once: false,
-		defeated_boss: false
+		immunity: 3000
 	};
 	p.infobox_element = g.gui_elements[infobox_create(g, 50, 300, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
+	for(let i = 0; i < g.saved_items.length; i++)
+		for(let j = 0; j < g.saved_items[i].length; j++) {
+			p.inventory_element.data.items[i][j] = g.saved_items[i][j];
+			g.saved_items[i][j] = 0;
+		}
 	p.hotbar_element = g.gui_elements[hotbar_create(g, p.inventory_element.data)];
 	Matter.Composite.add(g.engine.world, p.body);
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
@@ -56,7 +60,12 @@ function player_destroy(player_object) {
 function player_die(player_object) {
 	player_object.game.input.mouse.leftButtonPressed = false;
 	player_object.game.deaths += 1;
-	inventory_drop_all_items(player_object.data.inventory_element);
+	if(player_object.game.settings.lose_items_on_death)
+		inventory_drop_all_items(player_object.data.inventory_element);
+	else
+		for(let i = 0; i < player_object.game.saved_items.length; i++)
+			for(let j = 0; j < player_object.game.saved_items[i].length; j++)
+				player_object.game.saved_items[i][j] = player_object.data.inventory_element.data.items[i][j];
 	player_object.game.want_respawn_menu = true;
 	player_destroy(player_object);
 }
@@ -191,7 +200,6 @@ function player_update(player_object, dt) {
 			&& player_object.game.input.mouse.leftButtonPressed
 			&& p.shot_cooldown <= 0
 			&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-			p.shot_gun_once = true;
 			bullet_create(
 				player_object.game,
 				p.body.position.x,
@@ -212,10 +220,10 @@ function player_update(player_object, dt) {
 					player_object.game,
 					p.body.position.x,
 					p.body.position.y,
-					(0.8 + 0.4 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
-					(0.8 + 0.4 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+					(0.95 + 0.1 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+					(0.95 + 0.1 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight,
 					Math.random() * 10 + 10,
-					Math.random() * 1.5 + 0.5
+					Math.random() * 1.25 + 0.25
 				);
 			p.shotgun_cooldown = 1000;
 			if(Math.random() > 0.85)
@@ -231,16 +239,16 @@ function player_update(player_object, dt) {
 				p.body.position.y,
 				player_object.game.input.mouse.x - 0.5 * window.innerWidth,
 				player_object.game.input.mouse.y - 0.5 * window.innerHeight,
-				10,
+				17.5,
 				Math.random() * 10 + 20,
 				false,
-				15,
-				3000,
+				20,
+				1500,
 				"blue",
 				"white"
 			);
 			p.shot_cooldown = 750;
-			if(Math.random() > 0.85)
+			if(Math.random() > 0.75)
 				inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
 		}
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
@@ -295,10 +303,17 @@ function player_update(player_object, dt) {
 			p.car_object = null;
 		}
 	} 
+
+	if(p.immunity > 0) {
+		p.health = p.max_health;
+		p.immunity -= dt;
+	}
 }
 
 function player_draw(player_object, ctx) {
 	let p = player_object.data;
+	if(p.immunity % 350 > 175)
+		return;
 	if(!p.car_object) {
 		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");

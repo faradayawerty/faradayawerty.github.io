@@ -90,6 +90,10 @@
 				game1.settings.indicators = menu1.want_indicators;
 			if(menu1.want_auto_pickup != game1.settings.auto_pickup)
 				game1.settings.auto_pickup = menu1.want_auto_pickup;
+			if(menu1.want_lose_items != game1.settings.lose_items_on_death)
+				game1.settings.lose_items_on_death = menu1.want_lose_items;
+			if(menu1.want_respawn_here != game1.settings.respawn_on_current_level)
+				game1.settings.respawn_on_current_level = menu1.want_respawn_here;
 
 			// update game if menu is not shown, else update menu
 			if(isKeyDown(input1, 'Escape', true)) {
@@ -107,7 +111,13 @@
 				game_new(game1);
 				menu1.want_new_game = false;
 			} else if(menu1.want_player_respawn) {
-				player_create(game1, 1250, 1250, true);
+				let level_x = Number(game1.level.split("x")[0]);
+				let level_y = Number(game1.level.split("x")[1]);
+				if(!game1.settings.respawn_on_current_level) {
+					level_x = 0;
+					level_y = 0;
+				}
+				player_create(game1, 1250 + level_x * 2500, 1250 + level_y * 2500, true);
 				menu1.want_player_respawn = false;
 			} else {
 				game1.show_gui = true;

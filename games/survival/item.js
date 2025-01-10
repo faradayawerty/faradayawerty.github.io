@@ -101,6 +101,10 @@ function item_draw(item_object, ctx) {
 			name = "shotgun";
 		if(item.id == ITEM_MINIGUN)
 			name = "minigun";
+		if(item.id == ITEM_PLASMA_LAUNCHER)
+			name = "plasmagun";
+		if(item.id == ITEM_PLASMA)
+			name = "plasma";
 		if(item.id == ITEM_FUEL)
 			name = "fuel";
 		if(item.id == ITEM_MONEY)
@@ -321,6 +325,10 @@ function item_name_translate(language, text) {
 			return "топливо";
 		if(text == "minigun")
 			return "миниган";
+		if(text == "plasma")
+			return "плазма";
+		if(text == "plasmagun")
+			return "плазменная пушка";
 	}
 	return text;
 }

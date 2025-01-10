@@ -16,13 +16,13 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 			+ g.player_object.data.thirst / g.player_object.data.max_thirst
 			+ g.player_object.data.hunger / g.player_object.data.max_hunger
 		);
-		if(!g.player_object.data.shot_gun_once)
+		if(g.kills < 3)
 			m *= 0;
 		let bd = enemy_boss_distance_to_player(g);
 		if(-1 < bd && bd < 15000)
 			m *= 0.01;
-		if(g.player_object.data.defeated_boss) {
-			if(type == "random" && Math.random() < 0.25)
+		if(g.boss_kills > 0) {
+			if(type == "random" && Math.random() < 0.5)
 				type = "shooting";
 			m *= 0.5;
 		}
@@ -60,8 +60,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 	};
 	if(type == "shooting") {
 		e.type = "shooting";
-		e.health = 2000;
-		e.max_health = 2000;
+		e.health = 1000;
+		e.max_health = 1000;
 		e.speed = 5;
 		e.color = "#335544";
 		e.damage = 5 * e.damage;
@@ -186,14 +186,14 @@ function enemy_update(enemy_object, dt) {
 				let y = e.body.position.y + 50 * Math.sin(theta);
 				if(Math.random() > 0.85)
 					item_create_from_list(enemy_object.game, ITEMS_FOODS.concat(ITEMS_DRINKS), x, y);
-				else if(e.type == "shooting" && Math.random() > 0.5)
-					item_create(enemy_object.game, ITEM_PLASMA, x, y);
 				else if(Math.random() > 0.85)
 					item_create(enemy_object.game, ITEM_AMMO, x, y);
 				else if(Math.random() > 0.85)
 					item_create(enemy_object.game, ITEM_HEALTH, x, y);
-				else if(Math.random() > 0.85)
+				else if(Math.random() > 0.95)
 					item_create(enemy_object.game, ITEM_FUEL, x, y);
+				else if(e.type == "shooting" && Math.random() > 0.5)
+					item_create(enemy_object.game, ITEM_PLASMA, x, y);
 			}
 		}
 		enemy_destroy(enemy_object);

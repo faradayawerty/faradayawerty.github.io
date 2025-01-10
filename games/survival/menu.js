@@ -10,6 +10,8 @@ function menu_create() {
 		want_language: "english",
 		want_hints: false,
 		want_ammo_pickup_last: true,
+		want_lose_items: true,
+		want_respawn_here: true,
 		want_indicators: {
 			"show player health": true,
 			"show player hunger": true,
@@ -39,6 +41,8 @@ function menu_create() {
 			"enemies spawn",
 			"show hints",
 			"ammo pickup in last slot",
+			"lose items on death",
+			"respawn on current level",
 			"indicators",
 			"auto pickup",
 			"language",
@@ -92,6 +96,10 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_ammo_pickup_last);
 		else if(m.buttons[i] == "show hints")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_hints);
+		else if(m.buttons[i] == "lose items on death")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_lose_items);
+		else if(m.buttons[i] == "respawn on current level")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_respawn_here);
 		else if(m.buttons[i] == "enemies spawn")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
 		else if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
@@ -103,9 +111,9 @@ function menu_draw(ctx, m) {
 		else
 			text = menu_translate(m.want_language, text);
 		if(m.iselected == i)
-			drawButton(ctx, 300, 190 + 60 * i, "[" + text + "]");
+			drawButton(ctx, 100, 80 + 60 * i, "[" + text + "]");
 		else
-			drawButton(ctx, 280, 190 + 60 * i, text);
+			drawButton(ctx, 80, 80 + 60 * i, text);
 	}
 	ctx.restore();
 }
@@ -114,7 +122,7 @@ function menu_update(m, dt, input) {
 
 	for(let i = 0; i < m.buttons.length; i++)
 		if(doRectsCollide(input.mouse.x / window.innerWidth * 1800, input.mouse.y / window.innerWidth * 1800, 0, 0,
-			280, 150 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
+			80, 40 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
 			m.iselected = i;
 
 	if((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) && m.iselected < m.buttons.length - 1) {
@@ -161,6 +169,10 @@ function menu_update(m, dt, input) {
 			m.want_ammo_pickup_last = !m.want_ammo_pickup_last;
 		} else if(m.buttons[m.iselected] == "show hints") {
 			m.want_hints = !m.want_hints;
+		} else if(m.buttons[m.iselected] == "lose items on death") {
+			m.want_lose_items = !m.want_lose_items;
+		} else if(m.buttons[m.iselected] == "respawn on current level") {
+			m.want_respawn_here = !m.want_respawn_here;
 		} else if(m.buttons[m.iselected] == "set player color to red") {
 			m.want_player_color = "red";
 		} else if(m.buttons[m.iselected] == "set player color to lime") {
@@ -245,15 +257,19 @@ function menu_translate(lang, str) {
 		else if(str == "ammo pickup in last slot")
 			return "собирать патроны в последний слот";
 		else if(str == "automatically pickup food and drinks")
-			return "автоматически подбирать еду и напитки"
+			return "автоматически подбирать еду и напитки";
 		else if(str == "automatically pickup fuel")
-			return "автоматически подбирать топливо"
+			return "автоматически подбирать топливо";
 		else if(str == "automatically pickup health")
-			return "автоматически подбирать аптечки"
+			return "автоматически подбирать аптечки";
 		else if(str == "automatically pickup ammo")
-			return "автоматически подбирать патроны"
+			return "автоматически подбирать патроны";
 		else if(str == "auto pickup")
-			return "автоматически подбирать предметы"
+			return "автоматически подбирать предметы";
+		else if(str == "lose items on death")
+			return "терять вещи при смерти";
+		else if(str == "respawn on current level")
+			return "возрождение на текущем уровнe";
 	}
 	return str;
 }

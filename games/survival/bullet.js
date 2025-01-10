@@ -1,5 +1,5 @@
 
-function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=6, lifetime=1500, color_fill="orange", color_outline="yellow") {
+function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=6, lifetime=1500, color_fill="yellow", color_outline="orange") {
 	let width = size, height = size;
 	let d = Math.sqrt(dx*dx + dy*dy);
 	let b = {
@@ -15,6 +15,8 @@ function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=
 	};
 	if(b.enemy)
 		b.body.collisionFilter.category = 4;
+	else
+		b.body.collisionFilter.mask = -5;
 	Matter.Composite.add(g.engine.world, b.body);
 	let vel = Matter.Vector.create(b.speed * dx/d, b.speed * dy/d);
 	Matter.Body.setVelocity(b.body, vel);

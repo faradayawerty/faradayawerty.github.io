@@ -18,6 +18,7 @@ function game_create(input_, engine_) {
 			player_draw_gun: true,
 			enemies_spawn: true,
 			show_hints: false,
+			lose_items_on_death: true,
 			indicators: {
 				"show player health": true,
 				"show player hunger": true,
@@ -33,7 +34,8 @@ function game_create(input_, engine_) {
 				"automatically pickup health": false,
 				"automatically pickup ammo": false
 			},
-			ammo_pickup_last: true
+			ammo_pickup_last: true,
+			respawn_on_current_level: true
 		},
 		want_respawn_menu: false,
 		want_hide_inventory: false,
@@ -42,7 +44,14 @@ function game_create(input_, engine_) {
 		kills: 0,
 		boss_kills: 0,
 		show_gui: true,
-		deaths: 0
+		deaths: 0,
+		saved_items: [
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+		]
 	};
 	return g;
 }
@@ -50,6 +59,9 @@ function game_create(input_, engine_) {
 function game_new(g) {
 	game_destroy_all_gui_elements(g);
 	game_destroy_all_objects(g);
+	for(let i = 0; i < g.saved_items.length; i++)
+		for(let j = 0; j < g.saved_items[i].length; j++)
+			g.saved_items[i][j] = 0;
 	let iplayer = player_create(g, 1250, 1250);
 	g.max_survival_time = 0;
 	g.kills = 0;
