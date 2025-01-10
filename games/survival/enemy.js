@@ -16,7 +16,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 			+ g.player_object.data.thirst / g.player_object.data.max_thirst
 			+ g.player_object.data.hunger / g.player_object.data.max_hunger
 		);
-		if(g.kills < 3)
+		if(g.kills < 10)
 			m *= 0;
 		let bd = enemy_boss_distance_to_player(g);
 		if(-1 < bd && bd < 15000)
