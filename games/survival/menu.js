@@ -28,12 +28,14 @@ function menu_create() {
 			"automatically pickup ammo": false
 		},
 		iselected: 0,
+		language_selection_buttons: [
+			"english",
+			"русский"
+		],
 		main_menu_buttons: [
 			"continue game",
 			"start new game",
 			"settings",
-			" 🇷🇺 ",
-			" 🇬🇧 "
 		],
 		settings_buttons: [
 			"player color",
@@ -181,10 +183,14 @@ function menu_update(m, dt, input) {
 			m.want_player_color = "yellow";
 		} else if(m.buttons[m.iselected] == "set player color to blue") {
 			m.want_player_color = "blue";
-		} else if(m.buttons[m.iselected] == " 🇬🇧 ") {
+		} else if(m.buttons[m.iselected] == "english") {
 			m.want_language = "english";
-		} else if(m.buttons[m.iselected] == " 🇷🇺 ") {
+			m.buttons = m.main_menu_buttons;
+			m.iselected = 0;
+		} else if(m.buttons[m.iselected] == "русский") {
 			m.want_language = "русский";
+			m.buttons = m.main_menu_buttons;
+			m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "language") {
 			if(m.want_language == "русский")
 				m.want_language = "english";
