@@ -1,5 +1,10 @@
 
 function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=6, lifetime=1500, color_fill="yellow", color_outline="orange") {
+	let bullets = g.objects.filter((obj) => obj.name == "bullet");
+	if(bullets.length > 500)
+		for(let i = 0; i < 50 * Math.random() + 50; i++) {
+			bullets[i].destroy(bullets[i]);
+		}
 	let width = size, height = size;
 	let d = Math.sqrt(dx*dx + dy*dy);
 	let b = {
@@ -42,13 +47,21 @@ function bullet_update(bullet_object, dt) {
 				bullet_object.game.objects[i].data.hit_by_player = true;
 		}
 	}
-	if(bullet_object.data.enemy && bullet_object.game.player_object && Matter.Collision.collides(bullet_object.data.body, bullet_object.game.player_object.data.body) != null) {
-		bullet_object.game.player_object.data.health -= bullet_object.data.damage * dt;
+	if(bullet_object.data.enemy && bullet_object.game.player_object
+		&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.player_object.data.body) != null) {
+		if(bullet_object.game.player_object.data.shield_blue_health > 0) {
+				bullet_object.game.player_object.data.shield_blue_health -= 0.25 * bullet_object.data.damage * dt;
+		} else if(bullet_object.game.player_object.data.immunity <= 0) {
+			let k = 1.0;
+			if(bullet_object.game.player_object.data.sword_visible)
+				k = 0.05;
+			bullet_object.game.player_object.data.health -= k * bullet_object.data.damage * dt;
+		}
 	}
 }
 
 function bullet_draw(bullet_object, ctx) {
 	fillMatterBody(ctx, bullet_object.data.body, bullet_object.data.color_fill);
-	drawMatterBody(ctx, bullet_object.data.body, bullet_object.data.color_outline);
+	drawMatterBody(ctx, bullet_object.data.body, bullet_object.data.color_outline, 1);
 }
 

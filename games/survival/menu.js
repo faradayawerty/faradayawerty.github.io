@@ -32,22 +32,30 @@ function menu_create() {
 			"english",
 			"русский"
 		],
+		menu_new_game: [
+			"start new game",
+			"back to settings"
+		],
 		main_menu_buttons: [
 			"continue game",
-			"start new game",
 			"settings",
+		],
+		menu_respawn_buttons: [
+			"respawn and continue game",
+			"settings"
 		],
 		settings_buttons: [
 			"player color",
 			"player draw gun",
 			"enemies spawn",
 			"show hints",
+			"language",
 			"ammo pickup in last slot",
 			"lose items on death",
+			"new game",
 			"respawn on current level",
 			"indicators",
 			"auto pickup",
-			"language",
 			"main menu"
 		],
 		player_color_selection_menu: [
@@ -136,14 +144,14 @@ function menu_update(m, dt, input) {
 			m.shown = false;
 		} else if(m.buttons[m.iselected] == "respawn and continue game") {
 			m.shown = false;
-			m.main_menu_buttons[m.iselected] = "continue game";
+			m.main_menu_buttons[0] = "continue game";
 			m.want_player_respawn = true;
+			menu1.buttons = menu1.main_menu_buttons;
 		} else if(m.buttons[m.iselected] == "start new game") {
 			m.shown = false;
 			m.want_new_game = true;
-			let icontinue = menu1.main_menu_buttons.indexOf("respawn and continue game");
-			if(icontinue > -1)
-				menu1.main_menu_buttons[icontinue] = "continue game";
+			menu1.main_menu_buttons[0] = "continue game";
+			menu1.buttons = menu1.main_menu_buttons;
 		} else if(m.buttons[m.iselected] == "settings" || m.buttons[m.iselected] == "back to settings") {
 			m.buttons = m.settings_buttons;
 			m.iselected = 0;
@@ -157,6 +165,9 @@ function menu_update(m, dt, input) {
 			m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "indicators") {
 			m.buttons = m.indicators_settings;
+			m.iselected = 0;
+		} else if(m.buttons[m.iselected] == "new game") {
+			m.buttons = m.menu_new_game;
 			m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "auto pickup") {
 			m.buttons = m.auto_pickup_settings;
@@ -276,6 +287,8 @@ function menu_translate(lang, str) {
 			return "терять вещи при смерти";
 		else if(str == "respawn on current level")
 			return "возрождение на текущем уровнe";
+		else if(str == "new game")
+			return "новая игра";
 	}
 	return str;
 }

@@ -8,6 +8,12 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 			if(!enemies[i].data.boss)
 				enemies[i].destroy(enemies[i]);
 		}
+	if(type == "random" && Math.random() < 0.5 && g.enemies["sword"])
+		type = "sword";
+	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting red"])
+		type = "shooting red";
+	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting"])
+		type = "shooting";
 	let width = 30, height = 30;
 	let boss = make_boss;
 	if(g.player_object) {
@@ -16,18 +22,15 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 			+ g.player_object.data.thirst / g.player_object.data.max_thirst
 			+ g.player_object.data.hunger / g.player_object.data.max_hunger
 		);
-		if(g.kills < 10)
+		if(g.kills_for_boss > 0)
 			m *= 0;
 		let bd = enemy_boss_distance_to_player(g);
-		if(-1 < bd && bd < 15000)
+		if(-1 < bd && bd < 15000) {
 			m *= 0.01;
-		if(g.boss_kills > 0) {
-			if(type == "random" && Math.random() < 0.5)
-				type = "shooting";
-			m *= 0.5;
 		}
-		if(Math.random() > 1 - 0.25 * m)
+		if(Math.random() > 1 - 0.25 * m) {
 			boss = true;
+		}
 	}
 	if(make_minion)
 		boss = false;
@@ -54,9 +57,13 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		follow_range: 1000,
 		spawn_minion_delay: 4000,
 		color: "green",
+		color_outline: "white",
 		type: "regular",
 		shooting_delay: 1000,
-		shooting_range: 400
+		shooting_range: 400,
+		is_minion: false,
+		jump_delay: 4000,
+		sword_rotation: 0
 	};
 	if(type == "shooting") {
 		e.type = "shooting";
@@ -67,13 +74,34 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.damage = 5 * e.damage;
 		e.body.collisionFilter.mask = -5;
 	}
+	if(type == "shooting red") {
+		e.type = "shooting red";
+		e.health = 5000;
+		e.max_health = 5000;
+		e.speed = 8;
+		e.color = "#999999";
+		e.color_outline = "#aa3333";
+		e.damage = 11 * e.damage;
+		e.body.collisionFilter.mask = -5;
+	}
+	if(type == "sword") {
+		e.type = "sword";
+		e.health = 25000;
+		e.max_health = 25000;
+		e.speed = 9.75;
+		e.color = "#bbaa11";
+		e.color_outline = "lime";
+		e.damage = 23 * e.damage;
+	}
 	if(boss) {
 		e.damage = 5 * e.damage;
 		e.health = 25 * e.max_health;
 		e.max_health = 25 * e.max_health;
-		e.hunger = 2 * e.max_hunger;
-		e.max_hunger = 2 * e.max_hunger;
+		e.hunger = 4 * e.max_hunger;
+		e.max_hunger = 4 * e.max_hunger;
 		e.speed = 0.5 * e.speed;
+		if(e.type == "sword")
+			e.speed *= 2;
 		e.boss = true;
 		e.follow_range = 10 * e.follow_range;
 		e.shooting_range = 1.25 * e.shooting_range;
@@ -82,12 +110,18 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.damage = 0.5 * e.damage;
 		e.health = 0.25 * e.max_health;
 		e.max_health = 0.25 * e.max_health;
-		e.hunger = 0.25 * e.max_hunger;
-		e.max_hunger = 0.25 * e.max_hunger;
+		e.hunger = 0.05 * e.max_hunger;
+		e.max_hunger = 0.05 * e.max_hunger;
 		e.speed = 1.15 * e.speed;
+		if(e.type == "sword") {
+			e.speed = 0;
+			e.health *= 0.25;
+			e.max_health *= 0.25;
+		}
 		e.boss = false;
 		e.follow_range = 1.25 * e.follow_range;
-		e.shooting_range = 0.75 * e.shooting_range;
+		e.shooting_range = 25 * e.shooting_range;
+		e.is_minion = true;
 	}
 	
 	Matter.Composite.add(g.engine.world, e.body);
@@ -96,13 +130,21 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 
 function enemy_destroy(enemy_object) {
 	let g = enemy_object.game;
-	if(enemy_object.data.hit_by_player)
+	if(enemy_object.data.hit_by_player) {
 		if(enemy_object.data.boss) {
+			g.kills_for_boss = 10;
 			g.boss_kills += 1;
-			if(enemy_object.game.player_object)
-				enemy_object.game.player_object.data.defeated_boss = true;
-		} else
+			if(enemy_object.data.type == "regular")
+				g.enemies["shooting"] = true;
+			if(enemy_object.data.type == "shooting")
+				g.enemies["shooting red"] = true;
+			if(enemy_object.data.type == "shooting red")
+				g.enemies["sword"] = true;
+		} else {
 			g.kills += 1;
+			g.kills_for_boss -= 1;
+		}
+	}
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
 	enemy_object.destroyed = true;
 }
@@ -126,25 +168,67 @@ function enemy_update(enemy_object, dt) {
 		e.health -= 0.05 * dt;
 	if(e.shooting_delay < 1000)
 		e.shooting_delay += dt;
+	if(e.jump_delay < 4000)
+		e.jump_delay += Math.random() * dt;
+	e.sword_rotation += 0.01 * dt;
 	let target_object = enemy_get_target_object(enemy_object);
 	if(target_object != null) {
-		let dx = target_object.data.body.position.x - e.body.position.x;
-		let dy = target_object.data.body.position.y - e.body.position.y;
-		let v = Math.sqrt(dx*dx + dy*dy);
-		dx = e.speed * dx / v;
-		dy = e.speed * dy / v;
-		if(e.type == "shooting" && v < e.shooting_range) {
-			if(e.shooting_delay >= 1000) {
-				bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, dx, dy, 10, e.damage, true, e.w * 0.2, 3000, "blue", "white");
-				e.shooting_delay = 0;
+		let tx = target_object.data.body.position.x - e.body.position.x;
+		let ty = target_object.data.body.position.y - e.body.position.y;
+		let v = Math.sqrt(tx*tx + ty*ty);
+		dx = e.speed * tx / v;
+		dy = e.speed * ty / v;
+		if(e.type == "shooting") {
+			if(v < e.shooting_range) {
+				if(e.shooting_delay >= 1000) {
+					bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, dx, dy, 10, e.damage, true, e.w * 0.2, 2000, "blue", "white");
+					e.shooting_delay = 0;
+				}
+				dx = 0;
+				dy = 0;
 			}
-			dx = 0;
-			dy = 0;
+		}
+		if(e.type == "shooting red") {
+			if(v < e.shooting_range) {
+				if(e.shooting_delay >= 200) {
+					bullet_create(enemy_object.game, e.body.position.x + e.w, e.body.position.y, dx, dy, 15, e.damage, true, Math.max(0.09 * e.w, 4), 2000, "red", "white");
+					bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, dx, dy, 15, e.damage, true, Math.max(0.09 * e.w, 4), 2000, "red", "white");
+					e.shooting_delay = 0;
+				}
+				dx = 0;
+				dy = 0;
+			}
+		}
+		if(e.type == "sword" && e.boss) {
+			if(e.jump_delay >= 1000 && dist(e.body.position, target_object.data.body.position) > 500) {
+				e.jump_delay = 0;
+				Matter.Body.setPosition(e.body,
+					Matter.Vector.create(
+						-e.body.position.x + 2 * target_object.data.body.position.x,
+						-e.body.position.y + 2 * target_object.data.body.position.y
+					));
+			}
+		}
+		if(e.type == "sword" && e.is_minion) {
+			if(v < e.shooting_range) {
+				if(e.shooting_delay >= 500) {
+					bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, tx, ty, 7, e.damage, true, 0.33 * e.w, 2000, "gray", "lime");
+					bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, ty, -tx, 7, e.damage, true, 0.33 * e.w, 2000, "gray", "lime");
+					bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, -tx, -ty, 7, e.damage, true, 0.33 * e.w, 2000, "gray", "lime");
+					bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, -ty, tx, 7, e.damage, true, 0.33 * e.w, 2000, "gray", "lime");
+					e.shooting_delay = 0;
+				}
+			}
 		}
 		let vel = Matter.Vector.create(dx, dy);
 		Matter.Body.setVelocity(e.body, vel);
 		if(target_object.data.health && Matter.Collision.collides(e.body, target_object.data.body) != null) {
-			target_object.data.health -= e.damage * dt;
+			if(target_object.name == "player") {
+				if(target_object.data.shield_blue_health > 0)
+					target_object.data.shield_blue_health -= e.damage * dt;
+				else if(target_object.data.immunity <= 0)
+					target_object.data.health -= e.damage * dt;
+			}
 			if(target_object.name == "car"
 				&& Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.9 * target_object.data.max_speed
 				&& !e.boss) {
@@ -154,11 +238,20 @@ function enemy_update(enemy_object, dt) {
 				e.hunger = Math.min(e.max_hunger, e.hunger + 0.05 * dt)
 		}
 		if(e.spawn_minion_delay >= 4000 && e.boss) {
-			for(let i = 0; i < Math.random() * 4 + 1; i++) {
-				let theta = 2 * Math.PI * Math.random();
-				let x = e.body.position.x + 300 * Math.cos(theta);
-				let y = e.body.position.y + 300 * Math.sin(theta);
-				enemy_create(enemy_object.game, x, y, false, true, e.type);
+			let max_minions = 5;
+			if(enemy_object.data.type == "sword")
+				max_minions = 25;
+			if(enemy_count_minions(enemy_object) < max_minions) {
+				for(let i = 0; i < Math.random() * 4 + 1; i++) {
+					let theta = 2 * Math.PI * Math.random();
+					let x = e.body.position.x + 300 * Math.cos(theta);
+					let y = e.body.position.y + 300 * Math.sin(theta);
+					if(e.type == "sword") {
+						x = target_object.data.body.position.x + 500 * Math.cos(theta);
+						y = target_object.data.body.position.y + 500 * Math.sin(theta);
+					}
+					enemy_create(enemy_object.game, x, y, false, true, e.type);
+				}
 			}
 			e.spawn_minion_delay = 0;
 		}
@@ -171,12 +264,26 @@ function enemy_update(enemy_object, dt) {
 			if(enemy_object.data.boss) {
 				if(enemy_object.data.hunger > 0) {
 					N = 20 * Math.random() + 10;
-					if(e.type == "shooting")
+					if(e.type == "shooting") {
 						item_create(enemy_object.game, ITEM_PLASMA_LAUNCHER, e.body.position.x, e.body.position.y);
-					else if(Math.random() > 0.33)
-						item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
-					else
-						item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y);
+						if(Math.random() < 0.33)
+							item_create(enemy_object.game, ITEM_SHIELD, e.body.position.x, e.body.position.y);
+					} else if(e.type == "shooting red") {
+						if(Math.random() > 0.33)
+							item_create(enemy_object.game, ITEM_RED_PISTOLS, e.body.position.x, e.body.position.y);
+						else
+							item_create(enemy_object.game, ITEM_RED_SHOTGUN, e.body.position.x, e.body.position.y);
+					} else if(e.type == "sword") {
+						if(Math.random() > 0.33)
+							item_create(enemy_object.game, ITEM_SWORD, e.body.position.x, e.body.position.y);
+						else
+							item_create(enemy_object.game, ITEM_GREEN_GUN, e.body.position.x, e.body.position.y);
+					} else {
+						if(Math.random() > 0.33)
+							item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
+						else
+							item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y);
+					}
 				} else
 					N = 10 * Math.random() + 5;
 			}
@@ -192,8 +299,12 @@ function enemy_update(enemy_object, dt) {
 					item_create(enemy_object.game, ITEM_HEALTH, x, y);
 				else if(Math.random() > 0.95)
 					item_create(enemy_object.game, ITEM_FUEL, x, y);
-				else if(e.type == "shooting" && Math.random() > 0.5)
+				else if(["shooting", "shooting red"].includes(e.type) && Math.random() > 0.5)
 					item_create(enemy_object.game, ITEM_PLASMA, x, y);
+				else if(["shooting red", "sword"].includes(e.type) && Math.random() > 0.5)
+					item_create(enemy_object.game, ITEM_RED_PLASMA, x, y);
+				else if(["sword"].includes(e.type) && Math.random() > 0.25)
+					item_create(enemy_object.game, ITEM_SHIELD, x, y);
 			}
 		}
 		enemy_destroy(enemy_object);
@@ -202,8 +313,13 @@ function enemy_update(enemy_object, dt) {
 
 function enemy_draw(enemy_object, ctx) {
 	let e = enemy_object.data;
+	if(e.health <= 0)
+		return;
 	fillMatterBody(ctx, e.body, e.color);
-	drawMatterBody(ctx, e.body, 'white');
+	if(enemy_object.data.type == "shooting red")
+		drawMatterBody(ctx, e.body, e.color_outline, 0.05 * e.w);
+	else
+		drawMatterBody(ctx, e.body, e.color_outline, 1);
 	if(enemy_object.game.settings.indicators["show enemy hunger"]) {
 		ctx.fillStyle = "red";
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h, e.w, e.h * 0.05);
@@ -231,6 +347,29 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.lineWidth = 0.25 * e.w;
 			ctx.stroke();
 		}
+		if(e.type == "sword" && g < 0.33 * e.shooting_range && !e.is_minion) {
+			let sword_length = 2 * e.w;
+			ctx.beginPath();
+			ctx.moveTo(px, py);
+			ctx.strokeStyle = "#55aa11";
+			ctx.lineTo(px + Math.cos(e.sword_rotation) * sword_length, py + Math.sin(e.sword_rotation) * sword_length);
+			ctx.lineWidth = 0.25 * e.w;
+			ctx.stroke();
+		}
+		if(e.type == "shooting red" && g < 1.25 * e.shooting_range) {
+			ctx.beginPath();
+			ctx.moveTo(px, py);
+			ctx.strokeStyle = "#551111";
+			ctx.lineTo(px + 0.75 * e.w * gx / g, py + 0.75 * e.w * gy / g);
+			ctx.lineWidth = 0.21 * e.w;
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(px + e.w, py);
+			ctx.strokeStyle = "#551111";
+			ctx.lineTo(px + e.w + 0.75 * e.w * gx / g, py + 0.75 * e.w * gy / g);
+			ctx.lineWidth = 0.21 * e.w;
+			ctx.stroke();
+		}
 	}
 }
 
@@ -249,5 +388,12 @@ function enemy_boss_distance_to_player(g) {
 		if(dist(boss_closest.data.body.position, g.player_object.data.body.position) > dist(boss_objects[i].data.body.position, g.player_object.data.body.position))
 			boss_closest = boss_objects[i];
 	return dist(boss_closest.data.body.position, g.player_object.data.body.position);
+}
+
+function enemy_count_minions(enemy_object) {
+	let l = (enemy_object.game.objects.filter((obj) => obj.name == "enemy"
+		&& obj.data.type == enemy_object.data.type
+		&& obj.data.is_minion));
+	return l.length;
 }
 

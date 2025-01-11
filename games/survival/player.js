@@ -5,10 +5,10 @@ function player_create(g, x, y, respawn=false) {
 	let p = {
 		health: 100,
 		max_health: 100,
-		thirst: 150,
-		max_thirst: 150,
-		hunger: 150,
-		max_hunger: 150,
+		thirst: 210,
+		max_thirst: 210,
+		hunger: 210,
+		max_hunger: 210,
 		speed: 10,
 		max_speed: 10,
 		shot_cooldown: 0,
@@ -24,7 +24,11 @@ function player_create(g, x, y, respawn=false) {
 		body: Matter.Bodies.rectangle(x, y, width, height, {
 			inertia: Infinity
 		}),
-		immunity: 3000
+		immunity: 9000,
+		shield_blue_health: 0,
+		shield_blue_health_max: 9000,
+		sword_direction: 0,
+		sword_visible: false
 	};
 	p.infobox_element = g.gui_elements[infobox_create(g, 50, 300, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
@@ -38,8 +42,9 @@ function player_create(g, x, y, respawn=false) {
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
 	g.player_object = g.objects[iplayer];
 	if(respawn) {
-		p.hunger = 0.5 * p.max_hunger;
-		p.thirst = 0.5 * p.max_thirst;
+		p.health = 0.25 * p.max_health;
+		p.hunger = 0.45 * p.max_hunger;
+		p.thirst = 0.45 * p.max_thirst;
 	}
 	//if(respawn) {
 	//	p.inventory_element.data.items[1][0] = Math.max(0, Math.floor(Math.random() * 7 - 5)) * ITEM_GUN;
@@ -51,6 +56,8 @@ function player_create(g, x, y, respawn=false) {
 }
 
 function player_destroy(player_object) {
+	if(player_object.data.shield)
+		shield_destroy(player_object.data.shield);
 	Matter.Composite.remove(player_object.game.engine.world, player_object.data.body);
 	infobox_destroy(player_object.data.infobox_element);
 	inventory_destroy(player_object.data.inventory_element);
@@ -76,6 +83,9 @@ function player_die(player_object) {
 
 function player_update(player_object, dt) {
 
+	if(!player_object)
+		return;
+
 	let p = player_object.data;
 	if(p.shot_cooldown > 0)
 		p.shot_cooldown -= dt;
@@ -84,24 +94,29 @@ function player_update(player_object, dt) {
 	if(p.minigun_cooldown > 0)
 		p.minigun_cooldown -= dt;
 
+	if(p.shield_blue_health > 0)
+		p.shield_blue_health -= 0.15 * dt;
+	if(p.immunity > 0)
+		p.immunity -= dt;
+
 	if(player_object.data.health <= 0)
 		player_die(player_object);
 
 	if(p.thirst > 0)
 		p.thirst = Math.max(0, p.thirst - 0.001 * dt)
 	if(p.thirst <= 0)
-		p.health -= 0.05 * dt;
+		p.health -= 0.01 * dt;
 	if(p.hunger > 0)
 		p.hunger = Math.max(0, p.hunger - 0.001 * dt)
 	if(p.hunger <= 0)
-		p.health -= 0.05 * dt;
+		p.health -= 0.01 * dt;
 
 	p.speed = p.max_speed;
-	if(p.thirst < 0.50 * p.max_thirst)
+	if(p.thirst < 0.33 * p.max_thirst)
 		p.speed = 0.875 * p.speed;
-	if(p.hunger < 0.25 * p.max_hunger)
+	if(p.hunger < 0.11 * p.max_hunger)
 		p.speed = 0.75 * p.speed;
-	if(p.hunger > 0.95 * p.max_hunger && p.thirst > 0.95 * p.max_thirst)
+	if(p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
 
 	// choose level based on coordinates
@@ -148,6 +163,12 @@ function player_update(player_object, dt) {
 		}
 	}
 
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHIELD
+		&& player_object.game.input.mouse.leftButtonPressed) {
+		p.shield_blue_health = p.shield_blue_health_max;
+		p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+	}
+
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HEALTH
 		&& player_object.game.input.mouse.leftButtonPressed) {
 		p.health += Math.min(p.max_health - p.health, Math.random() * 10 + 5);
@@ -170,7 +191,7 @@ function player_update(player_object, dt) {
 
 	if(!p.inventory_element.shown && !p.car_object) {
 		player_object.game.camera_target_body = p.body;
-		p.body.collisionFilter.mask = -1;
+		p.body.collisionFilter.mask = -9;
 		if(player_object.game.input.keys.down['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
 		if(player_object.game.input.keys.down['a'])
@@ -182,7 +203,7 @@ function player_update(player_object, dt) {
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
-		if(closest_item && !closest_item.data.dropped && [ITEM_AMMO, ITEM_PLASMA].includes(closest_item.data.id)) {
+		if(closest_item && !closest_item.data.dropped && ITEMS_AMMOS.includes(closest_item.data.id)) {
 			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
 		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
@@ -215,6 +236,92 @@ function player_update(player_object, dt) {
 			if(Math.random() > 0.99)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SWORD && player_object.game.input.mouse.leftButtonPressed) {
+			if(player_object.game.input.mouse.x > 0.5 * window.innerWidth)
+				p.sword_direction += 0.02 * dt
+			else
+				p.sword_direction -= 0.02 * dt
+			p.sword_direction = p.sword_direction % (2 * Math.PI);
+			let closest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 150);
+			if(closest_enemy) {
+				enemy_direction = Math.atan2(closest_enemy.data.body.position.y - p.body.position.y, closest_enemy.data.body.position.x - p.body.position.x);
+				if(Math.abs(enemy_direction - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
+					closest_enemy.data.health -= (Math.random() * 1500 + 500) * dt;
+					closest_enemy.data.hit_by_player = true;
+				}
+			}
+			let closest_bullet = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "bullet", 100);
+			if(closest_bullet) {                                                   
+				let vx = closest_bullet.data.body.position.x - player_object.data.body.position.x;
+				let vy = closest_bullet.data.body.position.y - player_object.data.body.position.y;
+				let v = Math.sqrt(vx*vx + vy*vy);
+				Matter.Body.setVelocity(closest_bullet.data.body, {x: 5 * vx / v, y: 5 * vy / v});
+			}
+			p.sword_visible = true;
+		} else
+			p.sword_visible = false;
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.shot_cooldown <= 0
+			&& inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
+			let theta = Math.atan2(player_object.game.input.mouse.y - 0.5 * window.innerHeight, player_object.game.input.mouse.x - 0.5 * window.innerWidth);
+			N = Math.floor(Math.random() * 7 + 5);
+			for(let i = 0; i < N; i++)
+				bullet_create(
+					player_object.game,
+					p.body.position.x + 2 * p.w * Math.cos(theta - (0.5 * N - i) * Math.PI / N),
+					p.body.position.y + 2 * p.w * Math.sin(theta - (0.5 * N - i) * Math.PI / N),
+					player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+					player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+					30,
+					50 + 50 * Math.random(),
+					false,
+					6,
+					1500,
+					"pink",
+					"red"
+				);
+			p.shot_cooldown = 500;
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+		}
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.shot_cooldown <= 0
+			&& inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
+			let theta = Math.atan2(player_object.game.input.mouse.y - 0.5 * window.innerHeight, player_object.game.input.mouse.x - 0.5 * window.innerWidth);
+			bullet_create(
+				player_object.game,
+				p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
+				p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
+				player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+				30,
+				20 + 10 * Math.random(),
+				false,
+				6,
+				1500,
+				"pink",
+				"red"
+			);
+			bullet_create(
+				player_object.game,
+				p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
+				p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
+				player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+				30,
+				20 + 10 * Math.random(),
+				false,
+				6,
+				1500,
+				"pink",
+				"red"
+			);
+			p.shot_cooldown = 100;
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+		}
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN
 			&& player_object.game.input.mouse.leftButtonPressed
 			&& p.shotgun_cooldown <= 0
@@ -229,8 +336,8 @@ function player_update(player_object, dt) {
 					Math.random() * 10 + 10,
 					Math.random() * 1.25 + 0.25
 				);
-			p.shotgun_cooldown = 1000;
-			if(Math.random() > 0.85)
+			p.shotgun_cooldown = 750;
+			if(Math.random() > 0.91)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER
@@ -246,13 +353,13 @@ function player_update(player_object, dt) {
 				17.5,
 				Math.random() * 10 + 20,
 				false,
-				20,
+				12.5,
 				1500,
-				"blue",
-				"white"
+				"cyan",
+				"blue"
 			);
-			p.shot_cooldown = 750;
-			if(Math.random() > 0.75)
+			p.shot_cooldown = 400;
+			if(Math.random() > 0.99)
 				inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
 		}
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
@@ -268,9 +375,31 @@ function player_update(player_object, dt) {
 				Math.random() * 10 + 10,
 				Math.random()
 			);
-			p.minigun_cooldown = 40;
+			p.minigun_cooldown = 60;
 			if(Math.random() > 0.995)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		}
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.minigun_cooldown <= 0) {
+			bullet_create(
+				player_object.game,
+				p.body.position.x,
+				p.body.position.y,
+				(1 - 0.05 / 2 + 0.05 * Math.random()) * player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				(1 - 0.05 / 2 + 0.05 * Math.random()) * player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+				Math.random() * 10 + 20,
+				Math.random() * 800,
+				false,
+				6,
+				1500,
+				"lime",
+				"green"
+			);
+			p.minigun_cooldown = 80;
+			p.health -= 0.0255 * dt
+			p.hunger -= 0.0125 * dt
+			p.thirst -= 0.0125 * dt
 		}
 		if(isKeyDown(player_object.game.input, 'q', true))
 			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
@@ -285,7 +414,7 @@ function player_update(player_object, dt) {
 		}
 		let rotatedir = 0;
 		player_object.game.camera_target_body = p.car_object.data.body;
-		p.body.collisionFilter.mask = -3;
+		p.body.collisionFilter.mask = -11;
 		if(player_object.game.input.keys.down['w'] && p.car_object.data.fuel > 0) {
 			vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
 			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
@@ -307,11 +436,6 @@ function player_update(player_object, dt) {
 			p.car_object = null;
 		}
 	} 
-
-	if(p.immunity > 0) {
-		p.health = p.max_health;
-		p.immunity -= dt;
-	}
 }
 
 function player_draw(player_object, ctx) {
@@ -339,13 +463,34 @@ function player_draw(player_object, ctx) {
 			ctx.fillStyle = "orange";
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
 		}
+
 		if(player_object.game.settings.player_draw_gun &&
 			ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
 			ctx.strokeStyle = "black";
 			let lw = 0.25 * p.w;
 			let gl = 1;
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN)
+				ctx.strokeStyle = "#117733";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
 				ctx.strokeStyle = "#773311";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN)
+				ctx.strokeStyle = "#551111";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS) {
+				ctx.strokeStyle = "#551111";
+				lw *= 0.75;
+				gl *= 0.75;
+				ctx.beginPath();
+				let px = p.body.position.x - 0.45 * p.w + p.w;
+				let py = p.body.position.y - 0.45 * p.h;
+				ctx.moveTo(px, py);
+				let gx = 1, gy = 1;
+				gx = player_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
+				gy = player_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
+				let g = Math.sqrt(gx * gx + gy * gy);
+				ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
+				ctx.lineWidth = lw;
+				ctx.stroke();
+			}
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN)
 				ctx.strokeStyle = "#113377";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER) {
@@ -353,6 +498,7 @@ function player_draw(player_object, ctx) {
 				lw *= 2.25;
 				gl *= 1.5;
 			}
+			
 			ctx.beginPath();
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
@@ -364,11 +510,31 @@ function player_draw(player_object, ctx) {
 			ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
 			ctx.lineWidth = lw;
 			ctx.stroke();
+
 			ctx.lineWidth = 2;
+		} else if(p.sword_visible) {
+			let px = p.body.position.x - p.w * 0.45;
+			let py = p.body.position.y - p.h * 0.45;
+			let sword_length = 100;
+			ctx.beginPath();
+			ctx.moveTo(px, py);
+			ctx.strokeStyle = "#55aa11";
+			ctx.lineTo(px + Math.cos(p.sword_direction) * sword_length, py + Math.sin(p.sword_direction) * sword_length);
+			ctx.lineWidth = 0.25 * p.w;
+			ctx.stroke();
 		} else if(hotbar_get_selected_item(p.hotbar_element) > 0) {
 			let px = p.body.position.x - 0.25 * p.w,
 				py = p.body.position.y - 0.25 * p.h;
 			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element), px, py, 0.5 * p.w, 0.5 * p.h);
+		}
+		if(p.shield_blue_health > 0) {
+			ctx.fillStyle = "gray";
+			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w, p.h * 0.05);
+			ctx.fillStyle = "cyan";
+			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_blue_health / p.shield_blue_health_max, p.h * 0.05);
+			ctx.globalAlpha = 0.25;
+			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, "#115577", "#113377", 0.05 * p.w);
+			ctx.globalAlpha = 1.0;
 		}
 	}
 }

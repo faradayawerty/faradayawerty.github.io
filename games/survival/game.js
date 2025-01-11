@@ -42,6 +42,7 @@ function game_create(input_, engine_) {
 		survival_time: 0,
 		max_survival_time: 0,
 		kills: 0,
+		kills_for_boss: 10,
 		boss_kills: 0,
 		show_gui: true,
 		deaths: 0,
@@ -51,7 +52,13 @@ function game_create(input_, engine_) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
-		]
+		],
+		enemies: {
+			"regular": true,
+			"shooting": false,
+			"shooting red": false,
+			"sword": false
+		}
 	};
 	return g;
 }
@@ -105,7 +112,8 @@ function game_gui_element_create(g, name_, data_, func_update, func_draw, func_d
 }
 
 function game_update(g, dt) {
-	g.survival_time += dt / 1000.0;
+	if(g.player_object)
+		g.survival_time += dt / 1000.0;
 	g.max_survival_time = Math.max(g.survival_time, g.max_survival_time);
 	if(isKeyDown(g.input, '=', true) && g.scale < 2)
 		g.scale = g.scale / 0.9375;
@@ -200,6 +208,7 @@ function game_objects_arrange(g) {
 		"decorative_roof",
 		"decorative_leaves",
 		"decorative_trunk",
+		"shield",
 		"player",
 		"enemy",
 		"item",
