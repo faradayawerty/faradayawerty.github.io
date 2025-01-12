@@ -19,12 +19,12 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		type = "shooting";
 	let width = 30, height = 30;
 	let boss = make_boss;
-	g.player_object = game_object_find_closest(g, x, y, "player", 100);
-	if(g.player_object) {
+	let player_object = game_object_find_closest(g, x, y, "player", 4000);
+	if(player_object) {
 		let m = 0.33 * (
-			g.player_object.data.health / g.player_object.data.max_health
-			+ g.player_object.data.thirst / g.player_object.data.max_thirst
-			+ g.player_object.data.hunger / g.player_object.data.max_hunger
+			player_object.data.health / player_object.data.max_health
+			+ player_object.data.thirst / player_object.data.max_thirst
+			+ player_object.data.hunger / player_object.data.max_hunger
 		);
 		if(g.kills_for_boss > 0)
 			m *= 0;
@@ -32,6 +32,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		if(-1 < bd && bd < 15000) {
 			m *= 0.01;
 		}
+		console.log(m);
 		if(Math.random() > 1 - 0.25 * m) {
 			boss = true;
 		}
