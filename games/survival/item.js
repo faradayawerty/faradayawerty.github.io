@@ -19,6 +19,7 @@ let ITEM_HEALTH = 3;
 let ITEM_FUEL = 4;
 let ITEM_MONEY = 5;
 let ITEM_SHIELD = 22;
+let ITEM_HEALTH_GREEN = 28;
 
 let ITEM_CANNED_MEAT = 7;
 let ITEM_ORANGE = 8;
@@ -266,6 +267,15 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
 		ctx.strokeStyle = "#1177ff";
+		ctx.lineWidth = h * 0.01;
+		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+	} else if(id == ITEM_HEALTH_GREEN) {
+		ctx.fillStyle = "white";
+		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+		ctx.fillStyle = "#11ff77";
+		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
+		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
+		ctx.strokeStyle = "#11ff77";
 		ctx.lineWidth = h * 0.01;
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	} else if(id == ITEM_FUEL) {

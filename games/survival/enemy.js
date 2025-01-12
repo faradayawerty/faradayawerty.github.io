@@ -352,6 +352,8 @@ function enemy_update(enemy_object, dt) {
 					item_create(enemy_object.game, ITEM_SHIELD, x, y);
 				else if(["shooting rocket"].includes(e.type) && Math.random() > 0.25)
 					item_create(enemy_object.game, ITEM_ROCKET, x, y);
+				else if(["shooting red", "sword", "shooting rocket"].includes(e.type) && Math.random() > 0.25)
+					item_create(enemy_object.game, ITEM_HEALTH_GREEN, x, y);
 			}
 		}
 		enemy_destroy(enemy_object);
