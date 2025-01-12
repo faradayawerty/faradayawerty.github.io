@@ -383,7 +383,7 @@ function player_update(player_object, dt) {
 				player_object.game.input.mouse.y - 0.5 * window.innerHeight,
 				Math.min(0.25 * p.w, 10),
 				game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000),
-				100 + 200 * Math.random(),
+				1000 + 2000 * Math.random(),
 				p.max_health,
 				false,
 				15

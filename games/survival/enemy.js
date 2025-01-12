@@ -215,7 +215,7 @@ function enemy_update(enemy_object, dt) {
 						dy,
 						Math.min(0.25 * e.w, 10),
 						target_object,
-						e.damage,
+						0.25 * e.damage,
 						e.max_health * 0.005
 					);
 					e.shooting_delay = 0;

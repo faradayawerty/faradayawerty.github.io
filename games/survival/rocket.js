@@ -5,7 +5,7 @@ function rocket_create(g, x, y, dx, dy, w, target_object, damage, health, enemy=
 		max_health: health,
 		w: w,
 		speed: speed,
-		damage: 2.5,
+		damage: damage,
 		target_object: target_object,
 		body: Matter.Bodies.rectangle(x, y, 20, 20),
 		enemy: enemy
@@ -41,19 +41,19 @@ function rocket_update(rocket_object, dt) {
 			let vel = Matter.Vector.create(r.speed * dx/d, r.speed * dy/d);
 			Matter.Body.setVelocity(r.body, vel);
 			if(r.target_object && Matter.Collision.collides(rocket_object.data.body, r.target_object.data.body) != null) {
+				let alpha = 25;
 				if(r.target_object.name == "player") {
 					if(r.target_object.data.shield_blue_health > 0) {
-						r.target_object.data.shield_blue_health -= 0.75 * rocket_object.data.damage * dt;
+						r.target_object.data.shield_blue_health -= 0.75 * alpha * rocket_object.data.damage * dt;
 					} else if(r.target_object.data.immunity <= 0) {
 						let k = 1.0;
 						if(r.target_object.data.sword_visible)
-							k = 0.05;
-						r.target_object.data.health -= k * rocket_object.data.damage * dt;
+							k = 0.25;
+						r.target_object.data.health -= alpha * k * rocket_object.data.damage * dt;
 					}
 				} else
-					r.target_object.data.health -= 2000 * rocket_object.data.damage * dt;
-				r.health *= Math.pow(0.1, dt/1000);
-				r.health -= dt
+					r.target_object.data.health -= alpha * rocket_object.data.damage * dt;
+				r.health -= 10 * alpha * rocket_object.data.damage * dt;
 			}
 		}
 	} else {
