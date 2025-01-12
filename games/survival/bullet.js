@@ -45,11 +45,9 @@ function bullet_update(bullet_object, dt) {
 			&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.objects[i].data.body) != null) {
 			if(bullet_object.game.objects[i].name == "enemy" && !bullet_object.data.enemy) {
 				bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
+				bullet_object.game.objects[i].data.hit_by_player = true;
 			} else if(bullet_object.game.objects[i].name != "enemy") {
 				bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
-			}
-			if(bullet_object.game.objects[i].name == "enemy" && bullet_object.game.objects[i].data.hit_by_player == false) {
-				bullet_object.game.objects[i].data.hit_by_player = true;
 			}
 		}
 	}
