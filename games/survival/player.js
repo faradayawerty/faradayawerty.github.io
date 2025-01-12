@@ -158,7 +158,7 @@ function player_update(player_object, dt) {
 		&& player_object.game.input.mouse.leftButtonPressed) {
 		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		if(c) {
-			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, Math.random() * 60 + 10);
+			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.25 + 0.25));
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		}
 	}

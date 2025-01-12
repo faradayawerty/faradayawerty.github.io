@@ -43,7 +43,9 @@ function bullet_update(bullet_object, dt) {
 			|| bullet_object.game.objects[i].name == "car"
 			|| bullet_object.game.objects[i].name == "rocket")
 			&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.objects[i].data.body) != null) {
-			if(bullet_object.game.objects[i].name == "enemy" && !bullet_object.data.enemy) {
+			if(bullet_object.game.objects[i].name == "car" && bullet_object.game.objects[i].data.is_tank && !bullet_object.game.objects[i].data.enemy) {
+				continue;
+			} else if(bullet_object.game.objects[i].name == "enemy" && !bullet_object.data.enemy) {
 				bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
 				bullet_object.game.objects[i].data.hit_by_player = true;
 			} else if(bullet_object.game.objects[i].name != "enemy") {

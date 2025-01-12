@@ -268,8 +268,8 @@ function enemy_update(enemy_object, dt) {
 			if(target_object.name == "car")
 				target_object.data.health -= e.damage * dt;
 			if(target_object.name == "car"
-				&& Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.9 * target_object.data.max_speed
-				&& !e.boss) {
+				&& (!e.boss && Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.9 * target_object.data.max_speed
+					|| target_object.data.is_tank && Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.1 * target_object.data.max_speed)) {
 				enemy_object.data.health -= 10 * e.damage * dt;
 				enemy_object.data.hit_by_player = true;
 			} else
@@ -319,8 +319,10 @@ function enemy_update(enemy_object, dt) {
 					} else if(e.type == "shooting rocket") {
 						if(Math.random() > 0.33)
 							item_create(enemy_object.game, ITEM_ROCKET_LAUNCHER, e.body.position.x, e.body.position.y);
-						else
-							item_create(enemy_object.game, ITEM_ROCKET_LAUNCHER, e.body.position.x, e.body.position.y);
+						else {
+							let tank_colors = ["green", "blue", "#005533", "#003355", "#aaaa11"];
+							car_create(enemy_object.game, e.body.position.x, e.body.position.y, tank_colors[Math.floor(Math.random() * tank_colors.length)], true, true);
+						}
 					} else {
 						if(Math.random() > 0.33)
 							item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);

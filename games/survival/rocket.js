@@ -35,6 +35,9 @@ function rocket_update(rocket_object, dt) {
 		if(r.target_object.destroyed || r.target_object.name != "player" && r.target_object.name != "enemy" && r.target_object.name != "car" && r.target_object.name != "rocket") {
 			r.target_object = null;
 		} else {
+			if(r.target_object.name == "player" && r.target_object.data.car_object) {
+				r.target_object = r.target_object.data.car_object;
+			}
 			let dx = r.target_object.data.body.position.x - r.body.position.x;
 			let dy = r.target_object.data.body.position.y - r.body.position.y;
 			let d = Math.sqrt(dx*dx + dy*dy);
