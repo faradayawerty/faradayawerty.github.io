@@ -74,12 +74,13 @@ function player_destroy(player_object) {
 function player_die(player_object) {
 	player_object.game.input.mouse.leftButtonPressed = false;
 	player_object.game.deaths += 1;
-	if(player_object.game.settings.lose_items_on_death)
+	if(!player_object.data.ai_controlled && player_object.game.settings.lose_items_on_death) {
 		inventory_drop_all_items(player_object.data.inventory_element);
-	else
+	} else {
 		for(let i = 0; i < player_object.game.saved_items.length; i++)
 			for(let j = 0; j < player_object.game.saved_items[i].length; j++)
 				player_object.game.saved_items[i][j] = player_object.data.inventory_element.data.items[i][j];
+	}
 	if(!player_object.data.ai_controlled || player_object.game.objects.filter((obj) => obj.name == "player" && obj != player_object).length < 1)
 		player_object.game.want_respawn_menu = true;
 	player_destroy(player_object);
