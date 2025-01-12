@@ -159,7 +159,7 @@ function enemy_destroy(enemy_object) {
 				g.enemies["shooting rocket"] = true;
 		} else {
 			g.kills += 1;
-			g.kills_for_boss -= 1;
+			g.kills_for_boss += 1;
 		}
 	}
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
