@@ -74,7 +74,7 @@ function player_destroy(player_object) {
 function player_die(player_object) {
 	player_object.game.input.mouse.leftButtonPressed = false;
 	player_object.game.deaths += 1;
-	if(!player_object.data.ai_controlled && player_object.game.settings.lose_items_on_death) {
+	if(player_object.data.ai_controlled || player_object.game.settings.lose_items_on_death) {
 		inventory_drop_all_items(player_object.data.inventory_element);
 	} else {
 		for(let i = 0; i < player_object.game.saved_items.length; i++)
