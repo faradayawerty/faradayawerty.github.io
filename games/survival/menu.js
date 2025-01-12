@@ -50,7 +50,7 @@ function menu_create() {
 			"player color",
 			"player draw gun",
 			"enemies spawn",
-			"show hints",
+			//"show hints",
 			"language",
 			"ammo pickup in last slot",
 			"lose items on death",

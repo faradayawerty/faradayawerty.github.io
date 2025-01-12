@@ -159,7 +159,7 @@ function enemy_destroy(enemy_object) {
 				g.enemies["shooting rocket"] = true;
 		} else {
 			g.kills += 1;
-			g.kills_for_boss += 1;
+			g.kills_for_boss -= 1;
 		}
 	}
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
@@ -442,15 +442,15 @@ function enemy_boss_exists(g) {
 }
 
 function enemy_boss_distance_to_player(g, x, y) {
-	g.player_object = game_object_find_closest(g, x, y, "player", 20000);
+	let player_object = game_object_find_closest(g, x, y, "player", 20000);
 	let boss_objects = g.objects.filter((obj) => obj.name == "enemy" && obj.data.boss);
-	if(boss_objects.length < 1 || !g.player_object)
+	if(boss_objects.length < 1 || !player_object)
 		return -1;
 	let boss_closest = boss_objects[0];
 	for(let i = 1; i < boss_objects.length; i++)
-		if(dist(boss_closest.data.body.position, g.player_object.data.body.position) > dist(boss_objects[i].data.body.position, g.player_object.data.body.position))
+		if(dist(boss_closest.data.body.position, player_object.data.body.position) > dist(boss_objects[i].data.body.position, player_object.data.body.position))
 			boss_closest = boss_objects[i];
-	return dist(boss_closest.data.body.position, g.player_object.data.body.position);
+	return dist(boss_closest.data.body.position, player_object.data.body.position);
 }
 
 function enemy_count_minions(enemy_object) {
