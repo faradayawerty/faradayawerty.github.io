@@ -32,7 +32,6 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		if(-1 < bd && bd < 15000) {
 			m *= 0.01;
 		}
-		console.log(m);
 		if(Math.random() > 1 - 0.25 * m) {
 			boss = true;
 		}
