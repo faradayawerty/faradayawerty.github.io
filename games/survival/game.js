@@ -41,8 +41,6 @@ function game_create(input_, engine_) {
 		},
 		want_respawn_menu: false,
 		want_hide_inventory: false,
-		survival_time: 0,
-		max_survival_time: 0,
 		kills: 0,
 		kills_for_boss: 10,
 		boss_kills: 0,
@@ -81,7 +79,6 @@ function game_new(g) {
 		for(let j = 0; j < g.saved_items[i].length; j++)
 			g.saved_items[i][j] = 0;
 	let iplayer = player_create(g, 1250, 1250);
-	g.max_survival_time = 0;
 	g.kills = 0;
 	g.boss_kills = 0;
 	g.deaths = 0;
@@ -124,9 +121,6 @@ function game_gui_element_create(g, name_, data_, func_update, func_draw, func_d
 }
 
 function game_update(g, dt) {
-	if(g.player_object)
-		g.survival_time += dt / 1000.0;
-	g.max_survival_time = Math.max(g.survival_time, g.max_survival_time);
 	if(isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
 	if(isKeyDown(g.input, '-', true) && (g.scale > 0.5 || !g.camera_target_body))
@@ -182,15 +176,11 @@ function game_draw(g, ctx) {
 
 	ctx.save()
 	ctx.scale(window.innerWidth / 1800, window.innerWidth / 1800);
-	drawText(ctx, 50, 100, game_translate(g.settings.language, "max")
-		+ " " + game_translate(g.settings.language, "survived") + ": " + Math.round(g.max_survival_time) + " " + game_translate(g.settings.language, "seconds"));
-	drawText(ctx, 50, 130, game_translate(g.settings.language, "survived")
-		+ ": " + Math.round(g.survival_time) + " " + game_translate(g.settings.language, "seconds"));
-	drawText(ctx, 50, 160, game_translate(g.settings.language, "killed")
+	drawText(ctx, 50, 110, game_translate(g.settings.language, "killed")
 		+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
-	drawText(ctx, 50, 190, game_translate(g.settings.language, "killed")
+	drawText(ctx, 50, 140, game_translate(g.settings.language, "killed")
 		+ ": " + Math.round(g.boss_kills) + " " + game_translate(g.settings.language, "bosses"));
-	drawText(ctx, 50, 220, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
+	drawText(ctx, 50, 170, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
 	for(let i = 0; i < g.gui_elements.length; i++) {
 		if(!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
 			g.gui_elements[i].draw(g.gui_elements[i], ctx);

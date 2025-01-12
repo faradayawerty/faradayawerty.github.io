@@ -1,6 +1,5 @@
 
 function player_create(g, x, y, respawn=false, ai_controlled=false) {
-	g.survival_time = 0;
 	let width = 40, height = 40;
 	let p = {
 		health: 100,
