@@ -52,7 +52,7 @@ function rocket_update(rocket_object, dt) {
 					}
 				} else
 					r.target_object.data.health -= 2000 * rocket_object.data.damage * dt;
-				r.health *= Math.pow(0.5, dt/1000);
+				r.health *= Math.pow(0.1, dt/1000);
 				r.health -= dt
 			}
 		}
