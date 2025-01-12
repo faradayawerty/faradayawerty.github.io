@@ -26,7 +26,8 @@ function game_create(input_, engine_) {
 				"show enemy health": true,
 				"show enemy hunger": true,
 				"show car health": true,
-				"show car fuel": true
+				"show car fuel": true,
+				"show rocket health": false
 			},
 			auto_pickup: {
 				"automatically pickup food and drinks": false,
@@ -57,7 +58,8 @@ function game_create(input_, engine_) {
 			"regular": true,
 			"shooting": false,
 			"shooting red": false,
-			"sword": false
+			"sword": false,
+			"shooting rocket": false
 		}
 	};
 	return g;
@@ -209,6 +211,7 @@ function game_objects_arrange(g) {
 		"decorative_leaves",
 		"decorative_trunk",
 		"shield",
+		"rocket",
 		"player",
 		"enemy",
 		"item",

@@ -7,11 +7,13 @@ let ITEM_RED_PISTOLS = 20;
 let ITEM_RED_SHOTGUN = 21;
 let ITEM_SWORD = 23;
 let ITEM_GREEN_GUN = 24;
+let ITEM_ROCKET_LAUNCHER = 26;
 
 let ITEM_AMMO = 2;
 let ITEM_PLASMA = 18;
 let ITEM_RED_PLASMA = 19;
 let ITEM_GREEN_AMMO = 25;
+let ITEM_ROCKET = 27;
 
 let ITEM_HEALTH = 3;
 let ITEM_FUEL = 4;
@@ -32,7 +34,8 @@ let ITEM_MILK = 12;
 ITEMS_AMMOS = [
 	ITEM_AMMO,
 	ITEM_PLASMA,
-	ITEM_RED_PLASMA
+	ITEM_RED_PLASMA,
+	ITEM_ROCKET
 ];
 
 ITEMS_GUNS = [
@@ -42,7 +45,8 @@ ITEMS_GUNS = [
 	ITEM_PLASMA_LAUNCHER,
 	ITEM_RED_PISTOLS,
 	ITEM_RED_SHOTGUN,
-	ITEM_GREEN_GUN
+	ITEM_GREEN_GUN,
+	ITEM_ROCKET_LAUNCHER
 ];
 
 ITEMS_FOODS = [
@@ -200,6 +204,12 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.4);
+	} else if(id == ITEM_ROCKET_LAUNCHER) {
+		ctx.fillStyle = "#111133";
+		ctx.fillRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.4);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.4);
 	} else if(id == ITEM_CANNED_MEAT) {
 		ctx.fillStyle = "gray";
 		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
@@ -302,6 +312,13 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
 		ctx.fillStyle = "#dd1111";
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+	} else if(id == ITEM_ROCKET) {
+		ctx.fillStyle = "red";
+		ctx.fillRect(x + w * 0.25, y + h * 0.55, w * 0.5, h * 0.2);
+		ctx.fillStyle = "#777777";
+		ctx.fillRect(x + w * 0.35, y + h * 0.2, w * 0.3, h * 0.6);
+		ctx.fillStyle = "#777777";
+		ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.2, h * 0.6);
 	} else if(id == ITEM_MILK) {
 		ctx.fillStyle = "#113377";
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.4);

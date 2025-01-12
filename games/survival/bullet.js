@@ -39,12 +39,18 @@ function bullet_update(bullet_object, dt) {
 	else
 		bullet_object.data.lifetime -= dt;
 	for(let i = 0; i < bullet_object.game.objects.length; i++) {
-		if((bullet_object.game.objects[i].name == "enemy" || bullet_object.game.objects[i].name == "car")
-			&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.objects[i].data.body) != null
-			&& !bullet_object.data.enemy) {
-			bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
-			if(bullet_object.game.objects[i].name == "enemy" && bullet_object.game.objects[i].data.hit_by_player == false)
+		if((bullet_object.game.objects[i].name == "enemy"
+			|| bullet_object.game.objects[i].name == "car"
+			|| bullet_object.game.objects[i].name == "rocket")
+			&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.objects[i].data.body) != null) {
+			if(bullet_object.game.objects[i].name == "enemy" && !bullet_object.data.enemy) {
+				bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
+			} else if(bullet_object.game.objects[i].name != "enemy") {
+				bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
+			}
+			if(bullet_object.game.objects[i].name == "enemy" && bullet_object.game.objects[i].data.hit_by_player == false) {
 				bullet_object.game.objects[i].data.hit_by_player = true;
+			}
 		}
 	}
 	if(bullet_object.data.enemy && bullet_object.game.player_object

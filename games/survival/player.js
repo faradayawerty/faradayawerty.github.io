@@ -242,20 +242,28 @@ function player_update(player_object, dt) {
 			else
 				p.sword_direction -= 0.02 * dt
 			p.sword_direction = p.sword_direction % (2 * Math.PI);
-			let closest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 150);
+			let closest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 200);
 			if(closest_enemy) {
 				enemy_direction = Math.atan2(closest_enemy.data.body.position.y - p.body.position.y, closest_enemy.data.body.position.x - p.body.position.x);
 				if(Math.abs(enemy_direction - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
-					closest_enemy.data.health -= (Math.random() * 1500 + 500) * dt;
+					closest_enemy.data.health -= (Math.random() * 3000 + 2000) * dt;
 					closest_enemy.data.hit_by_player = true;
 				}
 			}
-			let closest_bullet = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "bullet", 100);
+			let closest_bullet = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "bullet", 200);
 			if(closest_bullet) {                                                   
 				let vx = closest_bullet.data.body.position.x - player_object.data.body.position.x;
 				let vy = closest_bullet.data.body.position.y - player_object.data.body.position.y;
 				let v = Math.sqrt(vx*vx + vy*vy);
 				Matter.Body.setVelocity(closest_bullet.data.body, {x: 5 * vx / v, y: 5 * vy / v});
+			}
+			let closest_rocket = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "rocket", 200);
+			if(closest_rocket) {                                                   
+				rocket_direction = Math.atan2(closest_rocket.data.body.position.y - p.body.position.y, closest_rocket.data.body.position.x - p.body.position.x);
+				if(Math.abs(rocket_direction - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
+					closest_rocket.data.health -= (Math.random() * 1500 + 500) * dt;
+					closest_rocket.data.hit_by_player = true;
+				}
 			}
 			p.sword_visible = true;
 		} else
@@ -361,6 +369,28 @@ function player_update(player_object, dt) {
 			p.shot_cooldown = 400;
 			if(Math.random() > 0.99)
 				inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
+		}
+		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER
+			&& player_object.game.input.mouse.leftButtonPressed
+			&& p.shot_cooldown <= 0
+			&& inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
+			let theta = Math.atan2(player_object.game.input.mouse.y - 0.5 * window.innerHeight, player_object.game.input.mouse.x - 0.5 * window.innerWidth);
+			rocket_create(
+				player_object.game,
+				p.body.position.x + Math.cos(theta) * p.w * 3,
+				p.body.position.y + Math.sin(theta) * p.h * 3,
+				player_object.game.input.mouse.x - 0.5 * window.innerWidth,
+				player_object.game.input.mouse.y - 0.5 * window.innerHeight,
+				Math.min(0.25 * p.w, 10),
+				game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000),
+				100 + 200 * Math.random(),
+				p.max_health,
+				false,
+				15
+			);
+			p.shot_cooldown = 400;
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
 		}
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
 			&& player_object.game.input.mouse.leftButtonPressed
@@ -495,6 +525,11 @@ function player_draw(player_object, ctx) {
 				ctx.strokeStyle = "#113377";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER) {
 				ctx.strokeStyle = "#331133";
+				lw *= 2.25;
+				gl *= 1.5;
+			}
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER) {
+				ctx.strokeStyle = "#111133";
 				lw *= 2.25;
 				gl *= 1.5;
 			}

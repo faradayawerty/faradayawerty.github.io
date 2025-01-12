@@ -19,7 +19,8 @@ function menu_create() {
 			"show enemy health": true,
 			"show enemy hunger": true,
 			"show car health": true,
-			"show car fuel": true
+			"show car fuel": true,
+			"show rocket health": false
 		},
 		want_auto_pickup: {
 			"automatically pickup food and drinks": false,
@@ -73,6 +74,7 @@ function menu_create() {
 			"show enemy hunger",
 			"show car health",
 			"show car fuel",
+			"show rocket health",
 			"back to settings"
 		],
 		auto_pickup_settings: [
@@ -263,6 +265,8 @@ function menu_translate(lang, str) {
 			return "показывать значение жажды игрока";
 		else if(str == "show enemy health")
 			return "показывать здоровье противников";
+		else if(str == "show rocket health")
+			return "показывать прочность ракеты";
 		else if(str == "show enemy hunger")
 			return "показывать значение сытости зомби";
 		else if(str == "show car health")
