@@ -37,12 +37,17 @@ function bullet_destroy(bullet_object) {
 }
 
 function bullet_update(bullet_object, dt) {
-	if (bullet_object.data.lifetime < 0) {
+	if(bullet_object.destroyed)
+		return;
+	if(bullet_object.data.lifetime < 0) {
 		bullet_destroy(bullet_object);
 		return;
-	} else
+	} else {
 		bullet_object.data.lifetime -= dt;
+	}
 	for(let i = 0; i < bullet_object.game.objects.length; i++) {
+		if(!bullet_object.game.objects[i].data.body)
+			continue;
 		if((bullet_object.game.objects[i].name == "enemy"
 			|| bullet_object.game.objects[i].name == "car"
 			|| bullet_object.game.objects[i].name == "rocket")
