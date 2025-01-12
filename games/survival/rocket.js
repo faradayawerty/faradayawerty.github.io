@@ -22,9 +22,12 @@ function rocket_create(g, x, y, dx, dy, w, target_object, damage, health, enemy=
 }
 
 function rocket_destroy(rocket_object) {
+	if(rocket_object.destroyed)
+		return;
 	rocket_object.data.target_object = null;
 	rocket_object.destroyed = true;
 	Matter.Composite.remove(rocket_object.game.engine.world, rocket_object.data.body);
+	rocket_object.data.body = null;
 }
 
 function rocket_update(rocket_object, dt) {
@@ -60,6 +63,8 @@ function rocket_update(rocket_object, dt) {
 			}
 		}
 	} else {
+		if(!r.body)
+			return;
 		rocket_object.name = "ROCKET";
 		r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "rocket", 50);
 		rocket_object.name = "rocket";

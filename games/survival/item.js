@@ -69,11 +69,14 @@ ITEMS_DRINKS = [
 	ITEM_COLA
 ];
 
+// TODO fix item limit
 function item_create(g, id_, x_, y_, dropped=false) {
 	let items = g.objects.filter((obj) => obj.name == "item");
-	if(items.length > 50)
-		for(let i = 0; i < 20 * Math.random() + 1; i++)
+	if(items.length > 50) {
+		for(let i = 0; i < 20 * Math.random() + 1; i++) {
 			items[i].destroy(items[i]);
+		}
+	}
 	if(id_ == 0)
 		return;
 	let item = {
@@ -97,8 +100,11 @@ function item_create_from_list(g, list, x, y) {
 }
 
 function item_destroy(item_object) {
+	if(item_object.destroyed)
+		return;
 	let g = item_object.game;
 	Matter.Composite.remove(g.engine.world, item_object.data.body);
+	item_object.data.body = null;
 	item_object.destroyed = true;
 }
 

@@ -1,10 +1,11 @@
 
-function infobox_create(g, x_, y_, max_lines_) {
+function infobox_create(g, x_, y_, max_lines_, attached_to_object=null) {
 	ib = {
 		x: x_,
 		y: y_,
 		lines: [],
-		max_lines: max_lines_
+		max_lines: max_lines_,
+		attached_to_object: attached_to_object
 	};
 	return game_gui_element_create(g, "infobox", ib, infobox_update, infobox_draw, infobox_destroy);
 }

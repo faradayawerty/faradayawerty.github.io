@@ -19,6 +19,7 @@ function game_create(input_, engine_) {
 			enemies_spawn: true,
 			show_hints: false,
 			lose_items_on_death: true,
+			trees: true,
 			indicators: {
 				"show player health": true,
 				"show player hunger": true,
@@ -60,6 +61,13 @@ function game_create(input_, engine_) {
 			"shooting red": false,
 			"sword": false,
 			"shooting rocket": false
+		},
+		enemies_default: {
+			"regular": true,
+			"shooting": false,
+			"shooting red": false,
+			"sword": false,
+			"shooting rocket": false
 		}
 	};
 	return g;
@@ -68,6 +76,7 @@ function game_create(input_, engine_) {
 function game_new(g) {
 	game_destroy_all_gui_elements(g);
 	game_destroy_all_objects(g);
+	g.enemies = g.enemies_default;
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++)
 			g.saved_items[i][j] = 0;
@@ -117,10 +126,31 @@ function game_update(g, dt) {
 	if(g.player_object)
 		g.survival_time += dt / 1000.0;
 	g.max_survival_time = Math.max(g.survival_time, g.max_survival_time);
-	if(isKeyDown(g.input, '=', true) && g.scale < 2)
+	if(isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
-	if(isKeyDown(g.input, '-', true) && g.scale > 0.5)
+	if(isKeyDown(g.input, '-', true) && (g.scale > 0.5 || !g.camera_target_body))
 		g.scale = g.scale * 0.9375;
+	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data.ai_controlled);
+	if(plr) {
+		if(isKeyDown(g.input, 'x', true)) {
+			plr.data.ai_controlled = true;
+			g.camera_target_body = null;
+		}
+	} else {
+		if(isKeyDown(g.input, 'x', true)) {
+			let plr = g.objects.find((obj) => obj.name == "player" && obj.data.ai_controlled);
+			if(plr)
+				plr.data.ai_controlled = false;
+		}
+		if(isKeyDown(g.input, 'd', false))
+			g.offset_x += dt;
+		if(isKeyDown(g.input, 'a', false))
+			g.offset_x -= dt;
+		if(isKeyDown(g.input, 'w', false))
+			g.offset_y -= dt;
+		if(isKeyDown(g.input, 's', false))
+			g.offset_y += dt;
+	}
 	g.objects = g.objects.filter((obj) => !obj.destroyed);
 	g.gui_elements = g.gui_elements.filter((elem) => !elem.destroyed);
 	for(let i = 0; i < g.objects.length; i++) {
@@ -151,20 +181,18 @@ function game_draw(g, ctx) {
 
 	ctx.save()
 	ctx.scale(window.innerWidth / 1800, window.innerWidth / 1800);
+	drawText(ctx, 50, 100, game_translate(g.settings.language, "max")
+		+ " " + game_translate(g.settings.language, "survived") + ": " + Math.round(g.max_survival_time) + " " + game_translate(g.settings.language, "seconds"));
+	drawText(ctx, 50, 130, game_translate(g.settings.language, "survived")
+		+ ": " + Math.round(g.survival_time) + " " + game_translate(g.settings.language, "seconds"));
+	drawText(ctx, 50, 160, game_translate(g.settings.language, "killed")
+		+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
+	drawText(ctx, 50, 190, game_translate(g.settings.language, "killed")
+		+ ": " + Math.round(g.boss_kills) + " " + game_translate(g.settings.language, "bosses"));
+	drawText(ctx, 50, 220, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
 	for(let i = 0; i < g.gui_elements.length; i++) {
 		if(!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
 			g.gui_elements[i].draw(g.gui_elements[i], ctx);
-	}
-	if(g.player_object && !g.player_object.data.inventory_element.shown) {
-		drawText(ctx, 50, 100, game_translate(g.settings.language, "max")
-			+ " " + game_translate(g.settings.language, "survived") + ": " + Math.round(g.max_survival_time) + " " + game_translate(g.settings.language, "seconds"));
-		drawText(ctx, 50, 130, game_translate(g.settings.language, "survived")
-			+ ": " + Math.round(g.survival_time) + " " + game_translate(g.settings.language, "seconds"));
-		drawText(ctx, 50, 160, game_translate(g.settings.language, "killed")
-			+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
-		drawText(ctx, 50, 190, game_translate(g.settings.language, "killed")
-			+ ": " + Math.round(g.boss_kills) + " " + game_translate(g.settings.language, "bosses"));
-		drawText(ctx, 50, 220, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
 	}
 	ctx.restore();
 }
@@ -182,10 +210,37 @@ function game_destroy_all_gui_elements(g) {
 	g.gui_elements = [];
 }
 
-function game_destroy_level(g) {
+function game_destroy_level(g, old_level=null) {
+	if(!old_level)
+		return;
 	for(let i = 0; i < g.objects.length; i++)
-		if(!g.objects[i].persistent)
+		if(!g.objects[i].persistent) {
+			if(old_level) {
+				let level_x = Number(old_level.split("x")[0]);
+				let level_y = Number(old_level.split("x")[1]);
+				let Ox = 2500 * level_x;
+				let Oy = 2500 * level_y;
+				if(["decorative_roof",
+					"decorative_leaves",
+					"decorative_trunk",
+					"decorative_wall",
+					"decorative",
+					"decorative_grass",
+					"decorative_level_base"].includes(g.objects[i].name)) {
+					if(g.objects[i].data.x < Ox || Ox + 2500 <= g.objects[i].data.x
+						|| g.objects[i].data.y < Oy || Oy + 2500 <= g.objects[i].data.y)
+						continue;
+				}
+				if(["bound"].includes(g.objects[i].name)) {
+					if(!g.objects[i].data.body)
+						continue;
+					if(g.objects[i].data.body.position.x < Ox || Ox + 2500 < g.objects[i].data.body.position.x
+						|| g.objects[i].data.body.position.y < Oy || Oy + 2500 < g.objects[i].data.body.position.y)
+						continue;
+				}
+			}
 			g.objects[i].destroy(g.objects[i]);
+		}
 }
 
 function game_object_find_closest(g, x, y, name, radius) {
@@ -197,6 +252,8 @@ function game_object_find_closest(g, x, y, name, radius) {
 			obj = g.objects[i];
 		else
 			continue;
+		if(!obj.data.body)
+			continue;
 		if(radius >= 0 && !closest && dist(obj.data.body.position, pos) < radius)
 			closest = obj;
 		if(closest && dist(obj.data.body.position, pos) < dist(closest.data.body.position, pos))
@@ -207,6 +264,7 @@ function game_object_find_closest(g, x, y, name, radius) {
 
 function game_objects_arrange(g) {
 	let arrangement = [
+		"bound",
 		"decorative_roof",
 		"decorative_leaves",
 		"decorative_trunk",

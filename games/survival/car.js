@@ -50,13 +50,17 @@ function car_create(g, x, y, color_, is_tank=false, unique=true) {
 }
 
 function car_destroy(car_object) {
+	if(car_object.destroyed)
+		return;
 	if(car_object.game.player_object && car_object.game.player_object.data.car_object == car_object)
 		car_object.game.player_object.data.car_object = null;
 	Matter.Composite.remove(car_object.game.engine.world, car_object.data.body);
+	car_object.data.body = null;
 	car_object.destroyed = true;
 }
 
 function car_update(car_object, dt) {
+	car_object.game.player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
 	if(car_object.data.shot_cooldown < 2000)
 		car_object.data.shot_cooldown += dt;
 	car_object.data.speed = car_object.data.max_speed;
@@ -97,6 +101,7 @@ function car_update(car_object, dt) {
 }
 
 function car_draw(car_object, ctx) {
+	car_object.game.player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
   	fillMatterBody(ctx, car_object.data.body, car_object.data.color);
 	drawMatterBody(ctx, car_object.data.body, "white");
 	if(car_object.data.is_tank) {

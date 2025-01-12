@@ -1,5 +1,5 @@
 
-function inventory_create(g) {
+function inventory_create(g, attached_to_object=null) {
 	let inv = {
 		slot_size: 80,
 		iselected: 0,
@@ -12,16 +12,22 @@ function inventory_create(g) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
 		imove: -1,
-		jmove: -1
+		jmove: -1,
+		attached_to_object: attached_to_object
 	};
 	return game_gui_element_create(g, "inventory", inv, inventory_update, inventory_draw, inventory_destroy);
 }
 
 function inventory_destroy(inventory_element) {
+	inventory_element.data.attached_to_object = null;
 	inventory_element.destroyed = true;
 }
 
 function inventory_update(inventory_element, dt) {
+
+	if(inventory_element.data.attached_to_object.data.ai_controlled)
+		inventory_element.shown = false;
+
 	let inv = inventory_element.data;
 
 	for(let i = 0; i < inv.items.length; i++)
@@ -94,8 +100,8 @@ function inventory_drop_item(inventory_element, i, j, death=false) {
 	if(inventory_element.data.items[i][j] == 0)
 		return;
 	item_create(inventory_element.game, inventory_element.data.items[i][j],
-		inventory_element.game.player_object.data.body.position.x + 100 * Math.cos(2 * Math.PI * Math.random()),
-		inventory_element.game.player_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()), !death);
+		inventory_element.data.attached_to_object.data.body.position.x + 100 * Math.cos(2 * Math.PI * Math.random()),
+		inventory_element.data.attached_to_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()), !death);
 	inventory_element.data.items[i][j] = 0;
 }
 
@@ -105,11 +111,12 @@ function inventory_drop_all_items(inventory_element) {
 			inventory_drop_item(inventory_element, i, j, true);
 }
 
-function hotbar_create(g, inv) {
+function hotbar_create(g, inv, attached_to_object=null) {
 	let hb = {
 		iselected: 0,
 		row: inv.items[0],
 		slot_size: 30,
+		attached_to_object: attached_to_object
 	};
 	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update, hotbar_draw, hotbar_destroy);
 	g.gui_elements[ihotbar].shown = true;
@@ -117,10 +124,13 @@ function hotbar_create(g, inv) {
 }
 
 function hotbar_destroy(hotbar_element) {
+	hotbar_element.data.attached_to_object = null;
 	hotbar_element.destroyed = true;
 }
 
 function hotbar_update(hotbar_element, dt) {
+	if(hotbar_element.data.attached_to_object.data.ai_controlled)
+		hotbar_element.shown = false;
 	let hb = hotbar_element.data;
 	if(isKeyDown(hotbar_element.game.input, '1', true))
 		hb.iselected = 0;
@@ -161,8 +171,6 @@ function hotbar_draw(hotbar_object, ctx) {
 }
 
 function hotbar_get_selected_item(hotbar_element) {
-	if(!hotbar_element.shown)
-		return 0;
 	return hotbar_element.data.row[hotbar_element.data.iselected];
 }
 

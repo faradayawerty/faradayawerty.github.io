@@ -7,6 +7,7 @@ function menu_create() {
 		want_player_color: "red",
 		want_player_draw_gun: true,
 		want_enemies_spawn: true,
+		want_trees: true,
 		want_language: "english",
 		want_hints: false,
 		want_ammo_pickup_last: true,
@@ -54,6 +55,7 @@ function menu_create() {
 			"ammo pickup in last slot",
 			"lose items on death",
 			"new game",
+			"enable trees",
 			"respawn on current level",
 			"indicators",
 			"auto pickup",
@@ -114,6 +116,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_respawn_here);
 		else if(m.buttons[i] == "enemies spawn")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
+		else if(m.buttons[i] == "enable trees")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_trees);
 		else if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_indicators[m.buttons[i]]);
 		else if(m.buttons[i] != "back to settings" && m.auto_pickup_settings.includes(m.buttons[i]))
@@ -196,6 +200,8 @@ function menu_update(m, dt, input) {
 			m.want_player_color = "yellow";
 		} else if(m.buttons[m.iselected] == "set player color to blue") {
 			m.want_player_color = "blue";
+		} else if(m.buttons[m.iselected] == "enable trees") {
+			m.want_trees = !m.want_trees;
 		} else if(m.buttons[m.iselected] == "english") {
 			m.want_language = "english";
 			m.buttons = m.main_menu_buttons;
@@ -293,6 +299,8 @@ function menu_translate(lang, str) {
 			return "возрождение на текущем уровнe";
 		else if(str == "new game")
 			return "новая игра";
+		else if(str == "enable trees")
+			return "деревья";
 	}
 	return str;
 }

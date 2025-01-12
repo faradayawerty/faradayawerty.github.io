@@ -29,14 +29,18 @@ function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=
 }
 
 function bullet_destroy(bullet_object) {
+	if(bullet_object.destroyed)
+		return;
 	Matter.Composite.remove(bullet_object.game.engine.world, bullet_object.data.body);
+	bullet_object.data.body = null;
 	bullet_object.destroyed = true;
 }
 
 function bullet_update(bullet_object, dt) {
-	if (bullet_object.data.lifetime < 0)
+	if (bullet_object.data.lifetime < 0) {
 		bullet_destroy(bullet_object);
-	else
+		return;
+	} else
 		bullet_object.data.lifetime -= dt;
 	for(let i = 0; i < bullet_object.game.objects.length; i++) {
 		if((bullet_object.game.objects[i].name == "enemy"
@@ -53,6 +57,8 @@ function bullet_update(bullet_object, dt) {
 			}
 		}
 	}
+	bullet_object.game.player_object = game_object_find_closest(bullet_object.game,
+		bullet_object.data.body.position.x, bullet_object.data.body.position.y, "player", 100);
 	if(bullet_object.data.enemy && bullet_object.game.player_object
 		&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.player_object.data.body) != null) {
 		if(bullet_object.game.player_object.data.shield_blue_health > 0) {

@@ -87,6 +87,8 @@ function decorative_parkinglot_create(g, x, y, w, h) {
 }
 
 function decorative_tree_create(g, x, y) {
+	if(!g.settings.trees)
+		return;
 	bound_create(g, x, y + 145, 30, 30);
 	game_object_change_name(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "#224400"), "decorative_leaves");
 	game_object_change_name(g, decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "#442200"), "decorative_trunk");
@@ -109,11 +111,12 @@ function decorative_roof_create(g, x, y, w, h) {
 }
 
 function decorative_roof_update(roof_object, dt) {
-	if(!roof_object.game.player_object)
-		return;
 	let r = roof_object.data;
+	let player_object = game_object_find_closest(roof_object.game, roof_object.data.x + 0.5 * r.w, roof_object.data.y + 0.5 * r.h, "player", Math.max(r.w, r.h));
+	if(!player_object)
+		return;
 	let g = roof_object.game;
-	let p = g.player_object.data;
+	let p = player_object.data;
 	if(doRectsCollide(p.body.position.x, p.body.position.y, 0, 0, r.x, r.y, r.w, r.h))
 		r.transparency = 0.1;
 	else

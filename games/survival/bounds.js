@@ -14,6 +14,7 @@ function bound_create(g, x, y, w, h) {
 
 function bound_destroy(bound_object) {
 	Matter.Composite.remove(bound_object.game.engine.world, bound_object.data.body);
+	bound_object.data.body = null;
 	bound_object.destroyed = true;
 }
 

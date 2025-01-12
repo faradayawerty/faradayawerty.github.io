@@ -95,6 +95,8 @@
 				game1.settings.lose_items_on_death = menu1.want_lose_items;
 			if(menu1.want_respawn_here != game1.settings.respawn_on_current_level)
 				game1.settings.respawn_on_current_level = menu1.want_respawn_here;
+			if(menu1.want_trees != game1.settings.trees)
+				game1.settings.trees = menu1.want_trees;
 
 			// update game if menu is not shown, else update menu
 			if(isKeyDown(input1, 'Escape', true)) {
