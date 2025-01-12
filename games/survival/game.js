@@ -85,6 +85,7 @@ function game_new(g) {
 	g.kills = 0;
 	g.boss_kills = 0;
 	g.deaths = 0;
+	g.kills_for_boss = 10;
 	levels_set(g, "0x0");
 }
 
