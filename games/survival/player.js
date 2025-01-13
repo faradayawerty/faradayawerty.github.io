@@ -45,6 +45,8 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		p.health = 0.25 * p.max_health;
 		p.hunger = 0.45 * p.max_hunger;
 		p.thirst = 0.45 * p.max_thirst;
+		game_destroy_level(g, g.level);
+		levels_set(g, g.level);
 	}
 	p.infobox_element.data.attached_to_object = g.objects[iplayer];
 	p.inventory_element.data.attached_to_object = g.objects[iplayer];
