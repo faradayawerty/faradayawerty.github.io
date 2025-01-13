@@ -57,8 +57,11 @@ function rocket_update(rocket_object, dt) {
 							k = 0.25;
 						r.target_object.data.health -= alpha * k * rocket_object.data.damage * dt;
 					}
-				} else
+				} else {
 					r.target_object.data.health -= alpha * rocket_object.data.damage * dt;
+					if(r.target_object.name == "enemy")
+						r.target_object.data.hit_by_player = true;
+				}
 				r.health -= 10 * alpha * rocket_object.data.damage * dt;
 			}
 		}
