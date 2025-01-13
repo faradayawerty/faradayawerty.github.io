@@ -150,6 +150,8 @@ function player_update(player_object, dt) {
 
 	if(p.ai_controlled) {
 
+		p.car_object = null;
+
 		let vel = Matter.Vector.create(0, 0);
 		let closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", 1000);
 		if(closest_enemy) {
