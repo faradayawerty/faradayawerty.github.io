@@ -9,7 +9,7 @@ function levels_set(g, level, old_level=null) {
 	if(g.visited_levels.length > 40) {
 		for(let i = 0; i < g.visited_levels.length; i++) {
 			if(!level_visible(g, g.visited_levels[i]))
-				game_destroy_level(g.visited_levels[i]);
+				game_destroy_level(g, g.visited_levels[i]);
 		}
 		g.visited_levels = ["0x0"];
 	}
