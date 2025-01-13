@@ -72,8 +72,6 @@ function game_create(input_, engine_) {
 }
 
 function game_new(g) {
-	game_destroy_all_gui_elements(g);
-	game_destroy_all_objects(g);
 	g.enemies["regular"] = g.enemies_default["regular"];
 	g.enemies["shooting"] = g.enemies_default["shooting"];
 	g.enemies["shooting red"] = g.enemies_default["shooting red"];
@@ -82,6 +80,8 @@ function game_new(g) {
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++)
 			g.saved_items[i][j] = 0;
+	game_destroy_all_gui_elements(g);
+	game_destroy_all_objects(g);
 	let iplayer = player_create(g, 1250, 1250);
 	g.kills = 0;
 	g.boss_kills = 0;
