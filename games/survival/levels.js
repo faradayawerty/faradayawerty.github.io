@@ -7,8 +7,13 @@ function levels_set(g, level, old_level=null) {
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
 
-	if(g.visited_levels.length > 40)
+	if(g.visited_levels.length > 40) {
+		for(let i = 0; i < g.visited_levels.length; i++) {
+			if(!level_visible(g, g.visited_levels[i]))
+				game_destroy_level(g.visited_levels[i]);
+		}
 		g.visited_levels = ["0x0"];
+	}
 
 	if(!g.visited_levels.includes(level)) {
 		g.visited_levels.push(level);
