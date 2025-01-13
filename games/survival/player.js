@@ -220,7 +220,7 @@ function player_update(player_object, dt) {
 		player_object.game.want_hide_inventory = false;
 	}
 
-	if(p.inventory_element.shown = false && p.hotbar_element.shown = true) {
+	if(p.inventory_element.shown == false && p.hotbar_element.shown == true) {
 		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_FUEL
 			&& player_object.game.input.mouse.leftButtonPressed) {
 			let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
