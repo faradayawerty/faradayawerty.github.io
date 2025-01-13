@@ -51,7 +51,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 	p.hotbar_element.data.attached_to_object = g.objects[iplayer];
 	if(ai_controlled) {
 		p.inventory_element.data.items[0][0] = ITEM_GUN;
-		p.inventory_element.data.items[0][1] = Math.round(Math.random()) * ITEM_AMMO;
+		p.inventory_element.data.items[0][1] = ITEM_AMMO;
 		p.inventory_element.data.items[0][2] = Math.round(Math.random()) * ITEM_WATER;
 		p.inventory_element.data.items[0][3] = Math.round(Math.random()) * ITEM_CANNED_MEAT;
 	}
@@ -59,6 +59,8 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 }
 
 function player_destroy(player_object) {
+	if(player_object.destroyed)
+		return;
 	if(player_object.game.camera_target_body == player_object.data.body)
 		player_object.game.camera_target_body = null;
 	Matter.Composite.remove(player_object.game.engine.world, player_object.data.body);
@@ -151,6 +153,7 @@ function player_update(player_object, dt) {
 	if(p.ai_controlled) {
 
 		p.car_object = null;
+		p.body.collisionFilter.mask = -1;
 
 		let vel = Matter.Vector.create(0, 0);
 		let closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", 1000);
@@ -262,7 +265,7 @@ function player_update(player_object, dt) {
 
 	if(!p.inventory_element.shown && !p.car_object) {
 		player_object.game.camera_target_body = p.body;
-		p.body.collisionFilter.mask = -9;
+		p.body.collisionFilter.mask = -1;
 		if(player_object.game.input.keys.down['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
 		if(player_object.game.input.keys.down['a'])
@@ -316,7 +319,7 @@ function player_update(player_object, dt) {
 		}
 		let rotatedir = 0;
 		player_object.game.camera_target_body = p.car_object.data.body;
-		p.body.collisionFilter.mask = -11;
+		p.body.collisionFilter.mask = -3;
 		if(player_object.game.input.keys.down['w'] && p.car_object.data.fuel > 0) {
 			vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
 			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
