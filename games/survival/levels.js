@@ -1,7 +1,6 @@
 
 function levels_set(g, level, old_level=null) {
 
-	g.level = level;
 	let level_x = Number(level.split("x")[0]);
 	let level_y = Number(level.split("x")[1]);
 	let Ox = 2500 * level_x;
@@ -21,6 +20,8 @@ function levels_set(g, level, old_level=null) {
 		let player_object = game_object_find_closest(g, Ox + 1250, Oy + 1250, "player", 3536);
 
 		if(player_object) {
+			if(!player_object.data.ai_controlled)
+				g.level = level;
 			let m = 0.33 * (
 				player_object.data.health / player_object.data.max_health
 				+ player_object.data.thirst / player_object.data.max_thirst
