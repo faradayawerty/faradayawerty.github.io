@@ -97,6 +97,8 @@ function inventory_draw(inventory_element, ctx) {
 }
 
 function inventory_drop_item(inventory_element, i, j, death=false) {
+	if(!inventory_element.data.attached_to_object || !inventory_element.data.attached_to_object.data.body)
+		return;
 	if(inventory_element.data.items[i][j] == 0)
 		return;
 	item_create(inventory_element.game, inventory_element.data.items[i][j],
