@@ -3,7 +3,8 @@ function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=
 	let bullets = g.objects.filter((obj) => obj.name == "bullet");
 	if(bullets.length > 500)
 		for(let i = 0; i < 50 * Math.random() + 50; i++) {
-			bullets[i].destroy(bullets[i]);
+			if(!bullets[i].destroyed)
+				bullets[i].destroy(bullets[i]);
 		}
 	let width = size, height = size;
 	let d = Math.sqrt(dx*dx + dy*dy);
