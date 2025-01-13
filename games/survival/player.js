@@ -42,11 +42,9 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
 	g.player_object = null;
 	if(respawn) {
-		p.health = 0.25 * p.max_health;
-		p.hunger = 0.45 * p.max_hunger;
-		p.thirst = 0.45 * p.max_thirst;
-		game_destroy_level(g, g.level);
-		levels_set(g, g.level);
+		p.health = 0.15 * p.max_health;
+		p.hunger = 0.35 * p.max_hunger;
+		p.thirst = 0.55 * p.max_thirst;
 	}
 	p.infobox_element.data.attached_to_object = g.objects[iplayer];
 	p.inventory_element.data.attached_to_object = g.objects[iplayer];
