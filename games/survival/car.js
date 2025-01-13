@@ -1,12 +1,6 @@
 
+// TODO add car limit
 function car_create(g, x, y, color_, is_tank=false, unique=true) {
-	let cars = g.objects.filter((obj) => obj.name == "car");
-	if(cars.length > 10)
-		for(let i = 0; i < 5 * Math.random() + 1; i++) {
-			if(g.player_object && g.player_object.data.car_object == cars[i] && i < cars.length - 1)
-				i++;
-			cars[i].destroy(cars[i]);
-		}
 	let width = 200, height = 110;
 	let c = {
 		health: Math.random() * 1500 + 500,
@@ -52,15 +46,16 @@ function car_create(g, x, y, color_, is_tank=false, unique=true) {
 function car_destroy(car_object) {
 	if(car_object.destroyed)
 		return;
-	if(car_object.game.player_object && car_object.game.player_object.data.car_object == car_object)
-		car_object.game.player_object.data.car_object = null;
+	let player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
+	if(player_object && player_object.data.car_object == car_object)
+		player_object.data.car_object = null;
 	Matter.Composite.remove(car_object.game.engine.world, car_object.data.body);
 	car_object.data.body = null;
 	car_object.destroyed = true;
 }
 
 function car_update(car_object, dt) {
-	car_object.game.player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
+	let player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
 	if(car_object.data.shot_cooldown < 2000)
 		car_object.data.shot_cooldown += dt;
 	car_object.data.speed = car_object.data.max_speed;
@@ -79,8 +74,8 @@ function car_update(car_object, dt) {
 		car_destroy(car_object);
 	let p = car_object.data;
 	if(car_object.data.is_tank
-		&& car_object.game.player_object
-		&& car_object.game.player_object.data.car_object == car_object
+		&& player_object
+		&& player_object.data.car_object == car_object
 		&& car_object.game.input.mouse.leftButtonPressed
 		&& p.shot_cooldown >= 600) {
 		let theta = Math.atan2(car_object.game.input.mouse.y - 0.5 * window.innerHeight, car_object.game.input.mouse.x - 0.5 * window.innerWidth);
@@ -101,7 +96,7 @@ function car_update(car_object, dt) {
 }
 
 function car_draw(car_object, ctx) {
-	car_object.game.player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
+	let player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
   	fillMatterBody(ctx, car_object.data.body, car_object.data.color);
 	drawMatterBody(ctx, car_object.data.body, "white");
 	if(car_object.data.is_tank) {
@@ -114,7 +109,7 @@ function car_draw(car_object, ctx) {
 		let py = p.body.position.y;
 		ctx.moveTo(px, py);
 		let gx = 0, gy = 1;
-		if(car_object.game.player_object && car_object.game.player_object.data.car_object == car_object) {
+		if(player_object && !player_object.data.ai_controlled && player_object.data.car_object == car_object) {
 			gx = car_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
 			gy = car_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
 		}
