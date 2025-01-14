@@ -3,7 +3,9 @@ function menu_create() {
 	let m = {
 		shown: true,
 		want_new_game: false,
+		want_spawn_ai: false,
 		want_player_respawn: false,
+		want_autorespawn: false,
 		want_player_color: "red",
 		want_player_draw_gun: true,
 		want_enemies_spawn: true,
@@ -50,6 +52,7 @@ function menu_create() {
 			"player color",
 			"player draw gun",
 			"enemies spawn",
+			"automatic respawn",
 			//"show hints",
 			"language",
 			"ammo pickup in last slot",
@@ -118,6 +121,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
 		else if(m.buttons[i] == "enable trees")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_trees);
+		else if(m.buttons[i] == "automatic respawn")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_autorespawn);
 		else if(m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_indicators[m.buttons[i]]);
 		else if(m.buttons[i] != "back to settings" && m.auto_pickup_settings.includes(m.buttons[i]))
@@ -140,6 +145,14 @@ function menu_update(m, dt, input) {
 		if(doRectsCollide(input.mouse.x / window.innerWidth * 1800, input.mouse.y / window.innerWidth * 1800, 0, 0,
 			80, 40 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
 			m.iselected = i;
+
+
+	if(m.buttons == m.menu_respawn_buttons && m.want_autorespawn) {
+		m.shown = false;
+		m.main_menu_buttons[0] = "continue game";
+		m.want_player_respawn = true;
+		menu1.buttons = menu1.main_menu_buttons;
+	}
 
 	if((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) && m.iselected < m.buttons.length - 1) {
 		m.iselected += 1;
@@ -166,6 +179,8 @@ function menu_update(m, dt, input) {
 			m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "enemies spawn") {
 			m.want_enemies_spawn = !m.want_enemies_spawn;
+		} else if(m.buttons[m.iselected] == "automatic respawn") {
+			m.want_autorespawn = !m.want_autorespawn;
 		} else if(m.buttons[m.iselected] == "player color") {
 			m.buttons = m.player_color_selection_menu;
 			m.iselected = 0;
@@ -301,6 +316,8 @@ function menu_translate(lang, str) {
 			return "новая игра";
 		else if(str == "enable trees")
 			return "деревья";
+		else if(str == "automatic respawn")
+			return "автоматическое возрождение";
 	}
 	return str;
 }

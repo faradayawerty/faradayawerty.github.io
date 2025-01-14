@@ -121,7 +121,7 @@
 					level_x = 0;
 					level_y = 0;
 				}
-				player_create(game1, 1250 + level_x * 2500, 1250 + level_y * 2500, true);
+				player_create(game1, 1250 + level_x * 2500, 1250 + level_y * 2500, true, menu1.want_spawn_ai);
 				menu1.want_player_respawn = false;
 			} else {
 				game1.show_gui = true;
