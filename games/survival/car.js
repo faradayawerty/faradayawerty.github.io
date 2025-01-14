@@ -108,7 +108,7 @@ function car_draw(car_object, ctx) {
 		let px = p.body.position.x;
 		let py = p.body.position.y;
 		ctx.moveTo(px, py);
-		let gx = 0, gy = 1;
+		let gx = 0, gy = -1;
 		if(player_object && !player_object.data.ai_controlled && player_object.data.car_object == car_object) {
 			gx = car_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
 			gy = car_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
