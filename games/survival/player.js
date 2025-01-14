@@ -28,7 +28,8 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shield_blue_health_max: 9000,
 		sword_direction: 0,
 		sword_visible: false,
-		ai_controlled: ai_controlled
+		ai_controlled: ai_controlled,
+		ai_random_dir: 0
 	};
 	p.infobox_element = g.gui_elements[infobox_create(g, 50, 300, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
@@ -89,7 +90,7 @@ function player_die(player_object) {
 
 function player_update(player_object, dt) {
 
-	if(!player_object || player_object.destroyed)
+	if(!player_object || player_object.destroyed || !player_object.data.body)
 		return;
 
 	let p = player_object.data;
@@ -152,43 +153,115 @@ function player_update(player_object, dt) {
 
 	if(p.ai_controlled) {
 
+		if(p.hunger < 0.5 * p.max_hunger) {
+			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_FOODS);
+			if(id > -1)
+				player_item_consume(player_object, id, true);
+		}
+
+		if(p.thirst < 0.5 * p.max_thirst) {
+ 			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_DRINKS);
+			if(id > -1)
+				player_item_consume(player_object, id, true);
+		}
+
+		if(p.health < 0.5 * p.max_health) {
+ 			let id = inventory_has_item_from_list(player_object.data.inventory_element, [ITEM_HEALTH, ITEM_HEALTH_GREEN]);
+			if(id > -1)
+				player_item_consume(player_object, id, true);
+		}
+
 		p.car_object = null;
 		p.body.collisionFilter.mask = -1;
 
 		let vel = Matter.Vector.create(0, 0);
-		let closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", 1000);
+
+		let closest_enemy = null;
+		let closest_item = null;
+		let closest_player = null;
+
+		let follow_range = 1000;
+
+ 		if(inventory_has_item(player_object.data.inventory_element, 0))
+			closest_item = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "item", 0.5 * follow_range);
+
+		if(!closest_item)
+			closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", follow_range);
+
+		if(!closest_enemy)
+			closest_item = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "item", 3.5 * follow_range);
+
+		if(closest_item) {
+			let tx = closest_item.data.body.position.x - p.body.position.x;
+			let ty = closest_item.data.body.position.y - p.body.position.y;
+			let v = Math.sqrt(tx*tx + ty*ty);
+			let dx = p.speed * tx / v;
+			let dy = p.speed * ty / v;
+			if(v < 1.5 * p.w)
+				item_pickup(player_object.data.inventory_element, closest_item)
+			vel = Matter.Vector.create(dx, dy);
+		}
+
 		if(closest_enemy) {
+ 			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_GUNS);
+			if(id > -1) {
+				for(let i = 0; i < player_object.data.inventory_element.data.items.length; i++)
+					for(let j = 0; j < player_object.data.inventory_element.data.items[i].length; j++)
+						if(player_object.data.inventory_element.data.items[i][j] == id) {
+							player_object.data.inventory_element.data.items[i][j]
+								= player_object.data.hotbar_element.data.row[player_object.data.hotbar_element.data.iselected];
+							player_object.data.hotbar_element.data.row[player_object.data.hotbar_element.data.iselected] = id;
+						}
+						
+			}
 			let tx = closest_enemy.data.body.position.x - p.body.position.x;
 			let ty = closest_enemy.data.body.position.y - p.body.position.y;
 			let v = Math.sqrt(tx*tx + ty*ty);
 			let dx = p.speed * tx / v;
 			let dy = p.speed * ty / v;
-			if(p.w * 4.5 < v && v < p.w * 11.5) {
+			if(p.w * 7.5 < v && v < p.w * 16.5) {
 				player_shoot(player_object, dt, closest_enemy.data.body);
 				dx = 0;
 				dy = 0;
 			}
-			if(p.w * 4.5 > v) {
+			if(p.w * 7.5 > v) {
 				dx = -dx;
 				dy = -dy;
+			} else {
+				
 			}
 			vel = Matter.Vector.create(dx, dy);
 		}
-		//else {
-		//	let closest_player = player_object.game.objects.find((obj) => obj.name == "player" && !obj.data.ai_controlled);
-		//	if(closest_player) {
-		//		let tx = closest_player.data.body.position.x - p.body.position.x;
-		//		let ty = closest_player.data.body.position.y - p.body.position.y;
-		//		let v = Math.sqrt(tx*tx + ty*ty);
-		//		let dx = p.speed * tx / v;
-		//		let dy = p.speed * ty / v;
-		//		if(p.w * 4.5 > v) {
-		//			dx = 0;
-		//			dy = 0;
-		//		}
-		//		vel = Matter.Vector.create(dx, dy);
-		//	}
-		//}
+
+		if(!closest_enemy && !closest_item)
+			closest_player = player_object.game.objects.find((obj) => obj.name == "player" && !obj.data.ai_controlled && !obj.destroyed);
+		if(!closest_player) {
+			player_object.name = "PLAYER";
+			closest_player = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "player", follow_range);
+			player_object.name = "player";
+		}
+
+		if(closest_player && !closest_player.destroyed && closest_player.data.body) {
+			let tx = closest_player.data.body.position.x - p.body.position.x;
+			let ty = closest_player.data.body.position.y - p.body.position.y;
+			let v = Math.sqrt(tx*tx + ty*ty);
+			let dx = p.speed * tx / v;
+			let dy = p.speed * ty / v;
+			if(p.w * 4.5 > v) {
+				dx = 0;
+				dy = 0;
+			}
+			if(p.w * 7.5 < v && v < 10.5 * p.w)
+				vel = Matter.Vector.create(dx, dy);
+			else
+				closest_player = null;
+		}
+		if(!closest_player && !closest_item && !closest_enemy) {
+			if(Math.random() < 0.0001 * dt)
+				p.ai_random_dir = 2 * Math.PI * Math.random();
+			vel = Matter.Vector.create(p.speed * Math.cos(p.ai_random_dir), p.speed * Math.sin(p.ai_random_dir));
+		}
+
 		Matter.Body.setVelocity(p.body, vel);
 		return;
 	}
@@ -203,8 +276,8 @@ function player_update(player_object, dt) {
 	p.infobox_element.data.lines.unshift(Math.round(player_object.data.health));
 	p.infobox_element.data.lines.unshift(Math.round(p.body.position.x) + ":" + Math.round(p.body.position.y));
 
-	if(isKeyDown(player_object.game.input, 'm', true))
-		player_create(player_object.game, p.body.position.x, p.body.position.y, false, true);
+	//if(isKeyDown(player_object.game.input, 'm', true))
+	//	player_create(player_object.game, p.body.position.x, p.body.position.y, false, true);
 
 	if(isKeyDown(player_object.game.input, 'o', true))
 		p.infobox_element.shown = !p.infobox_element.shown;
@@ -220,48 +293,8 @@ function player_update(player_object, dt) {
 		player_object.game.want_hide_inventory = false;
 	}
 
-	if(p.inventory_element.shown == false && p.hotbar_element.shown == true) {
-		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_FUEL
-			&& player_object.game.input.mouse.leftButtonPressed) {
-			let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
-			if(c) {
-				c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.25 + 0.25));
-				p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-			}
-		}
-
-		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHIELD
-			&& player_object.game.input.mouse.leftButtonPressed) {
-			p.shield_blue_health = p.shield_blue_health_max;
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-
-		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HEALTH
-			&& player_object.game.input.mouse.leftButtonPressed) {
-			p.health += Math.min(p.max_health - p.health, Math.random() * 10 + 5);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-
-		if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HEALTH_GREEN
-			&& player_object.game.input.mouse.leftButtonPressed) {
-			p.health = p.max_health;
-			p.hunger = p.max_hunger;
-			p.thirst = p.max_thirst;
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-
-		if(ITEMS_DRINKS.includes(hotbar_get_selected_item(p.hotbar_element))
-			&& player_object.game.input.mouse.leftButtonPressed) {
-			p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-
-		if(ITEMS_FOODS.includes(hotbar_get_selected_item(p.hotbar_element))
-			&& player_object.game.input.mouse.leftButtonPressed) {
-			p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 30 + 5);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		}
-	}
+	if(p.inventory_element.shown == false && p.hotbar_element.shown == true && player_object.game.input.mouse.leftButtonPressed)
+		player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
 
 	let vel = Matter.Vector.create(0, 0);
 
@@ -705,3 +738,50 @@ function player_shoot(player_object, dt, target_body=null) {
 	}
 }
 
+function player_item_consume(player_object, id, anywhere=false) {
+	let p = player_object.data;
+
+
+	let item_i = 0;
+	let item_j = player_object.data.hotbar_element.data.iselected;
+
+	if(anywhere) {
+		item_i = -1;
+		item_j = -1;
+	}
+
+	if(id == ITEM_FUEL && true) {
+		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+		if(c) {
+			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.25 + 0.25));
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		}
+	}
+
+	if(id == ITEM_SHIELD && true) {
+		p.shield_blue_health = p.shield_blue_health_max;
+		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
+	}
+
+	if(id == ITEM_HEALTH && true) {
+		p.health += Math.min(p.max_health - p.health, Math.random() * 10 + 5);
+		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
+	}
+
+	if(id == ITEM_HEALTH_GREEN && true) {
+		p.health = p.max_health;
+		p.hunger = p.max_hunger;
+		p.thirst = p.max_thirst;
+		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
+	}
+
+	if(ITEMS_DRINKS.includes(id) && true) {
+		p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
+		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
+	}
+
+	if(ITEMS_FOODS.includes(id) && true) {
+		p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 30 + 5);
+		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
+	}
+}

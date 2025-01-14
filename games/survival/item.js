@@ -382,12 +382,13 @@ function item_pickup(inventory_element, item_object) {
 				}
 	} else {
 		for(let i = 0; i < inv.items.length; i++)
-			for(let j = 0; j < inv.items[i].length; j++)
+			for(let j = 0; j < inv.items[i].length; j++) {
 				if(inv.items[i][j] == 0) {
 					inv.items[i][j] = item.id;
 					item_destroy(item_object);
 					return true;
 				}
+			}
 	}
 	return false;
 }

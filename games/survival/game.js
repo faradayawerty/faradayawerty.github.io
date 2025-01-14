@@ -242,12 +242,12 @@ function game_object_find_closest(g, x, y, name, radius) {
 	let pos = Matter.Vector.create(x, y);
 	let closest = null;
 	for(let i = 0; i < g.objects.length; i++) {
+		if(g.objects[i].destroyed || !g.objects[i].data.body)
+			continue;
 		let obj = null;
 		if(g.objects[i].name == name)
 			obj = g.objects[i];
 		else
-			continue;
-		if(!obj.data.body)
 			continue;
 		if(radius >= 0 && !closest && dist(obj.data.body.position, pos) < radius)
 			closest = obj;

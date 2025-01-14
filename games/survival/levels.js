@@ -17,8 +17,6 @@ function levels_set(g, level, old_level=null) {
 	let player_object = game_object_find_closest(g, Ox + 1250, Oy + 1250, "player", 3536);
 	if(player_object && !player_object.data.ai_controlled)
 		g.level = level;
-	else if(!g.objects.find((obj) => obj.name == "player" && !obj.data.ai_controlled))
-		g.level = level;
 	
 	if(!g.visited_levels.includes(level)) {
 		g.visited_levels.push(level);
@@ -50,6 +48,8 @@ function levels_set(g, level, old_level=null) {
 
 		if(Math.random() > 0.999)
 			item_create(g, ITEM_MONEY, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+		else if(Math.random() > 0.999)
+			player_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, false, true);
 
 		if(Math.random() > 0.995)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#1177ff");
