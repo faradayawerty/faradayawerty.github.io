@@ -367,15 +367,15 @@ function item_icon_draw(ctx, id, x, y, w, h) {
 	}
 }
 
-function item_pickup(inventory_element, item_object) {
+function item_pickup(inventory_element, item_object, force=false) {
 	if(!item_object)
 		return false;
 	let inv = inventory_element.data;
 	let item = item_object.data;
-	if(item_object.game.settings.ammo_pickup_last && ITEMS_AMMOS.includes(item_object.data.id)) {
+	if(item_object.game.settings.ammo_pickup_last && ITEMS_AMMOS.includes(item_object.data.id) || force) {
 		for(let i = inv.items.length - 1; i >= 0; i--)
 			for(let j = inv.items[i].length - 1; j >= 0; j--)
-				if(inv.items[i][j] == 0) {
+				if(inv.items[i][j] == 0 || force) {
 					inv.items[i][j] = item.id;
 					item_destroy(item_object);
 					return true;

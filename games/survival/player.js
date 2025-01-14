@@ -185,7 +185,7 @@ function player_update(player_object, dt) {
 		let follow_range = 10000;
 
  		if(inventory_has_item(player_object.data.inventory_element, 0))
-			closest_item = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "item", 0.5 * follow_range);
+			closest_item = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "item", follow_range);
 
 		closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", follow_range);
 
@@ -196,9 +196,11 @@ function player_update(player_object, dt) {
 			let iv = Math.sqrt(tx*tx + ty*ty);
 			let dx = p.speed * tx / iv;
 			let dy = p.speed * ty / iv;
-			if(iv < 1.5 * p.w)
-				item_pickup(player_object.data.inventory_element, closest_item)
-			vel = Matter.Vector.add(Matter.Vector.create(dx, dy), vel);
+			if(iv < 1.5 * p.w) {
+				if(!item_pickup(player_object.data.inventory_element, closest_item))
+					item_pickup(player_object.data.inventory_element, closest_item, true);
+			}
+			vel = Matter.Vector.create(dx, dy);
 		}
 
 		if(closest_enemy) {
@@ -223,14 +225,14 @@ function player_update(player_object, dt) {
 				dx = 0;
 				dy = 0;
 			}
-			if(p.w * 7.5 > v) {
+			if(v < p.w * 7.5) {
 				dx = -dx;
 				dy = -dy;
+				if(iv > v)
+					vel = Matter.Vector.create(dx, dy);
 			}
-			if(v > iv)
+			if(iv < v && Matter.Vector.magnitude(Matter.Vector.add(Matter.Vector.create(dx, dy), vel)) > 5)
 				vel = Matter.Vector.add(Matter.Vector.create(dx, dy), vel);
-			else
-				vel = Matter.Vector.create(dx, dy);
 		}
 
 		if(!closest_enemy && !closest_item)
