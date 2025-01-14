@@ -1,5 +1,4 @@
 
-// TODO add car limit
 function car_create(g, x, y, color_, is_tank=false, unique=true) {
 	let width = 200, height = 110;
 	let c = {
