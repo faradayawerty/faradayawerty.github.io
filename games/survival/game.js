@@ -1,7 +1,7 @@
 
 function game_create(input_, engine_) {
 	let g = {	
-		level: "0x0",
+		respawn_level: "0x0",
 		visited_levels: ["0x0"],
 		offset_x: 1250,
 		offset_y: 1250,
@@ -87,7 +87,6 @@ function game_new(g) {
 	g.boss_kills = 0;
 	g.deaths = 0;
 	g.kills_for_boss = 10;
-	levels_set(g, "0x0");
 }
 
 function game_object_create(g, name_, data_, func_update, func_draw, func_destroy, unique_name_=null) {

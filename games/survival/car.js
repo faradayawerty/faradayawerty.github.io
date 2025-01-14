@@ -69,8 +69,6 @@ function car_update(car_object, dt) {
 			break;
 		}
 	}
-	if(car_object.data.health < 0)
-		car_destroy(car_object);
 	let p = car_object.data;
 	if(car_object.data.is_tank
 		&& player_object
@@ -91,6 +89,27 @@ function car_update(car_object, dt) {
 			3500
 		);
 		p.shot_cooldown = 0;
+	}
+	if(car_object.data.health <= 0) {
+		console.log(car_object);
+		let N = Math.random() * 4 - 1;
+		for(let i = 0; i < N; i++) {
+			let theta = 2 * Math.PI * Math.random();
+			let x = car_object.data.body.position.x + 50 * Math.cos(theta);
+			let y = car_object.data.body.position.y + 50 * Math.sin(theta);
+			if(Math.random() > 0.85)
+				item_create_from_list(car_object.game, ITEMS_FOODS.concat(ITEMS_DRINKS), x, y);
+			else if(Math.random() > 0.95)
+				item_create(car_object.game, ITEM_AMMO, x, y);
+			else if(Math.random() > 0.95)
+				item_create(car_object.game, ITEM_HEALTH, x, y);
+			else if(Math.random() > 0.75)
+				item_create(car_object.game, ITEM_FUEL, x, y);
+		}
+	}
+	if(car_object.data.health < 0) {
+		car_destroy(car_object);
+		return;
 	}
 }
 

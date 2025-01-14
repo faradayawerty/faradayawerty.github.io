@@ -115,8 +115,8 @@
 				game_new(game1);
 				menu1.want_new_game = false;
 			} else if(menu1.want_player_respawn) {
-				let level_x = Number(game1.level.split("x")[0]);
-				let level_y = Number(game1.level.split("x")[1]);
+				let level_x = Number(game1.respawn_level.split("x")[0]);
+				let level_y = Number(game1.respawn_level.split("x")[1]);
 				if(!game1.settings.respawn_on_current_level) {
 					level_x = 0;
 					level_y = 0;

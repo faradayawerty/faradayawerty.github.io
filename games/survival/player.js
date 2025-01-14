@@ -13,10 +13,9 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shot_cooldown: 0,
 		shotgun_cooldown: 0,
 		minigun_cooldown: 0,
-		want_level: g.level,
+		want_level: "0x0",
 		w: width,
 		h: height,
-		infobox_element: null,
 		inventory_element: null,
 		hotbar_element: null,
 		car_object: null,
@@ -31,7 +30,6 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		ai_controlled: ai_controlled,
 		ai_random_dir: 0
 	};
-	p.infobox_element = g.gui_elements[infobox_create(g, 50, 300, 4)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++) {
@@ -47,7 +45,6 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		p.hunger = 0.35 * p.max_hunger;
 		p.thirst = 0.55 * p.max_thirst;
 	}
-	p.infobox_element.data.attached_to_object = g.objects[iplayer];
 	p.inventory_element.data.attached_to_object = g.objects[iplayer];
 	p.hotbar_element.data.attached_to_object = g.objects[iplayer];
 	if(ai_controlled) {
@@ -56,17 +53,22 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		p.inventory_element.data.items[0][2] = Math.round(Math.random()) * ITEM_WATER;
 		p.inventory_element.data.items[0][3] = Math.round(Math.random()) * ITEM_CANNED_MEAT;
 	}
+	if(level_visible(g, p.want_level))
+		levels_set(g, p.want_level);
 	return iplayer;
 }
 
 function player_destroy(player_object) {
 	if(player_object.destroyed)
 		return;
+	let p = player_object.data;
+	let g = player_object.game;
+	if(!level_visible(g, p.want_level, player_object))
+		game_destroy_level(g, p.want_level);
 	if(player_object.game.camera_target_body == player_object.data.body)
 		player_object.game.camera_target_body = null;
 	Matter.Composite.remove(player_object.game.engine.world, player_object.data.body);
 	player_object.data.body = null;
-	infobox_destroy(player_object.data.infobox_element);
 	inventory_destroy(player_object.data.inventory_element);
 	hotbar_destroy(player_object.data.hotbar_element);
 	player_object.destroyed = true;
@@ -180,26 +182,23 @@ function player_update(player_object, dt) {
 		let closest_item = null;
 		let closest_player = null;
 
-		let follow_range = 1000;
+		let follow_range = 10000;
 
  		if(inventory_has_item(player_object.data.inventory_element, 0))
 			closest_item = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "item", 0.5 * follow_range);
 
-		if(!closest_item)
-			closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", follow_range);
+		closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", follow_range);
 
-		if(!closest_enemy)
-			closest_item = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "item", 3.5 * follow_range);
-
+		let iv = -1;
 		if(closest_item) {
 			let tx = closest_item.data.body.position.x - p.body.position.x;
 			let ty = closest_item.data.body.position.y - p.body.position.y;
-			let v = Math.sqrt(tx*tx + ty*ty);
-			let dx = p.speed * tx / v;
-			let dy = p.speed * ty / v;
-			if(v < 1.5 * p.w)
+			let iv = Math.sqrt(tx*tx + ty*ty);
+			let dx = p.speed * tx / iv;
+			let dy = p.speed * ty / iv;
+			if(iv < 1.5 * p.w)
 				item_pickup(player_object.data.inventory_element, closest_item)
-			vel = Matter.Vector.create(dx, dy);
+			vel = Matter.Vector.add(Matter.Vector.create(dx, dy), vel);
 		}
 
 		if(closest_enemy) {
@@ -227,10 +226,11 @@ function player_update(player_object, dt) {
 			if(p.w * 7.5 > v) {
 				dx = -dx;
 				dy = -dy;
-			} else {
-				
 			}
-			vel = Matter.Vector.create(dx, dy);
+			if(v > iv)
+				vel = Matter.Vector.add(Matter.Vector.create(dx, dy), vel);
+			else
+				vel = Matter.Vector.create(dx, dy);
 		}
 
 		if(!closest_enemy && !closest_item)
@@ -257,7 +257,7 @@ function player_update(player_object, dt) {
 				closest_player = null;
 		}
 		if(!closest_player && !closest_item && !closest_enemy) {
-			if(Math.random() < 0.0001 * dt)
+			if(Math.random() < 0.001 * dt)
 				p.ai_random_dir = 2 * Math.PI * Math.random();
 			vel = Matter.Vector.create(p.speed * Math.cos(p.ai_random_dir), p.speed * Math.sin(p.ai_random_dir));
 		}
@@ -271,16 +271,8 @@ function player_update(player_object, dt) {
 		p.hotbar_element.shown = true;
 	}
 
-	p.infobox_element.data.lines.unshift(Math.round(player_object.game.input.mouse.x) + ":" + Math.round(player_object.game.input.mouse.y));
-	p.infobox_element.data.lines.unshift(player_object.game.level);
-	p.infobox_element.data.lines.unshift(Math.round(player_object.data.health));
-	p.infobox_element.data.lines.unshift(Math.round(p.body.position.x) + ":" + Math.round(p.body.position.y));
-
 	//if(isKeyDown(player_object.game.input, 'm', true))
 	//	player_create(player_object.game, p.body.position.x, p.body.position.y, false, true);
-
-	if(isKeyDown(player_object.game.input, 'o', true))
-		p.infobox_element.shown = !p.infobox_element.shown;
 
 	if(isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true)) {
 		p.inventory_element.shown = !p.inventory_element.shown;
@@ -525,6 +517,9 @@ function player_shoot(player_object, dt, target_body=null) {
 		sy = p.body.position.y;
 		tx = target_body.position.x;
 		ty = target_body.position.y;
+
+		tx = (tx - sx) * 10 + sx;
+		ty = (ty - sy) * 10 + sy;
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN
