@@ -9,7 +9,9 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 				enemies[i].destroy(enemies[i]);
 		}
 	}
-	if(type == "random" && Math.random() < 0.5 && g.enemies["shooting rocket"])
+	if(type == "random" && Math.random() < 0.25 && g.enemies["shooting laser"])
+		type = "shooting laser";
+	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting rocket"])
 		type = "shooting rocket";
 	else if(type == "random" && Math.random() < 0.5 && g.enemies["sword"])
 		type = "sword";
@@ -26,7 +28,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 			+ player_object.data.thirst / player_object.data.max_thirst
 			+ player_object.data.hunger / player_object.data.max_hunger
 		);
-		if(g.kills_for_boss > 0)
+		if(g.kills_for_boss > 0 || g.enemy_kills[type == "random" ? "regular" : type] < 16)
 			m *= 0;
 		let bd = enemy_boss_distance_to_player(g, x, y);
 		if(-1 < bd && bd < 15000) {
@@ -34,17 +36,22 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		}
 		if(Math.random() > 1 - 0.25 * m) {
 			boss = true;
+			g.enemy_kills[type == "random" ? "regular" : type] = 0;
 		}
+	}
+	if(type == "shooting laser") {
+		width = 50;
+		height = 50;
 	}
 	if(make_minion)
 		boss = false;
 	if(boss) {
-		width = 80;
-		height = 80;
+		width = width * 2.67;
+		height = height * 2.67;
 	}
 	if(make_minion) {
-		width = 20;
-		height = 20;
+		width = width * 0.67;
+		height = height * 0.67;;
 	}
 	let e = {
 		health: 200,
@@ -67,7 +74,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		shooting_range: 400,
 		is_minion: false,
 		jump_delay: 4000,
-		sword_rotation: 0
+		sword_rotation: 0,
+		color_gradient: Math.random() * 10000
 	};
 	if(type == "shooting") {
 		e.type = "shooting";
@@ -106,6 +114,15 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.color_outline = "black";
 		e.damage = 41 * e.damage;
 	}
+	if(type == "shooting laser") {
+		e.type = "shooting laser";
+		e.health = 32500000;
+		e.max_health = 32500000;
+		e.speed = 8.25;
+		e.color = "#ff0000";
+		e.color_outline = "white";
+		e.damage = 75370 * e.damage;
+	}
 	if(boss) {
 		e.damage = 5 * e.damage;
 		e.health = 25 * e.max_health;
@@ -115,6 +132,10 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.speed = 0.5 * e.speed;
 		if(e.type == "sword")
 			e.speed *= 2;
+		if(e.type == "shooting laser") {
+			e.shooting_range *= 1.5;
+			e.speed *= 2.25;
+		}
 		e.boss = true;
 		e.follow_range = 10 * e.follow_range;
 		e.shooting_range = 1.25 * e.shooting_range;
@@ -146,8 +167,9 @@ function enemy_destroy(enemy_object) {
 		return;
 	let g = enemy_object.game;
 	if(enemy_object.data.hit_by_player) {
+		g.enemy_kills[enemy_object.data.type] += 1;
 		if(enemy_object.data.boss) {
-			g.kills_for_boss = 10;
+			g.kills_for_boss = 16;
 			g.boss_kills += 1;
 			if(enemy_object.data.type == "regular")
 				g.enemies["shooting"] = true;
@@ -157,6 +179,8 @@ function enemy_destroy(enemy_object) {
 				g.enemies["sword"] = true;
 			if(enemy_object.data.type == "sword")
 				g.enemies["shooting rocket"] = true;
+			if(enemy_object.data.type == "shooting rocket")
+				g.enemies["shooting laser"] = true;
 		} else {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
@@ -203,6 +227,86 @@ function enemy_update(enemy_object, dt) {
 			if(v < e.shooting_range) {
 				if(e.shooting_delay >= 1000) {
 					bullet_create(enemy_object.game, e.body.position.x, e.body.position.y, dx, dy, 10, e.damage, true, e.w * 0.2, 2000, "blue", "white");
+					e.shooting_delay = 0;
+				}
+				dx = 0;
+				dy = 0;
+			}
+		}
+		e.color_gradient += 0.01 * dt;
+		if(e.type == "shooting laser" && e.boss) {
+			if(e.jump_delay >= 1000) {
+				if(dist(e.body.position, target_object.data.body.position) < 250) {
+					e.jump_delay = 0;
+					Matter.Body.setPosition(e.body,
+						Matter.Vector.create(
+							2.05 * (target_object.data.body.position.x - e.body.position.x) + target_object.data.body.position.x,
+							2.05 * (target_object.data.body.position.y - e.body.position.y) + target_object.data.body.position.y
+						));
+				}
+				if(dist(e.body.position, target_object.data.body.position) > 750) {
+					e.jump_delay = 0;
+					Matter.Body.setPosition(e.body,
+						Matter.Vector.create(
+							0.75 * (target_object.data.body.position.x - e.body.position.x) + target_object.data.body.position.x,
+							0.75 * (target_object.data.body.position.y - e.body.position.y) + target_object.data.body.position.y
+						));
+				}
+			}
+			if(v < 1.25 * e.shooting_range && e.shooting_delay < -4500) {
+				if(target_object.name == "player" && target_object.data.immunity <= 0 || target_object.name != "player") {
+					if(target_object.name == "player" && target_object.data.shield_blue_health > 0) {
+						target_object.data.shield_blue_health = target_object.data.shield_blue_health * Math.pow(0.75, dt/1000);
+					} else
+						target_object.data.health = target_object.data.health * Math.pow(0.75, dt/1000);
+				}
+			}
+			if(e.shooting_delay >= 1000) {
+				e.shooting_delay = -7500;
+			}
+		}
+		if(e.type == "shooting laser") {
+			let r = Math.cos(0.01 * e.color_gradient) * 15;
+			let g = 0.7 * (Math.cos(0.01 * e.color_gradient) + Math.sin(0.01 * e.color_gradient)) * 15;
+			let b = Math.sin(0.01 * e.color_gradient) * 15;
+			r = Math.floor(r*r);
+			g = Math.floor(g*g);
+			b = Math.floor(b*b);
+			e.color = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
+		}
+		if(e.type == "shooting laser" && e.is_minion) {
+			if(v < e.shooting_range) {
+				if(e.shooting_delay >= 300) {
+					//let colors = ["blue", "red", "yellow", "lime", "purple", "cyan"];
+					let colors = ["red", "orange", "yellow", "lime", "cyan", "blue", "purple"];
+					N = 7;
+					for(let i = 0; i < N; i++) {
+						let theta =  Math.PI * (i/N - 1/2);
+						bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
+							dx + Math.cos(theta), dy + Math.sin(theta), 25, e.damage * 10, true, e.w * 0.2, 2000,
+							colors[i], "white");
+					}
+					e.shooting_delay = 0;
+				}
+				dx = 0;
+				dy = 0;
+			}
+		}
+		if(e.type == "shooting laser" && !e.is_minion && !e.boss) {
+			if(v < e.shooting_range) {
+				if(e.shooting_delay >= 150) {
+					let colors = ["red", "orange", "yellow", "lime", "cyan", "blue", "purple"];
+					N = 1;
+					for(let i = 0; i < N; i++) {
+						let theta = Math.PI / 4 + Math.atan2(dy, dx);
+						bullet_create(enemy_object.game, e.body.position.x + 50 * Math.cos(theta), e.body.position.y + 50 * Math.sin(theta),
+							dx, dy, 25, e.damage * 10, true, e.w * 0.095, 2000,
+							colors[Math.floor(e.color_gradient) % 7], "white");
+						theta = -Math.PI / 4 + Math.atan2(dy, dx);
+						bullet_create(enemy_object.game, e.body.position.x + 50 * Math.cos(theta), e.body.position.y + 50 * Math.sin(theta),
+							dx, dy, 25, e.damage * 10, true, e.w * 0.095, 2000,
+							colors[Math.floor(e.color_gradient) % 7], "white");
+					}
 					e.shooting_delay = 0;
 				}
 				dx = 0;
@@ -328,6 +432,8 @@ function enemy_update(enemy_object, dt) {
 							let tank_colors = ["green", "blue", "#005533", "#003355", "#aaaa11"];
 							car_create(enemy_object.game, e.body.position.x, e.body.position.y, tank_colors[Math.floor(Math.random() * tank_colors.length)], true, true);
 						}
+					} else if(e.type == "shooting laser") {
+						item_create(enemy_object.game, ITEM_RAINBOW_PISTOLS, e.body.position.x, e.body.position.y);
 					} else {
 						if(Math.random() > 0.33)
 							item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
@@ -341,7 +447,21 @@ function enemy_update(enemy_object, dt) {
 				let theta = 2 * Math.PI * Math.random();
 				let x = e.body.position.x + 50 * Math.cos(theta);
 				let y = e.body.position.y + 50 * Math.sin(theta);
-				if(Math.random() > 0.85)
+				if(["shooting laser"].includes(e.type) && Math.random() < 0.25)
+					item_create(enemy_object.game, ITEM_SHIELD_GREEN, x, y);
+				else if(["shooting laser"].includes(e.type) && Math.random() < 0.75)
+					item_create(enemy_object.game, ITEM_RAINBOW_AMMO, x, y);
+				else if(["shooting red", "sword", "shooting rocket", "shooting laser"].includes(e.type) && Math.random() < 0.5)
+					item_create(enemy_object.game, ITEM_HEALTH_GREEN, x, y);
+				else if(["sword", "shooting rocket", "shooting laser"].includes(e.type) && Math.random() < 0.5)
+					item_create(enemy_object.game, ITEM_SHIELD, x, y);
+				else if(["shooting", "shooting red", "shooting laser"].includes(e.type) && Math.random() < 0.5)
+					item_create(enemy_object.game, ITEM_PLASMA, x, y);
+				else if(["shooting red", "sword", "shooting laser"].includes(e.type) && Math.random() < 0.5)
+					item_create(enemy_object.game, ITEM_RED_PLASMA, x, y);
+				else if(["shooting rocket", "shooting laser"].includes(e.type) && Math.random() < 0.5)
+					item_create(enemy_object.game, ITEM_ROCKET, x, y);
+				else if(Math.random() > 0.85)
 					item_create_from_list(enemy_object.game, ITEMS_FOODS.concat(ITEMS_DRINKS), x, y);
 				else if(Math.random() > 0.85)
 					item_create(enemy_object.game, ITEM_AMMO, x, y);
@@ -349,16 +469,6 @@ function enemy_update(enemy_object, dt) {
 					item_create(enemy_object.game, ITEM_HEALTH, x, y);
 				else if(Math.random() > 0.95)
 					item_create(enemy_object.game, ITEM_FUEL, x, y);
-				else if(["shooting", "shooting red"].includes(e.type) && Math.random() > 0.5)
-					item_create(enemy_object.game, ITEM_PLASMA, x, y);
-				else if(["shooting red", "sword"].includes(e.type) && Math.random() > 0.5)
-					item_create(enemy_object.game, ITEM_RED_PLASMA, x, y);
-				else if(["sword", "shooting rocket"].includes(e.type) && Math.random() > 0.25)
-					item_create(enemy_object.game, ITEM_SHIELD, x, y);
-				else if(["shooting rocket"].includes(e.type) && Math.random() > 0.25)
-					item_create(enemy_object.game, ITEM_ROCKET, x, y);
-				else if(["shooting red", "sword", "shooting rocket"].includes(e.type) && Math.random() > 0.25)
-					item_create(enemy_object.game, ITEM_HEALTH_GREEN, x, y);
 			}
 		}
 		enemy_destroy(enemy_object);
@@ -397,8 +507,52 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.beginPath();
 			ctx.moveTo(px, py);
 			ctx.strokeStyle = "#331133";
-			ctx.lineTo(px + e.w * gx / g, py + e.h * gy / g);
+			ctx.lineTo(px + e.w * gx / g, py + e.w * gy / g);
 			ctx.lineWidth = 0.25 * e.w;
+			ctx.stroke();
+		}
+		if(e.type == "shooting laser" && e.is_minion && g < 1.25 * e.shooting_range) {
+			ctx.beginPath();
+			ctx.moveTo(px, py);
+			ctx.strokeStyle = "#331133";
+			ctx.lineTo(px + e.w * gx / g, py + e.h * gy / g);
+			ctx.lineWidth = 0.175 * e.w;
+			ctx.stroke();
+		}
+		if(e.type == "shooting laser" && e.boss && g < 1.25 * e.shooting_range) {
+			ctx.beginPath();
+			ctx.moveTo(px + 0.45 * e.w, py + 0.45 * e.h);
+			ctx.strokeStyle = "#331133";
+			ctx.lineTo(px + 0.45 * e.w + e.w * gx / g, py + 0.45 * e.h + e.h * gy / g);
+			ctx.lineWidth = 0.175 * e.w;
+			ctx.stroke();
+			if(e.shooting_delay < -4500) {
+				ctx.beginPath();
+				ctx.moveTo(px + 0.45 * e.w + e.w * gx / g, py + 0.45 * e.h + e.w * gy / g);
+				ctx.strokeStyle = e.color;
+				ctx.lineTo(px + 0.45 * e.w + 4 * gx, py + 0.45 * e.h + 4 * gy);
+				ctx.lineWidth = 0.075 * e.w;
+				ctx.stroke();
+				ctx.beginPath();
+				ctx.moveTo(px + 0.45 * e.w + e.w * gx / g, py + 0.45 * e.h + e.w * gy / g);
+				ctx.strokeStyle = "white";
+				ctx.lineTo(px + 0.45 * e.w + 4 * gx, py + 0.45 * e.h + 4 * gy);
+				ctx.lineWidth = 0.05 * e.w;
+				ctx.stroke();
+			}
+		}
+		if(e.type == "shooting laser" && !e.is_minion && !e.boss && g < 1.25 * e.shooting_range) {
+			ctx.beginPath();
+			ctx.moveTo(px, py);
+			ctx.strokeStyle = "#331133";
+			ctx.lineTo(px + 0.75 * e.w * gx / g, py + 0.75 * e.w * gy / g);
+			ctx.lineWidth = 0.21 * e.w;
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(px + e.w, py);
+			ctx.strokeStyle = "#331133";
+			ctx.lineTo(px + e.w + 0.75 * e.w * gx / g, py + 0.75 * e.w * gy / g);
+			ctx.lineWidth = 0.21 * e.w;
 			ctx.stroke();
 		}
 		if(e.type == "shooting rocket" && g < 1.25 * e.shooting_range) {

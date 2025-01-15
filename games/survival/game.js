@@ -42,7 +42,7 @@ function game_create(input_, engine_) {
 		want_respawn_menu: false,
 		want_hide_inventory: false,
 		kills: 0,
-		kills_for_boss: 10,
+		kills_for_boss: 16,
 		boss_kills: 0,
 		show_gui: true,
 		deaths: 0,
@@ -58,15 +58,25 @@ function game_create(input_, engine_) {
 			"shooting": false,
 			"shooting red": false,
 			"sword": false,
-			"shooting rocket": false
+			"shooting rocket": false,
+			"shooting laser": false
 		},
 		enemies_default: {
 			"regular": true,
 			"shooting": false,
 			"shooting red": false,
 			"sword": false,
-			"shooting rocket": false
-		}
+			"shooting rocket": false,
+			"shooting laser": false
+		},
+		enemy_kills: {
+			"regular": 0,
+			"shooting": 0,
+			"shooting red": 0,
+			"sword": 0,
+			"shooting rocket": 0,
+			"shooting laser": 0
+		},
 	};
 	return g;
 }
@@ -77,6 +87,7 @@ function game_new(g) {
 	g.enemies["shooting red"] = g.enemies_default["shooting red"];
 	g.enemies["sword"] = g.enemies_default["sword"];
 	g.enemies["shooting rocket"] = g.enemies_default["shooting rocket"];
+	g.enemies["shooting laser"] = g.enemies_default["shooting laser"];
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++)
 			g.saved_items[i][j] = 0;

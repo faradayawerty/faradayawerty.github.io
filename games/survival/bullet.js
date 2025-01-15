@@ -1,5 +1,5 @@
 
-function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=6, lifetime=1500, color_fill="yellow", color_outline="orange") {
+function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=6, lifetime=1500, color_fill="yellow", color_outline="orange", invisible=false) {
 	let bullets = g.objects.filter((obj) => obj.name == "bullet");
 	if(bullets.length > 200)
 		for(let i = 0; i < bullets.length - 200; i++)
@@ -15,7 +15,8 @@ function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=
 		body: Matter.Bodies.rectangle(x + 25 * dx/d, y + 25 * dy/d, width, height),
 		enemy: enemy,
 		color_fill: color_fill,
-		color_outline: color_outline
+		color_outline: color_outline,
+		invisible: invisible
 	};
 	if(b.enemy)
 		b.body.collisionFilter.category = 4;
@@ -77,6 +78,8 @@ function bullet_update(bullet_object, dt) {
 }
 
 function bullet_draw(bullet_object, ctx) {
+	if(bullet_object.data.invisible)
+		return;
 	fillMatterBody(ctx, bullet_object.data.body, bullet_object.data.color_fill);
 	drawMatterBody(ctx, bullet_object.data.body, bullet_object.data.color_outline, 1);
 }

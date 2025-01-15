@@ -13,7 +13,8 @@ function inventory_create(g, attached_to_object=null) {
 		],
 		imove: -1,
 		jmove: -1,
-		attached_to_object: attached_to_object
+		attached_to_object: attached_to_object,
+		animation_state: 0
 	};
 	return game_gui_element_create(g, "inventory", inv, inventory_update, inventory_draw, inventory_destroy);
 }
@@ -29,6 +30,8 @@ function inventory_update(inventory_element, dt) {
 		inventory_element.shown = false;
 
 	let inv = inventory_element.data;
+
+	inv.animation_state += 0.02 * dt;
 
 	for(let i = 0; i < inv.items.length; i++)
 		for(let j = 0; j < inv.items[i].length; j++)
@@ -91,7 +94,7 @@ function inventory_draw(inventory_element, ctx) {
 				ctx.fillStyle = "blue";
 			ctx.fillRect(40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size);
 			ctx.globalAlpha = 1.0;
-			item_icon_draw(ctx, inv.items[i][j], 40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size);
+			item_icon_draw(ctx, inv.items[i][j], 40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size, inv.animation_state);
 		}
 	}
 }
@@ -103,7 +106,7 @@ function inventory_drop_item(inventory_element, i, j, death=false) {
 		return;
 	item_create(inventory_element.game, inventory_element.data.items[i][j],
 		inventory_element.data.attached_to_object.data.body.position.x + 100 * Math.cos(2 * Math.PI * Math.random()),
-		inventory_element.data.attached_to_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()), !death);
+		inventory_element.data.attached_to_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()), !death, !death);
 	inventory_element.data.items[i][j] = 0;
 }
 
@@ -118,7 +121,8 @@ function hotbar_create(g, inv, attached_to_object=null) {
 		iselected: 0,
 		row: inv.items[0],
 		slot_size: 30,
-		attached_to_object: attached_to_object
+		attached_to_object: attached_to_object,
+		animation_state: 0
 	};
 	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update, hotbar_draw, hotbar_destroy);
 	g.gui_elements[ihotbar].shown = true;
@@ -131,6 +135,7 @@ function hotbar_destroy(hotbar_element) {
 }
 
 function hotbar_update(hotbar_element, dt) {
+	hotbar_element.data.animation_state += 0.02 * dt;
 	if(hotbar_element.data.attached_to_object.data.ai_controlled)
 		hotbar_element.shown = false;
 	let hb = hotbar_element.data;
@@ -168,7 +173,7 @@ function hotbar_draw(hotbar_object, ctx) {
 			ctx.fillStyle = "blue";
 		ctx.fillRect(40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size);
 		ctx.globalAlpha = 1.0;
-		item_icon_draw(ctx, hb.row[i], 40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size);
+		item_icon_draw(ctx, hb.row[i], 40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size, hb.animation_state);
 	}
 }
 

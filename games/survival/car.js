@@ -83,15 +83,13 @@ function car_update(car_object, dt) {
 			car_object.game.input.mouse.x - 0.5 * window.innerWidth,
 			car_object.game.input.mouse.y - 0.5 * window.innerHeight,
 			60,
-			100000 + Math.random() * 200000,
-			false,
+			100000 + Math.random() * 100000, false,
 			12.5,
 			3500
 		);
 		p.shot_cooldown = 0;
 	}
 	if(car_object.data.health <= 0) {
-		console.log(car_object);
 		let N = Math.random() * 4 - 1;
 		for(let i = 0; i < N; i++) {
 			let theta = 2 * Math.PI * Math.random();

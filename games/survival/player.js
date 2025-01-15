@@ -2,6 +2,7 @@
 function player_create(g, x, y, respawn=false, ai_controlled=false) {
 	let width = 40, height = 40;
 	let p = {
+		old_health: 100,
 		health: 100,
 		max_health: 100,
 		thirst: 210,
@@ -22,13 +23,19 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		body: Matter.Bodies.rectangle(x, y, width, height, {
 			inertia: Infinity
 		}),
-		immunity: 9000,
+		immunity: 7500,
 		shield_blue_health: 0,
 		shield_blue_health_max: 9000,
+		shield_green_health: 0,
+		shield_green_health_max: 9000,
+		saved_health: 0,
+		saved_thirst: 0,
+		saved_hunger: 0,
 		sword_direction: 0,
 		sword_visible: false,
 		ai_controlled: ai_controlled,
-		ai_random_dir: 0
+		ai_random_dir: 0,
+		gradient: 0
 	};
 	p.inventory_element = g.gui_elements[inventory_create(g)];
 	for(let i = 0; i < g.saved_items.length; i++)
@@ -103,8 +110,30 @@ function player_update(player_object, dt) {
 	if(p.minigun_cooldown > 0)
 		p.minigun_cooldown -= dt;
 
-	if(p.shield_blue_health > 0)
+	if(p.shield_blue_health > 0) {
 		p.shield_blue_health -= 0.15 * dt;
+	}
+
+	if(p.shield_green_health > 0) {
+		p.shield_green_health -= 0.15 * dt;
+		if(p.health < p.saved_health)
+			p.health = p.saved_health;
+		if(p.hunger < p.saved_hunger)
+			p.hunger = p.saved_hunger;
+		if(p.thirst < p.saved_thirst)
+			p.thirst = p.saved_thirst;
+	}
+
+	if(p.shield_green_health < 0) {
+		p.shield_green_health = 0;
+		p.immunity += 3600;
+	}
+
+	if(p.shield_blue_health < 0) {
+		p.shield_blue_health = 0;
+		p.immunity += 1200;
+	}
+
 	if(p.immunity > 0)
 		p.immunity -= dt;
 
@@ -383,7 +412,7 @@ function player_draw(player_object, ctx) {
 			ctx.fillStyle = "red";
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, p.h * 0.05);
 			ctx.fillStyle = "lime";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w * p.health / p.max_health, p.h * 0.05);
+			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w * Math.max(p.health, 0) / p.max_health, p.h * 0.05);
 		}
 		if(player_object.game.settings.indicators["show player thirst"]) {
 			ctx.fillStyle = "red";
@@ -431,6 +460,22 @@ function player_draw(player_object, ctx) {
 				ctx.strokeStyle = "#551111";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS) {
 				ctx.strokeStyle = "#551111";
+				lw *= 0.75;
+				gl *= 0.75;
+				ctx.beginPath();
+				let px = p.body.position.x - 0.45 * p.w + p.w;
+				let py = p.body.position.y - 0.45 * p.h;
+				ctx.moveTo(px, py);
+				let gx = 1, gy = 1;
+				gx = mx - cx;
+				gy = my - cy;
+				let g = Math.sqrt(gx * gx + gy * gy);
+				ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
+				ctx.lineWidth = lw;
+				ctx.stroke();
+			}
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS) {
+				ctx.strokeStyle = "purple";
 				lw *= 0.75;
 				gl *= 0.75;
 				ctx.beginPath();
@@ -494,6 +539,15 @@ function player_draw(player_object, ctx) {
 			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_blue_health / p.shield_blue_health_max, p.h * 0.05);
 			ctx.globalAlpha = 0.25;
 			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, "#115577", "#113377", 0.05 * p.w);
+			ctx.globalAlpha = 1.0;
+		}
+		if(p.shield_green_health > 0) {
+			ctx.fillStyle = "gray";
+			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w, p.h * 0.05);
+			ctx.fillStyle = "lime";
+			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_green_health / p.shield_green_health_max, p.h * 0.05);
+			ctx.globalAlpha = 0.25;
+			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, "#117755", "#117733", 0.05 * p.w);
 			ctx.globalAlpha = 1.0;
 		}
 	}
@@ -595,6 +649,76 @@ function player_shoot(player_object, dt, target_body=null) {
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
 	}
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS
+		&& true
+		&& p.shot_cooldown <= 0
+		&& inventory_has_item_from_list(p.inventory_element, [ITEM_AMMO, ITEM_RED_PLASMA, ITEM_PLASMA, ITEM_RAINBOW_AMMO]) > -1) {
+		let theta = Math.atan2(ty - sy, tx - sx);
+
+		let colors = ["red", "orange", "yellow", "lime", "cyan", "blue", "purple"];
+		let color1 = null;
+		let color2 = null;
+
+		p.gradient += 0.01 * dt;
+
+		if(inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
+			color1 = colors[Math.floor(p.gradient) % 7];
+			color2 = "white";
+			if(Math.random() > 0.999)
+				inventory_clear_item(p.inventory_element, ITEM_RAINBOW_AMMO, 1);
+		}
+
+		else if(inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
+			color1 = "red";
+			color2 = "pink";
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+		}
+
+		else if(inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
+			color1 = "cyan";
+			color2 = "blue";
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
+		}
+
+		else if(inventory_has_item(p.inventory_element, ITEM_AMMO)) {
+			color1 = "yellow";
+			color2 = "orange";
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		}
+
+		bullet_create(
+			player_object.game,
+			p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
+			p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
+			tx - sx,
+			ty - sy,
+			30,
+			2000000000 + 1000000000 * Math.random(),
+			false,
+			6,
+			1500,
+			color1,
+			color2
+		);
+		bullet_create(
+			player_object.game,
+			p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
+			p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
+			tx - sx,
+			ty - sy,
+			30,
+			2000000000 + 1000000000 * Math.random(),
+			false,
+			6,
+			1500,
+			color1,
+			color2
+		);
+		p.shot_cooldown = 100;
+	}
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS
 		&& true
 		&& p.shot_cooldown <= 0
@@ -685,7 +809,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			ty - sy,
 			Math.min(0.25 * p.w, 10),
 			game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000),
-			1000 + 2000 * Math.random(),
+			10000 + 20000 * Math.random(),
 			p.max_health,
 			false,
 			15
@@ -757,28 +881,38 @@ function player_item_consume(player_object, id, anywhere=false) {
 
 	if(id == ITEM_SHIELD && true) {
 		p.shield_blue_health = p.shield_blue_health_max;
+		p.shield_green_health = 0;
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 
+	if(id == ITEM_SHIELD_GREEN && true) {
+		p.shield_green_health = p.shield_green_health_max;
+		p.shield_blue_health = 0;
+		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
+		p.saved_health = p.health;
+		p.saved_hunger = p.hunger;
+		p.saved_thirst = p.thirst;
+	}
+
 	if(id == ITEM_HEALTH && true) {
-		p.health += Math.min(p.max_health - p.health, Math.random() * 10 + 5);
+		p.health += Math.min(p.max_health - p.health, (Math.random() * 0.125 + 0.125) * p.max_health);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 
 	if(id == ITEM_HEALTH_GREEN && true) {
-		p.health = p.max_health;
-		p.hunger = p.max_hunger;
-		p.thirst = p.max_thirst;
+		p.health = Math.min(p.max_health, p.health + p.max_health * (Math.random() * 0.45 + 0.15));
+		p.hunger = Math.min(p.max_hunger, p.hunger + p.max_hunger * (Math.random() * 0.45 + 0.15));
+		p.thirst = Math.min(p.max_thirst, p.thirst + p.max_thirst * (Math.random() * 0.45 + 0.15));
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 
 	if(ITEMS_DRINKS.includes(id) && true) {
-		p.thirst += Math.min(p.max_thirst - p.thirst, Math.random() * 20 + 5);
+		p.thirst += Math.min(p.max_thirst - p.thirst, (Math.random() * 0.125 + 0.125) * p.max_thirst);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 
 	if(ITEMS_FOODS.includes(id) && true) {
-		p.hunger += Math.min(p.max_hunger - p.hunger, Math.random() * 30 + 5);
+		p.hunger += Math.min(p.max_hunger - p.hunger, (Math.random() * 0.125 + 0.125) * p.max_hunger);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 }
