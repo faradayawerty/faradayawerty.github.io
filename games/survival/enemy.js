@@ -116,8 +116,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 	}
 	if(type == "shooting laser") {
 		e.type = "shooting laser";
-		e.health = 32500000;
-		e.max_health = 32500000;
+		e.health = 12500000;
+		e.max_health = 12500000;
 		e.speed = 8.25;
 		e.color = "#ff0000";
 		e.color_outline = "white";
@@ -388,6 +388,8 @@ function enemy_update(enemy_object, dt) {
 			let max_minions = 5;
 			if(enemy_object.data.type == "sword")
 				max_minions = 25;
+			if(enemy_object.data.type == "shooting laser")
+				max_minions = 15;
 			if(enemy_count_minions(enemy_object) < max_minions) {
 				for(let i = 0; i < Math.random() * 4 + 1; i++) {
 					let theta = 2 * Math.PI * Math.random();
