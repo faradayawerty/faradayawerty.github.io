@@ -552,14 +552,13 @@ function item_spawn(g, x, y, enemy_type=null) {
 		item = available_guns[Math.floor(Math.random() * available_guns.length)];
 	a += chance_gun;
 
-	if(player_closest && ITEMS_GUNS.includes(item) && item < best_gun && Math.random() < 0.85)
-		item = best_gun;
-
-	if(player_closest && ITEMS_GUNS.includes(item) && inventory_has_item(player_closest.data.inventory_element, item)) {
-		if(chance_ammo > 0)
-			item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
-		else
-			item = 0;
+	for(let i = 0; i < ITEMS_GUNS.length; i++) {
+		if(player_closest && inventory_has_item(player_closest.data.inventory_element, ITEMS_GUNS[i]) && item == ITEMS_GUNS[i]) {
+			if(chance_ammo > 0)
+				item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
+			else
+				item = 0;
+		}
 	}
 
 	if(a < r && r < a + chance_fuel)
