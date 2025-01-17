@@ -499,6 +499,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 	}
 
 	if(enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
+		available_guns.push(ITEM_RAINBOW_AMMO);
 		available_guns.push(ITEM_ROCKET_LAUNCHER);
 	}
 
