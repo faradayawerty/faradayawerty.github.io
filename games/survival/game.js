@@ -53,7 +53,7 @@ function game_create(input_, engine_) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
-		enemies: {
+		enemies: { // should have been integer constants but too lazy to change now
 			"regular": true,
 			"shooting": false,
 			"shooting red": false,
@@ -189,7 +189,7 @@ function game_draw(g, ctx) {
 		return;
 
 	ctx.save()
-	ctx.scale(window.innerWidth / 1800, window.innerWidth / 1800);
+	ctx.scale(get_scale(), get_scale());
 	drawText(ctx, 50, 110, game_translate(g.settings.language, "killed")
 		+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
 	drawText(ctx, 50, 140, game_translate(g.settings.language, "killed")
@@ -317,5 +317,20 @@ function game_translate(language, text) {
 			return "смерти игрока";
 	}
 	return text;
+}
+
+function game_get_max_enemy(g) {
+	let ans = "regular";
+	if(g.objects["shooting"])
+		ans = "shooting";
+	if(g.objects["shooting red"])
+		ans = "shooting red";
+	if(g.objects["sword"])
+		ans = "sword";
+	if(g.objects["shooting rocket"])
+		ans = "shooting rocket";
+	if(g.objects["shooting laser"])
+		ans = "shooting laser";
+	return ans;
 }
 

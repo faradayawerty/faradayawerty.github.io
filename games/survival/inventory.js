@@ -10,6 +10,7 @@ function inventory_create(g, attached_to_object=null) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
 		imove: -1,
 		jmove: -1,
@@ -35,7 +36,7 @@ function inventory_update(inventory_element, dt) {
 
 	for(let i = 0; i < inv.items.length; i++)
 		for(let j = 0; j < inv.items[i].length; j++)
-			if(doRectsCollide(inventory_element.game.input.mouse.x / window.innerWidth * 1800, inventory_element.game.input.mouse.y / window.innerWidth * 1800, 0, 0,
+			if(doRectsCollide(inventory_element.game.input.mouse.x / get_scale(), inventory_element.game.input.mouse.y / get_scale(), 0, 0,
 				40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size)) {
 				inv.iselected = i;
 				inv.jselected = j;
@@ -76,6 +77,7 @@ function inventory_update(inventory_element, dt) {
 }
 
 function inventory_draw(inventory_element, ctx) {
+
 	if(inventory_element.game.want_hide_inventory)
 		return;
 	let inv = inventory_element.data;

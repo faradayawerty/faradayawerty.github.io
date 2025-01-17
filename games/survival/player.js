@@ -771,7 +771,7 @@ function player_shoot(player_object, dt, target_body=null) {
 				Math.random() * 1.25 + 0.25
 			);
 		p.shotgun_cooldown = 750;
-		if(Math.random() > 0.91)
+		if(Math.random() > 0.985)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 	}
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER
@@ -874,7 +874,7 @@ function player_item_consume(player_object, id, anywhere=false) {
 	if(id == ITEM_FUEL && true) {
 		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		if(c) {
-			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.25 + 0.25));
+			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.0625 + 0.0625));
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		}
 	}
@@ -900,9 +900,9 @@ function player_item_consume(player_object, id, anywhere=false) {
 	}
 
 	if(id == ITEM_HEALTH_GREEN && true) {
-		p.health = Math.min(p.max_health, p.health + p.max_health * (Math.random() * 0.45 + 0.15));
-		p.hunger = Math.min(p.max_hunger, p.hunger + p.max_hunger * (Math.random() * 0.45 + 0.15));
-		p.thirst = Math.min(p.max_thirst, p.thirst + p.max_thirst * (Math.random() * 0.45 + 0.15));
+		p.health = Math.min(p.max_health, p.health + p.max_health * (Math.random() * 0.125 + 0.375));
+		p.hunger = Math.min(p.max_hunger, p.hunger + p.max_hunger * (Math.random() * 0.125 + 0.375));
+		p.thirst = Math.min(p.max_thirst, p.thirst + p.max_thirst * (Math.random() * 0.125 + 0.375));
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 

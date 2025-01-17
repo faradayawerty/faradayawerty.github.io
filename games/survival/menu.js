@@ -101,7 +101,7 @@ function menu_draw(ctx, m) {
 	ctx.fillRect(0, 0, cvs1.width, cvs1.height);
 	ctx.globalAlpha = 1.0;
 	ctx.save();
-	ctx.scale(window.innerWidth / 1800, window.innerWidth / 1800);
+	ctx.scale(get_scale(), get_scale());
 	let s = "";
 	for(let i = 0; i < m.buttons.length; i++) {
 		let text = m.buttons[i];
@@ -142,7 +142,7 @@ function menu_draw(ctx, m) {
 function menu_update(m, dt, input) {
 
 	for(let i = 0; i < m.buttons.length; i++)
-		if(doRectsCollide(input.mouse.x / window.innerWidth * 1800, input.mouse.y / window.innerWidth * 1800, 0, 0,
+		if(doRectsCollide(input.mouse.x / get_scale(), input.mouse.y / get_scale(), 0, 0,
 			80, 40 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
 			m.iselected = i;
 

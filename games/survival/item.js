@@ -56,22 +56,11 @@ ITEMS_GUNS = [
 ];
 
 ITEMS_FOODS = [
-	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
-	ITEM_CANNED_MEAT,
 	ITEM_CANNED_MEAT
 ];
 
 ITEMS_DRINKS = [
-	ITEM_WATER,
-	ITEM_WATER,
-	ITEM_WATER,
-	ITEM_WATER,
-	ITEM_MILK,
-	ITEM_MILK,
-	ITEM_COLA,
-	ITEM_COLA
+	ITEM_WATER
 ];
 
 function item_create(g, id_, x_, y_, dropped=false, despawn=true) {
@@ -467,5 +456,144 @@ function item_name_translate(language, text) {
 			return "плазменная пушка";
 	}
 	return text;
+}
+
+function item_spawn(g, x, y, enemy_type=null) {
+
+	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
+
+	let chance_ammo = 0.1875;
+	let chance_food = 0.25;
+	let chance_misc = 0.15;
+
+	let chance_drink = chance_food * 0.95;
+	let chance_fuel = chance_misc * 0.0625;
+
+	let available_guns = [ITEM_GUN];
+	let available_ammos = [ITEM_AMMO];
+	let available_misc = [ITEM_HEALTH];
+
+	if(enemy_type == "shooting" || enemy_type == null && g.enemies["shooting"]) {
+		available_guns.push(ITEM_SHOTGUN);
+		available_ammos.push(ITEM_PLASMA);
+	}
+
+	if(enemy_type == "shooting red" || enemy_type == null && g.enemies["shooting red"]) {
+		available_guns.push(ITEM_PLASMA_LAUNCHER);
+		available_ammos.push(ITEM_RED_PLASMA);
+		if(enemy_type != null)
+			available_misc.push(ITEM_HEALTH_GREEN);
+	}
+
+	if(enemy_type == "sword" || enemy_type == null && g.enemies["sword"]) {
+		available_guns.push(ITEM_RED_PISTOLS);
+		if(enemy_type != null)
+			available_misc.push(ITEM_SHIELD);
+	}
+
+	if(enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
+		available_guns.push(ITEM_SWORD);
+		available_ammos.push(ITEM_ROCKET);
+		if(enemy_type != null)
+			available_misc.push(ITEM_GREEN_SHIELD);
+	}
+
+	if(enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
+		available_guns.push(ITEM_ROCKET_LAUNCHER);
+	}
+
+	let best_gun = ITEM_GUN;
+	for(let i = 0; i < available_guns.length; i++) {
+		if(best_gun < available_guns[i])
+			best_gun = available_guns[i];
+	}
+
+	let best_ammo = ITEM_AMMO;
+	for(let i = 0; i < available_ammos.length; i++) {
+		if(best_gun < available_ammos[i])
+			best_ammo = available_ammos[i];
+	}
+
+	if(player_closest) {
+		if(enemy_type != null)
+			chance_misc = Math.max(0, 1.125 - player_closest.data.health / player_closest.data.max_health);
+		else
+			chance_misc = Math.max(0, 0.675 - player_closest.data.health / player_closest.data.max_health);
+		chance_drink = Math.max(0, 0.775 - player_closest.data.thirst / player_closest.data.max_thirst);
+		chance_food = Math.max(0, 0.775 - player_closest.data.hunger / player_closest.data.max_hunger);
+		if(player_closest.data.car_object)
+			chance_fuel = 0.45;
+	}
+
+	let chance_gun = chance_ammo * 0.3333;
+
+	if(player_closest) {
+		chance_ammo = 0;
+		for(let i = 0; i < available_ammos.length; i++)
+			chance_ammo += 0.15
+				* Math.max(4.5 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
+				* (i+1) / (available_ammos.length * available_ammos.length);
+	}
+
+	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
+
+	chance_gun = chance_gun / chance_sum;
+	chance_ammo = chance_ammo / chance_sum;
+	chance_fuel = chance_fuel / chance_sum;
+	chance_food = chance_food / chance_sum;
+	chance_drink = chance_drink / chance_sum;
+	chance_misc = chance_misc / chance_sum;
+
+	let item = 0;
+
+	let r = Math.random();
+	let a = 0;
+
+	if(a < r && r < a + chance_gun)
+		item = available_guns[Math.floor(Math.random() * available_guns.length)];
+	a += chance_gun;
+
+	if(player_closest && ITEMS_GUNS.includes(item) && item < best_gun && Math.random() < 0.85)
+		item = best_gun;
+
+	if(player_closest && ITEMS_GUNS.includes(item) && inventory_has_item(player_closest.data.inventory_element, item)) {
+		if(chance_ammo > 0)
+			item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
+		else
+			item = 0;
+	}
+
+	if(a < r && r < a + chance_fuel)
+		item = ITEM_FUEL;
+	a += chance_fuel;
+
+	if(a < r && r < a + chance_food)
+		item = ITEMS_FOODS[Math.floor(Math.random() * ITEMS_FOODS.length)];
+	a += chance_food;
+
+	if(a < r && r < a + chance_drink)
+		item = ITEMS_DRINKS[Math.floor(Math.random() * ITEMS_DRINKS.length)];
+	a += chance_drink;
+
+	if(a < r && r < a + chance_misc)
+		item = available_misc[Math.floor(Math.random() * available_misc.length)];
+	a += chance_misc;
+
+	if(a < r && r < a + chance_ammo)
+		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
+	a += chance_ammo;
+
+	//if(player_closest && ITEMS_AMMOS.includes(item)
+	//	&& item < best_ammo
+	//	&& Math.random() < 0.85
+	//	&& inventory_has_item(player_closest.data.inventory_element, best_gun))
+	//	item = best_ammo;
+
+	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25 * Math.random())
+		item = 0;
+
+	console.log(item, chance_ammo, chance_food, chance_drink, chance_fuel, chance_gun, chance_misc);
+
+	item_create(g, item, x, y);
 }
 

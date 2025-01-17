@@ -1,5 +1,9 @@
 
 function car_create(g, x, y, color_, is_tank=false, unique=true) {
+
+	if(g.objects["shooting laser"])
+		is_tank = true;
+
 	let width = 200, height = 110;
 	let c = {
 		health: Math.random() * 1500 + 500,
@@ -95,14 +99,7 @@ function car_update(car_object, dt) {
 			let theta = 2 * Math.PI * Math.random();
 			let x = car_object.data.body.position.x + 50 * Math.cos(theta);
 			let y = car_object.data.body.position.y + 50 * Math.sin(theta);
-			if(Math.random() > 0.85)
-				item_create_from_list(car_object.game, ITEMS_FOODS.concat(ITEMS_DRINKS), x, y);
-			else if(Math.random() > 0.95)
-				item_create(car_object.game, ITEM_AMMO, x, y);
-			else if(Math.random() > 0.95)
-				item_create(car_object.game, ITEM_HEALTH, x, y);
-			else if(Math.random() > 0.75)
-				item_create(car_object.game, ITEM_FUEL, x, y);
+			item_spawn(car_object.game, x, y);
 		}
 	}
 	if(car_object.data.health < 0) {

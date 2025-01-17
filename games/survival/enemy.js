@@ -11,13 +11,13 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 	}
 	if(type == "random" && Math.random() < 0.25 && g.enemies["shooting laser"])
 		type = "shooting laser";
-	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting rocket"])
+	else if(type == "random" && Math.random() < 0.35 && g.enemies["shooting rocket"])
 		type = "shooting rocket";
-	else if(type == "random" && Math.random() < 0.5 && g.enemies["sword"])
+	else if(type == "random" && Math.random() < 0.55 && g.enemies["sword"])
 		type = "sword";
-	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting red"])
+	else if(type == "random" && Math.random() < 0.65 && g.enemies["shooting red"])
 		type = "shooting red";
-	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting"])
+	else if(type == "random" && Math.random() < 0.75 && g.enemies["shooting"])
 		type = "shooting";
 	let width = 30, height = 30;
 	let boss = make_boss;
@@ -449,28 +449,8 @@ function enemy_update(enemy_object, dt) {
 				let theta = 2 * Math.PI * Math.random();
 				let x = e.body.position.x + 50 * Math.cos(theta);
 				let y = e.body.position.y + 50 * Math.sin(theta);
-				if(["shooting laser"].includes(e.type) && Math.random() < 0.25)
-					item_create(enemy_object.game, ITEM_SHIELD_GREEN, x, y);
-				else if(["shooting laser"].includes(e.type) && Math.random() < 0.75)
-					item_create(enemy_object.game, ITEM_RAINBOW_AMMO, x, y);
-				else if(["shooting red", "sword", "shooting rocket", "shooting laser"].includes(e.type) && Math.random() < 0.5)
-					item_create(enemy_object.game, ITEM_HEALTH_GREEN, x, y);
-				else if(["sword", "shooting rocket", "shooting laser"].includes(e.type) && Math.random() < 0.5)
-					item_create(enemy_object.game, ITEM_SHIELD, x, y);
-				else if(["shooting", "shooting red", "shooting laser"].includes(e.type) && Math.random() < 0.5)
-					item_create(enemy_object.game, ITEM_PLASMA, x, y);
-				else if(["shooting red", "sword", "shooting laser"].includes(e.type) && Math.random() < 0.5)
-					item_create(enemy_object.game, ITEM_RED_PLASMA, x, y);
-				else if(["shooting rocket", "shooting laser"].includes(e.type) && Math.random() < 0.5)
-					item_create(enemy_object.game, ITEM_ROCKET, x, y);
-				else if(Math.random() > 0.85)
-					item_create_from_list(enemy_object.game, ITEMS_FOODS.concat(ITEMS_DRINKS), x, y);
-				else if(Math.random() > 0.85)
-					item_create(enemy_object.game, ITEM_AMMO, x, y);
-				else if(Math.random() > 0.85)
-					item_create(enemy_object.game, ITEM_HEALTH, x, y);
-				else if(Math.random() > 0.95)
-					item_create(enemy_object.game, ITEM_FUEL, x, y);
+				if(Math.random() < 0.75)
+					item_spawn(enemy_object.game, x, y, e.type);
 			}
 		}
 		enemy_destroy(enemy_object);
