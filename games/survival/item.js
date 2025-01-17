@@ -515,7 +515,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 	}
 
 	if(player_closest) {
-		chance_misc = Math.max(0, 0.675 - player_closest.data.health / player_closest.data.max_health);
+		chance_misc = Math.max(0, 0.475 - player_closest.data.health / player_closest.data.max_health);
 		chance_drink = Math.max(0, 0.775 - player_closest.data.thirst / player_closest.data.max_thirst);
 		chance_food = Math.max(0, 0.775 - player_closest.data.hunger / player_closest.data.max_hunger);
 		if(player_closest.data.car_object)
@@ -544,7 +544,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 	chance_drink = chance_drink / chance_sum;
 	chance_misc = chance_misc / chance_sum;
 
-	if(a < r && r < a + chance_misc || player_closest != null)
+	if(a < r && r < a + chance_misc)
 		item = available_misc[Math.floor(Math.random() * available_misc.length)];
 	a += chance_misc;
 
@@ -586,6 +586,9 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25 * Math.random())
 		item = 0;
+
+	if(item == 0 && enemy_type != null)
+		item = available_misc[Math.floor(Math.random() * available_misc.length)];
 
 	console.log(item, chance_ammo, chance_food, chance_drink, chance_fuel, chance_gun, chance_misc);
 
