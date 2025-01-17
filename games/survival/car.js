@@ -1,7 +1,7 @@
 
 function car_create(g, x, y, color_, is_tank=false, unique=true) {
 
-	if(g.objects["shooting laser"])
+	if(g.objects["shooting laser"] && Math.random() < 0.25)
 		is_tank = true;
 
 	let width = 200, height = 110;

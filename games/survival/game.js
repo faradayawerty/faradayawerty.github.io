@@ -5,7 +5,7 @@ function game_create(input_, engine_) {
 		visited_levels: ["0x0"],
 		offset_x: 1250,
 		offset_y: 1250,
-		scale: 1,
+		scale: 0.75,
 		camera_target_body: null,
 		player_object: null,
 		objects: [],
@@ -107,7 +107,8 @@ function game_new(g) {
 function game_object_create(g, name_, data_, func_update, func_draw, func_destroy, unique_name_=null) {
 
 	let debug_line = "creating " + name_;
-	g.debug_console.unshift(debug_line);
+	if(name_ != "item" && name_ != "bound" && name_ != "decorative" && name_ != "bullet" && name_ != "rocket")
+		g.debug_console.unshift(debug_line);
 	if(g.debug_console.length > 50)
 		g.debug_console.pop();
 

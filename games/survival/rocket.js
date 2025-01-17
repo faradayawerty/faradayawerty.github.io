@@ -1,10 +1,11 @@
 
-function rocket_create(g, x, y, dx, dy, w, target_object, damage, health, enemy=true, speed=10) {
+function rocket_create(g, x, y, dx, dy, w, target_object, damage, health, enemy=true, speed=10, lifetime=4800) {
 	let rockets = g.objects.filter((obj) => obj.name == "rocket");
 	if(rockets.length > 100)
 		for(let i = 0; i < rockets.length - 200; i++)
 			rockets[i].destroy(rockets[i]);
 	let r = {
+		lifetime: lifetime,
 		health: health,
 		max_health: health,
 		w: w,
@@ -36,6 +37,11 @@ function rocket_destroy(rocket_object) {
 
 function rocket_update(rocket_object, dt) {
 	let r = rocket_object.data;
+	if(rocket_object.data.lifetime < 0) {
+		r.health = -1;
+	} else {
+		rocket_object.data.lifetime -= dt;
+	}
 	if(r.health < 0)
 		rocket_destroy(rocket_object);
 	if(r.target_object) {

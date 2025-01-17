@@ -6,13 +6,13 @@ function levels_set(g, level, old_level=null) {
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
 
-	if(g.visited_levels.length > 40) {
-		for(let i = 0; i < g.visited_levels.length; i++) {
-			if(!level_visible(g, g.visited_levels[i]))
-				game_destroy_level(g, g.visited_levels[i]);
-		}
-		g.visited_levels = ["0x0"];
-	}
+	//if(g.visited_levels.length > 40) {
+	//	for(let i = 0; i < g.visited_levels.length; i++) {
+	//		if(!level_visible(g, g.visited_levels[i]))
+	//			game_destroy_level(g, g.visited_levels[i]);
+	//	}
+	//	g.visited_levels = ["0x0"];
+	//}
 
 	let player_object = game_object_find_closest(g, Ox + 1250, Oy + 1250, "player", 3536);
 	if(player_object && !player_object.data.ai_controlled)
@@ -31,7 +31,7 @@ function levels_set(g, level, old_level=null) {
 			if(-1 < bd && bd < 5000)
 				m *= 0.45;
 			for(let i = 0; i < Math.random() * 60 * m - 10; i++)
-				enemy_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
+				enemy_create(g, Ox + 250 + Math.random() * 2000, Oy + 250 + Math.random() * 2000);
 		}
 
 		for(let i = 0; i < Math.random() * 5; i++)
@@ -84,6 +84,16 @@ function level_visible(g, level, exclude_player_object=null) {
 		}
 	}
 	return false;
+}
+
+function level_get_type(g, x, y) {
+	if(x == 0 && y == 0)
+		return "parking";
+	if(x == 0)
+		return "road vertical";
+	if(y == 0)
+		return "road horizontal";
+	return "forest"
 }
 
 //function level_delete_invisible(g, levels) {

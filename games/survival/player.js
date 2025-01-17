@@ -27,7 +27,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shield_blue_health: 0,
 		shield_blue_health_max: 9000,
 		shield_green_health: 0,
-		shield_green_health_max: 9000,
+		shield_green_health_max: 3000,
 		saved_health: 0,
 		saved_thirst: 0,
 		saved_hunger: 0,

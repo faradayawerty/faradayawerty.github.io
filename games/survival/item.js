@@ -55,6 +55,10 @@ ITEMS_GUNS = [
 	ITEM_RAINBOW_PISTOLS
 ];
 
+ITEMS_MELEE = [
+	ITEM_SWORD
+];
+
 ITEMS_FOODS = [
 	ITEM_CANNED_MEAT
 ];
@@ -99,7 +103,7 @@ function item_destroy(item_object) {
 	if(item_object.destroyed)
 		return;
 	let g = item_object.game;
-	g.debug_console.unshift("destroying item");
+	//g.debug_console.unshift("destroying item");
 	Matter.Composite.remove(g.engine.world, item_object.data.body);
 	item_object.data.body = null;
 	item_object.destroyed = true;
@@ -466,6 +470,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 	let chance_ammo = 0.1875;
 	let chance_food = 0.25;
 	let chance_misc = 0.15;
+	let chance_gun = 0.125;
 
 	let chance_drink = chance_food * 0.95;
 	let chance_fuel = chance_misc * 0.0625;
@@ -476,32 +481,42 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(enemy_type == "shooting" || enemy_type == null && g.enemies["shooting"]) {
 		available_guns.push(ITEM_SHOTGUN);
-		available_ammos.push(ITEM_PLASMA);
+		if(enemy_type != null)
+			available_ammos.push(ITEM_PLASMA);
 	}
 
 	if(enemy_type == "shooting red" || enemy_type == null && g.enemies["shooting red"]) {
+		available_ammos.push(ITEM_PLASMA);
 		available_guns.push(ITEM_PLASMA_LAUNCHER);
-		available_ammos.push(ITEM_RED_PLASMA);
-		if(enemy_type != null)
+		if(enemy_type != null) {
+			available_ammos.push(ITEM_RED_PLASMA);
 			available_misc.push(ITEM_HEALTH_GREEN);
+		}
 	}
 
 	if(enemy_type == "sword" || enemy_type == null && g.enemies["sword"]) {
+		available_misc.push(ITEM_HEALTH_GREEN);
 		available_guns.push(ITEM_RED_PISTOLS);
+		available_ammos.push(ITEM_RED_PLASMA);
 		if(enemy_type != null)
 			available_misc.push(ITEM_SHIELD);
 	}
 
 	if(enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
 		available_guns.push(ITEM_SWORD);
-		available_ammos.push(ITEM_ROCKET);
-		if(enemy_type != null)
+		available_misc.push(ITEM_SHIELD);
+		if(enemy_type != null) {
+			available_ammos.push(ITEM_ROCKET);
 			available_misc.push(ITEM_SHIELD_GREEN);
+		}
 	}
 
 	if(enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
-		available_guns.push(ITEM_RAINBOW_AMMO);
+		available_misc.push(ITEM_SHIELD_GREEN);
 		available_guns.push(ITEM_ROCKET_LAUNCHER);
+		available_ammos.push(ITEM_ROCKET);
+		if(enemy_type != null)
+			available_guns.push(ITEM_RAINBOW_AMMO);
 	}
 
 	let best_gun = ITEM_GUN;
@@ -524,19 +539,30 @@ function item_spawn(g, x, y, enemy_type=null) {
 			chance_fuel = 0.45;
 	}
 
-	let chance_gun = chance_ammo * 0.3333;
-
 	if(player_closest) {
 		chance_ammo = 0;
 		for(let i = 0; i < available_ammos.length; i++)
 			chance_ammo += 0.15
-				* Math.max(6.25 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
+				* Math.max(4.25 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
 				* (i+1) / (available_ammos.length * available_ammos.length);
+		chance_gun = 0;
+		for(let i = 0; i < available_guns.length; i++)
+			chance_gun += 0.15
+				* Math.max(1 - inventory_count_item(player_closest.data.inventory_element, available_guns[i]), 0)
+				* (i+1) / (available_guns.length * available_guns.length);
 	}
 
 	let item = 0;
 	let r = Math.random();
 	let a = 0;
+
+	chance_gun = Math.max(0.01 * Math.random(), chance_gun)
+	chance_ammo = Math.max(0.01 * Math.random(), chance_ammo)
+	chance_fuel = Math.max(0.01 * Math.random(), chance_fuel)
+	chance_food = Math.max(0.01 * Math.random(), chance_food)
+	chance_drink = Math.max(0.01 * Math.random(), chance_drink)
+	chance_misc = Math.max(0.01 * Math.random(), chance_misc)
+
 	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
 
 	chance_gun = chance_gun / chance_sum;
@@ -554,8 +580,10 @@ function item_spawn(g, x, y, enemy_type=null) {
 		item = available_guns[Math.floor(Math.random() * available_guns.length)];
 	a += chance_gun;
 
-	for(let i = 0; i < ITEMS_GUNS.length; i++) {
-		if(player_closest && inventory_has_item(player_closest.data.inventory_element, ITEMS_GUNS[i]) && item <= ITEMS_GUNS[i]) {
+	let items_weapons = ITEMS_GUNS.concat(ITEMS_MELEE);
+
+	for(let i = 0; i < items_weapons.length; i++) {
+		if(player_closest && inventory_has_item(player_closest.data.inventory_element, items_weapons[i]) && item <= items_weapons[i]) {
 			if(chance_ammo > 0)
 				item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
 			else
@@ -584,6 +612,14 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(item == 0 && enemy_type != null)
 		item = available_misc[Math.floor(Math.random() * available_misc.length)];
+
+	g.debug_console.unshift("spawning item, chances: " + item
+		+ " A: " + Math.round(100 * chance_ammo) + "%"
+		+ " F: " + Math.round(100 * chance_food) + "%"
+		+ " M: " + Math.round(100 * chance_misc) + "%"
+		+ " D: " + Math.round(100 * chance_drink) + "%"
+		+ " G: " + Math.round(100 * chance_fuel) + "%"
+		+ " W: " + Math.round(100 * chance_gun) + "%");
 
 	item_create(g, item, x, y);
 }
