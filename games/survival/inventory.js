@@ -11,6 +11,7 @@ function inventory_create(g, attached_to_object=null) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
 		imove: -1,
 		jmove: -1,

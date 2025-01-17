@@ -70,6 +70,7 @@ function player_destroy(player_object) {
 		return;
 	let p = player_object.data;
 	let g = player_object.game;
+	g.debug_console.unshift("destroying player");
 	if(!level_visible(g, p.want_level, player_object))
 		game_destroy_level(g, p.want_level);
 	if(player_object.game.camera_target_body == player_object.data.body)

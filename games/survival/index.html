@@ -101,6 +101,8 @@
 				game1.settings.respawn_on_current_level = menu1.want_respawn_here;
 			if(menu1.want_trees != game1.settings.trees)
 				game1.settings.trees = menu1.want_trees;
+			if(menu1.want_debug != game1.debug)
+				game1.debug = menu1.want_debug;
 
 			// update game if menu is not shown, else update menu
 			if(isKeyDown(input1, 'Escape', true)) {

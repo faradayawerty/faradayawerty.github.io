@@ -15,6 +15,7 @@ function menu_create() {
 		want_ammo_pickup_last: true,
 		want_lose_items: true,
 		want_respawn_here: true,
+		want_debug: false,
 		want_indicators: {
 			"show player health": true,
 			"show player hunger": true,
@@ -58,6 +59,7 @@ function menu_create() {
 			"ammo pickup in last slot",
 			"lose items on death",
 			"new game",
+			"debug",
 			"enable trees",
 			"respawn on current level",
 			"indicators",
@@ -119,6 +121,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_respawn_here);
 		else if(m.buttons[i] == "enemies spawn")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
+		else if(m.buttons[i] == "debug")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_debug);
 		else if(m.buttons[i] == "enable trees")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_trees);
 		else if(m.buttons[i] == "automatic respawn")
@@ -143,9 +147,8 @@ function menu_update(m, dt, input) {
 
 	for(let i = 0; i < m.buttons.length; i++)
 		if(doRectsCollide(input.mouse.x / get_scale(), input.mouse.y / get_scale(), 0, 0,
-			80, 40 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i].length), 60))
+			80, 40 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i]).length, 60))
 			m.iselected = i;
-
 
 	if(m.buttons == m.menu_respawn_buttons && m.want_autorespawn) {
 		m.shown = false;
@@ -179,6 +182,8 @@ function menu_update(m, dt, input) {
 			m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "enemies spawn") {
 			m.want_enemies_spawn = !m.want_enemies_spawn;
+		} else if(m.buttons[m.iselected] == "debug") {
+			m.want_debug = !m.want_debug;
 		} else if(m.buttons[m.iselected] == "automatic respawn") {
 			m.want_autorespawn = !m.want_autorespawn;
 		} else if(m.buttons[m.iselected] == "player color") {
@@ -318,6 +323,8 @@ function menu_translate(lang, str) {
 			return "деревья";
 		else if(str == "automatic respawn")
 			return "автоматическое возрождение";
+		else if(str == "debug")
+			return "техническая информация для разработчика";
 	}
 	return str;
 }

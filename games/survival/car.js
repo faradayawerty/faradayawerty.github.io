@@ -49,6 +49,7 @@ function car_create(g, x, y, color_, is_tank=false, unique=true) {
 function car_destroy(car_object) {
 	if(car_object.destroyed)
 		return;
+	car_object.game.debug_console.unshift("destroying car");
 	let player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
 	if(player_object && player_object.data.car_object == car_object)
 		player_object.data.car_object = null;

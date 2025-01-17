@@ -52,6 +52,8 @@ function game_create(input_, engine_) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
 		enemies: { // should have been integer constants but too lazy to change now
 			"regular": true,
@@ -77,6 +79,8 @@ function game_create(input_, engine_) {
 			"shooting rocket": 0,
 			"shooting laser": 0
 		},
+		debug: false,
+		debug_console: []
 	};
 	return g;
 }
@@ -101,6 +105,12 @@ function game_new(g) {
 }
 
 function game_object_create(g, name_, data_, func_update, func_draw, func_destroy, unique_name_=null) {
+
+	let debug_line = "creating " + name_;
+	g.debug_console.unshift(debug_line);
+	if(g.debug_console.length > 50)
+		g.debug_console.pop();
+
 	if(unique_name_ && g.objects.find((obj) => obj.unique_name == unique_name_))
 		return -1;
 	let obj = {
@@ -170,6 +180,8 @@ function game_update(g, dt) {
 		if(!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
 			g.gui_elements[i].update(g.gui_elements[i], dt);
 	}
+	if(g.debug_console.length > 50)
+		g.debug_console.pop();
 }
 
 function game_draw(g, ctx) {
@@ -188,18 +200,27 @@ function game_draw(g, ctx) {
 	if(!g.show_gui)
 		return;
 
+	if(g.debug) {
+		ctx.save();
+		ctx.scale(get_scale(), get_scale());
+		for(let i = 0; i < g.debug_console.length; i++)
+			drawText(ctx, 50, 110 + i * 20, g.debug_console[i]);
+		ctx.restore();
+	}
+
 	ctx.save()
 	ctx.scale(get_scale(), get_scale());
-	drawText(ctx, 50, 110, game_translate(g.settings.language, "killed")
-		+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
-	drawText(ctx, 50, 140, game_translate(g.settings.language, "killed")
-		+ ": " + Math.round(g.boss_kills) + " " + game_translate(g.settings.language, "bosses"));
-	drawText(ctx, 50, 170, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
+	//drawText(ctx, 50, 110, game_translate(g.settings.language, "killed")
+	//	+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
+	//drawText(ctx, 50, 140, game_translate(g.settings.language, "killed")
+	//	+ ": " + Math.round(g.boss_kills) + " " + game_translate(g.settings.language, "bosses"));
+	//drawText(ctx, 50, 170, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
 	for(let i = 0; i < g.gui_elements.length; i++) {
 		if(!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
 			g.gui_elements[i].draw(g.gui_elements[i], ctx);
 	}
 	ctx.restore();
+	
 }
 
 function game_destroy_all_objects(g) {

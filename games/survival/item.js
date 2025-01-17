@@ -99,6 +99,7 @@ function item_destroy(item_object) {
 	if(item_object.destroyed)
 		return;
 	let g = item_object.game;
+	g.debug_console.unshift("destroying item");
 	Matter.Composite.remove(g.engine.world, item_object.data.body);
 	item_object.data.body = null;
 	item_object.destroyed = true;
@@ -495,7 +496,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 		available_guns.push(ITEM_SWORD);
 		available_ammos.push(ITEM_ROCKET);
 		if(enemy_type != null)
-			available_misc.push(ITEM_GREEN_SHIELD);
+			available_misc.push(ITEM_SHIELD_GREEN);
 	}
 
 	if(enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
@@ -577,12 +578,6 @@ function item_spawn(g, x, y, enemy_type=null) {
 	if(a < r && r < a + chance_ammo)
 		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
 	a += chance_ammo;
-
-	//if(player_closest && ITEMS_AMMOS.includes(item)
-	//	&& item < best_ammo
-	//	&& Math.random() < 0.85
-	//	&& inventory_has_item(player_closest.data.inventory_element, best_gun))
-	//	item = best_ammo;
 
 	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25 * Math.random())
 		item = 0;

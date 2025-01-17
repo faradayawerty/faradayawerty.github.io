@@ -166,6 +166,7 @@ function enemy_destroy(enemy_object) {
 	if(enemy_object.destroyed)
 		return;
 	let g = enemy_object.game;
+	g.debug_console.unshift("destroying enemy");
 	if(enemy_object.data.hit_by_player) {
 		g.enemy_kills[enemy_object.data.type] += 1;
 		if(enemy_object.data.boss) {
