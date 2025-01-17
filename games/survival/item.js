@@ -589,8 +589,6 @@ function item_spawn(g, x, y, enemy_type=null) {
 	if(item == 0 && enemy_type != null)
 		item = available_misc[Math.floor(Math.random() * available_misc.length)];
 
-	console.log(item, chance_ammo, chance_food, chance_drink, chance_fuel, chance_gun, chance_misc);
-
 	item_create(g, item, x, y);
 }
 
