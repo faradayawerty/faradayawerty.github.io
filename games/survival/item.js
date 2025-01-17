@@ -528,7 +528,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 		chance_ammo = 0;
 		for(let i = 0; i < available_ammos.length; i++)
 			chance_ammo += 0.15
-				* Math.max(4.5 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
+				* Math.max(6.25 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
 				* (i+1) / (available_ammos.length * available_ammos.length);
 	}
 
