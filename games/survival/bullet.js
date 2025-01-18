@@ -70,6 +70,8 @@ function bullet_update(bullet_object, dt) {
 		&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.player_object.data.body) != null) {
 		if(bullet_object.game.player_object.data.shield_blue_health > 0) {
 				bullet_object.game.player_object.data.shield_blue_health -= 0.25 * bullet_object.data.damage * dt;
+		} else if(bullet_object.game.player_object.data.shield_green_health > 0) {
+				bullet_object.game.player_object.data.shield_green_health -= 0.0625 * bullet_object.data.damage * dt;
 		} else if(bullet_object.game.player_object.data.immunity <= 0) {
 			let k = 1.0;
 			if(bullet_object.game.player_object.data.sword_visible)

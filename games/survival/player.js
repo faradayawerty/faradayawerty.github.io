@@ -9,6 +9,9 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		max_thirst: 210,
 		hunger: 210,
 		max_hunger: 210,
+		saved_health: 100,
+		saved_thirst: 210,
+		saved_hunger: 210,
 		speed: 10,
 		max_speed: 10,
 		shot_cooldown: 0,
@@ -23,14 +26,11 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		body: Matter.Bodies.rectangle(x, y, width, height, {
 			inertia: Infinity
 		}),
-		immunity: 7500,
+		immunity: 6000,
 		shield_blue_health: 0,
 		shield_blue_health_max: 9000,
 		shield_green_health: 0,
-		shield_green_health_max: 3000,
-		saved_health: 0,
-		saved_thirst: 0,
-		saved_hunger: 0,
+		shield_green_health_max: 12000,
 		sword_direction: 0,
 		sword_visible: false,
 		ai_controlled: ai_controlled,
@@ -116,23 +116,24 @@ function player_update(player_object, dt) {
 	}
 
 	if(p.shield_green_health > 0) {
-		p.shield_green_health -= 0.15 * dt;
-		if(p.health < p.saved_health)
-			p.health = p.saved_health;
-		if(p.hunger < p.saved_hunger)
-			p.hunger = p.saved_hunger;
-		if(p.thirst < p.saved_thirst)
-			p.thirst = p.saved_thirst;
+		p.shield_blue_health -= 0.15 * dt;
 	}
+
+	if(p.saved_health - p.health > 1) {
+		player_object.game.debug_console.unshift("player health: " + Math.round(p.health) + ", change " + Math.round(p.saved_health - p.health)
+			+ ": hunger: " + Math.round(p.hunger) + ", thirst: " + Math.round(p.thirst));
+	}
+
+	p.saved_health = p.health;
+	p.saved_hunger = p.hunger;
+	p.saved_thirst = p.thirst;
 
 	if(p.shield_green_health < 0) {
 		p.shield_green_health = 0;
-		p.immunity += 3600;
 	}
 
 	if(p.shield_blue_health < 0) {
 		p.shield_blue_health = 0;
-		p.immunity += 1200;
 	}
 
 	if(p.immunity > 0)
@@ -143,14 +144,25 @@ function player_update(player_object, dt) {
 		return;
 	}
 
-	if(p.thirst > 0)
-		p.thirst = Math.max(0, p.thirst - 0.001 * dt)
+	if(p.thirst > 0) {
+		if(p.shield_green_health <= 0)
+			p.thirst = Math.max(0, p.thirst - 0.001 * dt)
+		else
+			p.thirst = Math.max(0, p.thirst - 0.00005 * dt)
+	}
+
 	if(p.thirst <= 0)
 		p.health -= 0.01 * dt;
-	if(p.hunger > 0)
-		p.hunger = Math.max(0, p.hunger - 0.001 * dt)
+
+	if(p.hunger > 0 && p.shield_green_health <= 0) {
+		if(p.shield_green_health <= 0)
+			p.hunger = Math.max(0, p.hunger - 0.001 * dt)
+		else
+			p.hunger = Math.max(0, p.hunger - 0.00005 * dt)
+	}
+
 	if(p.hunger <= 0)
-		p.health -= 0.01 * dt;
+		p.health -= 0.005 * dt;
 
 	p.speed = p.max_speed;
 	if(p.thirst < 0.33 * p.max_thirst)
@@ -557,6 +569,8 @@ function player_draw(player_object, ctx) {
 
 function player_shoot(player_object, dt, target_body=null) {
 
+	let base_damage = 0.5;
+
 	let p = player_object.data;
 
 	let sx = 0;
@@ -588,12 +602,140 @@ function player_shoot(player_object, dt, target_body=null) {
 			p.body.position.x,
 			p.body.position.y,
 			tx - sx,
-			ty - sy
+			ty - sy,
+			20,
+			base_damage
 		);
 		p.shot_cooldown = 200;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN
+		&& true
+		&& p.shotgun_cooldown <= 0
+		&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
+		for(let i = 0; i < Math.random() * 7 + 7; i++)
+			bullet_create(
+				player_object.game,
+				p.body.position.x,
+				p.body.position.y,
+				(0.95 + 0.1 * Math.random()) * tx - sx,
+				(0.95 + 0.1 * Math.random()) * ty - sy,
+				Math.random() * 10 + 10,
+				5 * base_damage * (0.5 + 1.0 * Math.random())
+			);
+		p.shotgun_cooldown = 750;
+		if(Math.random() > 0.985)
+			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
+		&& true
+		&& p.minigun_cooldown <= 0
+		&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
+		bullet_create(
+			player_object.game,
+			p.body.position.x,
+			p.body.position.y,
+			(0.95 + 0.1 * Math.random()) * tx - sx,
+			(0.95 + 0.1 * Math.random()) * ty - sy,
+			Math.random() * 10 + 10,
+			0.33 * 10 * base_damage * Math.random()
+		);
+		p.minigun_cooldown = 60;
+		if(Math.random() > 0.995)
+			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER
+		&& true
+		&& p.shot_cooldown <= 0
+		&& inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
+		bullet_create(
+			player_object.game,
+			p.body.position.x,
+			p.body.position.y,
+			tx - sx,
+			ty - sy,
+			17.5,
+			3 * 25 * base_damage * (0.25 + 2 * 0.75 * Math.random()),
+			false,
+			12.5,
+			1500,
+			"cyan",
+			"blue"
+		);
+		p.shot_cooldown = 400;
+		if(Math.random() > 0.99)
+			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS
+		&& true
+		&& p.shot_cooldown <= 0
+		&& inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
+		let theta = Math.atan2(ty - sy, tx - sx);
+		bullet_create(
+			player_object.game,
+			p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
+			p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
+			tx - sx,
+			ty - sy,
+			30,
+			0.66 * 125 * base_damage * 2 * Math.random(),
+			false,
+			6,
+			1500,
+			"pink",
+			"red"
+		);
+		bullet_create(
+			player_object.game,
+			p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
+			p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
+			tx - sx,
+			ty - sy,
+			30,
+			0.66 * 125 * base_damage * 2 * Math.random(),
+			false,
+			6,
+			1500,
+			"pink",
+			"red"
+		);
+		p.shot_cooldown = 100;
+		if(Math.random() > 0.999)
+			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN
+		&& true
+		&& p.shot_cooldown <= 0
+		&& inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
+		let theta = Math.atan2(ty - sy, tx - sx);
+		N = Math.floor(Math.random() * 7 + 5);
+		for(let i = 0; i < N; i++)
+			bullet_create(
+				player_object.game,
+				p.body.position.x + 2 * p.w * Math.cos(theta - (0.5 * N - i) * Math.PI / N),
+				p.body.position.y + 2 * p.w * Math.sin(theta - (0.5 * N - i) * Math.PI / N),
+				tx - sx,
+				ty - sy,
+				30,
+				1.5 * 125 * base_damage * (0.5 + 1.0 * Math.random()),
+				false,
+				6,
+				1500,
+				"pink",
+				"red"
+			);
+		p.shot_cooldown = 500;
+		if(Math.random() > 0.99)
+			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+	}
+
+	// TODO balance damage
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SWORD && true) {
 		if(tx > sx)
 			p.sword_direction += 0.02 * dt
@@ -625,31 +767,53 @@ function player_shoot(player_object, dt, target_body=null) {
 		}
 		p.sword_visible = true;
 	}
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN
+		&& true
+		&& p.minigun_cooldown <= 0) {
+		bullet_create(
+			player_object.game,
+			p.body.position.x,
+			p.body.position.y,
+			(1 - 0.05 / 2 + 0.05 * Math.random()) * tx - sx,
+			(1 - 0.05 / 2 + 0.05 * Math.random()) * ty - sy,
+			Math.random() * 10 + 20,
+			625 * base_damage * 2 * Math.random(),
+			false,
+			6,
+			1500,
+			"lime",
+			"green"
+		);
+		p.minigun_cooldown = 80;
+		p.health -= 0.0255 * dt
+		p.hunger -= 0.0125 * dt
+		p.thirst -= 0.0125 * dt
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER
 		&& true
 		&& p.shot_cooldown <= 0
-		&& inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
+		&& inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
 		let theta = Math.atan2(ty - sy, tx - sx);
-		N = Math.floor(Math.random() * 7 + 5);
-		for(let i = 0; i < N; i++)
-			bullet_create(
-				player_object.game,
-				p.body.position.x + 2 * p.w * Math.cos(theta - (0.5 * N - i) * Math.PI / N),
-				p.body.position.y + 2 * p.w * Math.sin(theta - (0.5 * N - i) * Math.PI / N),
-				tx - sx,
-				ty - sy,
-				30,
-				50 + 150 * Math.random(),
-				false,
-				6,
-				1500,
-				"pink",
-				"red"
-			);
-		p.shot_cooldown = 500;
+		rocket_create(
+			player_object.game,
+			p.body.position.x + Math.cos(theta) * p.w * 0.25,
+			p.body.position.y + Math.sin(theta) * p.h * 0.25,
+			tx - sx,
+			ty - sy,
+			Math.min(0.25 * p.w, 10),
+			null,
+			0.33 * 3125 * base_damage * (0.75 + 0.5 * Math.random()),
+			p.max_health,
+			false,
+			15
+		);
+		p.shot_cooldown = 400;
 		if(Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+			inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
 	}
+
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS
 		&& true
 		&& p.shot_cooldown <= 0
@@ -697,7 +861,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			tx - sx,
 			ty - sy,
 			30,
-			2000000000 + 1000000000 * Math.random(),
+			3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
 			false,
 			6,
 			1500,
@@ -711,7 +875,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			tx - sx,
 			ty - sy,
 			30,
-			2000000000 + 1000000000 * Math.random(),
+			3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
 			false,
 			6,
 			1500,
@@ -719,144 +883,6 @@ function player_shoot(player_object, dt, target_body=null) {
 			color2
 		);
 		p.shot_cooldown = 100;
-	}
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS
-		&& true
-		&& p.shot_cooldown <= 0
-		&& inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
-		let theta = Math.atan2(ty - sy, tx - sx);
-		bullet_create(
-			player_object.game,
-			p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
-			p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
-			tx - sx,
-			ty - sy,
-			30,
-			10 + 40 * Math.random(),
-			false,
-			6,
-			1500,
-			"pink",
-			"red"
-		);
-		bullet_create(
-			player_object.game,
-			p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
-			p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
-			tx - sx,
-			ty - sy,
-			30,
-			10 + 40 * Math.random(),
-			false,
-			6,
-			1500,
-			"pink",
-			"red"
-		);
-		p.shot_cooldown = 100;
-		if(Math.random() > 0.999)
-			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
-	}
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN
-		&& true
-		&& p.shotgun_cooldown <= 0
-		&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-		for(let i = 0; i < Math.random() * 7 + 7; i++)
-			bullet_create(
-				player_object.game,
-				p.body.position.x,
-				p.body.position.y,
-				(0.95 + 0.1 * Math.random()) * tx - sx,
-				(0.95 + 0.1 * Math.random()) * ty - sy,
-				Math.random() * 10 + 10,
-				Math.random() * 1.25 + 1.25
-			);
-		p.shotgun_cooldown = 750;
-		if(Math.random() > 0.985)
-			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-	}
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER
-		&& true
-		&& p.shot_cooldown <= 0
-		&& inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			tx - sx,
-			ty - sy,
-			17.5,
-			Math.random() * 25 + 25,
-			false,
-			12.5,
-			1500,
-			"cyan",
-			"blue"
-		);
-		p.shot_cooldown = 400;
-		if(Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
-	}
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER
-		&& true
-		&& p.shot_cooldown <= 0
-		&& inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
-		let theta = Math.atan2(ty - sy, tx - sx);
-		rocket_create(
-			player_object.game,
-			p.body.position.x + Math.cos(theta) * p.w * 3,
-			p.body.position.y + Math.sin(theta) * p.h * 3,
-			tx - sx,
-			ty - sy,
-			Math.min(0.25 * p.w, 10),
-			game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000),
-			1000 + 2000 * Math.random(),
-			p.max_health,
-			false,
-			15
-		);
-		p.shot_cooldown = 400;
-		if(Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
-	}
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
-		&& true
-		&& p.minigun_cooldown <= 0
-		&& inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			(0.95 + 0.1 * Math.random()) * tx - sx,
-			(0.95 + 0.1 * Math.random()) * ty - sy,
-			Math.random() * 10 + 10,
-			Math.random() * 1.5
-		);
-		p.minigun_cooldown = 60;
-		if(Math.random() > 0.995)
-			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-	}
-	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN
-		&& true
-		&& p.minigun_cooldown <= 0) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			(1 - 0.05 / 2 + 0.05 * Math.random()) * tx - sx,
-			(1 - 0.05 / 2 + 0.05 * Math.random()) * ty - sy,
-			Math.random() * 10 + 20,
-			Math.random() * 800,
-			false,
-			6,
-			1500,
-			"lime",
-			"green"
-		);
-		p.minigun_cooldown = 80;
-		p.health -= 0.0255 * dt
-		p.hunger -= 0.0125 * dt
-		p.thirst -= 0.0125 * dt
 	}
 }
 
@@ -890,9 +916,6 @@ function player_item_consume(player_object, id, anywhere=false) {
 		p.shield_green_health = p.shield_green_health_max;
 		p.shield_blue_health = 0;
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
-		p.saved_health = p.health;
-		p.saved_hunger = p.hunger;
-		p.saved_thirst = p.thirst;
 	}
 
 	if(id == ITEM_HEALTH && true) {

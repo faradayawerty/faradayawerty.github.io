@@ -1,7 +1,7 @@
 
 function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random") {
 	if(!g.settings.enemies_spawn)
-		return;
+		return -1;
 	let enemies = g.objects.filter((obj) => obj.name == "enemy");
 	if(enemies.length > 100) {
 		for(let i = 0; i < enemies.length - 100; i++) {
@@ -9,13 +9,13 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 				enemies[i].destroy(enemies[i]);
 		}
 	}
-	if(type == "random" && Math.random() < 0.25 && g.enemies["shooting laser"])
+	if(type == "random" && Math.random() < 0.55 && g.enemies["shooting laser"])
 		type = "shooting laser";
-	else if(type == "random" && Math.random() < 0.35 && g.enemies["shooting rocket"])
+	else if(type == "random" && Math.random() < 0.60 && g.enemies["shooting rocket"])
 		type = "shooting rocket";
-	else if(type == "random" && Math.random() < 0.55 && g.enemies["sword"])
+	else if(type == "random" && Math.random() < 0.65 && g.enemies["sword"])
 		type = "sword";
-	else if(type == "random" && Math.random() < 0.65 && g.enemies["shooting red"])
+	else if(type == "random" && Math.random() < 0.70 && g.enemies["shooting red"])
 		type = "shooting red";
 	else if(type == "random" && Math.random() < 0.75 && g.enemies["shooting"])
 		type = "shooting";
@@ -121,14 +121,14 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.speed = 8.25;
 		e.color = "#ff0000";
 		e.color_outline = "white";
-		e.damage = 75370 * e.damage;
+		e.damage = 87 * e.damage;
 	}
 	if(boss) {
 		e.damage = 5 * e.damage;
-		e.health = 25 * e.max_health;
-		e.max_health = 25 * e.max_health;
-		e.hunger = 4 * e.max_hunger;
-		e.max_hunger = 4 * e.max_hunger;
+		e.health = 30 * e.max_health;
+		e.max_health = 30 * e.max_health;
+		e.hunger = 1.75 * e.max_hunger;
+		e.max_hunger = 1.75 * e.max_hunger;
 		e.speed = 0.5 * e.speed;
 		if(e.type == "sword")
 			e.speed *= 2;
@@ -258,8 +258,11 @@ function enemy_update(enemy_object, dt) {
 				if(target_object.name == "player" && target_object.data.immunity <= 0 || target_object.name != "player") {
 					if(target_object.name == "player" && target_object.data.shield_blue_health > 0) {
 						target_object.data.shield_blue_health = target_object.data.shield_blue_health * Math.pow(0.75, dt/1000);
-					} else
+					} else if(target_object.name == "player" && target_object.data.shield_green_health > 0) {
+						target_object.data.shield_green_health = target_object.data.shield_green_health * Math.pow(0.95, dt/1000);
+					} else {
 						target_object.data.health = target_object.data.health * Math.pow(0.75, dt/1000);
+					}
 				}
 			}
 			if(e.shooting_delay >= 1000) {
@@ -372,6 +375,8 @@ function enemy_update(enemy_object, dt) {
 			if(target_object.name == "player") {
 				if(target_object.data.shield_blue_health > 0)
 					target_object.data.shield_blue_health -= e.damage * dt;
+				else if(target_object.data.shield_green_health > 0)
+					target_object.data.shield_green_health -= 0.25 * e.damage * dt;
 				else if(target_object.data.immunity <= 0)
 					target_object.data.health -= e.damage * dt;
 			}

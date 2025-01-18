@@ -30,7 +30,7 @@ function car_create(g, x, y, color_, is_tank=false, unique=true) {
 		shot_cooldown: 2000
   	};
 	if(is_tank) {
-		c.max_health *= 250;
+		c.max_health *= 10;
 		c.health = c.max_health;
 		c.max_fuel *= 20;
 		c.fuel = Math.random() * c.max_fuel;
@@ -88,7 +88,7 @@ function car_update(car_object, dt) {
 			car_object.game.input.mouse.x - 0.5 * window.innerWidth,
 			car_object.game.input.mouse.y - 0.5 * window.innerHeight,
 			60,
-			100000 + Math.random() * 100000, false,
+			15625 * (0.125 + 1.75 * Math.random()), false,
 			12.5,
 			3500
 		);

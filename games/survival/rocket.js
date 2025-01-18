@@ -37,14 +37,31 @@ function rocket_destroy(rocket_object) {
 }
 
 function rocket_update(rocket_object, dt) {
+	if(rocket_object.destroyed)
+		return;
 	let r = rocket_object.data;
 	if(rocket_object.data.lifetime < 0) {
 		r.health = -1;
 	} else {
 		rocket_object.data.lifetime -= dt;
 	}
-	if(r.health < 0)
+	if(!r.enemy) {
+		r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "enemy", 300);
+		if(!r.target_object)
+			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "car", 300);
+		if(!r.target_object)
+			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "car", 300);
+		if(!r.target_object) {
+			rocket_object.name = "ROCKET";
+			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "rocket", 50);
+			rocket_object.name = "rocket";
+		}
+	}
+	if(r.health < 0) {
 		rocket_destroy(rocket_object);
+		return;
+	}
+
 	if(r.target_object) {
 		if(r.target_object.destroyed || r.target_object.name != "player" && r.target_object.name != "enemy" && r.target_object.name != "car" && r.target_object.name != "rocket") {
 			r.target_object = null;
@@ -62,6 +79,8 @@ function rocket_update(rocket_object, dt) {
 				if(r.target_object.name == "player") {
 					if(r.target_object.data.shield_blue_health > 0) {
 						r.target_object.data.shield_blue_health -= 0.75 * alpha * rocket_object.data.damage * dt;
+					} else if(r.target_object.data.shield_green_health > 0) {
+						r.target_object.data.shield_green_health -= 0.25 * alpha * rocket_object.data.damage * dt;
 					} else if(r.target_object.data.immunity <= 0) {
 						let k = 1.0;
 						if(r.target_object.data.sword_visible)

@@ -357,12 +357,22 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 		ctx.fillStyle = "#dd1111";
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	} else if(id == ITEM_ROCKET) {
-		ctx.fillStyle = "red";
-		ctx.fillRect(x + w * 0.25, y + h * 0.55, w * 0.5, h * 0.2);
-		ctx.fillStyle = "#777777";
-		ctx.fillRect(x + w * 0.35, y + h * 0.2, w * 0.3, h * 0.6);
-		ctx.fillStyle = "#777777";
-		ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.2, h * 0.6);
+		//ctx.fillStyle = "red";
+		//ctx.fillRect(x + w * 0.25, y + h * 0.55, w * 0.5, h * 0.2);
+		//ctx.fillStyle = "#777777";
+		//ctx.fillRect(x + w * 0.35, y + h * 0.2, w * 0.3, h * 0.6);
+		//ctx.fillStyle = "#777777";
+		//ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.2, h * 0.6);
+		let N = 3;
+		for(let i = 0; i < N; i++) {
+			ctx.fillStyle = "#666666";
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillStyle = "#bb3311";
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.strokeStyle = "#111111";
+			ctx.lineWidth = 0.01 * w;
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+		}
 	} else if(id == ITEM_MILK) {
 		ctx.fillStyle = "#113377";
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.4);
