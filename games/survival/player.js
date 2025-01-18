@@ -342,7 +342,7 @@ function player_update(player_object, dt) {
 		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
 			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
-		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_HEALTH) {
+		} else if(closest_item && !closest_item.data.dropped && [ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(closest_item.data.id)) {
 			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
 		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) {
@@ -639,7 +639,7 @@ function player_shoot(player_object, dt, target_body=null) {
 				tx - sx,
 				ty - sy,
 				30,
-				50 + 50 * Math.random(),
+				50 + 150 * Math.random(),
 				false,
 				6,
 				1500,
@@ -732,7 +732,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			tx - sx,
 			ty - sy,
 			30,
-			20 + 10 * Math.random(),
+			10 + 40 * Math.random(),
 			false,
 			6,
 			1500,
@@ -746,7 +746,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			tx - sx,
 			ty - sy,
 			30,
-			20 + 10 * Math.random(),
+			10 + 40 * Math.random(),
 			false,
 			6,
 			1500,
@@ -769,7 +769,7 @@ function player_shoot(player_object, dt, target_body=null) {
 				(0.95 + 0.1 * Math.random()) * tx - sx,
 				(0.95 + 0.1 * Math.random()) * ty - sy,
 				Math.random() * 10 + 10,
-				Math.random() * 1.25 + 0.25
+				Math.random() * 1.25 + 1.25
 			);
 		p.shotgun_cooldown = 750;
 		if(Math.random() > 0.985)
@@ -786,7 +786,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			tx - sx,
 			ty - sy,
 			17.5,
-			Math.random() * 10 + 20,
+			Math.random() * 25 + 25,
 			false,
 			12.5,
 			1500,
@@ -810,7 +810,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			ty - sy,
 			Math.min(0.25 * p.w, 10),
 			game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000),
-			10000 + 20000 * Math.random(),
+			1000 + 2000 * Math.random(),
 			p.max_health,
 			false,
 			15
@@ -830,7 +830,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			(0.95 + 0.1 * Math.random()) * tx - sx,
 			(0.95 + 0.1 * Math.random()) * ty - sy,
 			Math.random() * 10 + 10,
-			Math.random()
+			Math.random() * 1.5
 		);
 		p.minigun_cooldown = 60;
 		if(Math.random() > 0.995)

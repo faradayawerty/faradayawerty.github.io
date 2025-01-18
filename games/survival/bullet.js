@@ -1,9 +1,10 @@
 
 function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=6, lifetime=1500, color_fill="yellow", color_outline="orange", invisible=false) {
 	let bullets = g.objects.filter((obj) => obj.name == "bullet");
-	if(bullets.length > 200)
-		for(let i = 0; i < bullets.length - 200; i++)
-			bullets[i].destroy(bullets[i]);
+	// TODO fix limit
+	//if(bullets.length > 200)
+	//	for(let i = 0; i < bullets.length - 200; i++)
+	//		bullets[i].destroy(bullets[i]);
 	let width = size, height = size;
 	let d = Math.sqrt(dx*dx + dy*dy);
 	let b = {

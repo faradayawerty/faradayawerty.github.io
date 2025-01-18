@@ -1,9 +1,10 @@
 
 function rocket_create(g, x, y, dx, dy, w, target_object, damage, health, enemy=true, speed=10, lifetime=4800) {
 	let rockets = g.objects.filter((obj) => obj.name == "rocket");
-	if(rockets.length > 100)
-		for(let i = 0; i < rockets.length - 200; i++)
-			rockets[i].destroy(rockets[i]);
+	// TODO fix limit
+	//if(rockets.length > 100)
+	//	for(let i = 0; i < rockets.length - 200; i++)
+	//		rockets[i].destroy(rockets[i]);
 	let r = {
 		lifetime: lifetime,
 		health: health,

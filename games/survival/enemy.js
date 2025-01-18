@@ -107,8 +107,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 	}
 	if(type == "shooting rocket") {
 		e.type = "shooting rocket";
-		e.health = 250000;
-		e.max_health = 250000;
+		e.health = 125000;
+		e.max_health = 125000;
 		e.speed = 4.75;
 		e.color = "gray";
 		e.color_outline = "black";
@@ -116,8 +116,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 	}
 	if(type == "shooting laser") {
 		e.type = "shooting laser";
-		e.health = 12500000;
-		e.max_health = 12500000;
+		e.health = 625000;
+		e.max_health = 625000;
 		e.speed = 8.25;
 		e.color = "#ff0000";
 		e.color_outline = "white";
