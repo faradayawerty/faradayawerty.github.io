@@ -23,6 +23,7 @@ let ITEM_MONEY = 5;
 let ITEM_SHIELD = 22;
 let ITEM_HEALTH_GREEN = 28;
 let ITEM_SHIELD_GREEN = 31;;
+let ITEM_SHIELD_RAINBOW = 32;;
 
 let ITEM_CANNED_MEAT = 7;
 let ITEM_ORANGE = 8;
@@ -622,6 +623,9 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(item == 0 && enemy_type != null)
 		item = available_misc[Math.floor(Math.random() * available_misc.length)];
+
+	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25 * Math.random())
+		item = 0;
 
 	g.debug_console.unshift("spawning item, chances: " + item
 		+ " A: " + Math.round(100 * chance_ammo) + "%"

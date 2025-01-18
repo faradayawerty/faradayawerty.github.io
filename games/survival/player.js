@@ -31,6 +31,8 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shield_blue_health_max: 9000,
 		shield_green_health: 0,
 		shield_green_health_max: 12000,
+		shield_rainbow_health: 0,
+		shield_rainbow_health_max: 24000,
 		sword_direction: 0,
 		sword_visible: false,
 		ai_controlled: ai_controlled,
@@ -805,8 +807,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		let theta = Math.atan2(ty - sy, tx - sx);
 		rocket_create(
 			player_object.game,
-			p.body.position.x + Math.cos(theta) * p.w * 0.25,
-			p.body.position.y + Math.sin(theta) * p.h * 0.25,
+			p.body.position.x + Math.cos(theta) * p.w * 1.75,
+			p.body.position.y + Math.sin(theta) * p.h * 1.75,
 			tx - sx,
 			ty - sy,
 			Math.min(0.25 * p.w, 10),
@@ -814,7 +816,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			0.33 * 3125 * base_damage * (0.75 + 0.5 * Math.random()),
 			p.max_health,
 			false,
-			15
+			20
 		);
 		p.shot_cooldown = 400;
 		if(Math.random() > 0.99)
@@ -824,7 +826,7 @@ function player_shoot(player_object, dt, target_body=null) {
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS
 		&& true
 		&& p.shot_cooldown <= 0
-		&& inventory_has_item_from_list(p.inventory_element, [ITEM_AMMO, ITEM_RED_PLASMA, ITEM_PLASMA, ITEM_RAINBOW_AMMO]) > -1) {
+		&& inventory_has_item_from_list(p.inventory_element, [ITEM_AMMO, ITEM_RED_PLASMA, ITEM_PLASMA, ITEM_RAINBOW_AMMO, ITEM_ROCKET]) > -1) {
 		let theta = Math.atan2(ty - sy, tx - sx);
 
 		let colors = ["red", "orange", "yellow", "lime", "cyan", "blue", "purple"];
@@ -861,34 +863,65 @@ function player_shoot(player_object, dt, target_body=null) {
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 		}
 
-		bullet_create(
-			player_object.game,
-			p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
-			p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
-			tx - sx,
-			ty - sy,
-			30,
-			3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
-			false,
-			6,
-			1500,
-			color1,
-			color2
-		);
-		bullet_create(
-			player_object.game,
-			p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
-			p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
-			tx - sx,
-			ty - sy,
-			30,
-			3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
-			false,
-			6,
-			1500,
-			color1,
-			color2
-		);
+		if(!inventory_has_item(p.inventory_element, ITEM_ROCKET) || inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
+			bullet_create(
+				player_object.game,
+				p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
+				p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
+				tx - sx,
+				ty - sy,
+				30,
+				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
+				false,
+				6,
+				1500,
+				color1,
+				color2
+			);
+			bullet_create(
+				player_object.game,
+				p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
+				p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
+				tx - sx,
+				ty - sy,
+				30,
+				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
+				false,
+				6,
+				1500,
+				color1,
+				color2
+			);
+		} else if(inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
+			rocket_create(
+				player_object.game,
+				p.body.position.x + Math.cos(theta - Math.PI / 4) * p.w * 1.75,
+				p.body.position.y + Math.sin(theta - Math.PI / 4) * p.h * 1.75,
+				tx - sx,
+				ty - sy,
+				0.15 * p.w,
+				null,
+				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
+				p.max_health,
+				false,
+				20
+			);
+			rocket_create(
+				player_object.game,
+				p.body.position.x + Math.cos(theta + Math.PI / 4) * p.w * 1.75,
+				p.body.position.y + Math.sin(theta + Math.PI / 4) * p.h * 1.75,
+				tx - sx,
+				ty - sy,
+				0.15 * p.w,
+				null,
+				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
+				p.max_health,
+				false,
+				20
+			);
+			if(Math.random() > 0.99)
+				inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
+		}
 		p.shot_cooldown = 100;
 	}
 }
@@ -921,6 +954,13 @@ function player_item_consume(player_object, id, anywhere=false) {
 
 	if(id == ITEM_SHIELD_GREEN && true) {
 		p.shield_green_health = p.shield_green_health_max;
+		p.shield_blue_health = 0;
+		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
+	}
+
+	if(id == ITEM_SHIELD_RAINBOW && true) {
+		p.shield_rainbow_health = p.shield_rainbow_health_max;
+		p.shield_green_health = 0;
 		p.shield_blue_health = 0;
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}

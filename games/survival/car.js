@@ -133,7 +133,7 @@ function car_draw(car_object, ctx) {
 		ctx.stroke();
 		drawCircle(ctx, px, py, 0.45 * p.h, p.color, "black", 0.01 * p.w);
 	}
-	if(car_object.game.settings.indicators["show car health"]) {
+	if(car_object.game.settings.indicators["show car health"] && car_object.data.health > 0) {
 		ctx.fillStyle = "red";
 		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h, 0.5 * car_object.data.h, 2);
 		ctx.fillStyle = "lime";

@@ -75,7 +75,8 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		is_minion: false,
 		jump_delay: 4000,
 		sword_rotation: 0,
-		color_gradient: Math.random() * 10000
+		color_gradient: Math.random() * 10000,
+		laser_angle: 0
 	};
 	if(type == "shooting") {
 		e.type = "shooting";
