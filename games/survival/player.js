@@ -97,7 +97,10 @@ function player_die(player_object) {
 		player_object.game.want_respawn_menu = true;
 	for(let i = 0; i < player_object.game.objects.length; i++) {
 		if(player_object.game.objects[i].name == "enemy" && !player_object.game.objects[i].destroyed)
-			player_object.game.objects[i].data.health = player_object.game.objects[i].data.max_health;
+			player_object.game.objects[i].data.health = Math.min(
+				player_object.game.objects[i].data.max_health,
+				player_object.game.objects[i].data.health * 1.5
+			);
 	}
 	player_destroy(player_object);
 }
