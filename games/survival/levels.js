@@ -31,7 +31,7 @@ function levels_set(g, level, old_level=null) {
 			if(-1 < bd && bd < 5000)
 				m *= 0.45;
 			for(let i = 0; i < Math.random() * 60 * m - 10; i++)
-				enemy_create(g, Ox + 250 + Math.random() * 2000, Oy + 250 + Math.random() * 2000);
+				enemy_create(g, Ox + 1250 + (0.5 - Math.random()) * 1500, Oy + 1250 + (0.5 - Math.random()) * 1500);
 		}
 
 		for(let i = 0; i < Math.random() * 5; i++)
