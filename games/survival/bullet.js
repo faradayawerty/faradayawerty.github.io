@@ -1,7 +1,7 @@
 
+// TODO fix limit
 function bullet_create(g, x, y, dx, dy, speed=20, damage=0.5, enemy=false, size=6, lifetime=1500, color_fill="yellow", color_outline="orange", invisible=false) {
 	let bullets = g.objects.filter((obj) => obj.name == "bullet");
-	// TODO fix limit
 	//if(bullets.length > 200)
 	//	for(let i = 0; i < bullets.length - 200; i++)
 	//		bullets[i].destroy(bullets[i]);
@@ -69,9 +69,11 @@ function bullet_update(bullet_object, dt) {
 	if(bullet_object.data.enemy && bullet_object.game.player_object
 		&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.player_object.data.body) != null) {
 		if(bullet_object.game.player_object.data.shield_blue_health > 0) {
-				bullet_object.game.player_object.data.shield_blue_health -= 0.25 * bullet_object.data.damage * dt;
+				bullet_object.game.player_object.data.shield_blue_health -= 0.95 * bullet_object.data.damage * dt;
 		} else if(bullet_object.game.player_object.data.shield_green_health > 0) {
-				bullet_object.game.player_object.data.shield_green_health -= 0.0625 * bullet_object.data.damage * dt;
+				bullet_object.game.player_object.data.shield_green_health -= 0.75 * bullet_object.data.damage * dt;
+		} else if(bullet_object.game.player_object.data.shield_rainbow_health > 0) {
+				bullet_object.game.player_object.data.shield_rainbow_health -= 0.55 * bullet_object.data.damage * dt;
 		} else if(bullet_object.game.player_object.data.immunity <= 0) {
 			let k = 1.0;
 			if(bullet_object.game.player_object.data.sword_visible)

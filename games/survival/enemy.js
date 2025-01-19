@@ -1,14 +1,15 @@
 
+// TODO fix enemy limit
 function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random") {
 	if(!g.settings.enemies_spawn)
 		return -1;
-	let enemies = g.objects.filter((obj) => obj.name == "enemy");
-	if(enemies.length > 100) {
-		for(let i = 0; i < enemies.length - 100; i++) {
-			if(!enemies[i].data.boss)
-				enemies[i].destroy(enemies[i]);
-		}
-	}
+	//let enemies = g.objects.filter((obj) => obj.name == "enemy");
+	//if(enemies.length > 100) {
+	//	for(let i = 0; i < enemies.length - 100; i++) {
+	//		if(!enemies[i].data.boss)
+	//			enemies[i].destroy(enemies[i]);
+	//	}
+	//}
 	if(type == "random" && Math.random() < 0.55 && g.enemies["shooting laser"])
 		type = "shooting laser";
 	else if(type == "random" && Math.random() < 0.60 && g.enemies["shooting rocket"])
@@ -261,7 +262,7 @@ function enemy_update(enemy_object, dt) {
 						target_object.data.shield_blue_health = target_object.data.shield_blue_health * Math.pow(0.75, dt/1000);
 					} else if(target_object.name == "player" && target_object.data.shield_green_health > 0) {
 						target_object.data.shield_green_health = target_object.data.shield_green_health * Math.pow(0.95, dt/1000);
-					} else {
+					} else if(target_object.name != "player" || target_object.data.shield_rainbow_health <= 0) {
 						target_object.data.health = target_object.data.health * Math.pow(0.75, dt/1000);
 					}
 				}
@@ -378,6 +379,8 @@ function enemy_update(enemy_object, dt) {
 					target_object.data.shield_blue_health -= e.damage * dt;
 				else if(target_object.data.shield_green_health > 0)
 					target_object.data.shield_green_health -= 0.25 * e.damage * dt;
+				else if(target_object.data.shield_rainbow_health > 0)
+					target_object.data.shield_rainbow_health -= 0.10 * e.damage * dt;
 				else if(target_object.data.immunity <= 0)
 					target_object.data.health -= e.damage * dt;
 			}
@@ -442,7 +445,10 @@ function enemy_update(enemy_object, dt) {
 							car_create(enemy_object.game, e.body.position.x, e.body.position.y, tank_colors[Math.floor(Math.random() * tank_colors.length)], true, true);
 						}
 					} else if(e.type == "shooting laser") {
-						item_create(enemy_object.game, ITEM_RAINBOW_PISTOLS, e.body.position.x, e.body.position.y);
+						if(Math.random() > 0.33)
+							item_create(enemy_object.game, ITEM_RAINBOW_PISTOLS, e.body.position.x, e.body.position.y);
+						else
+							item_create(enemy_object.game, ITEM_LASER_GUN, e.body.position.x, e.body.position.y);
 					} else {
 						if(Math.random() > 0.33)
 							item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);

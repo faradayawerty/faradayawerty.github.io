@@ -30,14 +30,17 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shield_blue_health: 0,
 		shield_blue_health_max: 9000,
 		shield_green_health: 0,
-		shield_green_health_max: 12000,
+		shield_green_health_max: 18000,
 		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 24000,
+		shield_rainbow_health_max: 36000,
 		sword_direction: 0,
 		sword_visible: false,
 		ai_controlled: ai_controlled,
 		ai_random_dir: 0,
-		gradient: 0
+		gradient: 0,
+		item_animstate: 0,
+		laser_direction: 0,
+		shooting_laser: false
 	};
 	p.inventory_element = g.gui_elements[inventory_create(g)];
 	for(let i = 0; i < g.saved_items.length; i++)
@@ -120,12 +123,18 @@ function player_update(player_object, dt) {
 	if(p.minigun_cooldown > 0)
 		p.minigun_cooldown -= dt;
 
+	p.item_animstate += 0.01 * dt;
+
 	if(p.shield_blue_health > 0) {
 		p.shield_blue_health -= 0.15 * dt;
 	}
 
 	if(p.shield_green_health > 0) {
-		p.shield_blue_health -= 0.15 * dt;
+		p.shield_green_health -= 0.15 * dt;
+	}
+
+	if(p.shield_rainbow_health > 0) {
+		p.shield_rainbow_health -= 0.15 * dt;
 	}
 
 	if(p.saved_health - p.health > 1) {
@@ -136,6 +145,10 @@ function player_update(player_object, dt) {
 	p.saved_health = p.health;
 	p.saved_hunger = p.hunger;
 	p.saved_thirst = p.thirst;
+
+	if(p.shield_rainbow_health < 0) {
+		p.shield_rainbow_health = 0;
+	}
 
 	if(p.shield_green_health < 0) {
 		p.shield_green_health = 0;
@@ -154,20 +167,24 @@ function player_update(player_object, dt) {
 	}
 
 	if(p.thirst > 0) {
-		if(p.shield_green_health <= 0)
-			p.thirst = Math.max(0, p.thirst - 0.001 * dt)
+		if(p.shield_green_health > 0)
+			p.thirst = Math.max(0, p.thirst - 0.0005 * dt)
+		else if(p.shield_rainbow_health > 0)
+			p.thirst = Math.max(0, p.thirst - 0.00000025 * dt)
 		else
-			p.thirst = Math.max(0, p.thirst - 0.00005 * dt)
+			p.thirst = Math.max(0, p.thirst - 0.001 * dt)
 	}
 
 	if(p.thirst <= 0)
 		p.health -= 0.01 * dt;
 
-	if(p.hunger > 0 && p.shield_green_health <= 0) {
-		if(p.shield_green_health <= 0)
-			p.hunger = Math.max(0, p.hunger - 0.001 * dt)
+	if(p.hunger > 0) {
+		if(p.shield_green_health > 0)
+			p.hunger = Math.max(0, p.hunger - 0.0005 * dt)
+		else if(p.shield_rainbow_health > 0)
+			p.hunger = Math.max(0, p.hunger - 0.00000025 * dt)
 		else
-			p.hunger = Math.max(0, p.hunger - 0.00005 * dt)
+			p.hunger = Math.max(0, p.hunger - 0.001 * dt)
 	}
 
 	if(p.hunger <= 0)
@@ -449,13 +466,66 @@ function player_draw(player_object, ctx) {
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
 		}
 
+		if(p.shooting_laser) {
+
+			let r = Math.cos(0.1 * p.item_animstate) * 15;
+			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
+			let b = Math.sin(0.1 * p.item_animstate) * 15;
+			r = Math.floor(r*r);
+			g = Math.floor(g*g);
+			b = Math.floor(b*b);
+			let color = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
+
+			ctx.beginPath();
+			ctx.lineWidth = p.w * 0.65;
+			ctx.strokeStyle = color;
+			let px = p.body.position.x;
+			let py = p.body.position.y;
+			let gx = p.w * 60 * Math.cos(p.laser_direction);
+			let gy = p.w * 60 * Math.sin(p.laser_direction);
+			let ggx = gx;
+			let ggy = gy;
+			let gg = Math.sqrt(ggx * ggx + ggy * ggy);
+			ggx = ggx / gg;
+			ggy = ggy / gg;
+			px = px + 1.7 * p.w * ggx;
+			py = py + 1.7 * p.w * ggy;
+			ctx.moveTo(px, py);
+			ctx.lineTo(px + gx, py + gy);
+			ctx.stroke();
+
+			ctx.beginPath();
+			ctx.lineWidth = p.w * 0.45;
+			ctx.strokeStyle = "white";
+			px = p.body.position.x;
+			py = p.body.position.y;
+			gx = p.w * 60 * Math.cos(p.laser_direction);
+			gy = p.w * 60 * Math.sin(p.laser_direction);
+			ggx = gx;
+			ggy = gy;
+			gg = Math.sqrt(ggx * ggx + ggy * ggy);
+			ggx = ggx / gg;
+			ggy = ggy / gg;
+			px = px + 1.7 * p.w * ggx;
+			py = py + 1.7 * p.w * ggy;
+			ctx.moveTo(px, py);
+			ctx.lineTo(px + gx, py + gy);
+			ctx.stroke();
+
+			p.shooting_laser = false;
+		}
+
 		if(player_object.game.settings.player_draw_gun &&
 			ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
+
+			let px = p.body.position.x - 0.45 * p.w;
+			let py = p.body.position.y - 0.45 * p.h;
 
 			let mx = 1;
 			let my = 1;
 			let cx = 0;
 			let cy = 0;
+
 			if(p.ai_controlled) {
 				let closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", 1000);
 				if(closest_enemy) {
@@ -476,6 +546,14 @@ function player_draw(player_object, ctx) {
 			let gl = 1;
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN)
 				ctx.strokeStyle = "#117733";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_LASER_GUN) {
+				ctx.strokeStyle = "purple";
+				lw *= 1.25;
+				gl *= 1.75;
+				px = p.body.position.x;
+				py = p.body.position.y;
+			}
+
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
 				ctx.strokeStyle = "#773311";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN)
@@ -526,8 +604,6 @@ function player_draw(player_object, ctx) {
 			}
 			
 			ctx.beginPath();
-			let px = p.body.position.x - 0.45 * p.w;
-			let py = p.body.position.y - 0.45 * p.h;
 			ctx.moveTo(px, py);
 			let gx = 1, gy = 1;
 			gx = mx - cx;
@@ -550,9 +626,8 @@ function player_draw(player_object, ctx) {
 			ctx.stroke();
 			p.sword_visible = false;
 		} else if(hotbar_get_selected_item(p.hotbar_element) > 0) {
-			let px = p.body.position.x - 0.25 * p.w,
-				py = p.body.position.y - 0.25 * p.h;
-			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element), px, py, 0.5 * p.w, 0.5 * p.h);
+			let px = p.body.position.x - 0.25 * p.w, py = p.body.position.y - 0.25 * p.h;
+			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element), px, py, 0.5 * p.w, 0.5 * p.h, p.item_animstate);
 		}
 		if(p.shield_blue_health > 0) {
 			ctx.fillStyle = "gray";
@@ -570,6 +645,23 @@ function player_draw(player_object, ctx) {
 			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_green_health / p.shield_green_health_max, p.h * 0.05);
 			ctx.globalAlpha = 0.25;
 			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, "#117755", "#117733", 0.05 * p.w);
+			ctx.globalAlpha = 1.0;
+		}
+		if(p.shield_rainbow_health > 0) {
+			let r = Math.cos(0.1 * p.item_animstate) * 15;
+			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
+			let b = Math.sin(0.1 * p.item_animstate) * 15;
+			r = Math.floor(r*r);
+			g = Math.floor(g*g);
+			b = Math.floor(b*b);
+			let color = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
+			let color1 = "#"+(g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0') + (r).toString(16).padStart(2,'0');
+			ctx.fillStyle = "gray";
+			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w, p.h * 0.05);
+			ctx.fillStyle = color;
+			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_rainbow_health / p.shield_rainbow_health_max, p.h * 0.05);
+			ctx.globalAlpha = 0.25;
+			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, color, "white", 0.05 * p.w);
 			ctx.globalAlpha = 1.0;
 		}
 	}
@@ -602,6 +694,24 @@ function player_shoot(player_object, dt, target_body=null) {
 		ty = (ty - sy) * 10 + sy;
 	}
 
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_LASER_GUN
+		&& true
+		&& inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
+			p.laser_direction = Math.atan2(ty - sy, tx - sx);
+			p.shooting_laser = true;
+			let g = player_object.game;
+			for(let i = 0; i < g.objects.length; i++) {
+				let obj = g.objects[i];
+				if(!obj.destroyed && (obj.name == "enemy" || obj.name == "car" && !obj.data.is_tank || obj.name == "rocket")) {
+					if(player_laser_hits_point(player_object, obj.data.body.position.x, obj.data.body.position.y, p.w, 60 * p.w, p.laser_direction)) {
+						obj.data.health -= 15625 * dt;
+						obj.data.hit_by_player = true;
+					}
+				}
+			}
+		if(Math.random() < 0.0001 * dt)
+			inventory_clear_item(p.inventory_element, ITEM_RAINBOW_AMMO, 1);
+	}
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN
 		&& true
 		&& p.shot_cooldown <= 0
@@ -949,19 +1059,21 @@ function player_item_consume(player_object, id, anywhere=false) {
 	if(id == ITEM_SHIELD && true) {
 		p.shield_blue_health = p.shield_blue_health_max;
 		p.shield_green_health = 0;
+		p.shield_rainbow_health = 0;
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 
 	if(id == ITEM_SHIELD_GREEN && true) {
-		p.shield_green_health = p.shield_green_health_max;
 		p.shield_blue_health = 0;
+		p.shield_green_health = p.shield_green_health_max;
+		p.shield_rainbow_health = 0;
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 
 	if(id == ITEM_SHIELD_RAINBOW && true) {
-		p.shield_rainbow_health = p.shield_rainbow_health_max;
-		p.shield_green_health = 0;
 		p.shield_blue_health = 0;
+		p.shield_green_health = 0;
+		p.shield_rainbow_health = p.shield_rainbow_health_max;
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 
@@ -987,3 +1099,14 @@ function player_item_consume(player_object, id, anywhere=false) {
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 	}
 }
+
+function player_laser_hits_point(player_object, x, y, w, l, alpha) {
+	let px = player_object.data.body.position.x;
+	let py = player_object.data.body.position.y;
+	x = x - px;
+	y = y - py;
+	let X = x * Math.cos(alpha) + y * Math.sin(alpha);
+	let Y = -x * Math.sin(alpha) + y * Math.cos(alpha);
+	return (X/l - 1) * (X/l - 1) + (Y/w) * (Y/w) < 1;
+}
+

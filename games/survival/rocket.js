@@ -48,12 +48,10 @@ function rocket_update(rocket_object, dt) {
 	if(!r.enemy) {
 		r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "enemy", 300);
 		if(!r.target_object)
-			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "car", 300);
-		if(!r.target_object)
-			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "car", 300);
+			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "car", 200);
 		if(!r.target_object) {
 			rocket_object.name = "ROCKET";
-			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "rocket", 50);
+			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "rocket", 25);
 			rocket_object.name = "rocket";
 		}
 	}
@@ -63,7 +61,9 @@ function rocket_update(rocket_object, dt) {
 	}
 
 	if(r.target_object) {
-		if(r.target_object.destroyed || r.target_object.name != "player" && r.target_object.name != "enemy" && r.target_object.name != "car" && r.target_object.name != "rocket") {
+		if(r.target_object.destroyed
+			|| r.target_object.name != "player" && r.target_object.name != "enemy" && r.target_object.name != "car" && r.target_object.name != "rocket"
+			|| r.target_object.name == "car" && r.target_object.data.is_tank) {
 			r.target_object = null;
 		} else {
 			if(r.target_object.name == "player" && r.target_object.data.car_object) {
@@ -78,9 +78,11 @@ function rocket_update(rocket_object, dt) {
 				let alpha = 25;
 				if(r.target_object.name == "player") {
 					if(r.target_object.data.shield_blue_health > 0) {
-						r.target_object.data.shield_blue_health -= 0.75 * alpha * rocket_object.data.damage * dt;
+						r.target_object.data.shield_blue_health -= 0.95 * alpha * rocket_object.data.damage * dt;
 					} else if(r.target_object.data.shield_green_health > 0) {
-						r.target_object.data.shield_green_health -= 0.25 * alpha * rocket_object.data.damage * dt;
+						r.target_object.data.shield_green_health -= 0.75 * alpha * rocket_object.data.damage * dt;
+					} else if(r.target_object.data.shield_rainbow_health > 0) {
+						r.target_object.data.shield_rainbow_health -= 0.55 * alpha * rocket_object.data.damage * dt;
 					} else if(r.target_object.data.immunity <= 0) {
 						let k = 1.0;
 						if(r.target_object.data.sword_visible)

@@ -9,6 +9,7 @@ let ITEM_SWORD = 23;
 let ITEM_GREEN_GUN = 24;
 let ITEM_ROCKET_LAUNCHER = 26;
 let ITEM_RAINBOW_PISTOLS = 29;
+let ITEM_LASER_GUN = 33;
 
 let ITEM_AMMO = 2;
 let ITEM_PLASMA = 18;
@@ -53,7 +54,8 @@ ITEMS_GUNS = [
 	ITEM_RED_SHOTGUN,
 	ITEM_GREEN_GUN,
 	ITEM_ROCKET_LAUNCHER,
-	ITEM_RAINBOW_PISTOLS
+	ITEM_RAINBOW_PISTOLS,
+	ITEM_LASER_GUN
 ];
 
 ITEMS_MELEE = [
@@ -68,14 +70,15 @@ ITEMS_DRINKS = [
 	ITEM_WATER
 ];
 
+// TODO fix item limit
 function item_create(g, id_, x_, y_, dropped=false, despawn=true) {
-	let items = g.objects.filter((obj) => obj.name == "item");
-	if(items.length > 50) {
-		for(let i = 0; i < items.length - 50; i++) {
-			if(!items[i].data.dropped && items[i].data.despawn)
-				items[i].destroy(items[i]);
-		}
-	}
+	//let items = g.objects.filter((obj) => obj.name == "item");
+	//if(items.length > 50) {
+	//	for(let i = 0; i < items.length - 50; i++) {
+	//		if(!items[i].data.dropped && items[i].data.despawn)
+	//			items[i].destroy(items[i]);
+	//	}
+	//}
 	if(id_ == 0)
 		return;
 	let item = {
@@ -86,7 +89,7 @@ function item_create(g, id_, x_, y_, dropped=false, despawn=true) {
 		}),
 		dropped: dropped,
 		animation_state: 0,
-		despawn: despawn
+		despawn: despawn,
 	};
 	Matter.Composite.add(g.engine.world, item.body);
 	return game_object_create(g, "item", item,
@@ -220,6 +223,12 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_LASER_GUN) {
+		ctx.fillStyle = "purple";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+		ctx.strokeStyle = "pink";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	} else if(id == ITEM_PLASMA_LAUNCHER) {
 		ctx.fillStyle = "#331133";
 		ctx.fillRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.4);
@@ -248,6 +257,15 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 			ctx.lineWidth = 0.01 * w;
 			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 		}
+	} else if(id == ITEM_SHIELD_RAINBOW && animstate != null) {
+		let r = Math.cos(0.1 * animstate) * 15;
+		let g = 0.7 * (Math.cos(0.1 * animstate) + Math.sin(0.1 * animstate)) * 15;
+		let b = Math.sin(0.1 * animstate) * 15;
+		r = Math.floor(r*r);
+		g = Math.floor(g*g);
+		b = Math.floor(b*b);
+		let color = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, color, "white", 0.05 * w);
 	} else if(id == ITEM_RAINBOW_AMMO && animstate != null) {
 		let colors = ["pink", "yellow", "lime", "cyan"];
 		let colors1 = ["red", "orange", "green", "blue"];
@@ -526,8 +544,10 @@ function item_spawn(g, x, y, enemy_type=null) {
 		available_misc.push(ITEM_SHIELD_GREEN);
 		available_guns.push(ITEM_ROCKET_LAUNCHER);
 		available_ammos.push(ITEM_ROCKET);
-		if(enemy_type != null)
-			available_guns.push(ITEM_RAINBOW_AMMO);
+		if(enemy_type != null) {
+			available_ammos.push(ITEM_RAINBOW_AMMO);
+			available_misc.push(ITEM_SHIELD_RAINBOW);
+		}
 	}
 
 	let best_gun = ITEM_GUN;
