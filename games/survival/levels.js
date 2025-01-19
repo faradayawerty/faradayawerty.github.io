@@ -48,7 +48,7 @@ function levels_set(g, level, old_level=null) {
 	}
 
 	if(level == "0x0") {
-		car_create(g, Ox + 1960, Oy + 2200, "#7711ff");
+		//car_create(g, Ox + 1960, Oy + 2200, "#7711ff");
 		decorative_building_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1960, 1050, 525);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1410, 1050, 525);

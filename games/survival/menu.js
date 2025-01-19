@@ -16,6 +16,8 @@ function menu_create() {
 		want_lose_items: true,
 		want_respawn_here: true,
 		want_debug: false,
+		want_save: false,
+		want_load: false,
 		want_indicators: {
 			"show player health": true,
 			"show player hunger": true,
@@ -44,6 +46,8 @@ function menu_create() {
 		main_menu_buttons: [
 			"continue game",
 			"settings",
+			"save game",
+			"load game",
 		],
 		menu_respawn_buttons: [
 			"respawn and continue game",
@@ -189,6 +193,10 @@ function menu_update(m, dt, input) {
 		} else if(m.buttons[m.iselected] == "player color") {
 			m.buttons = m.player_color_selection_menu;
 			m.iselected = 0;
+		} else if(m.buttons[m.iselected] == "save game") {
+			m.want_save = true;
+		} else if(m.buttons[m.iselected] == "load game") {
+			m.want_load = true;
 		} else if(m.buttons[m.iselected] == "indicators") {
 			m.buttons = m.indicators_settings;
 			m.iselected = 0;
@@ -325,6 +333,10 @@ function menu_translate(lang, str) {
 			return "автоматическое возрождение";
 		else if(str == "debug")
 			return "техническая информация для разработчика";
+		else if(str == "save game")
+			return "сохранить игру";
+		else if(str == "load game")
+			return "загрузить игру";
 	}
 	return str;
 }

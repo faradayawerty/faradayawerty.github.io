@@ -59,6 +59,8 @@ function car_destroy(car_object) {
 }
 
 function car_update(car_object, dt) {
+	if(car_object.destroyed || !car_object.data.body)
+		return;
 	let player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
 	if(car_object.data.shot_cooldown < 2000)
 		car_object.data.shot_cooldown += dt;

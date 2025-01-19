@@ -356,3 +356,190 @@ function game_get_max_enemy(g) {
 	return ans;
 }
 
+function game_object_make_savable(obj) {
+
+	if(obj.destroyed)
+		return null;
+
+	if(obj.name == "item") {
+		let saved_obj = {
+			name: "item",
+			data: {
+				x: obj.data.body.position.x,
+				y: obj.data.body.position.y,
+				id: obj.data.id,
+				dropped: obj.data.dropped,
+				despawn: obj.data.despawn
+			}
+		};
+		return saved_obj;
+	}
+
+	if(obj.name == "car") {
+		let saved_obj = {
+			name: "car",
+			unique_name: obj.unique_name,
+			data: {
+				x: obj.data.body.position.x,
+				y: obj.data.body.position.y,
+				is_tank: obj.data.is_tank,
+				color: obj.data.color,
+			}
+		};
+		return saved_obj;
+	}
+
+	if(obj.name == "enemy") {
+		let saved_obj = {
+			name: "enemy",
+			data: {
+				x: obj.data.body.position.x,
+				y: obj.data.body.position.y,
+				type: obj.data.type,
+				is_minion: obj.data.is_minion,
+				boss: obj.data.boss
+			}
+		};
+		return saved_obj;
+	}
+
+	if(obj.name == "player") {
+		let saved_obj = {
+			name: "player",
+			data: {
+				ai_controlled: obj.data.ai_controlled,
+				x: obj.data.body.position.x,
+				y: obj.data.body.position.y,
+				items: [
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+				]
+			}
+		};
+	
+		for(let i = 0; i < obj.data.inventory_element.data.items.length; i++) {
+			for(let j = 0; j < obj.data.inventory_element.data.items[i].length; j++)
+				saved_obj.data.items[i][j] = obj.data.inventory_element.data.items[i][j];
+		}
+
+		return saved_obj;
+	}
+
+	return null;
+}
+
+//function game_element_make_savable(elem) {
+//	let elem1 = {
+//		name: elem.name,
+//		data: elem.data,
+//		update: elem.update,  
+//		draw: elem.draw,      
+//		destroy: elem.destroy,
+//		shown: elem.show
+//	};
+//	return elem1;
+//}
+
+// https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+function game_save(g) {
+	
+	let objs = [];
+
+	let state_object = {
+		name: "state",
+		enemies: {
+			"regular": g.enemies["regular"],
+			"shooting": g.enemies["shooting"],
+			"shooting red": g.enemies["shooting red"],
+			"sword": g.enemies["sword"],
+			"shooting rocket": g.enemies["shooting rocket"],
+			"shooting laser": g.enemies["shooting laser"],
+		},
+		kills: g.kills,
+		boss_kills: g.boss_kills,
+		deaths: g.deaths,
+		visited_levels: g.visited_levels
+	};
+
+	objs.push(state_object);
+
+	for(let i = 0; i < g.objects.length; i++) {
+		let obj = game_object_make_savable(g.objects[i]);
+		if(obj)
+			objs.push(obj);
+	}
+
+	let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(objs));
+	let filename = "faw_survival_save_" + Math.floor(Math.random() * 1000) + ".json";
+	let dlAnchorElem = document.getElementById('downloadAnchorElem');
+	dlAnchorElem.setAttribute("href", dataStr);
+	dlAnchorElem.setAttribute("download", filename);
+	dlAnchorElem.click();
+}
+
+// TODO убрать костыли
+// https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js
+function game_load(g) {
+	let input = document.getElementById('file-input');
+	input.onchange = e => { 
+		let file = e.target.files[0]; 
+		let reader = new FileReader();
+		reader.readAsText(file,'UTF-8');
+		reader.onload = readerEvent => {
+			let content = readerEvent.target.result;
+			let saved_objects = JSON.parse(content);
+
+			game_destroy_all_gui_elements(g);
+			game_destroy_all_objects(g);
+
+			for(let i = 0; i < saved_objects.length; i++) {
+				let obj = saved_objects[i];
+
+				if(obj.name == "state") {
+					g.enemies["regular"] = obj.enemies["regular"];
+					g.enemies["shooting"] = obj.enemies["shooting"];
+					g.enemies["shooting red"] = obj.enemies["shooting red"];
+					g.enemies["sword"] = obj.enemies["sword"];
+					g.enemies["shooting rocket"] = obj.enemies["shooting rocket"];
+					g.enemies["shooting laser"] = obj.enemies["shooting laser"];
+					g.kills = obj.kills;
+					g.boss_kills = obj.boss_kills;
+					g.deaths = obj.deaths;
+					g.visited_levels = obj.visited_levels;
+				}
+
+				if(obj.name == "player") {
+					let iplayer = player_create(g, obj.data.x, obj.data.y, false, obj.data.ai_controlled);
+					let plr = g.objects[iplayer];
+					for(let i = 0; i < plr.data.inventory_element.data.items.length; i++) {
+						for(let j = 0; j < plr.data.inventory_element.data.items[i].length; j++)
+							plr.data.inventory_element.data.items[i][j] = obj.data.items[i][j];
+					}
+				}
+				if(obj.name == "enemy")
+					enemy_create(g, obj.data.x, obj.data.y, obj.data.boss, obj.data.is_minion, obj.data.type);
+
+				if(obj.name == "item")
+					item_create(g, obj.data.id, obj.data.x, obj.data.y, obj.data.dropped, obj.data.despawn);
+
+				if(obj.name == "car")
+					car_create(g, obj.data.x, obj.data.y, obj.data.color, obj.data.is_tank, true);
+			}
+		}
+		// https://stackoverflow.com/questions/1703228/how-can-i-clear-an-html-file-input-with-javascript
+		try{
+		    input.value = '';
+		    if(input.value){
+			   input.type = "text";
+			   input.type = "file";
+		    }
+		} catch(e) {}
+	}
+	input.click();
+}
+

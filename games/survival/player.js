@@ -17,7 +17,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shot_cooldown: 0,
 		shotgun_cooldown: 0,
 		minigun_cooldown: 0,
-		want_level: "0x0",
+		want_level: null,
 		w: width,
 		h: height,
 		inventory_element: null,
@@ -65,8 +65,6 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		p.inventory_element.data.items[0][2] = Math.round(Math.random()) * ITEM_WATER;
 		p.inventory_element.data.items[0][3] = Math.round(Math.random()) * ITEM_CANNED_MEAT;
 	}
-	if(level_visible(g, p.want_level))
-		levels_set(g, p.want_level);
 	return iplayer;
 }
 
@@ -197,6 +195,12 @@ function player_update(player_object, dt) {
 		p.speed = 0.75 * p.speed;
 	if(p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
+
+	if(p.want_level == null) {
+		if(!level_visible(player_object.game, "0x0", player_object))
+			levels_set(player_object.game, "0x0");
+		p.want_level = "0x0";
+	}
 
 	let old_level = p.want_level;
 
