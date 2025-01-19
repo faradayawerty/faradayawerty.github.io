@@ -703,7 +703,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			for(let i = 0; i < g.objects.length; i++) {
 				let obj = g.objects[i];
 				if(!obj.destroyed && (obj.name == "enemy" || obj.name == "car" && !obj.data.is_tank || obj.name == "rocket")) {
-					if(player_laser_hits_point(player_object, obj.data.body.position.x, obj.data.body.position.y, p.w, 60 * p.w, p.laser_direction)) {
+					if(player_laser_hits_point(player_object, obj.data.body.position.x, obj.data.body.position.y, 1.5 * p.w, 60 * p.w, p.laser_direction)) {
 						obj.data.health -= 15625 * dt;
 						obj.data.hit_by_player = true;
 					}
@@ -1107,6 +1107,6 @@ function player_laser_hits_point(player_object, x, y, w, l, alpha) {
 	y = y - py;
 	let X = x * Math.cos(alpha) + y * Math.sin(alpha);
 	let Y = -x * Math.sin(alpha) + y * Math.cos(alpha);
-	return (X/l - 1) * (X/l - 1) + (Y/w) * (Y/w) < 1;
+	return Math.pow(Math.abs(X/l - 1), 4) + Math.pow(Math.abs(Y/w), 4) < 1;
 }
 
