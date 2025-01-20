@@ -750,6 +750,7 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 200;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		audio_play("data/sfx/gunshot_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN
@@ -769,6 +770,7 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shotgun_cooldown = 750;
 		if(Math.random() > 0.985)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		audio_play("data/sfx/shotgun_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
@@ -787,6 +789,7 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.minigun_cooldown = 60;
 		if(Math.random() > 0.995)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		audio_play("data/sfx/gunshot_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER
@@ -810,6 +813,7 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 400;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
+		audio_play("data/sfx/plasmagun_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS
@@ -848,6 +852,7 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 100;
 		if(Math.random() > 0.999)
 			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+		audio_play("data/sfx/red_pistols_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN
@@ -874,10 +879,13 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 500;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
+		audio_play("data/sfx/red_pistols_1.mp3");
 	}
 
 	// TODO balance damage
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SWORD && true) {
+		if(Math.cos(p.sword_direction) < -0.985)
+			audio_play("data/sfx/sword_1.mp3");
 		if(tx > sx)
 			p.sword_direction += 0.02 * dt
 		else
@@ -930,6 +938,7 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.health -= 0.0255 * dt
 		p.hunger -= 0.0125 * dt
 		p.thirst -= 0.0125 * dt
+		audio_play("data/sfx/red_pistols_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER
@@ -953,6 +962,7 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 400;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
+		audio_play("data/sfx/rocketlauncher_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS
@@ -966,6 +976,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		let color2 = null;
 
 		p.gradient += 0.01 * dt;
+
+		let shot_sound = "data/sfx/red_pistols_1.mp3";
 
 		if(inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
 			color1 = colors[Math.floor(p.gradient) % 7];
@@ -993,6 +1005,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			color2 = "orange";
 			if(Math.random() > 0.99)
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+			shot_sound = "data/sfx/gunshot_1.mp3"
 		}
 
 		if(!inventory_has_item(p.inventory_element, ITEM_ROCKET) || inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
@@ -1024,6 +1037,7 @@ function player_shoot(player_object, dt, target_body=null) {
 				color1,
 				color2
 			);
+			audio_play(shot_sound);
 		} else if(inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
 			rocket_create(
 				player_object.game,
@@ -1053,6 +1067,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			);
 			if(Math.random() > 0.99)
 				inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
+			audio_play("data/sfx/rocketlauncher_1.mp3");
 		}
 		p.shot_cooldown = 100;
 	}
