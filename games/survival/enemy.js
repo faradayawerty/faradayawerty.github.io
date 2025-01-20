@@ -457,14 +457,15 @@ function enemy_update(enemy_object, dt) {
 					}
 				} else
 					N = 10 * Math.random() + 5;
-			} else {
-				let to = enemy_get_target_object(enemy_object);
-				if(to && to.name == "player" && !to.data.ai_controlled) {
-					let xx = to.data.body.position.x - enemy_object.data.body.position.x;
-					let yy = to.data.body.position.y - enemy_object.data.body.position.y;
-					if(xx*xx + yy*yy < 800 * 800)
-						audio_play("data/sfx/zombie_dies_1.mp3");
-				}
+			} 
+			let sound = "data/sfx/zombie_dies_1.mp3";
+			if(enemy_object.data.boss)
+				sound = "data/sfx/zombie_boss_dies_1.mp3";
+			let to = game_object_find_closest(enemy_object.game, e.body.position.x, e.body.position.y, "player", 10000);
+			if(to && to.name == "player" && !to.data.ai_controlled) {
+				let xx = to.data.body.position.x - enemy_object.data.body.position.x;
+				let yy = to.data.body.position.y - enemy_object.data.body.position.y;
+				audio_play(sound);
 			}
 			for(let i = 0; i < N; i++) {
 				let theta = 2 * Math.PI * Math.random();

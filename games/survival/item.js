@@ -72,12 +72,10 @@ ITEMS_DRINKS = [
 
 // TODO fix item limit
 function item_create(g, id_, x_, y_, dropped=false, despawn=true) {
-	let items = g.objects.filter((obj) => obj.name == "item");
+	let items = g.objects.filter((obj) => obj.name == "item" && obj.data.despawn && !obj.data.dropped);
 	if(items.length > 50) {
-		for(let i = 0; i < items.length - 50; i++) {
-			if(!items[i].data.dropped && items[i].data.despawn)
-				items[i].destroy(items[i]);
-		}
+		for(let i = 0; i < items.length - 50; i++)
+			items[i].destroy(items[i]);
 	}
 	if(id_ == 0)
 		return;
