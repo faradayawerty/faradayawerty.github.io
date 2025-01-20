@@ -95,6 +95,7 @@ function car_update(car_object, dt) {
 			3500
 		);
 		p.shot_cooldown = 0;
+		audio_play("data/sfx/shotgun_1.mp3", 0.125);
 	}
 	if(car_object.data.health <= 0) {
 		let N = Math.random() * 4 - 1;
