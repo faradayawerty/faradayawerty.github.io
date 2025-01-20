@@ -459,7 +459,7 @@ function enemy_update(enemy_object, dt) {
 					N = 10 * Math.random() + 5;
 			} else {
 				let to = enemy_get_target_object(enemy_object);
-				if(to) {
+				if(to && to.name == "player" && !to.data.ai_controlled) {
 					let xx = to.data.body.position.x - enemy_object.data.body.position.x;
 					let yy = to.data.body.position.y - enemy_object.data.body.position.y;
 					if(xx*xx + yy*yy < 800 * 800)

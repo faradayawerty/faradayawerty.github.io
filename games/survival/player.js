@@ -701,6 +701,8 @@ function player_shoot(player_object, dt, target_body=null) {
 	let tx = 1;
 	let ty = 1;
 
+	let enable_audio = !p.ai_controlled;
+
 	if(!p.ai_controlled) {
 		sx = 0.5 * window.innerWidth;
 		sy = 0.5 * window.innerHeight;
@@ -750,7 +752,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 200;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		audio_play("data/sfx/gunshot_1.mp3");
+		if(enable_audio)
+			audio_play("data/sfx/gunshot_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN
@@ -770,7 +773,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shotgun_cooldown = 750;
 		if(Math.random() > 0.985)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		audio_play("data/sfx/shotgun_1.mp3");
+		if(enable_audio)
+			audio_play("data/sfx/shotgun_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN
@@ -789,7 +793,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.minigun_cooldown = 60;
 		if(Math.random() > 0.995)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		audio_play("data/sfx/gunshot_1.mp3");
+		if(enable_audio)
+			audio_play("data/sfx/gunshot_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER
@@ -813,7 +818,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 400;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
-		audio_play("data/sfx/plasmagun_1.mp3");
+		if(enable_audio)
+			audio_play("data/sfx/plasmagun_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS
@@ -852,7 +858,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 100;
 		if(Math.random() > 0.999)
 			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
-		audio_play("data/sfx/red_pistols_1.mp3");
+		if(enable_audio)
+			audio_play("data/sfx/red_pistols_1.mp3");
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN
@@ -879,7 +886,8 @@ function player_shoot(player_object, dt, target_body=null) {
 		p.shot_cooldown = 500;
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
-		audio_play("data/sfx/red_pistols_1.mp3");
+		if(enable_audio)
+			audio_play("data/sfx/red_pistols_1.mp3");
 	}
 
 	// TODO balance damage
