@@ -570,28 +570,23 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(player_closest) {
 		chance_ammo = 0;
-		chance_gun = 0.95 * (chance_misc + chance_drink + chance_food);
 		for(let i = 0; i < available_ammos.length; i++)
 			chance_ammo += 0.15
 				* Math.max(4.25 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
 				* (i+1) / (available_ammos.length * available_ammos.length);
 		chance_gun = 0;
 		for(let i = 0; i < available_guns.length; i++)
-			chance_gun += 0.35
+			chance_gun += 0.25
 				* Math.max(1 - inventory_count_item(player_closest.data.inventory_element, available_guns[i]), 0)
 				* (i+1) / (available_guns.length * available_guns.length);
 	}
 
-	let item = 0;
-	let r = Math.random();
-	let a = 0;
-
-	chance_gun = Math.max(0.01 * Math.random(), chance_gun)
-	chance_ammo = Math.max(0.01 * Math.random(), chance_ammo)
-	chance_fuel = Math.max(0.01 * Math.random(), chance_fuel)
-	chance_food = Math.max(0.01 * Math.random(), chance_food)
-	chance_drink = Math.max(0.01 * Math.random(), chance_drink)
-	chance_misc = Math.max(0.01 * Math.random(), chance_misc)
+	chance_gun = Math.max(0.01, chance_gun)
+	chance_ammo = Math.max(0.01, chance_ammo)
+	chance_fuel = Math.max(0.01, chance_fuel)
+	chance_food = Math.max(0.01, chance_food)
+	chance_drink = Math.max(0.01, chance_drink)
+	chance_misc = Math.max(0.01, chance_misc)
 
 	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
 
@@ -601,6 +596,10 @@ function item_spawn(g, x, y, enemy_type=null) {
 	chance_food = chance_food / chance_sum;
 	chance_drink = chance_drink / chance_sum;
 	chance_misc = chance_misc / chance_sum;
+
+	let item = 0;
+	let r = Math.random();
+	let a = 0;
 
 	if(a < r && r < a + chance_misc)
 		item = available_misc[Math.floor(Math.random() * available_misc.length)];
@@ -614,7 +613,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	for(let i = 0; i < items_weapons.length; i++) {
 		if(player_closest && inventory_has_item(player_closest.data.inventory_element, items_weapons[i]) && item <= items_weapons[i]) {
-			if(chance_ammo > 0)
+			if(chance_ammo > 0.01)
 				item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
 			else
 				item = 0;
@@ -637,22 +636,26 @@ function item_spawn(g, x, y, enemy_type=null) {
 		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
 	a += chance_ammo;
 
-	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25 * Math.random())
+	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25)
 		item = 0;
 
 	if(item == 0 && enemy_type != null)
 		item = available_misc[Math.floor(Math.random() * available_misc.length)];
 
-	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25 * Math.random())
+	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25)
 		item = 0;
 
-	g.debug_console.unshift("spawning item, chances: " + item
-		+ " A: " + Math.round(100 * chance_ammo) + "%"
-		+ " F: " + Math.round(100 * chance_food) + "%"
-		+ " M: " + Math.round(100 * chance_misc) + "%"
-		+ " D: " + Math.round(100 * chance_drink) + "%"
-		+ " G: " + Math.round(100 * chance_fuel) + "%"
-		+ " W: " + Math.round(100 * chance_gun) + "%");
+	g.debug_console.unshift(
+		"item_spawn"
+		+ " i:" + item
+		+ " r:" + Math.round(100 * r) + "%"
+		+ " M:" + Math.round(100 * chance_misc) + "%"
+		+ " W:" + Math.round(100 * chance_gun) + "%"
+		+ " G:" + Math.round(100 * chance_fuel) + "%"
+		+ " F:" + Math.round(100 * chance_food) + "%"
+		+ " D:" + Math.round(100 * chance_drink) + "%"
+		+ " A:" + Math.round(100 * chance_ammo) + "%"
+	);
 
 	item_create(g, item, x, y);
 }
