@@ -1,18 +1,25 @@
 
 function levels_set(g, level, old_level=null) {
 
+	g.debug_console.unshift("time from previous level creation " + g.level_set_delay);
+	g.level_set_delay = 0;
+	
 	let level_x = Number(level.split("x")[0]);
 	let level_y = Number(level.split("x")[1]);
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
 
-	//if(g.visited_levels.length > 40) {
-	//	for(let i = 0; i < g.visited_levels.length; i++) {
-	//		if(!level_visible(g, g.visited_levels[i]))
-	//			game_destroy_level(g, g.visited_levels[i]);
-	//	}
-	//	g.visited_levels = ["0x0"];
-	//}
+	if(g.visited_levels.length > 20) {
+		g.debug_console.unshift("starting level deletion");
+		for(let i = 0; i < g.visited_levels.length; i++) {
+			if(!level_visible(g, g.visited_levels[i])) {
+				g.debug_console.unshift("destroying level " + g.visited_levels[i]);
+				game_destroy_level(g, g.visited_levels[i]);
+				g.debug_console.unshift("destroyed level " + g.visited_levels[i]);
+			}
+		}
+		g.visited_levels = ["0x0"];
+	}
 
 	let player_object = game_object_find_closest(g, Ox + 1250, Oy + 1250, "player", 3536);
 	if(player_object && !player_object.data.ai_controlled)
@@ -20,6 +27,7 @@ function levels_set(g, level, old_level=null) {
 	
 	if(!g.visited_levels.includes(level)) {
 		g.visited_levels.push(level);
+		g.debug_console.unshift("new level: " + level);
 
 		if(player_object) {
 			let m = 0.33 * (

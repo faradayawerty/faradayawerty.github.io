@@ -24,6 +24,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		hotbar_element: null,
 		car_object: null,
 		body: Matter.Bodies.rectangle(x, y, width, height, {
+			isStatic: false,
 			inertia: Infinity
 		}),
 		immunity: 6000,
@@ -40,7 +41,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		gradient: 0,
 		item_animstate: 0,
 		laser_direction: 0,
-		shooting_laser: false
+		shooting_laser: false,
 	};
 	p.inventory_element = g.gui_elements[inventory_create(g)];
 	for(let i = 0; i < g.saved_items.length; i++)
@@ -110,10 +111,29 @@ function player_die(player_object) {
 
 function player_update(player_object, dt) {
 
-	if(!player_object || player_object.destroyed || !player_object.data.body)
+	if(dt < 1000/120 && !player_object || player_object.destroyed || !player_object.data.body)
 		return;
 
 	let p = player_object.data;
+
+	let max_levels = 600;
+
+	if(p.body.position.x < -max_levels * 2500) {
+		Matter.Body.setPosition(p.body, {x: max_levels * 2500, y: p.body.position.y}, false);
+	}
+
+	if(max_levels * 2500 < p.body.position.x) {
+		Matter.Body.setPosition(p.body, {x: -max_levels * 2500, y: p.body.position.y}, false);
+	}
+
+	if(p.body.position.y < -max_levels * 2500) {
+		Matter.Body.setPosition(p.body, {x: p.body.position.x, y: max_levels * 2500}, false);
+	}
+
+	if(max_levels * 2500 < p.body.position.y) {
+		Matter.Body.setPosition(p.body, {x: p.body.position.x, y: -max_levels * 2500}, false);
+	}
+
 	if(p.shot_cooldown > 0)
 		p.shot_cooldown -= dt;
 	if(p.shotgun_cooldown > 0)
@@ -204,19 +224,17 @@ function player_update(player_object, dt) {
 
 	let old_level = p.want_level;
 
+	let pos = p.body.position;
+	let px = pos.x;
+	let py = pos.y;
+
 	// choose level based on coordinates
 	let level_x = Number(p.want_level.split("x")[0]);
 	let level_y = Number(p.want_level.split("x")[1]);
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
-	if(p.body.position.x < Ox)
-		p.want_level = (level_x - 1) + "x" + level_y;
-	else if(p.body.position.x > Ox + 2500)
-		p.want_level = (level_x + 1) + "x" + level_y;
-	if(p.body.position.y < Oy)
-		p.want_level = level_x + "x" + (level_y - 1);
-	else if(p.body.position.y > Oy + 2500)
-		p.want_level = level_x + "x" + (level_y + 1);
+
+	p.want_level = (Math.floor(px / 2500)) + "x" + (Math.floor(py / 2500));
 
 	if(old_level != p.want_level) {
 		if(!level_visible(player_object.game, old_level, player_object))

@@ -1,6 +1,8 @@
 
 function game_create(input_, engine_) {
 	let g = {	
+		want_levels: [],
+		level_set_delay: 100,
 		respawn_level: "0x0",
 		visited_levels: ["0x0"],
 		offset_x: 1250,
@@ -146,6 +148,7 @@ function game_gui_element_create(g, name_, data_, func_update, func_draw, func_d
 }
 
 function game_update(g, dt) {
+	g.level_set_delay += dt;
 	if(isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
 	if(isKeyDown(g.input, '-', true) && (g.scale > 0.5 || !g.camera_target_body))

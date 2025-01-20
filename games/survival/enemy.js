@@ -424,36 +424,36 @@ function enemy_update(enemy_object, dt) {
 				if(enemy_object.data.hunger > 0) {
 					N = 20 * Math.random() + 10;
 					if(e.type == "shooting") {
-						item_create(enemy_object.game, ITEM_PLASMA_LAUNCHER, e.body.position.x, e.body.position.y);
+						item_create(enemy_object.game, ITEM_PLASMA_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
 						if(Math.random() < 0.33)
-							item_create(enemy_object.game, ITEM_SHIELD, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_SHIELD, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "shooting red") {
 						if(Math.random() > 0.33)
-							item_create(enemy_object.game, ITEM_RED_PISTOLS, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_RED_PISTOLS, e.body.position.x, e.body.position.y, false, false);
 						else
-							item_create(enemy_object.game, ITEM_RED_SHOTGUN, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_RED_SHOTGUN, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "sword") {
 						if(Math.random() > 0.33)
-							item_create(enemy_object.game, ITEM_SWORD, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_SWORD, e.body.position.x, e.body.position.y, false, false);
 						else
-							item_create(enemy_object.game, ITEM_GREEN_GUN, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_GREEN_GUN, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "shooting rocket") {
 						if(Math.random() > 0.33)
-							item_create(enemy_object.game, ITEM_ROCKET_LAUNCHER, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_ROCKET_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
 						else {
 							let tank_colors = ["green", "blue", "#005533", "#003355", "#aaaa11"];
 							car_create(enemy_object.game, e.body.position.x, e.body.position.y, tank_colors[Math.floor(Math.random() * tank_colors.length)], true, true);
 						}
 					} else if(e.type == "shooting laser") {
 						if(Math.random() > 0.33)
-							item_create(enemy_object.game, ITEM_RAINBOW_PISTOLS, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_RAINBOW_PISTOLS, e.body.position.x, e.body.position.y, false, false);
 						else
-							item_create(enemy_object.game, ITEM_LASER_GUN, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_LASER_GUN, e.body.position.x, e.body.position.y, false, false);
 					} else {
 						if(Math.random() > 0.33)
-							item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y, false, false);
 						else
-							item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y);
+							item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y, false, false);
 					}
 				} else
 					N = 10 * Math.random() + 5;
