@@ -148,15 +148,15 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.max_health = 0.25 * e.max_health;
 		e.hunger = 0.05 * e.max_hunger;
 		e.max_hunger = 0.05 * e.max_hunger;
-		e.speed = 1.15 * e.speed;
+		e.speed = 1.75 * e.speed;
 		if(e.type == "sword") {
 			e.speed = 0;
 			e.health *= 0.25;
 			e.max_health *= 0.25;
 		}
 		e.boss = false;
-		e.follow_range = 1.25 * e.follow_range;
-		e.shooting_range = 25 * e.shooting_range;
+		e.follow_range = 1.75 * e.follow_range;
+		e.shooting_range = 2.25 * e.shooting_range;
 		e.is_minion = true;
 	}
 	
@@ -395,19 +395,23 @@ function enemy_update(enemy_object, dt) {
 				e.hunger = Math.min(e.max_hunger, e.hunger + 0.05 * dt)
 		}
 		if(e.spawn_minion_delay >= 4000 && e.boss) {
-			let max_minions = 5;
+			let max_minions = 10;
 			if(enemy_object.data.type == "sword")
 				max_minions = 25;
 			if(enemy_object.data.type == "shooting laser")
-				max_minions = 15;
+				max_minions = 5;
 			if(enemy_count_minions(enemy_object) < max_minions) {
 				for(let i = 0; i < Math.random() * 4 + 1; i++) {
 					let theta = 2 * Math.PI * Math.random();
-					let x = e.body.position.x + 300 * Math.cos(theta);
-					let y = e.body.position.y + 300 * Math.sin(theta);
+					let x = e.body.position.x + 200 * Math.cos(theta);
+					let y = e.body.position.y + 200 * Math.sin(theta);
+					if(e.type == "shooting laser") {
+						x = target_object.data.body.position.x + 7.5 * e.w * Math.cos(theta);
+						y = target_object.data.body.position.y + 7.5 * e.w * Math.sin(theta);
+					}
 					if(e.type == "sword") {
-						x = target_object.data.body.position.x + 500 * Math.cos(theta);
-						y = target_object.data.body.position.y + 500 * Math.sin(theta);
+						x = target_object.data.body.position.x + 5.25 * e.w * Math.cos(theta);
+						y = target_object.data.body.position.y + 5.25 * e.w * Math.sin(theta);
 					}
 					enemy_create(enemy_object.game, x, y, false, true, e.type);
 				}

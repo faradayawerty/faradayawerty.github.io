@@ -698,6 +698,9 @@ function player_draw(player_object, ctx) {
 
 function player_shoot(player_object, dt, target_body=null) {
 
+	if(player_object.data.immunity > 0)
+		return;
+
 	let base_damage = 0.5;
 
 	let p = player_object.data;
@@ -1106,6 +1109,7 @@ function player_item_consume(player_object, id, anywhere=false) {
 		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		if(c) {
 			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.0625 + 0.0625));
+			c.data.health += Math.min(c.data.max_health - c.data.health, c.data.max_health * (Math.random() * 0.0625 + 0.0625));
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		}
 	}
