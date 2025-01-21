@@ -388,6 +388,7 @@ function player_update(player_object, dt) {
 	if(!p.inventory_element.shown && !p.car_object) {
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
+
 		if(player_object.game.input.keys.down['d'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
 		if(player_object.game.input.keys.down['a'])
@@ -396,6 +397,10 @@ function player_update(player_object, dt) {
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
 		if(player_object.game.input.keys.down['w'])
 			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
+
+
+		if(player_object.game.input.touch.length > 0)
+			vel = Matter.Vector.add(vel, Matter.Vector.create(player_object.game.input.joystick.right.dx, player_object.game.input.joystick.right.dy));
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
