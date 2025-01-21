@@ -73,6 +73,8 @@ function levels_set(g, level, old_level=null) {
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 2420);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
 	} else {
+		for(let i = 0; i < Math.random() * 40 - 35; i++)
+			animal_create(g, Ox + 1250 + (0.5 - Math.random()) * 1500, Oy + 1250 + (0.5 - Math.random()) * 1500);
 		N = 6;
 		for(let i = 0; i < N; i++)
 			for(let j = 0; j < N; j++) {

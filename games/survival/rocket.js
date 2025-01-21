@@ -62,7 +62,7 @@ function rocket_update(rocket_object, dt) {
 
 	if(r.target_object) {
 		if(r.target_object.destroyed
-			|| r.target_object.name != "player" && r.target_object.name != "enemy" && r.target_object.name != "car" && r.target_object.name != "rocket"
+			|| r.target_object.name != "animal" && r.target_object.name != "player" && r.target_object.name != "enemy" && r.target_object.name != "car" && r.target_object.name != "rocket"
 			|| r.target_object.name == "car" && r.target_object.data.is_tank) {
 			r.target_object = null;
 		} else {

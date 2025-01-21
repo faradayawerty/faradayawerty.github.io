@@ -384,8 +384,12 @@ function enemy_update(enemy_object, dt) {
 				else if(target_object.data.immunity <= 0)
 					target_object.data.health -= e.damage * dt;
 			}
-			if(target_object.name == "car")
-				target_object.data.health -= e.damage * dt;
+			if(target_object.name == "car") {
+				if(target_object.data.is_tank)
+					target_object.data.health -= 0.0625 * e.damage * dt;
+				else
+					target_object.data.health -= e.damage * dt;
+			}
 			if(target_object.name == "car"
 				&& (!e.boss && Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.9 * target_object.data.max_speed
 					|| target_object.data.is_tank && Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.1 * target_object.data.max_speed)) {
@@ -445,7 +449,7 @@ function enemy_update(enemy_object, dt) {
 						if(Math.random() > 0.33)
 							item_create(enemy_object.game, ITEM_ROCKET_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
 						else {
-							let tank_colors = ["green", "blue", "#005533", "#003355", "#aaaa11"];
+							let tank_colors = ["green", "#005533", "#003355", "#aaaa11"];
 							car_create(enemy_object.game, e.body.position.x, e.body.position.y, tank_colors[Math.floor(Math.random() * tank_colors.length)], true, true);
 						}
 					} else if(e.type == "shooting laser") {

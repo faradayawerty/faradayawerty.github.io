@@ -302,6 +302,7 @@ function game_objects_arrange(g) {
 		"shield",
 		"rocket",
 		"player",
+		"animal",
 		"enemy",
 		"item",
 		"car",

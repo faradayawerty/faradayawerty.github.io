@@ -739,7 +739,7 @@ function player_shoot(player_object, dt, target_body=null) {
 			let g = player_object.game;
 			for(let i = 0; i < g.objects.length; i++) {
 				let obj = g.objects[i];
-				if(!obj.destroyed && (obj.name == "enemy" || obj.name == "car" && !obj.data.is_tank || obj.name == "rocket")) {
+				if(!obj.destroyed && (obj.name == "animal" || obj.name == "enemy" || obj.name == "car" && !obj.data.is_tank || obj.name == "rocket")) {
 					if(player_laser_hits_point(player_object, obj.data.body.position.x, obj.data.body.position.y, 1.5 * p.w, 60 * p.w, p.laser_direction)) {
 						obj.data.health -= 15625 * dt;
 						obj.data.hit_by_player = true;
