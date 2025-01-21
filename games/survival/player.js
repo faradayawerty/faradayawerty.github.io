@@ -400,7 +400,10 @@ function player_update(player_object, dt) {
 
 
 		if(player_object.game.input.touch.length > 0)
-			vel = Matter.Vector.add(vel, Matter.Vector.create(player_object.game.input.joystick.right.dx, player_object.game.input.joystick.right.dy));
+			vel = Matter.Vector.add(vel, Matter.Vector.create(
+				p.speed * player_object.game.input.joystick.right.dx,
+				p.speed * player_object.game.input.joystick.right.dy
+			));
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
