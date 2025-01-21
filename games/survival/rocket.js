@@ -45,6 +45,12 @@ function rocket_update(rocket_object, dt) {
 	} else {
 		rocket_object.data.lifetime -= dt;
 	}
+
+	if(r.health < 0) {
+		rocket_destroy(rocket_object);
+		return;
+	}
+
 	if(!r.enemy) {
 		r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "enemy", 300);
 		if(!r.target_object)
@@ -57,10 +63,6 @@ function rocket_update(rocket_object, dt) {
 			rocket_object.name = "rocket";
 		}
 	}
-	if(r.health < 0) {
-		rocket_destroy(rocket_object);
-		return;
-	}
 
 	if(r.target_object) {
 		if(r.target_object.destroyed
@@ -68,6 +70,7 @@ function rocket_update(rocket_object, dt) {
 			|| r.target_object.name == "car" && r.target_object.data.is_tank) {
 			r.target_object = null;
 		} else {
+			//rocket_object.game.debug_console.unshift("rocket object found " + r.target_object.name);
 			if(r.target_object.name == "player" && r.target_object.data.car_object) {
 				r.target_object = r.target_object.data.car_object;
 			}
@@ -77,6 +80,7 @@ function rocket_update(rocket_object, dt) {
 			let vel = Matter.Vector.create(r.speed * dx/d, r.speed * dy/d);
 			Matter.Body.setVelocity(r.body, vel);
 			if(r.target_object && Matter.Collision.collides(rocket_object.data.body, r.target_object.data.body) != null) {
+				rocket_object.game.debug_console.unshift("rocket object collides with " + r.target_object.name);
 				let alpha = 25;
 				if(r.target_object.name == "player") {
 					if(r.target_object.data.shield_blue_health > 0) {
@@ -117,7 +121,7 @@ function rocket_update(rocket_object, dt) {
 
 function rocket_draw(rocket_object, ctx) {
 	let r = rocket_object.data;
-	if(r.target_object && (r.target_object.name == "player" || r.target_object.name == "enemy" || r.target_object.name == "car")) {
+	if(r.target_object && r.target_object.data.body) {
 		let rx = r.body.position.x;
 		let ry = r.body.position.y;
 		let dx = r.target_object.data.body.position.x - r.body.position.x;

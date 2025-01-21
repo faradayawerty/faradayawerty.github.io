@@ -37,11 +37,13 @@ function animal_update(ao, dt) {
 	let a = ao.data;
 
 	if(a.health <= 0) {
-		item_create(ao.game, ITEM_CANNED_MEAT, a.body.position.x, a.body.position.y);
-		if(Math.random() < 0.1)
-			item_create(ao.game, ITEM_HEALTH, a.body.position.x, a.body.position.y);
-		if(Math.random() < 0.01)
+		if(Math.random() < 0.75)
+			item_create(ao.game, ITEM_CANNED_MEAT, a.body.position.x, a.body.position.y);
+		if(Math.random() < 0.075)
 			item_create(ao.game, ITEM_AMMO, a.body.position.x, a.body.position.y);
+		if(Math.random() < 0.0075)
+			item_create(ao.game, ITEM_HEALTH_GREEN, a.body.position.x, a.body.position.y);
+		audio_play("data/sfx/deer_dies_1.mp3");
 		animal_destroy(ao);
 		return;
 	}
@@ -61,7 +63,11 @@ function animal_update(ao, dt) {
 		dy = -a.speed * dy / d;
 	}
 
-	let ho = game_object_find_closest(ao.game, ao.data.body.position.x, ao.data.body.position.y, "player", 300);
+	let ho = game_object_find_closest(ao.game, ao.data.body.position.x, ao.data.body.position.y, "rocket", 500);
+	if(!ho)
+		ho = game_object_find_closest(ao.game, ao.data.body.position.x, ao.data.body.position.y, "enemy", 400);
+	if(!ho)
+		ho = game_object_find_closest(ao.game, ao.data.body.position.x, ao.data.body.position.y, "player", 300);
 	if(ho) {
 		dx = ho.data.body.position.x - a.body.position.x;
 		dy = ho.data.body.position.y - a.body.position.y;

@@ -127,3 +127,8 @@ function decorative_level_base_create(g, x, y) {
 	game_object_change_name(g, decorative_rectangle_create(g, x, y, 2500, 2500, "gray", "white"), "decorative_level_base");
 }
 
+//function decorative_office_cooler(g, x, y) {
+//	let w = 40;
+//	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, w, "gray", "white"), "cooler");
+//}
+
