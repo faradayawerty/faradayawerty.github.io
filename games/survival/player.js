@@ -401,8 +401,8 @@ function player_update(player_object, dt) {
 
 		if(player_object.game.input.touch.length > 0)
 			vel = Matter.Vector.add(vel, Matter.Vector.create(
-				p.speed * player_object.game.input.joystick.right.dx,
-				p.speed * player_object.game.input.joystick.right.dy
+				Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dx,
+				Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dy
 			));
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
@@ -434,6 +434,8 @@ function player_update(player_object, dt) {
 		}
 
 		if(player_object.game.input.mouse.leftButtonPressed) {
+			player_shoot(player_object, dt);
+		} else if(player_object.game.input.touch.length > 0) {
 			player_shoot(player_object, dt);
 		} else {
 			p.laser_sound_has_played = false;
@@ -704,7 +706,7 @@ function player_draw(player_object, ctx) {
 }
 
 
-function player_shoot(player_object, dt, target_body=null) {
+function player_shoot(player_object, dt, target_body=nul, shoot_dir_x=null, shoot_dir_y=null) {
 
 	if(player_object.data.immunity > 0)
 		return;
