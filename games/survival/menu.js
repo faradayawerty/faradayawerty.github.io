@@ -165,7 +165,7 @@ function menu_update(m, dt, input) {
 		m.iselected += 1;
 	} else if((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp', true)) && m.iselected > 0) {
 		m.iselected -= 1;
-	} else if((isKeyDown(input, ' ', true) || isKeyDown(input, 'Enter', true) || isMouseLeftButtonPressed(input))) {
+	} else if((isKeyDown(input, ' ', true) || isKeyDown(input, 'Enter', true) || isMouseLeftButtonPressed(input)) || input.touch.length > 0) {
 		if(m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
 		} else if(m.buttons[m.iselected] == "respawn and continue game") {
