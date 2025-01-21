@@ -225,7 +225,7 @@ function game_draw(g, ctx) {
 	}
 	ctx.restore();
 	
-	drawJoysticks(ctx, g.input);
+	drawJoysticks(ctx, g.input.joystick);
 }
 
 function game_destroy_all_objects(g) {
