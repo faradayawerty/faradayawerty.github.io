@@ -49,6 +49,8 @@ function rocket_update(rocket_object, dt) {
 		r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "enemy", 300);
 		if(!r.target_object)
 			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "car", 200);
+		if(!r.target_object)
+			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "animal", 200);
 		if(!r.target_object) {
 			rocket_object.name = "ROCKET";
 			r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "rocket", 25);

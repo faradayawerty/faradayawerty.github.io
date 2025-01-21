@@ -148,7 +148,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.max_health = 0.25 * e.max_health;
 		e.hunger = 0.05 * e.max_hunger;
 		e.max_hunger = 0.05 * e.max_hunger;
-		e.speed = 1.75 * e.speed;
+		e.speed = 1.25 * e.speed;
 		if(e.type == "sword") {
 			e.speed = 0;
 			e.health *= 0.25;

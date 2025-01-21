@@ -155,12 +155,12 @@ function game_update(g, dt) {
 		g.scale = g.scale * 0.9375;
 	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data.ai_controlled);
 	if(plr) {
-		if(isKeyDown(g.input, 'x', true)) {
+		if(isKeyDown(g.input, ']', true)) {
 			plr.data.ai_controlled = true;
 			g.camera_target_body = null;
 		}
 	} else {
-		if(isKeyDown(g.input, 'x', true)) {
+		if(isKeyDown(g.input, ']', true)) {
 			let plr = g.objects.find((obj) => obj.name == "player" && obj.data.ai_controlled);
 			if(plr)
 				plr.data.ai_controlled = false;
