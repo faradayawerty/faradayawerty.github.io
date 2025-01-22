@@ -443,14 +443,14 @@ function player_update(player_object, dt) {
 
 		if(player_object.game.input.mouse.leftButtonPressed) {
 			player_shoot(player_object, dt);
-		} else if(Matter.Vector.magnitude(player_object.game.input.joystick.left) > 0) {
+		} else if(player_object.game.input.joystick.left.dx != 0 || player_object.game.input.joystick.left.dy != 0) {
 			player_shoot(player_object, dt,
 				game_object_find_closest(player_object.game,
-					player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.x,
-					player_object.data.body.position.y + 50 * player_object.game.input.joystick.left.y,
+					player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.dx,
+					player_object.data.body.position.y + 50 * player_object.game.input.joystick.left.dy,
 					"enemy", 300),
-				player_object.game.input.joystick.left.x,
-				player_object.game.input.joystick.left.y				
+				player_object.game.input.joystick.left.dx,
+				player_object.game.input.joystick.left.dy				
 			);
 		} else {
 			p.laser_sound_has_played = false;
@@ -488,7 +488,9 @@ function player_update(player_object, dt) {
 		Matter.Body.setVelocity(p.car_object.data.body, vel);
 		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(0, 0)));
 
-		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true)) {
+		if(isKeyDown(player_object.game.input, 'f', true)
+			//|| isKeyDown(player_object.game.input, ' ', true)
+			|| isKeyDown(player_object.game.input, ' ', true)) {
 			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
 			p.car_object = null;
 		}
@@ -748,7 +750,9 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			tx = shoot_dir_x;
 		if(shoot_dir_y)
 			ty = shoot_dir_y;
-	} else if(target_body) {
+	}
+
+	if(target_body) {
 		sx = p.body.position.x;
 		sy = p.body.position.y;
 		tx = target_body.position.x;
@@ -1191,6 +1195,7 @@ function player_item_consume(player_object, id, anywhere=false) {
 
 	if(ITEMS_FOODS.includes(id) && true) {
 		p.hunger += Math.min(p.max_hunger - p.hunger, (Math.random() * 0.125 + 0.125) * p.max_hunger);
+		p.thirst += Math.min(p.max_thirst - p.thirst, (Math.random() * 0.03125 + 0.03125) * p.max_thirst);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/eating_1.mp3", 1.0);
 	}
