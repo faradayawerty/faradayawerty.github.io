@@ -56,8 +56,8 @@ function animal_update(ao, dt) {
 	let dx = 0, dy = 0;
 
  	if(a.movement_change_delay < 0) {
-		dx = Math.random();
-		dy = Math.random();
+		dx = 2 * Math.random() - 1;
+		dy = 2 * Math.random() - 1;
 		let d = Math.sqrt(dx*dx + dy*dy);
 		dx = -a.speed * dx / d;
 		dy = -a.speed * dy / d;
