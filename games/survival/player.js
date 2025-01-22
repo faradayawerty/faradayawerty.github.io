@@ -389,21 +389,22 @@ function player_update(player_object, dt) {
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
 
-		if(player_object.game.input.keys.down['d'])
-			vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
-		if(player_object.game.input.keys.down['a'])
-			vel = Matter.Vector.add(vel, Matter.Vector.create(-p.speed, 0));
-		if(player_object.game.input.keys.down['s'])
-			vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
-		if(player_object.game.input.keys.down['w'])
-			vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
+		vel = Matter.Vector.mult(getWishDir(player_object.game.input), p.speed);
 
-
-		if(player_object.game.input.touch.length > 0)
-			vel = Matter.Vector.add(vel, Matter.Vector.create(
-				Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dx,
-				Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dy
-			));
+		//if(player_object.game.input.keys.down['d'])
+		//	vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
+		//if(player_object.game.input.keys.down['a'])
+		//	vel = Matter.Vector.add(vel, Matter.Vector.create(-p.speed, 0));
+		//if(player_object.game.input.keys.down['s'])
+		//	vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
+		//if(player_object.game.input.keys.down['w'])
+		//	vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
+		//
+		//if(player_object.game.input.touch.length > 0)
+		//	vel = Matter.Vector.add(vel, Matter.Vector.create(
+		//		Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dx,
+		//		Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dy
+		//	));
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
@@ -420,8 +421,11 @@ function player_update(player_object, dt) {
 			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down)
 				item_pickup(p.inventory_element, closest_item);
 		} else if(f_down) {
-			if(!item_pickup(p.inventory_element, closest_item))
+			if(!item_pickup(p.inventory_element, closest_item)) {
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+				if(p.car_object)
+					audio_play("data/sfx/car_1.mp3");
+			}
 			if(!p.car_object) {
 				player_object.name = "PLAYER";
 				let player_closest = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "player", 100);
@@ -435,6 +439,15 @@ function player_update(player_object, dt) {
 
 		if(player_object.game.input.mouse.leftButtonPressed) {
 			player_shoot(player_object, dt);
+		if(Matter.Vector.magnitude(player_object.game.input.joystick.left) > 0) {
+			player_shoot(player_object, dt,
+				game_object_find_closest(player_object.game,
+					player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.x,
+					player_object.data.body.position.y + 50 * player_object.game.input.joystick.left.y,
+					"enemy", 100),
+				player_object.game.input.joystick.left.x,
+				player_object.game.input.joystick.left.y				
+			);
 		} else {
 			p.laser_sound_has_played = false;
 		}
@@ -453,22 +466,24 @@ function player_update(player_object, dt) {
 		let rotatedir = 0;
 		player_object.game.camera_target_body = p.car_object.data.body;
 		p.body.collisionFilter.mask = -3;
-		if(player_object.game.input.keys.down['w'] && p.car_object.data.fuel > 0) {
+		if(getWishDir(player_object.game.input).y < 0 && p.car_object.data.fuel > 0) {
 			vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
 			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
 			rotatedir = 1;
 		}
-		if(player_object.game.input.keys.down['s'] && p.car_object.data.fuel > 0) {
+		if(getWishDir(player_object.game.input).y > 0 && p.car_object.data.fuel > 0) { 
 			vel = Matter.Vector.create(-0.5 * p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), -0.5 * p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
 			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
 			rotatedir = -1;
 		}
-		if(player_object.game.input.keys.down['d'])
+		if(getWishDir(player_object.game.input).x > 0)
 			Matter.Body.rotate(p.car_object.data.body, rotatedir * 0.0015 * dt);
-		if(player_object.game.input.keys.down['a'])
+		if(getWishDir(player_object.game.input).x < 0)
 			Matter.Body.rotate(p.car_object.data.body, -rotatedir * 0.0015 * dt);
+
 		Matter.Body.setVelocity(p.car_object.data.body, vel);
 		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(0, 0)));
+
 		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true)) {
 			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
 			p.car_object = null;
@@ -725,6 +740,10 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 		sy = 0.5 * window.innerHeight;
 		tx = player_object.game.input.mouse.x
 		ty = player_object.game.input.mouse.y
+		if(shoot_dir_x)
+			tx = shoot_dir_x;
+		if(shoot_dir_y)
+			ty = shoot_dir_y;
 	} else if(target_body) {
 		sx = p.body.position.x;
 		sy = p.body.position.y;

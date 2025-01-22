@@ -14,6 +14,24 @@ function input_create() {
 	};
 }
 
+function getWishDir(input) {
+	if(input.touch.length > 0)
+		return {x: input.joystick.right.dx, y: input.joystick.right.dy}
+
+	let vel = Matter.Vector.create(0, 0);
+
+	if(input.keys.down['d'])
+		vel = Matter.Vector.add(vel, Matter.Vector.create(1, 0));
+	if(input.keys.down['a'])
+		vel = Matter.Vector.add(vel, Matter.Vector.create(-1, 0));
+	if(input.keys.down['s'])
+		vel = Matter.Vector.add(vel, Matter.Vector.create(0, 1));
+	if(input.keys.down['w'])
+		vel = Matter.Vector.add(vel, Matter.Vector.create(0, -1));
+
+	return vel;
+}
+
 function isMouseWheelUp(input) {
 	let val = input.mouse.wheelUp;
 	input.mouse.wheelUp = false;
