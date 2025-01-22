@@ -439,7 +439,7 @@ function player_update(player_object, dt) {
 
 		if(player_object.game.input.mouse.leftButtonPressed) {
 			player_shoot(player_object, dt);
-		if(Matter.Vector.magnitude(player_object.game.input.joystick.left) > 0) {
+		} else if(Matter.Vector.magnitude(player_object.game.input.joystick.left) > 0) {
 			player_shoot(player_object, dt,
 				game_object_find_closest(player_object.game,
 					player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.x,
