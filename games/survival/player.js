@@ -406,7 +406,11 @@ function player_update(player_object, dt) {
 		//		Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dy
 		//	));
 
-		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
+
+		let f_down = isKeyDown(player_object.game.input, 'f', true)
+			|| isKeyDown(player_object.game.input, ' ', true)
+			|| player_object.game.input.touch.length > 0;
+
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
 		if(closest_item && !closest_item.data.dropped && ITEMS_AMMOS.includes(closest_item.data.id)) {
 			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down)
@@ -444,7 +448,7 @@ function player_update(player_object, dt) {
 				game_object_find_closest(player_object.game,
 					player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.x,
 					player_object.data.body.position.y + 50 * player_object.game.input.joystick.left.y,
-					"enemy", 100),
+					"enemy", 300),
 				player_object.game.input.joystick.left.x,
 				player_object.game.input.joystick.left.y				
 			);
