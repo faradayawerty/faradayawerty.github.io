@@ -169,8 +169,9 @@ function enemy_destroy(enemy_object) {
 		return;
 	let g = enemy_object.game;
 	g.debug_console.unshift("destroying enemy");
-	if(enemy_object.data.hit_by_player) {
+	if(enemy_object.data.hit_by_player && enemy_object.data.hunger > 0) {
 		g.enemy_kills[enemy_object.data.type] += 1;
+		g.debug_console.unshift("killed " + enemy_object.data.type + ": " + g.enemy_kills[enemy_object.data.type]);
 		if(enemy_object.data.boss) {
 			g.kills_for_boss = 16;
 			g.boss_kills += 1;
@@ -188,6 +189,7 @@ function enemy_destroy(enemy_object) {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
 		}
+		g.debug_console.unshift("need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
 	}
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
 	enemy_object.data.body = null;
@@ -395,8 +397,7 @@ function enemy_update(enemy_object, dt) {
 					|| target_object.data.is_tank && Matter.Vector.magnitude(Matter.Body.getVelocity(target_object.data.body)) > 0.1 * target_object.data.max_speed)) {
 				enemy_object.data.health -= 10 * e.damage * dt;
 				enemy_object.data.hit_by_player = true;
-			} else
-				e.hunger = Math.min(e.max_hunger, e.hunger + 0.05 * dt)
+			}
 		}
 		if(e.spawn_minion_delay >= 4000 && e.boss) {
 			let max_minions = 10;
@@ -464,13 +465,13 @@ function enemy_update(enemy_object, dt) {
 							item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y, false, false);
 					}
 				} else
-					N = 10 * Math.random() + 5;
+					N = 5 * Math.random();
 			} 
 			let sound = "data/sfx/zombie_dies_1.mp3";
 			if(enemy_object.data.boss)
 				sound = "data/sfx/zombie_boss_dies_1.mp3";
 			let to = game_object_find_closest(enemy_object.game, e.body.position.x, e.body.position.y, "player", 10000);
-			if(to && to.name == "player" && !to.data.ai_controlled) {
+			if(to && to.name == "player" && !to.data.ai_controlled && enemy_object.data.hunger > 0) {
 				let xx = to.data.body.position.x - enemy_object.data.body.position.x;
 				let yy = to.data.body.position.y - enemy_object.data.body.position.y;
 				audio_play(sound);

@@ -5,6 +5,7 @@ function game_create(input_, engine_) {
 		level_set_delay: 100,
 		respawn_level: "0x0",
 		visited_levels: ["0x0"],
+		assigned_tiles: [TILE_START],
 		offset_x: 1250,
 		offset_y: 1250,
 		scale: 0.75,
@@ -468,7 +469,8 @@ function game_save(g) {
 		kills: g.kills,
 		boss_kills: g.boss_kills,
 		deaths: g.deaths,
-		visited_levels: g.visited_levels
+		visited_levels: g.visited_levels,
+		assigned_tiles: g.assigned_tiles
 	};
 
 	objs.push(state_object);
@@ -516,6 +518,7 @@ function game_load(g) {
 					g.boss_kills = obj.boss_kills;
 					g.deaths = obj.deaths;
 					g.visited_levels = obj.visited_levels;
+					g.assigned_tiles = obj.assigned_tiles;
 				}
 
 				if(obj.name == "player") {
