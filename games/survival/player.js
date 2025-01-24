@@ -951,6 +951,8 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 		let closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 200);
 		if(!closest_target)
 			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 200);
+		if(!closest_target)
+			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 300);
 		if(closest_target) {
 			target_direction = Math.atan2(closest_target.data.body.position.y - p.body.position.y, closest_target.data.body.position.x - p.body.position.x);
 			if(Math.abs(target_direction - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
