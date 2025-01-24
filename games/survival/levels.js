@@ -115,7 +115,7 @@ function levels_set(g, level, old_level=null) {
 			].includes(tile)));
 
 		if(available_tiles.length < 1)
-			available_tiles.push(TILE_VOID);
+			available_tiles.push(TILE_FOREST);
 
 		g.debug_console.unshift("new level: " + level);
 		g.debug_console.unshift("visited levels: ..." + g.visited_levels.slice(g.visited_levels.length - 10));
@@ -163,8 +163,8 @@ function levels_set(g, level, old_level=null) {
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1410, 1050, 525);
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1050, false);
-		decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
-		decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
+		decorative_rectangle_create(g, Ox, Oy + 1150, 2500, 200, "#222222", "#222222");
+		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
 	} else if(tile == TILE_ROAD_CROSSROAD) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 1050);
@@ -178,24 +178,28 @@ function levels_set(g, level, old_level=null) {
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1370, 1050);
 		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
 	} else if(tile == TILE_ROAD_TURN_WS) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 1090, 1050, 1370);
 		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
 	} else if(tile == TILE_ROAD_TURN_ES) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1090, 1050, 1370);
 		decorative_grass_create(g, Ox + 1410, Oy + 1410, 1050, 1050);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
 	} else if(tile == TILE_ROAD_TURN_EN) {
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1370);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 2420, 1050);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
 	} else if (tile == TILE_ROAD_HORIZONTAL) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 2420, 1050);

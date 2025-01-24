@@ -869,7 +869,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 		if(Math.random() > 0.99)
 			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
 		if(enable_audio)
-			audio_play("data/sfx/plasmagun_1.mp3", 0.25);
+			audio_play("data/sfx/plasmagun_1.mp3", 0.125);
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS
