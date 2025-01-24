@@ -619,7 +619,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	for(let i = 0; i < items_weapons.length; i++) {
 		if(player_closest && inventory_has_item(player_closest.data.inventory_element, items_weapons[i]) && item <= items_weapons[i]) {
-			if(chance_ammo > 0.01)
+			if(chance_ammo > chance_misc)
 				item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
 			else
 				item = 0;
