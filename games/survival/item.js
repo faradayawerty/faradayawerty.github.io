@@ -580,19 +580,19 @@ function item_spawn(g, x, y, enemy_type=null) {
 				* (i+1) / (available_guns.length * available_guns.length);
 	}
 
-	chance_gun = Math.min(0.25, chance_gun)
-	chance_ammo = Math.min(0.25, chance_ammo)
-	chance_fuel = Math.min(0.25, chance_fuel)
-	chance_food = Math.min(0.25, chance_food)
-	chance_drink = Math.min(0.25, chance_drink)
-	chance_misc = Math.min(0.25, chance_misc)
+	chance_gun = Math.min(0.75, chance_gun)
+	chance_ammo = Math.min(0.75, chance_ammo)
+	chance_fuel = Math.min(0.75, chance_fuel)
+	chance_food = Math.min(0.75, chance_food)
+	chance_drink = Math.min(0.75, chance_drink)
+	chance_misc = Math.min(0.75, chance_misc)
 
-	chance_gun = Math.max(0.01, chance_gun)
-	chance_ammo = Math.max(0.01, chance_ammo)
-	chance_fuel = Math.max(0.01, chance_fuel)
-	chance_food = Math.max(0.01, chance_food)
-	chance_drink = Math.max(0.01, chance_drink)
-	chance_misc = Math.max(0.01, chance_misc)
+	chance_gun = Math.max(0.05, chance_gun)
+	chance_ammo = Math.max(0.05, chance_ammo)
+	chance_fuel = Math.max(0.05, chance_fuel)
+	chance_food = Math.max(0.05, chance_food)
+	chance_drink = Math.max(0.05, chance_drink)
+	chance_misc = Math.max(0.05, chance_misc)
 
 	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
 
