@@ -5,8 +5,8 @@ let ITEM_MINIGUN = 16;
 let ITEM_PLASMA_LAUNCHER = 17;
 let ITEM_RED_PISTOLS = 20;
 let ITEM_RED_SHOTGUN = 21;
-let ITEM_SWORD = 23;
-let ITEM_GREEN_GUN = 24;
+let ITEM_GREEN_GUN = 23;
+let ITEM_SWORD = 24;
 let ITEM_ROCKET_LAUNCHER = 26;
 let ITEM_RAINBOW_PISTOLS = 29;
 let ITEM_LASER_GUN = 33;
@@ -560,7 +560,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 	}
 
 	if(player_closest) {
-		chance_misc = Math.max(0, 0.475 - player_closest.data.health / player_closest.data.max_health);
+		chance_misc = Math.max(0.125, 0.475 - player_closest.data.health / player_closest.data.max_health);
 		chance_drink = Math.max(0, 0.775 - player_closest.data.thirst / player_closest.data.max_thirst);
 		chance_food = Math.max(0, 0.775 - player_closest.data.hunger / player_closest.data.max_hunger);
 		if(player_closest.data.car_object)
@@ -570,29 +570,29 @@ function item_spawn(g, x, y, enemy_type=null) {
 	if(player_closest) {
 		chance_ammo = 0;
 		for(let i = 0; i < available_ammos.length; i++)
-			chance_ammo += 0.0625
+			chance_ammo += 0.125
 				* Math.max(4.25 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
 				* (i+1) / (available_ammos.length * available_ammos.length);
 		chance_gun = 0;
 		for(let i = 0; i < available_guns.length; i++)
-			chance_gun += 0.125
+			chance_gun += 0.25
 				* Math.max(1 - inventory_count_item(player_closest.data.inventory_element, available_guns[i]), 0)
 				* (i+1) / (available_guns.length * available_guns.length);
 	}
 
-	chance_gun = Math.min(0.6, chance_gun)
-	chance_ammo = Math.min(0.6, chance_ammo)
-	chance_fuel = Math.min(0.6, chance_fuel)
-	chance_food = Math.min(0.6, chance_food)
-	chance_drink = Math.min(0.6, chance_drink)
-	chance_misc = Math.min(0.6, chance_misc)
+	chance_gun = Math.min(0.625, chance_gun)
+	chance_ammo = Math.min(0.625, chance_ammo)
+	chance_fuel = Math.min(0.625, chance_fuel)
+	chance_food = Math.min(0.625, chance_food)
+	chance_drink = Math.min(0.625, chance_drink)
+	chance_misc = Math.min(0.625, chance_misc)
 
-	chance_gun = Math.max(0.1, chance_gun)
-	chance_ammo = Math.max(0.1, chance_ammo)
-	chance_fuel = Math.max(0.1, chance_fuel)
-	chance_food = Math.max(0.1, chance_food)
-	chance_drink = Math.max(0.1, chance_drink)
-	chance_misc = Math.max(0.1, chance_misc)
+	chance_gun = Math.max(0.075, chance_gun)
+	chance_ammo = Math.max(0.075, chance_ammo)
+	chance_fuel = Math.max(0.075, chance_fuel)
+	chance_food = Math.max(0.075, chance_food)
+	chance_drink = Math.max(0.075, chance_drink)
+	chance_misc = Math.max(0.075, chance_misc)
 
 	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
 

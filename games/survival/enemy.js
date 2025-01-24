@@ -264,7 +264,7 @@ function enemy_update(enemy_object, dt) {
 						target_object.data.shield_blue_health = target_object.data.shield_blue_health * Math.pow(0.75, dt/1000);
 					} else if(target_object.name == "player" && target_object.data.shield_green_health > 0) {
 						target_object.data.shield_green_health = target_object.data.shield_green_health * Math.pow(0.95, dt/1000);
-					} else if(target_object.name != "player" || target_object.data.shield_rainbow_health <= 0) {
+					} else if(target_object.name != "player" && !(target_object.name == "car" && target_object.data.is_tank) || target_object.data.shield_rainbow_health <= 0) {
 						target_object.data.health = target_object.data.health * Math.pow(0.75, dt/1000);
 					}
 				}
