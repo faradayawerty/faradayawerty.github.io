@@ -570,15 +570,22 @@ function item_spawn(g, x, y, enemy_type=null) {
 	if(player_closest) {
 		chance_ammo = 0;
 		for(let i = 0; i < available_ammos.length; i++)
-			chance_ammo += 0.15
+			chance_ammo += 0.0625
 				* Math.max(4.25 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
 				* (i+1) / (available_ammos.length * available_ammos.length);
 		chance_gun = 0;
 		for(let i = 0; i < available_guns.length; i++)
-			chance_gun += 0.25
+			chance_gun += 0.125
 				* Math.max(1 - inventory_count_item(player_closest.data.inventory_element, available_guns[i]), 0)
 				* (i+1) / (available_guns.length * available_guns.length);
 	}
+
+	chance_gun = Math.min(0.25, chance_gun)
+	chance_ammo = Math.min(0.25, chance_ammo)
+	chance_fuel = Math.min(0.25, chance_fuel)
+	chance_food = Math.min(0.25, chance_food)
+	chance_drink = Math.min(0.25, chance_drink)
+	chance_misc = Math.min(0.25, chance_misc)
 
 	chance_gun = Math.max(0.01, chance_gun)
 	chance_ammo = Math.max(0.01, chance_ammo)
