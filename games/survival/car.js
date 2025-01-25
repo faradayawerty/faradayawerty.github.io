@@ -108,6 +108,13 @@ function car_update(car_object, dt) {
 			let y = car_object.data.body.position.y + 50 * Math.sin(theta);
 			item_spawn(car_object.game, x, y);
 		}
+		N = Math.random() * 3 - 1;
+		for(let i = 0; i < N; i++) {
+			let theta = 2 * Math.PI * Math.random();
+			let x = car_object.data.body.position.x + 50 * Math.cos(theta);
+			let y = car_object.data.body.position.y + 50 * Math.sin(theta);
+			item_create(car_object.game, ITEM_FUEL, x, y);
+		}
 	}
 	if(car_object.data.health < 0) {
 		car_destroy(car_object);
