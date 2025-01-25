@@ -106,7 +106,7 @@ function player_die(player_object) {
 				player_object.game.objects[i].data.max_health,
 				player_object.game.objects[i].data.health * 1.5
 			);
-			player_object.game.objects[i].data.hunger *= 0.75;
+			player_object.game.objects[i].data.hunger -= 0.25 * player_object.game.objects[i].data.max_hunger;
 		}
 	}
 	player_destroy(player_object);
@@ -953,6 +953,8 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 200);
 		if(!closest_target)
 			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 300);
+		if(closest_target.name == "car" && closest_target.data.is_tank)
+			closest_target = null;
 		if(closest_target) {
 			target_direction = Math.atan2(closest_target.data.body.position.y - p.body.position.y, closest_target.data.body.position.x - p.body.position.x);
 			if(Math.abs(target_direction - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
