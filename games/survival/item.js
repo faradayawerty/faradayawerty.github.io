@@ -537,8 +537,8 @@ function item_spawn(g, x, y, enemy_type=null) {
 		}
 	}
 
-	let chance_ammo = 0.4;
-	let chance_misc = 0.4;
+	let chance_ammo = 0.3;
+	let chance_misc = 0.3;
 	let chance_gun = 0.2;
 	let chance_food = 0.1;
 	let chance_drink = 0.1;
@@ -546,12 +546,12 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
 	if(player_closest) {
-		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst / player_closest.data.max_thirst);
-		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger / player_closest.data.max_hunger);
+		chance_drink = Math.max(chance_drink, 0.6 - player_closest.data.thirst / player_closest.data.max_thirst);
+		chance_food = Math.max(chance_food, 0.6 - player_closest.data.hunger / player_closest.data.max_hunger);
 		if(enemy_type != null)
 			chance_fuel = 0.1;
 		if(player_closest.data.car_object)
-			chance_fuel = Math.max(chance_fuel, 0.6 - player_closest.data.car_object.data.fuel / player_closest.data.car_object.data.max_fuel);
+			chance_fuel = Math.max(chance_fuel, 0.4 - player_closest.data.car_object.data.fuel / player_closest.data.car_object.data.max_fuel);
 	}
 
 	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
