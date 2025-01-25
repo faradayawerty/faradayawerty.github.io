@@ -546,7 +546,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
 	if(player_closest) {
-		chance_misc = Math.max(chance_misc, 0.6 - player_closest.data.health / player_closest.data.max_health);
+		//chance_misc = Math.max(chance_misc, 0.6 - player_closest.data.health / player_closest.data.max_health);
 		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst / player_closest.data.max_thirst);
 		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger / player_closest.data.max_hunger);
 		if(enemy_type != null)
