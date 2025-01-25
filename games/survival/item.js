@@ -539,9 +539,9 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	let chance_ammo = 0.4;
 	let chance_misc = 0.3;
-	let chance_food = 0.2;
-	let chance_drink = 0.2;
-	let chance_gun = 0.1;
+	let chance_gun = 0.3;
+	let chance_food = 0.1;
+	let chance_drink = 0.1;
 	let chance_fuel = 0;
 
 	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
