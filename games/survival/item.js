@@ -492,16 +492,6 @@ function item_name_translate(language, text) {
 
 function item_spawn(g, x, y, enemy_type=null) {
 
-	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
-
-	let chance_ammo = 0.1875;
-	let chance_food = 0.25;
-	let chance_misc = 0.15;
-	let chance_gun = 0.125;
-
-	let chance_drink = chance_food * 0.95;
-	let chance_fuel = chance_misc * 0.0625;
-
 	let available_guns = [ITEM_GUN];
 	let available_ammos = [ITEM_AMMO];
 	let available_misc = [ITEM_HEALTH];
@@ -547,52 +537,24 @@ function item_spawn(g, x, y, enemy_type=null) {
 		}
 	}
 
-	let best_gun = ITEM_GUN;
-	for(let i = 0; i < available_guns.length; i++) {
-		if(best_gun < available_guns[i])
-			best_gun = available_guns[i];
+	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
+	let chance_ammo = 0.3;
+	let chance_food = 0.3;
+	let chance_drink = 0.3;
+	let chance_misc = 0.1;
+	let chance_gun = 0.1;
+	let chance_fuel = 0;
+	if(enemy_type != null) {
+		chance_fuel = 0.1;
+		chance_misc = 0.3;
 	}
-
-	let best_ammo = ITEM_AMMO;
-	for(let i = 0; i < available_ammos.length; i++) {
-		if(best_gun < available_ammos[i])
-			best_ammo = available_ammos[i];
-	}
-
 	if(player_closest) {
-		chance_misc = Math.max(0.125, 0.475 - player_closest.data.health / player_closest.data.max_health);
-		chance_drink = Math.max(0, 0.775 - player_closest.data.thirst / player_closest.data.max_thirst);
-		chance_food = Math.max(0, 0.775 - player_closest.data.hunger / player_closest.data.max_hunger);
+		chance_misc = Math.max(chance_misc, 0.8 - player_closest.data.health / player_closest.data.max_health);
+		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst / player_closest.data.max_thirst);
+		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger / player_closest.data.max_hunger);
 		if(player_closest.data.car_object)
-			chance_fuel = Math.max(0, 0.775 - player_closest.data.car_object.data.fuel / player_closest.data.car_object.data.max_fuel);
+			chance_fuel = Math.max(chance_fuel, 0.6 - player_closest.data.car_object.data.fuel / player_closest.data.car_object.data.max_fuel);
 	}
-
-	if(player_closest) {
-		chance_ammo = 0;
-		for(let i = 0; i < available_ammos.length; i++)
-			chance_ammo += 0.125
-				* Math.max(4.25 - inventory_count_item(player_closest.data.inventory_element, available_ammos[i]), 0)
-				* (i+1) / (available_ammos.length * available_ammos.length);
-		chance_gun = 0;
-		for(let i = 0; i < available_guns.length; i++)
-			chance_gun += 0.25
-				* Math.max(1 - inventory_count_item(player_closest.data.inventory_element, available_guns[i]), 0)
-				* (i+1) / (available_guns.length * available_guns.length);
-	}
-
-	chance_gun = Math.min(0.625, chance_gun)
-	chance_ammo = Math.min(0.375, chance_ammo)
-	chance_fuel = Math.min(0.625, chance_fuel)
-	chance_food = Math.min(0.625, chance_food)
-	chance_drink = Math.min(0.625, chance_drink)
-	chance_misc = Math.min(0.765, chance_misc)
-
-	chance_gun = Math.max(0.075, chance_gun)
-	chance_ammo = Math.max(0.075, chance_ammo)
-	chance_fuel = Math.max(0.005, chance_fuel)
-	chance_food = Math.max(0.075, chance_food)
-	chance_drink = Math.max(0.075, chance_drink)
-	chance_misc = Math.max(0.075, chance_misc)
 
 	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
 
@@ -615,17 +577,6 @@ function item_spawn(g, x, y, enemy_type=null) {
 		item = available_guns[Math.floor(Math.random() * available_guns.length)];
 	a += chance_gun;
 
-	let items_weapons = ITEMS_GUNS.concat(ITEMS_MELEE);
-
-	for(let i = 0; i < items_weapons.length; i++) {
-		if(player_closest && inventory_has_item(player_closest.data.inventory_element, items_weapons[i]) && item <= items_weapons[i]) {
-			if(chance_ammo > 0.65)
-				item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
-			else
-				item = 0;
-		}
-	}
-
 	if(a < r && r < a + chance_fuel)
 		item = ITEM_FUEL;
 	a += chance_fuel;
@@ -640,16 +591,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(a < r && r < a + chance_ammo)
 		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
-	a += chance_ammo;
-
-	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25)
-		item = 0;
-
-	if(item == 0 && enemy_type != null)
-		item = available_misc[Math.floor(Math.random() * available_misc.length)];
-
-	if(player_closest && inventory_count_item(player_closest.data.inventory_element, item) > 6.25)
-		item = 0;
+	a += chane_ammo;
 
 	g.debug_console.unshift(
 		"item_spawn"
