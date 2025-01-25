@@ -591,7 +591,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(a < r && r < a + chance_ammo)
 		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
-	a += chane_ammo;
+	a += chance_ammo;
 
 	g.debug_console.unshift(
 		"item_spawn"
