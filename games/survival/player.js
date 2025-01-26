@@ -22,6 +22,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		h: height,
 		inventory_element: null,
 		hotbar_element: null,
+		achievements_element: null,
 		car_object: null,
 		body: Matter.Bodies.rectangle(x, y, width, height, {
 			isStatic: false,
@@ -44,6 +45,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shooting_laser: false,
 		laser_sound_has_played: false,
 	};
+	p.achievements_element = g.gui_elements[achievements_create(g)];
 	p.inventory_element = g.gui_elements[inventory_create(g)];
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++) {
@@ -366,9 +368,10 @@ function player_update(player_object, dt) {
 		return;
 	}
 
-	if(!p.inventory_element.shown && !p.hotbar_element.shown) {
+	if(!p.inventory_element.shown && !p.hotbar_element.shown && !p.achievements_element.shown) {
 		p.inventory_element.shown = false;
 		p.hotbar_element.shown = true;
+		p.achievements_element.shown = false;
 	}
 
 	//if(isKeyDown(player_object.game.input, 'm', true))
@@ -379,10 +382,20 @@ function player_update(player_object, dt) {
 		p.hotbar_element.shown = !p.hotbar_element.shown;
 	}
 
+	if(isKeyDown(p.achievements_element.game.input, 'j', true)) {
+		p.achievements_element.shown = !p.achievements_element.shown;
+	}
+
+	if(p.achievements_element.shown) {
+		p.hotbar_element.shown = false;
+		p.inventory_element.shown = false;
+	}
+
 	if(player_object.game.want_hide_inventory) {
 		p.inventory_element.shown = false;
 		p.hotbar_element.shown = true;
 		player_object.game.want_hide_inventory = false;
+		p.achievements_element.shown = false;
 	}
 
 	if(p.inventory_element.shown == false && p.hotbar_element.shown == true && player_object.game.input.mouse.leftButtonPressed)
@@ -956,7 +969,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 200);
 		if(!closest_target)
 			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 300);
-		if(closest_target.name == "car" && closest_target.data.is_tank)
+		if(closest_target && closest_target.name == "car" && closest_target.data.is_tank)
 			closest_target = null;
 		if(closest_target) {
 			target_direction = Math.atan2(closest_target.data.body.position.y - p.body.position.y, closest_target.data.body.position.x - p.body.position.x);
