@@ -37,7 +37,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		}
 		if(Math.random() > 1 - 0.25 * m) {
 			boss = true;
-			g.enemy_kills[type == "random" ? "regular" : type] = 0;
+			//g.enemy_kills[type == "random" ? "regular" : type] = 0;
 		}
 	}
 	if(type == "shooting laser") {
@@ -185,12 +185,19 @@ function enemy_destroy(enemy_object) {
 				g.enemies["shooting rocket"] = true;
 			if(enemy_object.data.type == "shooting rocket")
 				g.enemies["shooting laser"] = true;
-		} else if(enemy_object.data.hunger > 0 && enemy_object.data.hit_by_player){
+		} else {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
 		}
+
 		g.debug_console.unshift("need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
 	}
+
+	if(enemy_object.data.boss && enemy_object.data.hit_by_player && enemy_object.data.hunger <= 0) {
+		g.kills_for_boss = Math.max(48, g.kills_for_boss);
+		g.debug_console.unshift("couldn't defeat boss, need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
+	}
+
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
 	enemy_object.data.body = null;
 	enemy_object.destroyed = true;
@@ -467,7 +474,6 @@ function enemy_update(enemy_object, dt) {
 					}
 				} else {
 					N = 5 * Math.random();
-					enemy_object.game.kills_for_boss = 48;
 				}
 			} 
 			let sound = "data/sfx/zombie_dies_1.mp3";
