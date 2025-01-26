@@ -467,7 +467,7 @@ function enemy_update(enemy_object, dt) {
 					}
 				} else {
 					N = 5 * Math.random();
-					g.kills_for_boss = 48;
+					enemy_object.game.kills_for_boss = 48;
 				}
 			} 
 			let sound = "data/sfx/zombie_dies_1.mp3";

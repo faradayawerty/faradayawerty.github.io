@@ -106,7 +106,7 @@ function player_die(player_object) {
 				player_object.game.objects[i].data.max_health,
 				player_object.game.objects[i].data.health * 1.5
 			);
-			player_object.game.objects[i].data.hunger -= 0.25 * player_object.game.objects[i].data.max_hunger;
+			player_object.game.objects[i].data.hunger = Math.max(0, player_object.game.objects[i].data.hunger - 0.25 * player_object.game.objects[i].data.max_hunger);
 		}
 	}
 	player_destroy(player_object);
