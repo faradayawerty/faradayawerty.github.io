@@ -194,7 +194,7 @@ function enemy_destroy(enemy_object) {
 	}
 
 	if(enemy_object.data.boss && enemy_object.data.hit_by_player && enemy_object.data.hunger <= 0) {
-		g.kills_for_boss = Math.max(48, g.kills_for_boss);
+		g.kills_for_boss = Math.max(32, g.kills_for_boss);
 		g.debug_console.unshift("couldn't defeat boss, need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
 	}
 

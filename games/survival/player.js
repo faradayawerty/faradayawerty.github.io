@@ -109,6 +109,8 @@ function player_die(player_object) {
 			player_object.game.objects[i].data.hunger = Math.max(0, player_object.game.objects[i].data.hunger - 0.25 * player_object.game.objects[i].data.max_hunger);
 		}
 	}
+	let g = player_object.game;
+	g.kills_for_boss = Math.min(32, g.kills_for_boss + 6);
 	player_destroy(player_object);
 }
 
