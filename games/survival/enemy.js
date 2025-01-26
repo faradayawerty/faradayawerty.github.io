@@ -185,7 +185,7 @@ function enemy_destroy(enemy_object) {
 				g.enemies["shooting rocket"] = true;
 			if(enemy_object.data.type == "shooting rocket")
 				g.enemies["shooting laser"] = true;
-		} else if(enemy_object.data.hunger >= 0 && enemy_object.data.hit_by_player){
+		} else if(enemy_object.data.hunger > 0 && enemy_object.data.hit_by_player){
 			g.kills += 1;
 			g.kills_for_boss -= 1;
 		}
