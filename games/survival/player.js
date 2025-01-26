@@ -160,7 +160,8 @@ function player_update(player_object, dt) {
 
 	if(p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(p.health) + ", change " + Math.round(p.saved_health - p.health)
-			+ ": hunger: " + Math.round(p.hunger) + ", thirst: " + Math.round(p.thirst));
+			+ ": hunger: " + Math.round(p.hunger) + ", thirst: " + Math.round(p.thirst)
+			+ ", at x:" + Math.random(p.body.position.x) +  " y:" + Math.random(p.body.position.y));
 	}
 
 	p.saved_health = p.health;
