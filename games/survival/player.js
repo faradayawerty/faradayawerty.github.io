@@ -854,7 +854,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			(0.95 + 0.1 * Math.random()) * tx - sx,
 			(0.95 + 0.1 * Math.random()) * ty - sy,
 			Math.random() * 10 + 10,
-			0.33 * 10 * base_damage * Math.random()
+			0.66 * 10 * base_damage * Math.random()
 		);
 		p.minigun_cooldown = 60;
 		if(Math.random() > 0.995)
