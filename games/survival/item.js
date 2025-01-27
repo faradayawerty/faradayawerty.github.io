@@ -20,11 +20,10 @@ let ITEM_RAINBOW_AMMO = 30;
 
 let ITEM_HEALTH = 3;
 let ITEM_FUEL = 4;
-let ITEM_MONEY = 5;
 let ITEM_SHIELD = 22;
 let ITEM_HEALTH_GREEN = 28;
-let ITEM_SHIELD_GREEN = 31;;
-let ITEM_SHIELD_RAINBOW = 32;;
+let ITEM_SHIELD_GREEN = 31;
+let ITEM_SHIELD_RAINBOW = 32;
 
 let ITEM_CANNED_MEAT = 7;
 let ITEM_ORANGE = 8;
@@ -36,6 +35,9 @@ let ITEM_CHOCOLATE = 14;
 let ITEM_WATER = 6;
 let ITEM_COLA = 11;
 let ITEM_MILK = 12;
+
+let ITEM_MONEY = 5;
+let ITEM_BOSSIFIER = 34;
 
 ITEMS_AMMOS = [
 	ITEM_AMMO,
@@ -307,7 +309,7 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 			ctx.fillStyle = "red";
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
-			ctx.strokeStyle = "white";
+			ctx.strokeStyle = "red";
 			ctx.lineWidth = 0.01 * w;
 			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
 		}
@@ -319,6 +321,23 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
 		ctx.strokeStyle = "#1177ff";
 		ctx.lineWidth = h * 0.01;
+		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+	} else if(id == ITEM_BOSSIFIER && animstate != null) {
+		let rate = 0.05;
+		let r = Math.cos(rate * animstate) * 15;
+		let g = 0.7 * (Math.cos(rate * animstate) + Math.sin(rate * animstate)) * 15;
+		let b = Math.sin(rate * animstate) * 15;
+		r = Math.floor(r*r);
+		g = Math.floor(g*g);
+		b = Math.floor(b*b);
+		let color = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
+		ctx.fillStyle = "black";
+		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+		drawLine(ctx, x + w * 0.5, y + h * 0.7, x + w * 0.5, y + h * 0.28375, color, w * 0.05);
+		drawLine(ctx, x + w * 0.5, y + h * 0.3, x + w * 0.65, y + h * 0.5, color, w * 0.05);
+		drawLine(ctx, x + w * 0.5, y + h * 0.3, x + w * 0.35, y + h * 0.5, color, w * 0.05);
+		ctx.strokeStyle = color;
+		ctx.lineWidth = h * 0.025;
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	} else if(id == ITEM_HEALTH_GREEN) {
 		ctx.fillStyle = "white";

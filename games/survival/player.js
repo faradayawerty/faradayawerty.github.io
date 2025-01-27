@@ -941,7 +941,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 				tx - sx,
 				ty - sy,
 				30,
-				1.5 * 125 * base_damage * (0.5 + 1.0 * Math.random()),
+				3.5 * 125 * base_damage * (0.5 + 1.0 * Math.random()),
 				false,
 				6,
 				1500,
@@ -1170,6 +1170,23 @@ function player_item_consume(player_object, id, anywhere=false) {
 		if(c) {
 			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.0625 + 0.0625));
 			c.data.health += Math.min(c.data.max_health - c.data.health, c.data.max_health * (Math.random() * 0.0625 + 0.0625));
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		}
+	}
+
+	if(id == ITEM_BOSSIFIER && true) {
+		let ao = null;
+		let eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 200);
+		if(eo) {
+			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position.y, true, false, eo.data.type);
+			enemy_destroy(eo, false);
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		} else {
+			ao = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 200);
+		}
+		if(ao) {
+			enemy_create(ao.game, ao.data.body.position.x, ao.data.body.position.y, true, false, ao.data.type);
+			animal_destroy(ao);
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		}
 	}

@@ -10,15 +10,15 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 				enemies[i].destroy(enemies[i]);
 		}
 	}
-	if(type == "random" && Math.random() < 0.55 && g.enemies["shooting laser"])
+	if(type == "random" && Math.random() < 0.5 && g.enemies["shooting laser"])
 		type = "shooting laser";
-	else if(type == "random" && Math.random() < 0.60 && g.enemies["shooting rocket"])
+	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting rocket"])
 		type = "shooting rocket";
-	else if(type == "random" && Math.random() < 0.65 && g.enemies["sword"])
+	else if(type == "random" && Math.random() < 0.5 && g.enemies["sword"])
 		type = "sword";
-	else if(type == "random" && Math.random() < 0.70 && g.enemies["shooting red"])
+	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting red"])
 		type = "shooting red";
-	else if(type == "random" && Math.random() < 0.75 && g.enemies["shooting"])
+	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting"])
 		type = "shooting";
 	let width = 30, height = 30;
 	let boss = make_boss;
@@ -125,6 +125,15 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.color_outline = "white";
 		e.damage = 87 * e.damage;
 	}
+	if(type == "deer") {
+		e.type = "deer";
+		e.health = 25 * 625000;
+		e.max_health = 25 * 625000;
+		e.speed = 8.25;
+		e.color = "#aa8844";
+		e.color_outline = "white";
+		e.damage = 1337 * e.damage;
+	}
 	if(boss) {
 		e.damage = 5 * e.damage;
 		e.health = 30 * e.max_health;
@@ -164,12 +173,12 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 	return game_object_create(g, "enemy", e, enemy_update, enemy_draw, enemy_destroy);
 }
 
-function enemy_destroy(enemy_object) {
+function enemy_destroy(enemy_object, death=true) {
 	if(enemy_object.destroyed)
 		return;
 	let g = enemy_object.game;
 	g.debug_console.unshift("destroying enemy");
-	if(enemy_object.data.hit_by_player && enemy_object.data.hunger > 0) {
+	if(enemy_object.data.hit_by_player && enemy_object.data.hunger > 0 && death) {
 		g.enemy_kills[enemy_object.data.type] += 1;
 		g.debug_console.unshift("killed " + enemy_object.data.type + ": " + g.enemy_kills[enemy_object.data.type]);
 		if(enemy_object.data.boss) {
@@ -193,7 +202,7 @@ function enemy_destroy(enemy_object) {
 		g.debug_console.unshift("need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
 	}
 
-	if(enemy_object.data.boss && enemy_object.data.hit_by_player && enemy_object.data.hunger <= 0) {
+	if(enemy_object.data.boss && enemy_object.data.hit_by_player && enemy_object.data.hunger <= 0 && death) {
 		g.kills_for_boss = Math.max(32, g.kills_for_boss);
 		g.debug_console.unshift("couldn't defeat boss, need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
 	}
@@ -466,6 +475,15 @@ function enemy_update(enemy_object, dt) {
 							item_create(enemy_object.game, ITEM_LASER_GUN, e.body.position.x, e.body.position.y, false, false);
 						else
 							item_create(enemy_object.game, ITEM_RAINBOW_PISTOLS, e.body.position.x, e.body.position.y, false, false);
+						for(let j = 0; j < Math.random() * 11 - 4; j++)
+							item_create(enemy_object.game, ITEM_BOSSIFIER, e.body.position.x, e.body.position.y, false, false);
+					} else if(e.type == "deer") {
+						for(let j = 0; j < Math.random() * 17 + 4; j++) {
+							let theta = 2 * Math.PI * Math.random();
+							let x = e.body.position.x + 50 * Math.cos(theta);
+							let y = e.body.position.y + 50 * Math.sin(theta);
+							item_create(enemy_object.game, ITEM_CANNED_MEAT, x, y, false, false);
+						}
 					} else {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y, false, false);
@@ -485,7 +503,7 @@ function enemy_update(enemy_object, dt) {
 				let yy = to.data.body.position.y - enemy_object.data.body.position.y;
 				audio_play(sound);
 			}
-			for(let i = 0; i < N; i++) {
+			for(let i = 0; i < N && e.type != "deer"; i++) {
 				let theta = 2 * Math.PI * Math.random();
 				let x = e.body.position.x + 50 * Math.cos(theta);
 				let y = e.body.position.y + 50 * Math.sin(theta);
@@ -608,6 +626,8 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.lineWidth = 0.21 * e.w;
 			ctx.stroke();
 		}
+		if(e.type == "deer")
+			animal_deer_draw_horns(ctx, e.body.position.x, e.body.position.y, e.w, e.h);
 	}
 }
 
