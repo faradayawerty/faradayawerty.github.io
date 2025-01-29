@@ -21,7 +21,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 	else if(type == "random" && Math.random() < 0.5 && g.enemies["shooting"])
 		type = "shooting";
 	let width = 30, height = 30;
-	let boss = make_boss;
+	let boss = make_boss || g.all_enemies_are_bosses;
 	let player_object = game_object_find_closest(g, x, y, "player", 4000);
 	if(player_object) {
 		let m = 0.33 * (
@@ -468,8 +468,6 @@ function enemy_update(enemy_object, dt) {
 					N = 20 * Math.random() + 10;
 					if(e.type == "shooting") {
 						item_create(enemy_object.game, ITEM_PLASMA_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
-						if(Math.random() < 0.33)
-							item_create(enemy_object.game, ITEM_SHIELD, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "shooting red") {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_RED_SHOTGUN, e.body.position.x, e.body.position.y, false, false);

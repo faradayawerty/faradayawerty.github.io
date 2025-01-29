@@ -1,5 +1,5 @@
 
-function game_create(input_, engine_) {
+function game_create(input_, engine_, audios_) {
 	let g = {	
 		want_levels: [],
 		level_set_delay: 100,
@@ -14,6 +14,7 @@ function game_create(input_, engine_) {
 		objects: [],
 		gui_elements: [],
 		input: input_,
+		audio: audios_,
 		engine: engine_,
 		settings: {
 			language: "english",
@@ -83,7 +84,9 @@ function game_create(input_, engine_) {
 			"shooting laser": 0
 		},
 		debug: false,
-		debug_console: []
+		debug_console: [],
+		godmode: false,
+		all_enemies_are_bosses: false,
 	};
 	return g;
 }
@@ -95,6 +98,8 @@ function game_new(g) {
 	g.enemies["sword"] = g.enemies_default["sword"];
 	g.enemies["shooting rocket"] = g.enemies_default["shooting rocket"];
 	g.enemies["shooting laser"] = g.enemies_default["shooting laser"];
+	g.visited_levels = ["0x0"];
+	g.assigned_tiles = [TILE_START];
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++)
 			g.saved_items[i][j] = 0;
