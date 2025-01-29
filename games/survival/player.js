@@ -1181,13 +1181,13 @@ function player_item_consume(player_object, id, anywhere=false) {
 
 	if(id == ITEM_BOSSIFIER && true) {
 		let ao = null;
-		let eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 200);
+		let eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 500);
 		if(eo) {
 			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position.y, true, false, eo.data.type);
 			enemy_destroy(eo, false);
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		} else {
-			ao = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 200);
+			ao = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 500);
 		}
 		if(ao) {
 			enemy_create(ao.game, ao.data.body.position.x, ao.data.body.position.y, true, false, ao.data.type);
