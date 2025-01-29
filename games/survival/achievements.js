@@ -51,6 +51,7 @@ function achievements_create(g) {
 }
 
 function achievements_destroy(ae) {
+	ae.destroyed = true;
 }
 
 function achievements_update(ae, dt) {

@@ -30,11 +30,11 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		}),
 		immunity: 6000,
 		shield_blue_health: 0,
-		shield_blue_health_max: 9000,
+		shield_blue_health_max: 18000,
 		shield_green_health: 0,
-		shield_green_health_max: 18000,
+		shield_green_health_max: 36000,
 		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 36000,
+		shield_rainbow_health_max: 72000,
 		sword_direction: 0,
 		sword_visible: false,
 		ai_controlled: ai_controlled,
@@ -54,6 +54,16 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		}
 	p.hotbar_element = g.gui_elements[hotbar_create(g, p.inventory_element.data)];
 	Matter.Composite.add(g.engine.world, p.body);
+	if(ai_controlled) {
+		p.inventory_element.data.items[0][0] = ITEM_GUN;
+		p.inventory_element.data.items[0][1] = ITEM_AMMO;
+		p.inventory_element.data.items[0][2] = Math.round(Math.random()) * ITEM_WATER;
+		p.inventory_element.data.items[0][3] = Math.round(Math.random()) * ITEM_CANNED_MEAT;
+		for(let i = 0; i < g.objects.length; i++) {
+			if(g.objects[i].name == "player")
+				g.objects[i].data.ai_controlled = false;
+		}
+	}
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
 	g.player_object = null;
 	if(respawn) {
@@ -63,12 +73,6 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 	}
 	p.inventory_element.data.attached_to_object = g.objects[iplayer];
 	p.hotbar_element.data.attached_to_object = g.objects[iplayer];
-	if(ai_controlled) {
-		p.inventory_element.data.items[0][0] = ITEM_GUN;
-		p.inventory_element.data.items[0][1] = ITEM_AMMO;
-		p.inventory_element.data.items[0][2] = Math.round(Math.random()) * ITEM_WATER;
-		p.inventory_element.data.items[0][3] = Math.round(Math.random()) * ITEM_CANNED_MEAT;
-	}
 	return iplayer;
 }
 
@@ -84,6 +88,7 @@ function player_destroy(player_object) {
 		player_object.game.camera_target_body = null;
 	Matter.Composite.remove(player_object.game.engine.world, player_object.data.body);
 	player_object.data.body = null;
+	achievements_destroy(player_object.data.achievements_element);
 	inventory_destroy(player_object.data.inventory_element);
 	hotbar_destroy(player_object.data.hotbar_element);
 	player_object.destroyed = true;
@@ -151,15 +156,15 @@ function player_update(player_object, dt) {
 	p.item_animstate += 0.01 * dt;
 
 	if(p.shield_blue_health > 0) {
-		p.shield_blue_health -= 0.15 * dt;
+		p.shield_blue_health -= 0.1 * dt;
 	}
 
 	if(p.shield_green_health > 0) {
-		p.shield_green_health -= 0.15 * dt;
+		p.shield_green_health -= 0.2 * dt;
 	}
 
 	if(p.shield_rainbow_health > 0) {
-		p.shield_rainbow_health -= 0.15 * dt;
+		p.shield_rainbow_health -= 0.3 * dt;
 	}
 
 	if(p.saved_health - p.health > 1) {
@@ -799,7 +804,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 					}
 				}
 			}
-		if(Math.random() < 0.0001 * dt)
+		if(Math.random() < 0.00005 * dt)
 			inventory_clear_item(p.inventory_element, ITEM_RAINBOW_AMMO, 1);
 	}
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN
@@ -1127,7 +1132,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 				ty - sy,
 				0.15 * p.w,
 				null,
-				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
+				0.5 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
 				p.max_health,
 				false,
 				20
@@ -1140,7 +1145,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 				ty - sy,
 				0.15 * p.w,
 				null,
-				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
+				0.5 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
 				p.max_health,
 				false,
 				20

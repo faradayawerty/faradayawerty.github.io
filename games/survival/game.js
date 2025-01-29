@@ -297,7 +297,6 @@ function game_object_find_closest(g, x, y, name, radius) {
 function game_objects_arrange(g) {
 	let arrangement = [
 		"bound",
-		"spawner",
 		"decorative_roof",
 		"decorative_leaves",
 		"decorative_trunk",

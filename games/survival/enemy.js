@@ -85,7 +85,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.max_health = 1000;
 		e.speed = 5;
 		e.color = "#335544";
-		e.damage = 5 * e.damage;
+		e.damage = 2 * e.damage;
 		e.body.collisionFilter.mask = -5;
 	}
 	if(type == "shooting red") {
@@ -95,7 +95,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.speed = 8;
 		e.color = "#999999";
 		e.color_outline = "#aa3333";
-		e.damage = 11 * e.damage;
+		e.damage = 4 * e.damage;
 		e.body.collisionFilter.mask = -5;
 	}
 	if(type == "sword") {
@@ -105,7 +105,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.speed = 9.75;
 		e.color = "#bbaa11";
 		e.color_outline = "lime";
-		e.damage = 23 * e.damage;
+		e.damage = 16 * e.damage;
 	}
 	if(type == "shooting rocket") {
 		e.type = "shooting rocket";
@@ -114,7 +114,7 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.speed = 4.75;
 		e.color = "gray";
 		e.color_outline = "black";
-		e.damage = 41 * e.damage;
+		e.damage = 32 * e.damage;
 	}
 	if(type == "shooting laser") {
 		e.type = "shooting laser";
@@ -123,16 +123,16 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.speed = 8.25;
 		e.color = "#ff0000";
 		e.color_outline = "white";
-		e.damage = 87 * e.damage;
+		e.damage = 64 * e.damage;
 	}
 	if(type == "deer") {
 		e.type = "deer";
-		e.health = 25 * 625000;
-		e.max_health = 25 * 625000;
-		e.speed = 8.25;
+		e.health = 31250000;
+		e.max_health = 31250000;
+		e.speed = 7.875;
 		e.color = "#aa8844";
 		e.color_outline = "white";
-		e.damage = 1337 * e.damage;
+		e.damage = 256 * e.damage;
 	}
 	if(boss) {
 		e.damage = 5 * e.damage;
@@ -350,7 +350,7 @@ function enemy_update(enemy_object, dt) {
 						dy,
 						Math.min(0.25 * e.w, 10),
 						target_object,
-						0.25 * e.damage,
+						4.25 * e.damage,
 						e.max_health * 0.005
 					);
 					e.shooting_delay = 0;
@@ -391,8 +391,24 @@ function enemy_update(enemy_object, dt) {
 				}
 			}
 		}
+		if(e.type == "deer") {
+			let k = 1.75;
+			if(e.boss)
+				k = 6.25;
+			if(e.jump_delay >= 2200) {
+				e.jump_delay = 0;
+			} else if(e.jump_delay >= 1600) {
+				dx = 0;
+				dy = 0;
+			} else if(e.jump_delay >= 1500) {
+				dx *= k;
+				dy *= k;
+				e.jump_delay = 1600;
+			}
+		}
 		let vel = Matter.Vector.create(dx, dy);
-		Matter.Body.setVelocity(e.body, vel);
+		if(vel.x * vel.x + vel.y * vel.y > 0)
+			Matter.Body.setVelocity(e.body, vel);
 		if(target_object.data.health && Matter.Collision.collides(e.body, target_object.data.body) != null) {
 			if(target_object.name == "player") {
 				if(target_object.data.shield_blue_health > 0)
@@ -478,12 +494,7 @@ function enemy_update(enemy_object, dt) {
 						for(let j = 0; j < Math.random() * 11 - 4; j++)
 							item_create(enemy_object.game, ITEM_BOSSIFIER, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "deer") {
-						for(let j = 0; j < Math.random() * 17 + 4; j++) {
-							let theta = 2 * Math.PI * Math.random();
-							let x = e.body.position.x + 50 * Math.cos(theta);
-							let y = e.body.position.y + 50 * Math.sin(theta);
-							item_create(enemy_object.game, ITEM_CANNED_MEAT, x, y, false, false);
-						}
+						N = N + 1;
 					} else {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y, false, false);
@@ -503,7 +514,7 @@ function enemy_update(enemy_object, dt) {
 				let yy = to.data.body.position.y - enemy_object.data.body.position.y;
 				audio_play(sound);
 			}
-			for(let i = 0; i < N && e.type != "deer"; i++) {
+			for(let i = 0; i < N; i++) {
 				let theta = 2 * Math.PI * Math.random();
 				let x = e.body.position.x + 50 * Math.cos(theta);
 				let y = e.body.position.y + 50 * Math.sin(theta);
@@ -639,13 +650,14 @@ function enemy_boss_exists(g) {
 
 function enemy_boss_distance_to_player(g, x, y) {
 	let player_object = game_object_find_closest(g, x, y, "player", 20000);
-	let boss_objects = g.objects.filter((obj) => obj.name == "enemy" && obj.data.boss);
+	let boss_objects = g.objects.filter((obj) => obj.name == "enemy" && !obj.destroyed && obj.data.boss);
 	if(boss_objects.length < 1 || !player_object)
 		return -1;
 	let boss_closest = boss_objects[0];
-	for(let i = 1; i < boss_objects.length; i++)
+	for(let i = 1; i < boss_objects.length; i++) {
 		if(dist(boss_closest.data.body.position, player_object.data.body.position) > dist(boss_objects[i].data.body.position, player_object.data.body.position))
 			boss_closest = boss_objects[i];
+	}
 	return dist(boss_closest.data.body.position, player_object.data.body.position);
 }
 

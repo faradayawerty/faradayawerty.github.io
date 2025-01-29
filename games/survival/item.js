@@ -626,6 +626,9 @@ function item_spawn(g, x, y, enemy_type=null) {
 		+ " A:" + Math.round(100 * chance_ammo) + "%"
 	);
 
+	if(enemy_type == "deer")
+		item = ITEM_CANNED_MEAT;
+
 	item_create(g, item, x, y);
 }
 
