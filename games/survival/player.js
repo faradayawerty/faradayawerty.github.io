@@ -30,11 +30,11 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		}),
 		immunity: 6000,
 		shield_blue_health: 0,
-		shield_blue_health_max: 18000,
+		shield_blue_health_max: 500,
 		shield_green_health: 0,
-		shield_green_health_max: 36000,
+		shield_green_health_max: 2500,
 		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 72000,
+		shield_rainbow_health_max: 62500,
 		sword_direction: 0,
 		sword_visible: false,
 		ai_controlled: ai_controlled,
@@ -156,15 +156,15 @@ function player_update(player_object, dt) {
 	p.item_animstate += 0.01 * dt;
 
 	if(p.shield_blue_health > 0) {
-		p.shield_blue_health -= 0.1 * dt;
+		p.shield_blue_health -= 0.01 * dt;
 	}
 
 	if(p.shield_green_health > 0) {
-		p.shield_green_health -= 0.2 * dt;
+		p.shield_green_health -= 0.05 * dt;
 	}
 
 	if(p.shield_rainbow_health > 0) {
-		p.shield_rainbow_health -= 0.3 * dt;
+		p.shield_rainbow_health -= 0.25 * dt;
 	}
 
 	if(p.saved_health - p.health > 1) {

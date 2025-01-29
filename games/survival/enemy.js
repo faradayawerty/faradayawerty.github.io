@@ -230,7 +230,7 @@ function enemy_update(enemy_object, dt) {
 		e.hunger = Math.max(0, e.hunger - 0.001 * dt)
 	if(e.hunger <= 0) {
 		e.health *= Math.pow(0.5, dt/1000);
-		e.health -= dt
+		e.health -= 0.01 * e.max_health * dt / 1000;
 	}
 	if(e.shooting_delay < 5000)
 		e.shooting_delay += dt;

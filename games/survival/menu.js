@@ -51,7 +51,7 @@ function menu_create() {
 		],
 		menu_respawn_buttons: [
 			"respawn and continue game",
-			"settings"
+			//"settings"
 		],
 		settings_buttons: [
 			"player color",

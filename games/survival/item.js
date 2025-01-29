@@ -526,7 +526,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 		available_guns.push(ITEM_PLASMA_LAUNCHER);
 		if(enemy_type != null) {
 			available_ammos.push(ITEM_RED_PLASMA);
-			available_misc.push(ITEM_HEALTH_GREEN);
+			available_misc.push(ITEM_SHIELD);
 		}
 	}
 
@@ -535,7 +535,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 		available_ammos.push(ITEM_RED_PLASMA);
 		if(enemy_type != null) {
 			available_misc.push(ITEM_HEALTH_GREEN);
-			available_misc.push(ITEM_SHIELD);
+			available_misc.push(ITEM_SHIELD_GREEN);
 		}
 	}
 
