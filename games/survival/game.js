@@ -24,6 +24,7 @@ function game_create(input_, engine_, audios_) {
 			show_hints: false,
 			lose_items_on_death: true,
 			trees: true,
+			volume: 1.0,
 			indicators: {
 				"show player health": true,
 				"show player hunger": true,

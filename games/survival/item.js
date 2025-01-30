@@ -270,7 +270,7 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 		let colors = ["pink", "yellow", "lime", "cyan"];
 		let colors1 = ["red", "orange", "green", "blue"];
 		let colors2 = ["white", "white", "white", "white"];
-		let N = 3;
+		let N = 4;
 		for(let i = 0; i < N; i++) {
 			ctx.fillStyle = colors[(i + Math.floor(animstate)) % 4];
 			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
