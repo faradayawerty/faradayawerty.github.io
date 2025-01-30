@@ -517,8 +517,10 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(enemy_type == "shooting" || enemy_type == null && g.enemies["shooting"]) {
 		available_guns.push(ITEM_SHOTGUN);
-		if(enemy_type != null)
+		if(enemy_type != null) {
 			available_ammos.push(ITEM_PLASMA);
+			available_misc.push(ITEM_SHIELD);
+		}
 	}
 
 	if(enemy_type == "shooting red" || enemy_type == null && g.enemies["shooting red"]) {
@@ -526,13 +528,13 @@ function item_spawn(g, x, y, enemy_type=null) {
 		available_guns.push(ITEM_PLASMA_LAUNCHER);
 		if(enemy_type != null) {
 			available_ammos.push(ITEM_RED_PLASMA);
-			available_misc.push(ITEM_SHIELD);
 		}
 	}
 
 	if(enemy_type == "sword" || enemy_type == null && g.enemies["sword"]) {
 		available_guns.push(ITEM_RED_PISTOLS);
 		available_ammos.push(ITEM_RED_PLASMA);
+		available_misc.push(ITEM_SHIELD);
 		if(enemy_type != null) {
 			available_misc.push(ITEM_HEALTH_GREEN);
 			available_misc.push(ITEM_SHIELD_GREEN);
@@ -541,7 +543,6 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
 		available_guns.push(ITEM_SWORD);
-		available_misc.push(ITEM_SHIELD);
 		available_misc.push(ITEM_HEALTH_GREEN);
 		if(enemy_type != null)
 			available_ammos.push(ITEM_ROCKET);
