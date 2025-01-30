@@ -44,7 +44,7 @@ function menu_create() {
 			"back to settings"
 		],
 		main_menu_buttons: [
-			"~MAIN MENU",
+			//"~MAIN MENU",
 			"continue game",
 			"settings",
 			"save game",
