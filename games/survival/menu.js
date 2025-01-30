@@ -44,16 +44,19 @@ function menu_create() {
 			"back to settings"
 		],
 		main_menu_buttons: [
+			"~MAIN MENU",
 			"continue game",
 			"settings",
 			"save game",
 			"load game",
 		],
 		menu_respawn_buttons: [
+			//"~YOU DIED",
 			"respawn and continue game",
 			//"settings"
 		],
 		settings_buttons: [
+			"~SETTINGS",
 			"player color",
 			"player draw gun",
 			"enemies spawn",
@@ -139,7 +142,9 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_language);
 		else
 			text = menu_translate(m.want_language, text);
-		if(m.iselected == i)
+		if(text.length > 0 && text[0] == "~")
+			drawButton(ctx, 80, 80 + 60 * i, text.substring(1));
+		else if(m.iselected == i)
 			drawButton(ctx, 100, 80 + 60 * i, "[" + text + "]");
 		else
 			drawButton(ctx, 80, 80 + 60 * i, text);
@@ -248,96 +253,107 @@ function menu_update(m, dt, input) {
 }
 
 function menu_translate(lang, str) {
+	let prefix = "";
+	if(str.length > 0 && str[0] == "~") {
+		str = str.substring(1);
+		prefix = "~";
+	}
 	if(lang == "русский") {
 		if(str == "start new game")
-			return "начать новую игру";
+			str = "начать новую игру";
 		else if(str == "settings")
-			return "настройки";
+			str = "настройки";
 		else if(str == "language")
-			return "язык";
+			str = "язык";
 		else if(str == "continue game")
-			return "продолжить игру";
+			str = "продолжить игру";
 		else if(str == "respawn and continue game")
-			return "возродиться и продолжить игру";
+			str = "возродиться и продолжить игру";
 		else if(String(str) == "true")
-			return "да";
+			str = "да";
 		else if(String(str) == "false")
-			return "нет";
+			str = "нет";
 		else if(str == "player color")
-			return "цвет игрока";
+			str = "цвет игрока";
 		else if(str == "red")
-			return "красный";
+			str = "красный";
 		else if(str == "lime")
-			return "светло-зелёный";
+			str = "светло-зелёный";
 		else if(str == "yellow")
-			return "жёлтый";
+			str = "жёлтый";
 		else if(str == "blue")
-			return "синий";
+			str = "синий";
 		else if(str == "set player color to red")
-			return "сделать игрока красным";
+			str = "сделать игрока красным";
 		else if(str == "set player color to blue")
-			return "сделать игрока синим";
+			str = "сделать игрока синим";
 		else if(str == "set player color to lime")
-			return "сделать игрока светло-зелёным";
+			str = "сделать игрока светло-зелёным";
 		else if(str == "set player color to yellow")
-			return "сделать игрока жёлтым";
+			str = "сделать игрока жёлтым";
 		else if(str == "indicators")
-			return "индикаторы";
+			str = "индикаторы";
 		else if(str == "back to settings")
-			return "назад к настройкам";
+			str = "назад к настройкам";
 		else if(str == "enemies spawn")
-			return "появление противников";
+			str = "появление противников";
 		else if(str == "player draw gun")
-			return "показывать оружие у игрока";
+			str = "показывать оружие у игрока";
 		else if(str == "main menu")
-			return "главное меню";
+			str = "главное меню";
 		else if(str == "show player health")
-			return "показывать здоровье игрока";
+			str = "показывать здоровье игрока";
 		else if(str == "show player hunger")
-			return "показывать значение сытости игрока";
+			str = "показывать значение сытости игрока";
 		else if(str == "show player thirst")
-			return "показывать значение жажды игрока";
+			str = "показывать значение жажды игрока";
 		else if(str == "show enemy health")
-			return "показывать здоровье противников";
+			str = "показывать здоровье противников";
 		else if(str == "show rocket health")
-			return "показывать прочность ракеты";
+			str = "показывать прочность ракеты";
 		else if(str == "show enemy hunger")
-			return "показывать значение сытости зомби";
+			str = "показывать значение сытости зомби";
 		else if(str == "show car health")
-			return "показывать значение сломанности автомобилей"
+			str = "показывать значение сломанности автомобилей"
 		else if(str == "show car fuel")
-			return "показывать значение топлива автомобиля";
+			str = "показывать значение топлива автомобиля";
 		else if(str == "show hints")
-			return "подсказки";
+			str = "подсказки";
 		else if(str == "ammo pickup in last slot")
-			return "собирать патроны в последний слот";
+			str = "собирать патроны в последний слот";
 		else if(str == "automatically pickup food and drinks")
-			return "автоматически подбирать еду и напитки";
+			str = "автоматически подбирать еду и напитки";
 		else if(str == "automatically pickup fuel")
-			return "автоматически подбирать топливо";
+			str = "автоматически подбирать топливо";
 		else if(str == "automatically pickup health")
-			return "автоматически подбирать аптечки";
+			str = "автоматически подбирать аптечки";
 		else if(str == "automatically pickup ammo")
-			return "автоматически подбирать патроны";
+			str = "автоматически подбирать патроны";
 		else if(str == "auto pickup")
-			return "автоматически подбирать предметы";
+			str = "автоматически подбирать предметы";
 		else if(str == "lose items on death")
-			return "терять вещи при смерти";
+			str = "терять вещи при смерти";
 		else if(str == "respawn on current level")
-			return "возрождение на текущем уровнe";
+			str = "возрождение на текущем уровнe";
 		else if(str == "new game")
-			return "новая игра";
+			str = "новая игра";
 		else if(str == "enable trees")
-			return "деревья";
+			str = "деревья";
 		else if(str == "automatic respawn")
-			return "автоматическое возрождение";
+			str = "автоматическое возрождение";
 		else if(str == "debug")
-			return "техническая информация для разработчика";
+			str = "техническая информация для разработчика";
 		else if(str == "save game")
-			return "сохранить игру";
+			str = "сохранить игру";
 		else if(str == "load game")
-			return "загрузить игру";
+			str = "загрузить игру";
+		else if(str == "MAIN MENU")
+			str = "ГЛАВНОЕ МЕНЮ";
+		else if(str == "YOU DIED")
+			str = "СМЕРТЬ";
+		else if(str == "SETTINGS")
+			str = "НАСТРОЙКИ";
 	}
-	return str;
+	return prefix + str;
 }
 
