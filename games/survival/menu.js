@@ -56,7 +56,7 @@ function menu_create() {
 			//"settings"
 		],
 		settings_buttons: [
-			"~SETTINGS",
+			//"~SETTINGS",
 			"player color",
 			"player draw gun",
 			"enemies spawn",

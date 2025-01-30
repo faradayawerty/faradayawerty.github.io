@@ -1027,7 +1027,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			"lime",
 			"green"
 		);
-		p.minigun_cooldown = 80;
+		p.minigun_cooldown = 90;
 		p.health -= 0.0255 * dt
 		p.hunger -= 0.0125 * dt
 		p.thirst -= 0.0125 * dt

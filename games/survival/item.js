@@ -526,6 +526,7 @@ function item_spawn(g, x, y, enemy_type=null) {
 	if(enemy_type == "shooting red" || enemy_type == null && g.enemies["shooting red"]) {
 		available_ammos.push(ITEM_PLASMA);
 		available_guns.push(ITEM_PLASMA_LAUNCHER);
+		available_misc.push(ITEM_SHIELD);
 		if(enemy_type != null)
 			available_ammos.push(ITEM_RED_PLASMA);
 	}
@@ -533,7 +534,6 @@ function item_spawn(g, x, y, enemy_type=null) {
 	if(enemy_type == "sword" || enemy_type == null && g.enemies["sword"]) {
 		available_guns.push(ITEM_RED_PISTOLS);
 		available_ammos.push(ITEM_RED_PLASMA);
-		available_misc.push(ITEM_SHIELD);
 		if(enemy_type != null)
 			available_misc = [ITEM_HEALTH_GREEN, ITEM_SHIELD_GREEN]
 	}
@@ -541,14 +541,14 @@ function item_spawn(g, x, y, enemy_type=null) {
 	if(enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
 		available_guns.push(ITEM_SWORD);
 		if(enemy_type != null)
-			available_ammos.push(ITEM_ROCKET);
+			available_ammos = [ITEM_ROCKET];
 	}
 
 	if(enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
 		available_guns.push(ITEM_ROCKET_LAUNCHER);
 		available_ammos.push(ITEM_ROCKET);
 		if(enemy_type != null) {
-			available_ammos.push(ITEM_RAINBOW_AMMO);
+			available_ammos = [ITEM_ROCKET, ITEM_RAINBOW_AMMO];
 			available_misc = [ITEM_SHIELD_RAINBOW];
 		}
 	}
@@ -565,6 +565,9 @@ function item_spawn(g, x, y, enemy_type=null) {
 		chance_ammo = 0.5;
 		chance_misc = 0.4;
 	}
+
+	if(enemy_type == "sword")
+		chance_misc = 0.7;
 
 	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
 	if(player_closest) {
