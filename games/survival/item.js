@@ -540,6 +540,8 @@ function item_spawn(g, x, y, enemy_type=null) {
 
 	if(enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
 		available_guns.push(ITEM_SWORD);
+		available_misc.push(ITEM_SHIELD_GREEN);
+		available_misc.push(ITEM_HEALTH_GREEN);
 		if(enemy_type != null)
 			available_ammos = [ITEM_ROCKET];
 	}
