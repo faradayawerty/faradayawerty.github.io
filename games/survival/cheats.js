@@ -4,11 +4,13 @@ function cheat_all_weapons() {
 	item_create(game1, ITEM_SHOTGUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_MINIGUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_PLASMA_LAUNCHER, 1250, 1250, false, false);
+	item_create(game1, ITEM_PLASMA_PISTOL, 1250, 1250, false, false);
 	item_create(game1, ITEM_RED_PISTOLS, 1250, 1250, false, false);
 	item_create(game1, ITEM_RED_SHOTGUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_GREEN_GUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_SWORD, 1250, 1250, false, false);
 	item_create(game1, ITEM_ROCKET_LAUNCHER, 1250, 1250, false, false);
+	item_create(game1, ITEM_ROCKET_SHOTGUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_RAINBOW_PISTOLS, 1250, 1250, false, false);
 	item_create(game1, ITEM_LASER_GUN, 1250, 1250, false, false);
 }

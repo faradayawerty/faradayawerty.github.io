@@ -10,6 +10,8 @@ let ITEM_SWORD = 24;
 let ITEM_ROCKET_LAUNCHER = 26;
 let ITEM_RAINBOW_PISTOLS = 29;
 let ITEM_LASER_GUN = 33;
+let ITEM_PLASMA_PISTOL = 35;
+let ITEM_ROCKET_SHOTGUN = 36;
 
 let ITEM_AMMO = 2;
 let ITEM_PLASMA = 18;
@@ -57,7 +59,9 @@ ITEMS_GUNS = [
 	ITEM_GREEN_GUN,
 	ITEM_ROCKET_LAUNCHER,
 	ITEM_RAINBOW_PISTOLS,
-	ITEM_LASER_GUN
+	ITEM_LASER_GUN,
+	ITEM_PLASMA_PISTOL,
+	ITEM_ROCKET_SHOTGUN
 ];
 
 ITEMS_MELEE = [
@@ -171,6 +175,12 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_PLASMA_PISTOL) {
+		ctx.fillStyle = "#331133";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	} else if(id == ITEM_GREEN_GUN) {
 		ctx.fillStyle = "#117733";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
@@ -213,6 +223,12 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 		ctx.strokeRect(x + w * 0.1, y + h * 0.55, w * 0.8, h * 0.2);
 	} else if(id == ITEM_SHOTGUN) {
 		ctx.fillStyle = "#773311";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+		ctx.strokeStyle = "gray";
+		ctx.lineWidth = 0.05 * w;
+		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_ROCKET_SHOTGUN) {
+		ctx.fillStyle = "#111133";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 		ctx.strokeStyle = "gray";
 		ctx.lineWidth = 0.05 * w;
@@ -566,10 +582,9 @@ function item_spawn(g, x, y, enemy_type=null) {
 		chance_fuel = 0.1;
 		chance_ammo = 0.5;
 		chance_misc = 0.4;
+		if(enemy_type == "sword")
+			chance_misc = 0.7;
 	}
-
-	if(enemy_type == "sword")
-		chance_misc = 0.7;
 
 	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
 	if(player_closest) {

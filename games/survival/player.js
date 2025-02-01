@@ -34,7 +34,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shield_green_health: 0,
 		shield_green_health_max: 2500,
 		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 62500,
+		shield_rainbow_health_max: 12500,
 		sword_direction: 0,
 		sword_visible: false,
 		ai_controlled: ai_controlled,
@@ -155,17 +155,12 @@ function player_update(player_object, dt) {
 
 	p.item_animstate += 0.01 * dt;
 
-	if(p.shield_blue_health > 0) {
+	if(p.shield_blue_health > 0)
 		p.shield_blue_health -= 0.01 * dt;
-	}
-
-	if(p.shield_green_health > 0) {
-		p.shield_green_health -= 0.05 * dt;
-	}
-
-	if(p.shield_rainbow_health > 0) {
-		p.shield_rainbow_health -= 0.25 * dt;
-	}
+	if(p.shield_green_health > 0)
+		p.shield_green_health -= 0.01 * dt;
+	if(p.shield_rainbow_health > 0)
+		p.shield_rainbow_health -= 0.01 * dt;
 
 	if(p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(p.health) + ", change " + Math.round(p.saved_health - p.health)
@@ -642,6 +637,8 @@ function player_draw(player_object, ctx) {
 
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
 				ctx.strokeStyle = "#773311";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_SHOTGUN)
+				ctx.strokeStyle = "#111133";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN)
 				ctx.strokeStyle = "#551111";
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS) {
@@ -682,6 +679,9 @@ function player_draw(player_object, ctx) {
 				ctx.strokeStyle = "#331133";
 				lw *= 2.25;
 				gl *= 1.5;
+			}
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_PISTOL) {
+				ctx.strokeStyle = "#331133";
 			}
 			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER) {
 				ctx.strokeStyle = "#111133";
@@ -833,6 +833,31 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			audio_play("data/sfx/gunshot_1.mp3", 0.25);
 	}
 
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_PISTOL
+		&& true
+		&& p.shot_cooldown <= 0
+		&& inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
+		bullet_create(
+			player_object.game,
+			p.body.position.x,
+			p.body.position.y,
+			tx - sx,
+			ty - sy,
+			20,
+			(25 + 25 * Math.random()) * base_damage,
+			false,
+			6,
+			1500,
+			"cyan",
+			"blue"
+		);
+		p.shot_cooldown = 200;
+		if(Math.random() > 0.995)
+			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
+		if(enable_audio)
+			audio_play("data/sfx/red_pistols_1.mp3", 0.25);
+	}
+
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN
 		&& true
 		&& p.shotgun_cooldown <= 0
@@ -887,7 +912,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			tx - sx,
 			ty - sy,
 			17.5,
-			3 * 25 * base_damage * (0.25 + 2 * 0.75 * Math.random()),
+			4.25 * 25 * base_damage * (0.25 + 2 * 0.75 * Math.random()),
 			false,
 			12.5,
 			1500,
@@ -913,7 +938,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			tx - sx,
 			ty - sy,
 			30,
-			0.66 * 125 * base_damage * 2 * Math.random(),
+			1.5 * 125 * base_damage * 2.5 * Math.random(),
 			false,
 			6,
 			1500,
@@ -927,7 +952,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			tx - sx,
 			ty - sy,
 			30,
-			0.66 * 125 * base_damage * 2 * Math.random(),
+			1.5 * 125 * base_damage * 2.5 * Math.random(),
 			false,
 			6,
 			1500,
@@ -940,13 +965,41 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 		audio_play("data/sfx/red_pistols_1.mp3", 0.125);
 	}
 
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_SHOTGUN
+		&& true
+		&& p.shot_cooldown <= 0
+		&& inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
+		let theta = Math.atan2(ty - sy, tx - sx);
+		N = Math.floor(Math.random() * 4 + 3);
+		for(let i = 0; i <= N; i++)
+			rocket_create(
+				player_object.game,
+				p.body.position.x + 2 * p.w * Math.cos(theta - (0.5 * N - i) * Math.PI / N),
+				p.body.position.y + 2 * p.w * Math.sin(theta - (0.5 * N - i) * Math.PI / N),
+				tx - sx,
+				ty - sy,
+				6,
+				null,
+				0.11 * 3125 * base_damage * (0.1 + 0.9 * Math.random()),
+				p.max_health,
+				false,
+				20,
+				1500
+			);
+		p.shot_cooldown = 500;
+		if(Math.random() > 0.99)
+			inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
+		if(enable_audio)
+			audio_play("data/sfx/rocketlauncher_1.mp3", 0.125);
+	}
+
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN
 		&& true
 		&& p.shot_cooldown <= 0
 		&& inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
 		let theta = Math.atan2(ty - sy, tx - sx);
 		N = Math.floor(Math.random() * 7 + 5);
-		for(let i = 0; i < N; i++)
+		for(let i = 0; i <= N; i++)
 			bullet_create(
 				player_object.game,
 				p.body.position.x + 2 * p.w * Math.cos(theta - (0.5 * N - i) * Math.PI / N),
@@ -954,7 +1007,7 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 				tx - sx,
 				ty - sy,
 				30,
-				3.5 * 125 * base_damage * (0.5 + 1.0 * Math.random()),
+				4.0 * 125 * base_damage * (0.75 + 0.25 * Math.random()),
 				false,
 				6,
 				1500,

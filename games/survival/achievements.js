@@ -7,6 +7,11 @@ function achievements_create(g) {
 		offset_y: 50,
 		x: 50 + 500,
 		y: 50 + 100,
+		xx: 50 + 500, // x before mouse click
+		yy: 50 + 500, // y before mouse click
+		mxx: 0,
+		myy: 0,
+		clicked: false,
 		icon_size: 40,
 		achievements: [
 			{
@@ -60,10 +65,26 @@ function achievements_update(ae, dt) {
 		let mx = ae.game.input.mouse.x / get_scale();
 		let my = ae.game.input.mouse.y / get_scale();
 
+		if(!ae.data.clicked) {
+			ae.data.xx = ae.data.x;
+			ae.data.yy = ae.data.y;
+			ae.data.mxx = mx;
+			ae.data.myy = my;
+		}
+
+		let dx = mx - ae.data.mxx;
+		let dy = my - ae.data.myy;
+
 		if(ae.data.offset_x < mx && mx < ae.data.offset_x + ae.data.width)
-			ae.data.x = mx;
+			ae.data.x = ae.data.xx + dx;
 		if(ae.data.offset_y < my && my < ae.data.offset_y + ae.data.width)
-			ae.data.y = my;
+			ae.data.y = ae.data.yy + dy;
+
+		ae.data.clicked = true;
+	} else if(ae.data.clicked) {
+		ae.data.xx = ae.game.input.mouse.x / get_scale();
+		ae.data.yy = ae.game.input.mouse.y / get_scale();
+		ae.data.clicked = false;
 	}
 }
 
@@ -94,7 +115,7 @@ function achievements_translate(lang, text) {
 
 function achievement_icon_draw(ctx, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000) {
 
-	if(x < bbx || x > bbw || y < bby || y > bbh)
+	if(x < bbx || x > bbw + 0.25 * bbx || y < bby || y > bbh + 0.25 * bby)
 		return;
 
 	let c0 = "red";

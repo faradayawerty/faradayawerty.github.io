@@ -141,8 +141,11 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.hunger = 1.75 * e.max_hunger;
 		e.max_hunger = 1.75 * e.max_hunger;
 		e.speed = 0.5 * e.speed;
-		if(e.type == "sword")
+		if(e.type == "sword") {
 			e.speed *= 2;
+			e.health = 2.75 * e.max_health;
+			e.max_health = 2.75 * e.max_health;
+		}
 		if(e.type == "shooting laser") {
 			e.shooting_range *= 1.5;
 			e.speed *= 2.25;
@@ -309,8 +312,24 @@ function enemy_update(enemy_object, dt) {
 					for(let i = 0; i < N; i++) {
 						let theta =  Math.PI * (i/N - 1/2);
 						bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
-							dx + Math.cos(theta), dy + Math.sin(theta), 25, e.damage * 10, true, e.w * 0.2, 2000,
+							dx + Math.cos(theta), dy + Math.sin(theta), 25, e.damage, true, e.w * 0.2, 2000,
 							colors[i], "white");
+					}
+					e.shooting_delay = 0;
+				}
+				dx = 0;
+				dy = 0;
+			}
+		}
+		if(e.type == "shooting red" && e.boss) {
+			if(v < e.shooting_range) {
+				if(e.shooting_delay >= 500) {
+					N = 7;
+					for(let i = 0; i < N; i++) {
+						let theta =  Math.PI * (i/N - 1/2);
+						bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
+							dx + Math.cos(theta), dy + Math.sin(theta), 25, e.damage * 10, true, e.w * 0.075, 2000,
+							"red", "pink");
 					}
 					e.shooting_delay = 0;
 				}
@@ -359,7 +378,7 @@ function enemy_update(enemy_object, dt) {
 				dy = 0;
 			}
 		}
-		if(e.type == "shooting red") {
+		if(e.type == "shooting red" && !e.boss) {
 			if(v < e.shooting_range) {
 				if(e.shooting_delay >= 200) {
 					bullet_create(enemy_object.game, e.body.position.x + e.w, e.body.position.y, dx, dy, 15, e.damage, true, Math.max(0.09 * e.w, 4), 2000, "red", "white");
@@ -467,7 +486,10 @@ function enemy_update(enemy_object, dt) {
 				if(enemy_object.data.hunger > 0) {
 					N = 20 * Math.random() + 10;
 					if(e.type == "shooting") {
-						item_create(enemy_object.game, ITEM_PLASMA_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
+						if(Math.random() < 0.33)
+							item_create(enemy_object.game, ITEM_PLASMA_PISTOL, e.body.position.x, e.body.position.y, false, false);
+						else
+							item_create(enemy_object.game, ITEM_PLASMA_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "shooting red") {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_RED_SHOTGUN, e.body.position.x, e.body.position.y, false, false);
@@ -622,18 +644,23 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.stroke();
 		}
 		if(e.type == "shooting red" && g < 1.25 * e.shooting_range) {
+			let k = 0.75;
+			if(e.boss)
+				k = 1;
 			ctx.beginPath();
 			ctx.moveTo(px, py);
 			ctx.strokeStyle = "#551111";
-			ctx.lineTo(px + 0.75 * e.w * gx / g, py + 0.75 * e.w * gy / g);
+			ctx.lineTo(px + k * e.w * gx / g, py + k * e.w * gy / g);
 			ctx.lineWidth = 0.21 * e.w;
 			ctx.stroke();
-			ctx.beginPath();
-			ctx.moveTo(px + e.w, py);
-			ctx.strokeStyle = "#551111";
-			ctx.lineTo(px + e.w + 0.75 * e.w * gx / g, py + 0.75 * e.w * gy / g);
-			ctx.lineWidth = 0.21 * e.w;
-			ctx.stroke();
+			if(!e.boss) {
+				ctx.beginPath();
+				ctx.moveTo(px + e.w, py);
+				ctx.strokeStyle = "#551111";
+				ctx.lineTo(px + e.w + k * e.w * gx / g, py + k * e.w * gy / g);
+				ctx.lineWidth = 0.21 * e.w;
+				ctx.stroke();
+			}
 		}
 		if(e.type == "deer")
 			animal_deer_draw_horns(ctx, e.body.position.x, e.body.position.y, e.w, e.h);
