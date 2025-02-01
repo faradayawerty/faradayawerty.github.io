@@ -142,9 +142,9 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		e.max_hunger = 1.75 * e.max_hunger;
 		e.speed = 0.5 * e.speed;
 		if(e.type == "sword") {
-			e.speed *= 2;
-			e.health = 2.75 * e.max_health;
-			e.max_health = 2.75 * e.max_health;
+			e.speed *= 2.125;
+			e.health = 3.75 * e.max_health;
+			e.max_health = 3.75 * e.max_health;
 		}
 		if(e.type == "shooting laser") {
 			e.shooting_range *= 1.5;
@@ -501,8 +501,11 @@ function enemy_update(enemy_object, dt) {
 						else
 							item_create(enemy_object.game, ITEM_SWORD, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "shooting rocket") {
-						item_create(enemy_object.game, ITEM_ROCKET_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
-						if(Math.random() < 0.33) {
+						if(Math.random() < 0.33)
+							item_create(enemy_object.game, ITEM_ROCKET_SHOTGUN, e.body.position.x, e.body.position.y, false, false);
+						else
+							item_create(enemy_object.game, ITEM_ROCKET_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
+						if(Math.random() < 0.5) {
 							let tank_colors = ["green", "#005533", "#003355", "#aaaa11"];
 							car_create(enemy_object.game, e.body.position.x, e.body.position.y, tank_colors[Math.floor(Math.random() * tank_colors.length)], true, true);
 						}
@@ -514,6 +517,7 @@ function enemy_update(enemy_object, dt) {
 						for(let j = 0; j < Math.random() * 11 - 4; j++)
 							item_create(enemy_object.game, ITEM_BOSSIFIER, e.body.position.x, e.body.position.y, false, false);
 					} else if(e.type == "deer") {
+						item_create(enemy_object.game, ITEM_HORN, e.body.position.x, e.body.position.y, false, false);
 						N = N + 1;
 					} else {
 						if(Math.random() < 0.33)

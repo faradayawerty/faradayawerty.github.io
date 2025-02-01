@@ -56,7 +56,7 @@ function bullet_update(bullet_object, dt) {
 			|| (bullet_object.game.objects[i].name == "rocket" && bullet_object.game.objects[i].data.enemy))
 			&& Matter.Collision.collides(bullet_object.data.body, bullet_object.game.objects[i].data.body) != null) {
 			if(bullet_object.game.objects[i].name == "car" && bullet_object.game.objects[i].data.is_tank && !bullet_object.game.objects[i].data.enemy) {
-				continue;
+				bullet_object.game.objects[i].data.health -= 0.0125 * bullet_object.data.damage * dt;
 			} else if(bullet_object.game.objects[i].name == "enemy" && !bullet_object.data.enemy) {
 				bullet_object.game.objects[i].data.health -= bullet_object.data.damage * dt;
 				bullet_object.game.objects[i].data.hit_by_player = true;
@@ -77,8 +77,11 @@ function bullet_update(bullet_object, dt) {
 				bullet_object.game.player_object.data.shield_rainbow_health -= 0.55 * bullet_object.data.damage * dt;
 		} else if(bullet_object.game.player_object.data.immunity <= 0) {
 			let k = 1.0;
-			if(bullet_object.game.player_object.data.sword_visible)
+			if(bullet_object.game.player_object.data.sword_protection) {
 				k = 0.05;
+				if(hotbar_get_selected_item(bullet_object.game.player_object.data.hotbar_element) == ITEM_HORN)
+					k = 0.001;
+			}
 			bullet_object.game.player_object.data.health -= k * bullet_object.data.damage * dt;
 		}
 	}

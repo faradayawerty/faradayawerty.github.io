@@ -37,6 +37,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		shield_rainbow_health_max: 12500,
 		sword_direction: 0,
 		sword_visible: false,
+		sword_protection: false,
 		ai_controlled: ai_controlled,
 		ai_random_dir: 0,
 		gradient: 0,
@@ -330,6 +331,7 @@ function player_update(player_object, dt) {
 				dy = 0;
 			} else {
 				p.laser_sound_has_played = false;
+				p.sword_protection = false;
 			}
 			if(v < p.w * 7.5) {
 				dx = -dx;
@@ -478,6 +480,7 @@ function player_update(player_object, dt) {
 			);
 		} else {
 			p.laser_sound_has_played = false;
+			p.sword_protection = false;
 		}
 
 		if(isKeyDown(player_object.game.input, 'q', true))
@@ -706,10 +709,19 @@ function player_draw(player_object, ctx) {
 			let sword_length = 100;
 			ctx.beginPath();
 			ctx.moveTo(px, py);
-			ctx.strokeStyle = "#55aa11";
+			let col = "#55aa11";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN)
+				col = "brown";
+			ctx.strokeStyle = col;
 			ctx.lineTo(px + Math.cos(p.sword_direction) * sword_length, py + Math.sin(p.sword_direction) * sword_length);
 			ctx.lineWidth = 0.25 * p.w;
 			ctx.stroke();
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN) {
+				let dx = Math.cos(p.sword_direction) * sword_length;
+				let dy = Math.sin(p.sword_direction) * sword_length;
+				drawLine(ctx, px + 0.4 * dx, py + 0.4 * dy, px + 0.95 * dx - 0.25 * dy, py + 0.95 * dy + 0.25 * dx, "brown", p.w * 0.2);
+				drawLine(ctx, px + 0.3 * dx, py + 0.3 * dy, px + 0.85 * dx + 0.25 * dy, py + 0.85 * dy - 0.25 * dx, "brown", p.w * 0.2);
+			}
 			p.sword_visible = false;
 		} else if(hotbar_get_selected_item(p.hotbar_element) > 0) {
 			let px = p.body.position.x - 0.25 * p.w, py = p.body.position.y - 0.25 * p.h;
@@ -1061,6 +1073,49 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 			}
 		}
 		p.sword_visible = true;
+		p.sword_protection = true;
+	}
+
+	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN && true) {
+		if(Math.cos(p.sword_direction) < -0.955)
+			audio_play("data/sfx/sword_1.mp3");
+		if(tx > sx)
+			p.sword_direction += 0.04 * dt
+		else
+			p.sword_direction -= 0.04 * dt
+		p.sword_direction = p.sword_direction % (2 * Math.PI);
+		let closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 200);
+		if(!closest_target)
+			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 200);
+		if(!closest_target)
+			closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 300);
+		if(closest_target && closest_target.name == "car" && closest_target.data.is_tank)
+			closest_target = null;
+		if(closest_target) {
+			target_direction = Math.atan2(closest_target.data.body.position.y - p.body.position.y, closest_target.data.body.position.x - p.body.position.x);
+			if(Math.abs(target_direction - p.sword_direction) % (2 * Math.PI) < Math.PI / 4) {
+				closest_target.data.health -= (Math.random() * 300000 + 200000) * dt;
+				if(closest_target.name == "enemy")
+					closest_target.data.hit_by_player = true;
+			}
+		}
+		let closest_bullet = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "bullet", 200);
+		if(closest_bullet) {                                                   
+			let vx = closest_bullet.data.body.position.x - player_object.data.body.position.x;
+			let vy = closest_bullet.data.body.position.y - player_object.data.body.position.y;
+			let v = Math.sqrt(vx*vx + vy*vy);
+			Matter.Body.setVelocity(closest_bullet.data.body, {x: 5 * vx / v, y: 5 * vy / v});
+		}
+		let closest_rocket = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "rocket", 200);
+		if(closest_rocket) {                                                   
+			rocket_direction = Math.atan2(closest_rocket.data.body.position.y - p.body.position.y, closest_rocket.data.body.position.x - p.body.position.x);
+			if(Math.abs(rocket_direction - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
+				closest_rocket.data.health -= (Math.random() * 15000 + 5000) * dt;
+				closest_rocket.data.hit_by_player = true;
+			}
+		}
+		p.sword_visible = true;
+		p.sword_protection = true;
 	}
 
 	if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN

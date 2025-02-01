@@ -12,6 +12,7 @@ let ITEM_RAINBOW_PISTOLS = 29;
 let ITEM_LASER_GUN = 33;
 let ITEM_PLASMA_PISTOL = 35;
 let ITEM_ROCKET_SHOTGUN = 36;
+let ITEM_HORN = 37;
 
 let ITEM_AMMO = 2;
 let ITEM_PLASMA = 18;
@@ -193,6 +194,15 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 		ctx.strokeStyle = "#bbaa11";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(id == ITEM_HORN) {
+		ctx.fillStyle = "brown";
+		ctx.fillRect(x + w * 0.1, y + h * 0.425, w * 0.8, h * 0.15);
+		//ctx.strokeStyle = "black";
+		//ctx.lineWidth = 0.05 * w;
+		//ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+		//drawLine(ctx, x + w * 0.5, y + h * 0.5, x + w * 0.8, y + h * 0.8, "black", w * 0.15);
+		drawLine(ctx, x + w * 0.5, y + h * 0.5, x + w * 0.8, y + h * 0.8, "brown", w * 0.1);
+		drawLine(ctx, x + w * 0.4, y + h * 0.5, x + w * 0.7, y + h * 0.2, "brown", w * 0.1);
 	} else if(id == ITEM_RED_SHOTGUN) {
 		ctx.fillStyle = "#dd1111";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
