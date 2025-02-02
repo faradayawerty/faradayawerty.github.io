@@ -1,15 +1,20 @@
 
-let TILE_VOID = 0;
-let TILE_START = 1;
-let TILE_DEFAULT = 4;
+let LEVEL_TILE_VOID = 0;
+let LEVEL_TILE_START = 1;
+let LEVEL_TILE_DEFAULT = 4;
 
-let TILE_ROAD_CROSSROAD = 5;
-let TILE_ROAD_VERTICAL = 2;
-let TILE_ROAD_HORIZONTAL = 3;
-let TILE_ROAD_TURN_WN = 6;
-let TILE_ROAD_TURN_WS = 7;
-let TILE_ROAD_TURN_EN = 8;
-let TILE_ROAD_TURN_ES = 9;
+let LEVEL_TILE_ROAD_CROSSROAD = 5;
+let LEVEL_TILE_ROAD_VERTICAL = 2;
+let LEVEL_TILE_ROAD_HORIZONTAL = 3;
+let LEVEL_TILE_ROAD_TURN_WN = 6;
+let LEVEL_TILE_ROAD_TURN_WS = 7;
+let LEVEL_TILE_ROAD_TURN_EN = 8;
+let LEVEL_TILE_ROAD_TURN_ES = 9;
+
+let LEVEL_THEME_FOREST = 1;
+let LEVEL_THEME_CITY = 2;
+let LEVEL_THEME_MILITARY_BASE = 5;
+let LEVEL_THEME_SPACE = 6;
 
 function levels_set(g, level, old_level=null) {
 
@@ -40,82 +45,82 @@ function levels_set(g, level, old_level=null) {
 	if(!g.visited_levels.includes(level)) {
 
 		let available_tiles = [
-			TILE_ROAD_CROSSROAD,
-			TILE_ROAD_HORIZONTAL, TILE_ROAD_VERTICAL,
-			TILE_ROAD_TURN_WN, TILE_ROAD_TURN_WS, TILE_ROAD_TURN_EN, TILE_ROAD_TURN_ES,
-			TILE_DEFAULT
+			LEVEL_TILE_ROAD_CROSSROAD,
+			LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_VERTICAL,
+			LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_WS, LEVEL_TILE_ROAD_TURN_EN, LEVEL_TILE_ROAD_TURN_ES,
+			LEVEL_TILE_DEFAULT
 		];
 
-		if(level_tile_get_neighbour_west(g, level) == TILE_DEFAULT)
+		if(level_tile_get_neighbour_west(g, level) == LEVEL_TILE_DEFAULT)
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_CROSSROAD, TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_WS
+				LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_WS
 			].includes(tile)));
-		if(level_tile_get_neighbour_east(g, level) == TILE_DEFAULT)
+		if(level_tile_get_neighbour_east(g, level) == LEVEL_TILE_DEFAULT)
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_CROSSROAD, TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_EN, TILE_ROAD_TURN_ES
+				LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_EN, LEVEL_TILE_ROAD_TURN_ES
 			].includes(tile)));
-		if(level_tile_get_neighbour_north(g, level) == TILE_DEFAULT)
+		if(level_tile_get_neighbour_north(g, level) == LEVEL_TILE_DEFAULT)
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_CROSSROAD, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_EN, TILE_ROAD_TURN_WN
+				LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_EN, LEVEL_TILE_ROAD_TURN_WN
 			].includes(tile)));
-		if(level_tile_get_neighbour_south(g, level) == TILE_DEFAULT)
+		if(level_tile_get_neighbour_south(g, level) == LEVEL_TILE_DEFAULT)
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_CROSSROAD, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_ES, TILE_ROAD_TURN_WS
-			].includes(tile)));
-
-		if([TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_EN, TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_west(g, level)))
-			available_tiles = available_tiles.filter((tile) => !([
-				TILE_DEFAULT, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_EN, TILE_ROAD_TURN_ES
-			].includes(tile)));
-		if([TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_WS].includes(level_tile_get_neighbour_east(g, level)))
-			available_tiles = available_tiles.filter((tile) => !([
-				TILE_DEFAULT, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_WS
-			].includes(tile)));
-		if([TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_EN].includes(level_tile_get_neighbour_north(g, level)))
-			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_CROSSROAD, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_EN
-			].includes(tile)));
-		if([TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_WS, TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_south(g, level)))
-			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_CROSSROAD, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_WS, TILE_ROAD_TURN_ES
+				LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_ES, LEVEL_TILE_ROAD_TURN_WS
 			].includes(tile)));
 
-		if([TILE_ROAD_VERTICAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_WS].includes(level_tile_get_neighbour_west(g, level)))
+		if([LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_EN, LEVEL_TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_west(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_HORIZONTAL, TILE_ROAD_CROSSROAD, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_WS
+				LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_EN, LEVEL_TILE_ROAD_TURN_ES
 			].includes(tile)));
-		if([TILE_ROAD_VERTICAL, TILE_ROAD_TURN_EN, TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_east(g, level)))
+		if([LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_WS].includes(level_tile_get_neighbour_east(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_HORIZONTAL, TILE_ROAD_CROSSROAD, TILE_ROAD_TURN_EN, TILE_ROAD_TURN_ES
+				LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_WS
 			].includes(tile)));
-		if([TILE_ROAD_VERTICAL, TILE_ROAD_TURN_WS, TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_north(g, level)))
+		if([LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_EN].includes(level_tile_get_neighbour_north(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_HORIZONTAL, TILE_DEFAULT, TILE_ROAD_TURN_WS, TILE_ROAD_TURN_ES
+				LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_EN
 			].includes(tile)));
-		if([TILE_ROAD_VERTICAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_EN].includes(level_tile_get_neighbour_south(g, level)))
+		if([LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_WS, LEVEL_TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_south(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_ROAD_HORIZONTAL, TILE_DEFAULT, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_EN
+				LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_WS, LEVEL_TILE_ROAD_TURN_ES
 			].includes(tile)));
 
-		if([TILE_ROAD_CROSSROAD, TILE_START].includes(level_tile_get_neighbour_west(g, level)))
+		if([LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_WS].includes(level_tile_get_neighbour_west(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_DEFAULT, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_ES, TILE_ROAD_TURN_EN
+				LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_WS
 			].includes(tile)));
-		if([TILE_ROAD_CROSSROAD, TILE_START].includes(level_tile_get_neighbour_east(g, level)))
+		if([LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_EN, LEVEL_TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_east(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_DEFAULT, TILE_ROAD_VERTICAL, TILE_ROAD_TURN_WS, TILE_ROAD_TURN_WN
+				LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_ROAD_TURN_EN, LEVEL_TILE_ROAD_TURN_ES
 			].includes(tile)));
-		if([TILE_ROAD_CROSSROAD, TILE_START].includes(level_tile_get_neighbour_north(g, level)))
+		if([LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_WS, LEVEL_TILE_ROAD_TURN_ES].includes(level_tile_get_neighbour_north(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_DEFAULT, TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_WS, TILE_ROAD_TURN_ES
+				LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_TURN_WS, LEVEL_TILE_ROAD_TURN_ES
 			].includes(tile)));
-		if([TILE_ROAD_CROSSROAD, TILE_START].includes(level_tile_get_neighbour_south(g, level)))
+		if([LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_EN].includes(level_tile_get_neighbour_south(g, level)))
 			available_tiles = available_tiles.filter((tile) => !([
-				TILE_DEFAULT, TILE_ROAD_HORIZONTAL, TILE_ROAD_TURN_WN, TILE_ROAD_TURN_EN
+				LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_EN
+			].includes(tile)));
+
+		if([LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_START].includes(level_tile_get_neighbour_west(g, level)))
+			available_tiles = available_tiles.filter((tile) => !([
+				LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_ES, LEVEL_TILE_ROAD_TURN_EN
+			].includes(tile)));
+		if([LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_START].includes(level_tile_get_neighbour_east(g, level)))
+			available_tiles = available_tiles.filter((tile) => !([
+				LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_VERTICAL, LEVEL_TILE_ROAD_TURN_WS, LEVEL_TILE_ROAD_TURN_WN
+			].includes(tile)));
+		if([LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_START].includes(level_tile_get_neighbour_north(g, level)))
+			available_tiles = available_tiles.filter((tile) => !([
+				LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_WS, LEVEL_TILE_ROAD_TURN_ES
+			].includes(tile)));
+		if([LEVEL_TILE_ROAD_CROSSROAD, LEVEL_TILE_START].includes(level_tile_get_neighbour_south(g, level)))
+			available_tiles = available_tiles.filter((tile) => !([
+				LEVEL_TILE_DEFAULT, LEVEL_TILE_ROAD_HORIZONTAL, LEVEL_TILE_ROAD_TURN_WN, LEVEL_TILE_ROAD_TURN_EN
 			].includes(tile)));
 
 		if(available_tiles.length < 1)
-			available_tiles.push(TILE_DEFAULT);
+			available_tiles.push(LEVEL_TILE_DEFAULT);
 
 		g.debug_console.unshift("new level: " + level);
 		g.debug_console.unshift("visited levels: ..." + g.visited_levels.slice(g.visited_levels.length - 10));
@@ -156,7 +161,7 @@ function levels_set(g, level, old_level=null) {
 
 	let tile = g.assigned_tiles[g.visited_levels.indexOf(level)];
 
-	if(tile == TILE_START) {
+	if(tile == LEVEL_TILE_START) {
 		car_create(g, Ox + 1960, Oy + 2200, "#7711ff");
 		decorative_building_create(g, Ox + 50, Oy + 50, 900, 900);
 		decorative_parkinglot_create(g, Ox + 1410, Oy + 1960, 1050, 525);
@@ -165,50 +170,50 @@ function levels_set(g, level, old_level=null) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1050, false);
 		decorative_rectangle_create(g, Ox, Oy + 1150, 2500, 200, "#222222", "#222222");
 		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
-	} else if(tile == TILE_ROAD_CROSSROAD) {
+	} else if(tile == LEVEL_TILE_ROAD_CROSSROAD) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 1410, 1050, 1050);
 		decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
-	} else if(tile == TILE_ROAD_TURN_WN) {
+	} else if(tile == LEVEL_TILE_ROAD_TURN_WN) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 2420);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1370, 1050);
 		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
 		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
-	} else if(tile == TILE_ROAD_TURN_WS) {
+	} else if(tile == LEVEL_TILE_ROAD_TURN_WS) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1050, 1050);
 		decorative_grass_create(g, Ox + 1410, Oy + 1090, 1050, 1370);
 		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
 		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
-	} else if(tile == TILE_ROAD_TURN_ES) {
+	} else if(tile == LEVEL_TILE_ROAD_TURN_ES) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1090, 1050, 1370);
 		decorative_grass_create(g, Ox + 1410, Oy + 1410, 1050, 1050);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
 		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
-	} else if(tile == TILE_ROAD_TURN_EN) {
+	} else if(tile == LEVEL_TILE_ROAD_TURN_EN) {
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1370);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 2420, 1050);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
 		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
-	} else if (tile == TILE_ROAD_HORIZONTAL) {
+	} else if (tile == LEVEL_TILE_ROAD_HORIZONTAL) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 1050);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 2420, 1050);
 		decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
-	} else if (tile == TILE_ROAD_VERTICAL){
+	} else if (tile == LEVEL_TILE_ROAD_VERTICAL){
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 2420);
 		decorative_grass_create(g, Ox + 1410, Oy + 40, 1050, 2420);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
-	} else if (tile == TILE_DEFAULT) {
+	} else if (tile == LEVEL_TILE_DEFAULT) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 2420, 2420);
 	}
 	decorative_level_base_create(g, Ox, Oy);
@@ -249,7 +254,7 @@ function level_get_neighbour_south(level) {
 }
 
 function level_tile_get_neighbour_west(g, level) {
-	let res = TILE_VOID;
+	let res = LEVEL_TILE_VOID;
 	let west_level = level_get_neighbour_west(level);
 	let il = g.visited_levels.indexOf(west_level);
 	if(il > -1)
@@ -258,7 +263,7 @@ function level_tile_get_neighbour_west(g, level) {
 }
 
 function level_tile_get_neighbour_east(g, level) {
-	let res = TILE_VOID;
+	let res = LEVEL_TILE_VOID;
 	let east_level = level_get_neighbour_east(level);
 	let il = g.visited_levels.indexOf(east_level);
 	if(il > -1)
@@ -267,7 +272,7 @@ function level_tile_get_neighbour_east(g, level) {
 }
 
 function level_tile_get_neighbour_north(g, level) {
-	let res = TILE_VOID;
+	let res = LEVEL_TILE_VOID;
 	let north_level = level_get_neighbour_north(level);
 	let il = g.visited_levels.indexOf(north_level);
 	if(il > -1)
@@ -276,7 +281,7 @@ function level_tile_get_neighbour_north(g, level) {
 }
 
 function level_tile_get_neighbour_south(g, level) {
-	let res = TILE_VOID;
+	let res = LEVEL_TILE_VOID;
 	let south_level = level_get_neighbour_south(level);
 	let il = g.visited_levels.indexOf(south_level);
 	if(il > -1)

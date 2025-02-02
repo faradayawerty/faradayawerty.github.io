@@ -411,7 +411,7 @@ function player_update(player_object, dt) {
 
 	let vel = Matter.Vector.create(0, 0);
 
-	if(!p.inventory_element.shown && !p.car_object) {
+	if(!p.inventory_element.shown && !p.achievements_element.shown &&!p.car_object) {
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
 
@@ -488,7 +488,7 @@ function player_update(player_object, dt) {
 		Matter.Body.setVelocity(p.body, vel);
 	}
 
-	if(!p.inventory_element.shown && p.car_object) {
+	if(!p.inventory_element.shown && !p.achievements_element.shown && p.car_object) {
 		if(player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
 			let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
 			if(closest_item && closest_item.data.id == ITEM_FUEL)

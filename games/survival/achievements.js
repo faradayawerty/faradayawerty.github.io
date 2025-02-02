@@ -60,27 +60,34 @@ function achievements_destroy(ae) {
 }
 
 function achievements_update(ae, dt) {
+
+	let as = ae.data.achievements;
+
+	if(!achievement_get(as, "getting in").done)
+		achievement_do(as, "getting in");
+
 	if(ae.game.input.mouse.leftButtonPressed) {
 
 		let mx = ae.game.input.mouse.x / get_scale();
 		let my = ae.game.input.mouse.y / get_scale();
+		if(ae.data.offset_x < mx && mx < ae.data.offset_x + ae.data.width
+			&& ae.data.offset_y < my && my < ae.data.offset_y + ae.data.height) {
 
-		if(!ae.data.clicked) {
-			ae.data.xx = ae.data.x;
-			ae.data.yy = ae.data.y;
-			ae.data.mxx = mx;
-			ae.data.myy = my;
+			if(!ae.data.clicked) {
+				ae.data.xx = ae.data.x;
+				ae.data.yy = ae.data.y;
+				ae.data.mxx = mx;
+				ae.data.myy = my;
+			}
+
+			let dx = mx - ae.data.mxx;
+			let dy = my - ae.data.myy;
+
+				ae.data.x = ae.data.xx + dx;
+				ae.data.y = ae.data.yy + dy;
+
+			ae.data.clicked = true;
 		}
-
-		let dx = mx - ae.data.mxx;
-		let dy = my - ae.data.myy;
-
-		if(ae.data.offset_x < mx && mx < ae.data.offset_x + ae.data.width)
-			ae.data.x = ae.data.xx + dx;
-		if(ae.data.offset_y < my && my < ae.data.offset_y + ae.data.width)
-			ae.data.y = ae.data.yy + dy;
-
-		ae.data.clicked = true;
 	} else if(ae.data.clicked) {
 		ae.data.xx = ae.game.input.mouse.x / get_scale();
 		ae.data.yy = ae.game.input.mouse.y / get_scale();
@@ -89,6 +96,8 @@ function achievements_update(ae, dt) {
 }
 
 function achievements_draw(ae, ctx) {
+
+	let as = ae.data.achievements;
 
 	ctx.fillStyle = "#000810";
 	ctx.fillRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data.height);
@@ -99,24 +108,25 @@ function achievements_draw(ae, ctx) {
 	let y = ae.data.y;
 	let w = ae.data.icon_size;
 	let h = ae.data.icon_size;
-	achievement_icon_draw(ctx, "getting in", x, y, w, h);
-
-	achievement_icon_draw(ctx, "discovering inventory", x + w * 2, y + h * 2, w, h);
-	achievement_icon_draw(ctx, "first steps", x, y + h * 2, w, h);
-	achievement_icon_draw(ctx, "achievements", x - w * 2, y + h * 2, w, h);
-
-	achievement_icon_draw(ctx, "outside the box", x, y + h * 4, w, h);
-	achievement_icon_draw(ctx, "get a ride", x - w * 2, y + h * 4, w, h);
+	achievement_icon_draw(ctx, as, "getting in", x, y, w, h);
+	achievement_icon_draw(ctx, as, "discovering inventory", x + w * 2, y + h * 2, w, h);
+	achievement_icon_draw(ctx, as, "first steps", x, y + h * 2, w, h);
+	achievement_icon_draw(ctx, as, "achievements", x - w * 2, y + h * 2, w, h);
+	achievement_icon_draw(ctx, as, "outside the box", x, y + h * 4, w, h);
+	achievement_icon_draw(ctx, as, "get a ride", x - w * 2, y + h * 4, w, h);
 }
 
 function achievements_translate(lang, text) {
 	return text;
 }
 
-function achievement_icon_draw(ctx, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000) {
+function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000) {
 
 	if(x < bbx || x > bbw + 0.25 * bbx || y < bby || y > bbh + 0.25 * bby)
 		return;
+
+	if(!done)
+		done = achievement_get(as, name).done;
 
 	let c0 = "red";
 	let c1 = "yellow";
@@ -149,3 +159,16 @@ function achievement_icon_draw(ctx, name, x, y, w, h, done=false, bbx=50, bby=50
 	}
 }
 
+function achievement_get(as, name) {
+	for(let i = 0; i < as.length; i++)
+		if(as[i].name == name)
+			return as[i];
+	return null;
+}
+
+function achievement_do(as, name) {
+	for(let i = 0; i < as.length; i++) {
+		if(as[i].name == name)
+			as[i].done = true;
+	}
+}

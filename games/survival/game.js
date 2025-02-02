@@ -5,7 +5,7 @@ function game_create(input_, engine_, audios_) {
 		level_set_delay: 100,
 		respawn_level: "0x0",
 		visited_levels: ["0x0"],
-		assigned_tiles: [TILE_START],
+		assigned_tiles: [LEVEL_TILE_START],
 		offset_x: 1250,
 		offset_y: 1250,
 		scale: 0.75,
@@ -100,7 +100,7 @@ function game_new(g) {
 	g.enemies["shooting rocket"] = g.enemies_default["shooting rocket"];
 	g.enemies["shooting laser"] = g.enemies_default["shooting laser"];
 	g.visited_levels = ["0x0"];
-	g.assigned_tiles = [TILE_START];
+	g.assigned_tiles = [LEVEL_TILE_START];
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++)
 			g.saved_items[i][j] = 0;
