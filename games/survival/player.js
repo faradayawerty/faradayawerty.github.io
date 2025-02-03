@@ -23,6 +23,7 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		inventory_element: null,
 		hotbar_element: null,
 		achievements_element: null,
+		achievements_shower_element: null,
 		car_object: null,
 		body: Matter.Bodies.rectangle(x, y, width, height, {
 			isStatic: false,
@@ -47,6 +48,13 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		laser_sound_has_played: false,
 	};
 	p.achievements_element = g.gui_elements[achievements_create(g)];
+	p.achievements_shower_element = g.gui_elements[achievements_shower_create(g, p.achievements_element)];
+	if(!p.ai_controlled) {
+		p.achievements_shower_element.shown = true;
+		for(let i = 0; i < g.saved_achievements.length; i++) // TODO исправить необходимость располагать ачивки в нужном порядке
+			achievement_do(p.achievements_element.data.achievements, g.saved_achievements[i].name, p.achievements_shower_element, true);
+		g.saved_achievements = [];
+	}
 	p.inventory_element = g.gui_elements[inventory_create(g)];
 	for(let i = 0; i < g.saved_items.length; i++)
 		for(let j = 0; j < g.saved_items[i].length; j++) {
@@ -66,6 +74,10 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		}
 	}
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
+	achievement_do(
+		g.objects[iplayer].data.achievements_element.data.achievements,
+		"joining in",
+		g.objects[iplayer].data.achievements_shower_element);
 	g.player_object = null;
 	if(respawn) {
 		p.health = 0.15 * p.max_health;
@@ -89,6 +101,7 @@ function player_destroy(player_object) {
 		player_object.game.camera_target_body = null;
 	Matter.Composite.remove(player_object.game.engine.world, player_object.data.body);
 	player_object.data.body = null;
+	achievements_shower_destroy(player_object.data.achievements_shower_element);
 	achievements_destroy(player_object.data.achievements_element);
 	inventory_destroy(player_object.data.inventory_element);
 	hotbar_destroy(player_object.data.hotbar_element);
@@ -105,6 +118,9 @@ function player_die(player_object) {
 		for(let i = 0; i < player_object.game.saved_items.length; i++)
 			for(let j = 0; j < player_object.game.saved_items[i].length; j++)
 				player_object.game.saved_items[i][j] = player_object.data.inventory_element.data.items[i][j];
+	}
+	if(!player_object.data.ai_controlled && !player_object.game.settings.lose_achievements_on_death) {
+		player_object.game.saved_achievements = player_object.data.achievements_element.data.achievements.filter((ach) => ach.done);
 	}
 	if(!player_object.data.ai_controlled || player_object.game.objects.filter((obj) => obj.name == "player" && obj != player_object).length < 1)
 		player_object.game.want_respawn_menu = true;
@@ -199,7 +215,7 @@ function player_update(player_object, dt) {
 		p.thirst = p.max_thirst;
 	}
 
-	if(p.thirst > 0) {
+	if(p.thirst > 0 && achievement_get(p.achievements_element.data.achievements, "first steps").done) {
 		if(p.shield_green_health > 0)
 			p.thirst = Math.max(0, p.thirst - 0.0005 * dt)
 		else if(p.shield_rainbow_health > 0)
@@ -211,7 +227,7 @@ function player_update(player_object, dt) {
 	if(p.thirst <= 0)
 		p.health -= 0.01 * dt;
 
-	if(p.hunger > 0) {
+	if(p.hunger > 0 && achievement_get(p.achievements_element.data.achievements, "first steps").done) {
 		if(p.shield_green_health > 0)
 			p.hunger = Math.max(0, p.hunger - 0.0005 * dt)
 		else if(p.shield_rainbow_health > 0)
@@ -256,26 +272,31 @@ function player_update(player_object, dt) {
 			game_destroy_level(player_object.game, old_level);
 		if(!level_visible(player_object.game, p.want_level, player_object))
 			levels_set(player_object.game, p.want_level, old_level);
+
+		achievement_do(p.achievements_element.data.achievements, "outside the box", p.achievements_shower_element);
 	}
 
 	if(p.ai_controlled) {
 
 		if(p.hunger < 0.5 * p.max_hunger) {
 			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_FOODS);
-			if(id > -1)
+			if(id > -1) {
 				player_item_consume(player_object, id, true);
+			}
 		}
 
 		if(p.thirst < 0.5 * p.max_thirst) {
  			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_DRINKS);
-			if(id > -1)
+			if(id > -1) {
 				player_item_consume(player_object, id, true);
+			}
 		}
 
 		if(p.health < 0.5 * p.max_health) {
  			let id = inventory_has_item_from_list(player_object.data.inventory_element, [ITEM_HEALTH, ITEM_HEALTH_GREEN]);
-			if(id > -1)
+			if(id > -1) {
 				player_item_consume(player_object, id, true);
+			}
 		}
 
 		p.car_object = null;
@@ -382,15 +403,27 @@ function player_update(player_object, dt) {
 		p.achievements_element.shown = false;
 	}
 
+	if(p.achievements_element.shown || p.inventory_element.shown)
+		p.achievements_shower_element.shown = false;
+	else
+		p.achievements_shower_element.shown = true;
+
 	//if(isKeyDown(player_object.game.input, 'm', true))
 	//	player_create(player_object.game, p.body.position.x, p.body.position.y, false, true);
 
 	if(isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true)) {
+		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
 		p.inventory_element.shown = !p.inventory_element.shown;
 		p.hotbar_element.shown = !p.hotbar_element.shown;
+		if(p.achievements_element.shown)
+			p.hotbar_element.shown = false;
+		p.achievements_element.shown = false;
 	}
 
-	if(isKeyDown(p.achievements_element.game.input, 'j', true)) {
+	if(isKeyDown(p.achievements_element.game.input, 'j', true) || isKeyDown(p.achievements_element.game.input, 'r', true)) {
+		p.achievements_element.data.x = 75;
+		p.achievements_element.data.y = 75;
+		achievement_do(p.achievements_element.data.achievements, "achievements", p.achievements_shower_element);
 		p.achievements_element.shown = !p.achievements_element.shown;
 	}
 
@@ -411,7 +444,7 @@ function player_update(player_object, dt) {
 
 	let vel = Matter.Vector.create(0, 0);
 
-	if(!p.inventory_element.shown && !p.achievements_element.shown &&!p.car_object) {
+	if(!p.inventory_element.shown && !p.achievements_element.shown && !p.car_object) {
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
 
@@ -439,22 +472,38 @@ function player_update(player_object, dt) {
 
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
 		if(closest_item && !closest_item.data.dropped && ITEMS_AMMOS.includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down)
+			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down) {
 				item_pickup(p.inventory_element, closest_item);
+				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+			}
 		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down)
+			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down) {
 				item_pickup(p.inventory_element, closest_item);
+				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+			}
 		} else if(closest_item && !closest_item.data.dropped && [ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down)
+			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down) {
 				item_pickup(p.inventory_element, closest_item);
+				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+			}
 		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) {
-			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down)
+			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down) {
 				item_pickup(p.inventory_element, closest_item);
+				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+			}
 		} else if(f_down) {
-			if(!item_pickup(p.inventory_element, closest_item)) {
+			let did_pickup = item_pickup(p.inventory_element, closest_item);
+			if(did_pickup) {
+				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+				if(closest_item.data.id == ITEM_GUN)
+					achievement_do(p.achievements_element.data.achievements, "get a gun", p.achievements_shower_element);
+			}
+			if(!did_pickup) {
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
-				if(p.car_object)
+				if(p.car_object) {
 					audio_play("data/sfx/car_1.mp3");
+					achievement_do(p.achievements_element.data.achievements, "get a ride", p.achievements_shower_element);
+				}
 			}
 			if(!p.car_object) {
 				player_object.name = "PLAYER";
@@ -469,6 +518,8 @@ function player_update(player_object, dt) {
 
 		if(player_object.game.input.mouse.leftButtonPressed) {
 			player_shoot(player_object, dt);
+			if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
+				achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
 		} else if(player_object.game.input.joystick.left.dx != 0 || player_object.game.input.joystick.left.dy != 0) {
 			player_shoot(player_object, dt,
 				game_object_find_closest(player_object.game,
@@ -485,6 +536,10 @@ function player_update(player_object, dt) {
 
 		if(isKeyDown(player_object.game.input, 'q', true))
 			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
+
+		if(Matter.Vector.magnitude(vel) > 0)
+			achievement_do(p.achievements_element.data.achievements, "first steps", p.achievements_shower_element);
+
 		Matter.Body.setVelocity(p.body, vel);
 	}
 
@@ -1337,6 +1392,7 @@ function player_item_consume(player_object, id, anywhere=false) {
 	}
 
 	if(id == ITEM_HEALTH && true) {
+		achievement_do(p.achievements_element.data.achievements, "healthy lifestyle", p.achievements_shower_element);
 		p.health += Math.min(p.max_health - p.health, (Math.random() * 0.125 + 0.125) * p.max_health);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/healing_1.mp3");
@@ -1351,12 +1407,14 @@ function player_item_consume(player_object, id, anywhere=false) {
 	}
 
 	if(ITEMS_DRINKS.includes(id) && true) {
+		achievement_do(p.achievements_element.data.achievements, "stay hydrated", p.achievements_shower_element);
 		p.thirst += Math.min(p.max_thirst - p.thirst, (Math.random() * 0.125 + 0.125) * p.max_thirst);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/water_1.mp3");
 	}
 
 	if(ITEMS_FOODS.includes(id) && true) {
+		achievement_do(p.achievements_element.data.achievements, "yummy", p.achievements_shower_element);
 		p.hunger += Math.min(p.max_hunger - p.hunger, (Math.random() * 0.125 + 0.125) * p.max_hunger);
 		p.thirst += Math.min(p.max_thirst - p.thirst, (Math.random() * 0.03125 + 0.03125) * p.max_thirst);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);

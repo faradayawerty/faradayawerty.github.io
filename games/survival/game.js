@@ -23,6 +23,7 @@ function game_create(input_, engine_, audios_) {
 			enemies_spawn: true,
 			show_hints: false,
 			lose_items_on_death: true,
+			lose_achievements_on_death: false,
 			trees: true,
 			volume: 1.0,
 			indicators: {
@@ -60,6 +61,7 @@ function game_create(input_, engine_, audios_) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
+		saved_achievements: [],
 		enemies: { // should have been integer constants but too lazy to change now
 			"regular": true,
 			"shooting": false,

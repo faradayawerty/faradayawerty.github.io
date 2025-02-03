@@ -123,7 +123,7 @@ function hotbar_create(g, inv, attached_to_object=null) {
 	let hb = {
 		iselected: 0,
 		row: inv.items[0],
-		slot_size: 30,
+		slot_size: 50,
 		attached_to_object: attached_to_object,
 		animation_state: 0
 	};

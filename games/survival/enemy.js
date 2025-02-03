@@ -481,6 +481,12 @@ function enemy_update(enemy_object, dt) {
 	}
 	if(enemy_object.data.health <= 0) {
 		if(enemy_object.data.hit_by_player) {
+
+			if(target_object && target_object.name == "player") {
+				let p = target_object.data;
+				achievement_do(p.achievements_element.data.achievements, "shoot 'em up", p.achievements_shower_element);
+			}
+
 			let N = 1;
 			if(enemy_object.data.boss) {
 				if(enemy_object.data.hunger > 0) {
@@ -533,7 +539,7 @@ function enemy_update(enemy_object, dt) {
 			if(enemy_object.data.boss)
 				sound = "data/sfx/zombie_boss_dies_1.mp3";
 			let to = game_object_find_closest(enemy_object.game, e.body.position.x, e.body.position.y, "player", 10000);
-			if(to && to.name == "player" && !to.data.ai_controlled && enemy_object.data.hunger > 0) {
+			if(to && to.name == "player" && !to.data.ai_controlled && enemy_object.data.hit_by_player) {
 				let xx = to.data.body.position.x - enemy_object.data.body.position.x;
 				let yy = to.data.body.position.y - enemy_object.data.body.position.y;
 				audio_play(sound);

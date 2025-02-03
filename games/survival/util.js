@@ -7,8 +7,8 @@ function drawButton(ctx, x, y, text) {
 	ctx.fillText(text, x + 1, y + 1);
 }
 
-function drawText(ctx, x, y, text) {
-	ctx.font = "18px verdana";
+function drawText(ctx, x, y, text, fontsize=18) {
+	ctx.font = fontsize + "px verdana";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
 	ctx.fillStyle = 'white';
@@ -76,5 +76,9 @@ function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
 		      ctx.strokeStyle = stroke
 		      ctx.stroke()
 		    }
+}
+
+function smoothMin(a, b) {
+	return 0.5 * (a + b - 0.5 +  Math.sqrt(0.25 + (a - b) * (a - b)));
 }
 
