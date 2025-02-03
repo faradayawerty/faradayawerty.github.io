@@ -431,7 +431,8 @@ function game_object_make_savable(obj) {
 					[0, 0, 0, 0, 0, 0, 0, 0, 0],
 					[0, 0, 0, 0, 0, 0, 0, 0, 0],
 					[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				]
+				],
+				achievements: []
 			}
 		};
 	
@@ -439,6 +440,8 @@ function game_object_make_savable(obj) {
 			for(let j = 0; j < obj.data.inventory_element.data.items[i].length; j++)
 				saved_obj.data.items[i][j] = obj.data.inventory_element.data.items[i][j];
 		}
+
+		saved_obj.data.achievements = obj.data.achievements_element.data.achievements.filter((ach) => ach.done);
 
 		return saved_obj;
 	}
@@ -535,6 +538,13 @@ function game_load(g) {
 						for(let j = 0; j < plr.data.inventory_element.data.items[i].length; j++)
 							plr.data.inventory_element.data.items[i][j] = obj.data.items[i][j];
 					}
+					try {
+						for(let i = 0; i < obj.data.achievements.length; i++)
+							achievement_do(plr.data.achievements_element.data.achievements, obj.data.achievements[i].name, plr.data.achievements_shower_element, true);
+					} catch(e) {
+						g.debug_console.unshift(e);
+					}
+					
 				}
 				if(obj.name == "enemy")
 					enemy_create(g, obj.data.x, obj.data.y, obj.data.boss, obj.data.is_minion, obj.data.type);

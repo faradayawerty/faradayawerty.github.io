@@ -118,6 +118,14 @@ function achievements_create(g) {
 				req: "pick an item",
 				done: false
 			},
+			{
+				name: "time to boss",
+				desc: "kill 16 enemies so that a boss can spawn",
+				name_rus: "первый босс",
+				desc_rus: "убейте 16 зомби, не умерев, чтобы появился босс",
+				req: "shoot 'em up",
+				done: false
+			},
 		]
 	};
 	return game_gui_element_create(g, "achievements", ach, achievements_update, achievements_draw, achievements_destroy);
@@ -204,6 +212,7 @@ function achievements_draw(ae, ctx) {
 		],
 		[
 			"shoot 'em up",
+			"time to boss",
 		]
 	]
 
@@ -295,6 +304,12 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+	} else if(name == "time to boss") {
+		ctx.fillStyle = c7;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
 	} else if(name == "get a gun") {
 		ctx.fillStyle = c9;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
@@ -429,7 +444,7 @@ function achievements_shower_update(ashe, dt) {
 	ashe.data.time_since_last_deleted_achievement += dt * (achievement_get(ashe.data.attached_to.data.achievements, "achievements").done ? 1 : 0);
 	if(ashe.data.achievements.length < 1)
 		ashe.data.time_since_last_deleted_achievement = 0;
-	if(ashe.data.time_since_last_deleted_achievement > 4000 || ashe.data.achievements.length > 4) {
+	if(ashe.data.time_since_last_deleted_achievement > 10000 || ashe.data.achievements.length > 4) {
 		ashe.data.achievements.pop();
 		ashe.data.time_since_last_deleted_achievement = 0;
 	}

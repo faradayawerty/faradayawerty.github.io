@@ -145,6 +145,9 @@ function player_update(player_object, dt) {
 
 	let p = player_object.data;
 
+	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["regular"] < 16))
+		achievement_do(p.achievements_element.data.achievements, "time to boss", p.achievements_shower_element);
+
 	let max_levels = 600;
 
 	if(p.body.position.x < -max_levels * 2500) {
