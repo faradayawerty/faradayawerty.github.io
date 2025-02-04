@@ -74,10 +74,6 @@ function player_create(g, x, y, respawn=false, ai_controlled=false) {
 		}
 	}
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw, player_destroy);
-	achievement_do(
-		g.objects[iplayer].data.achievements_element.data.achievements,
-		"joining in",
-		g.objects[iplayer].data.achievements_shower_element);
 	g.player_object = null;
 	if(respawn) {
 		p.health = 0.15 * p.max_health;
@@ -145,8 +141,29 @@ function player_update(player_object, dt) {
 
 	let p = player_object.data;
 
+	if(!menu1.shown)
+		achievement_do(p.achievements_element.data.achievements, "joining in", p.achievements_shower_element);
+
 	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["regular"] < 16))
 		achievement_do(p.achievements_element.data.achievements, "time to boss", p.achievements_shower_element);
+	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting"] < 16))
+		achievement_do(p.achievements_element.data.achievements, "time to boss, round II", p.achievements_shower_element);
+	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting red"] < 16))
+		achievement_do(p.achievements_element.data.achievements, "red boss", p.achievements_shower_element);
+	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["sword"] < 16))
+		achievement_do(p.achievements_element.data.achievements, "boss with a sword", p.achievements_shower_element);
+	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting rocket"] < 16))
+		achievement_do(p.achievements_element.data.achievements, "boss with a rocket launcher", p.achievements_shower_element);
+	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting laser"] < 16))
+		achievement_do(p.achievements_element.data.achievements, "rainbow boss", p.achievements_shower_element);
+
+	let has_empty = false;
+	for(let i = 0; i < p.inventory_element.data.items.length; i++)
+		for(let j = 0; j < p.inventory_element.data.items[i].length; j++)
+			if(p.inventory_element.data.items[i][j] == 0)
+				has_empty = true;
+	if(!has_empty)
+		achievement_do(p.achievements_element.data.achievements, "full inventory", p.achievements_shower_element);
 
 	let max_levels = 600;
 
@@ -504,7 +521,7 @@ function player_update(player_object, dt) {
 			if(!did_pickup) {
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 				if(p.car_object) {
-					audio_play("data/sfx/car_1.mp3");
+					audio_play("data/sfx/car_1.mp3", 0.125);
 					achievement_do(p.achievements_element.data.achievements, "get a ride", p.achievements_shower_element);
 				}
 			}

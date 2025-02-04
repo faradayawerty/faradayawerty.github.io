@@ -13,6 +13,7 @@ function achievements_create(g) {
 		myy: 0,
 		clicked: false,
 		icon_size: 40,
+		animstate: 0,
 		achievements: [
 			{
 				name: "joining in",
@@ -36,6 +37,14 @@ function achievements_create(g) {
 				name_rus: "открытие инвентаря",
 				desc_rus: "откройте инвентарь, нажав E или I",
 				req: "joining in",
+				done: false
+			},
+			{
+				name: "full inventory",
+				desc: "fill up the inventory with items fully",
+				name_rus: "полный инвентарь",
+				desc_rus: "полностью заполните инвентарь предметами",
+				req: "discovering inventory",
 				done: false
 			},
 			{
@@ -120,10 +129,138 @@ function achievements_create(g) {
 			},
 			{
 				name: "time to boss",
-				desc: "kill 16 enemies so that a boss can spawn",
+				desc: "kill 16 enemies without dying so that a boss can spawn",
 				name_rus: "первый босс",
-				desc_rus: "убейте 16 зомби, не умерев, чтобы появился босс",
+				desc_rus: "убейте 16 зомби, не умерев, чтобы мог появиться босс",
 				req: "shoot 'em up",
+				done: false
+			},
+			{
+				name: "big guy",
+				desc: "kill the first boss",
+				name_rus: "большой парень",
+				desc_rus: "убейте первого босса",
+				req: "time to boss",
+				done: false
+			},
+			{
+				name: "they can shoot?",
+				desc: "kill the first shooting enemy",
+				name_rus: "они умеют стрелять?",
+				desc_rus: "убейте первого стрелка",
+				req: "big guy",
+				done: false
+			},
+			{
+				name: "time to boss, round II",
+				desc: "kill 16 shooters without dying so that a new boss can spawn",
+				name_rus: "новый день, новый босс",
+				desc_rus: "убейте 16 стрелков, не умерев, чтобы мог появиться новый босс",
+				req: "big guy",
+				done: false
+			},
+			{
+				name: "big shooting guy",
+				desc: "kill a shooting boss",
+				name_rus: "большой стрелок",
+				desc_rus: "убейте босса стрелка",
+				req: "big guy",
+				done: false
+			},
+			{
+				name: "red shooter",
+				desc: "kill one red shooter",
+				name_rus: "красный стрелок",
+				desc_rus: "убейте одного красного стрелка",
+				req: "big shooting guy",
+				done: false
+			},
+			{
+				name: "red boss",
+				desc: "kill 16 red shooters without dying so that a new boss can spawn",
+				name_rus: "красный босс",
+				desc_rus: "убейте 16 красных стрелков, не умерев, чтобы мог появиться новый босс",
+				req: "big shooting guy",
+				done: false
+			},
+			{
+				name: "big red guy",
+				desc: "kill red boss",
+				name_rus: "большой красный парень",
+				desc_rus: "убейте красного босса",
+				req: "big shooting guy",
+				done: false
+			},
+			{
+				name: "he has a sword?",
+				desc: "kill one yellow enemy",
+				name_rus: "у него меч?",
+				desc_rus: "убейте одного желтого врага",
+				req: "big red guy",
+				done: false
+			},
+			{
+				name: "boss with a sword",
+				desc: "kill 16 yellow enemyes without dying so that a new boss can spawn",
+				name_rus: "босс с мечом",
+				desc_rus: "убейте 16 желтых врагов, не умерев, чтобы мог появиться новый босс",
+				req: "big red guy",
+				done: false
+			},
+			{
+				name: "big guy with a sword",
+				desc: "kill yellow boss",
+				name_rus: "большой парень с мечом",
+				desc_rus: "убейте желтого босса",
+				req: "big red guy",
+				done: false
+			},
+			{
+				name: "rocket shooter",
+				desc: "kill one rocket shooting enemy",
+				name_rus: "стрелок с ракетницей",
+				desc_rus: "убейте одного стрелка с ракетницей",
+				req: "big guy with a sword",
+				done: false
+			},
+			{
+				name: "boss with a rocket launcher",
+				desc: "kill 16 rocket shooting enemies so that a new boss can spawn",
+				name_rus: "босс с ракетницей",
+				desc_rus: "убейте 16 стрелков с ракетницей, не умерев, чтобы мог появиться новый босс",
+				req: "big guy with a sword",
+				done: false
+			},
+			{
+				name: "big military guy",
+				desc: "kill the boss with a rocket launcher",
+				name_rus: "большой военный парень",
+				desc_rus: "убейте босса с ракетницей",
+				req: "big guy with a sword",
+				done: false
+			},
+			{
+				name: "rainbow",
+				desc: "kill one rainbow enemy",
+				name_rus: "радуга",
+				desc_rus: "убейте одного радужного противника",
+				req: "big military guy",
+				done: false
+			},
+			{
+				name: "rainbow boss",
+				desc: "kill 16 rainbow enemies so that a new boss can spawn",
+				name_rus: "радужный босс",
+				desc_rus: "убейте 16 радужных противников, не умерев, чтобы мог появиться новый босс",
+				req: "big military guy",
+				done: false
+			},
+			{
+				name: "huge rainbow guy",
+				desc: "kill the rainbow boss",
+				name_rus: "гигантский радужный парень",
+				desc_rus: "убейте радужного босса",
+				req: "big military guy",
 				done: false
 			},
 		]
@@ -138,6 +275,8 @@ function achievements_destroy(ae) {
 }
 
 function achievements_update(ae, dt) {
+
+	ae.data.animstate += 0.0075 * dt;
 
 	let as = ae.data.achievements;
 
@@ -194,6 +333,7 @@ function achievements_draw(ae, ctx) {
 			"joining in",
 			"achievements",
 			"discovering inventory",
+			"full inventory",
 		],
 		[
 			"first steps",
@@ -213,6 +353,26 @@ function achievements_draw(ae, ctx) {
 		[
 			"shoot 'em up",
 			"time to boss",
+			"big guy",
+			"they can shoot?",
+			"time to boss, round II",
+			"big shooting guy",
+		],
+		[
+			"red shooter",
+			"red boss",
+			"big red guy",
+			"he has a sword?",
+			"boss with a sword",
+			"big guy with a sword",
+		],
+		[
+			"rocket shooter",
+			"boss with a rocket launcher",
+			"big military guy",
+			"rainbow",
+			"rainbow boss",
+			"huge rainbow guy",
 		]
 	]
 
@@ -221,7 +381,8 @@ function achievements_draw(ae, ctx) {
 
 	for(let i = 0; i < achs.length; i++) {
 		for(let j = 0; j < achs[i].length; j++)
-			achievement_icon_draw(ctx, as, achs[i][j], x + 2 * i * w, y + 2 * j * h, w, h);
+			achievement_icon_draw(ctx, as, achs[i][j], x + 2 * i * w, y + 2 * j * h, w, h,
+				false, 50, 50, 1000, 1000, ae.data.animstate);
 	}
 
 	for(let i = 0; i < achs.length; i++) {
@@ -241,7 +402,7 @@ function achievements_translate(lang, text) {
 	return text;
 }
 
-function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000) {
+function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000, animstate=null) {
 
 	if(x < bbx || x > bbw + 0.25 * bbx || y < bby || y > bbh + 0.25 * bby || !name)
 		return;
@@ -268,6 +429,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 	let c11 = "#771111";
 	let c12 = "#1177dd";
 	let c13 = "#1177ff";
+	let c14 = "#335544";
 	if(!done) {
 		c0 = "black";
 		c1 = "white";
@@ -283,22 +445,127 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		c11 = "#111111";
 		c12 = "#777777";
 		c13 = "#777777";
+		c14 = "#333333";
+	}
+
+	let c15 = "black";
+	if(animstate != null) {
+		let r = Math.cos(0.1 * animstate) * 15;
+		let g = 0.7 * (Math.cos(0.1 * animstate) + Math.sin(0.1 * animstate)) * 15;
+		let b = Math.sin(0.1 * animstate) * 15;
+		let avg = Math.floor(0.11 * (r+g+b) * (r+g+b));
+		r = Math.floor(r*r);
+		g = Math.floor(g*g);
+		b = Math.floor(b*b);
+		if(done)
+			c15 = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
+		if(!done)
+			c15 = "#"+(avg).toString(16).padStart(2,'0') + (avg).toString(16).padStart(2,'0') + (avg).toString(16).padStart(2,'0');
 	}
 
 	ctx.lineWidth = 0.025 * w;
 
 	ctx.globalAlpha *= 0.25;
-	ctx.fillStyle = "blue";
+	ctx.fillStyle = done ? "green" : "red";
 	ctx.fillRect(x, y, w, h);
 	ctx.strokeStyle = "white";
 	ctx.strokeRect(x, y, w, h);
 	ctx.globalAlpha *= 4;
+
+			//"they can shoot?",
+			//"time to boss, round II",
+			//"big shooting guy",
 
 	if(name == "joining in") {
 		ctx.fillStyle = c0;
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+	} else if(name == "huge rainbow guy") {
+		ctx.fillStyle = c15;
+		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+	} else if(name == "rainbow") {
+		ctx.fillStyle = c15;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+	} else if(name == "rainbow boss") {
+		ctx.fillStyle = c15;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+	} else if(name == "big military guy") {
+		ctx.fillStyle = c10;
+		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		ctx.strokeStyle = c3;
+		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+	} else if(name == "rocket shooter") {
+		ctx.fillStyle = c10;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c3;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+	} else if(name == "boss with a rocket launcher") {
+		ctx.fillStyle = c10;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c3;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+	} else if(name == "big shooting guy") {
+		ctx.fillStyle = c14;
+		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+	} else if(name == "they can shoot?") {
+		ctx.fillStyle = c14;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+	} else if(name == "time to boss, round II") {
+		ctx.fillStyle = c14;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+	} else if(name == "big guy with a sword") {
+		ctx.fillStyle = c1;
+		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		ctx.strokeStyle = c2;
+		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+	} else if(name == "he has a sword?") {
+		ctx.fillStyle = c1;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c2;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+	} else if(name == "boss with a sword") {
+		ctx.fillStyle = c1;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c2;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+	} else if(name == "big red guy") {
+		ctx.fillStyle = c10;
+		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		ctx.strokeStyle = c0;
+		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+	} else if(name == "red shooter") {
+		ctx.fillStyle = c10;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c0;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+	} else if(name == "red boss") {
+		ctx.fillStyle = c10;
+		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		ctx.strokeStyle = c0;
+		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+	} else if(name == "big guy") {
+		ctx.fillStyle = c7;
+		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		ctx.strokeStyle = c8;
+		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
 	} else if(name == "shoot 'em up") {
 		ctx.fillStyle = c7;
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
@@ -378,7 +645,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
 	} else if(name == "outside the box") {
-		ctx.fillStyle = c7;
+		ctx.fillStyle = c10;
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
@@ -391,6 +658,16 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 			for(let j = 0; j < 4; j++) {
 				ctx.fillStyle = c3;
 				ctx.fillRect(x + 0.15 * w * i + 0.1 * w, y + 0.15 * h * j + 0.1 * h, 0.1 * w, 0.1 * h);
+			}
+		}
+	} else if(name == "full inventory") {
+		let cols = [c9, c8, c14, c11, c1];
+		for(let i = 0; i < 5; i++) {
+			for(let j = 0; j < 4; j++) {
+				ctx.fillStyle = c3;
+				ctx.fillRect(x + 0.15 * w * i + 0.1 * w, y + 0.15 * h * j + 0.1 * h, 0.1 * w, 0.1 * h);
+				ctx.fillStyle = cols[(3 * i + 2 * j + i*j) % cols.length];
+				ctx.fillRect(x + 0.15 * w * i + 0.1 * w, y + 0.15 * h * j + 0.1 * h, 0.075 * w, 0.075 * h);
 			}
 		}
 	} else if(name == "achievements") {
@@ -421,8 +698,10 @@ function achievement_do(as, name, ash=null, silent=false) {
 	for(let i = 0; i < as.length; i++) {
 		if(as[i].name == name && !as[i].done && !(achievement_get(as, name).req && !achievement_get(as, achievement_get(as, name).req).done)) {
 			as[i].done = true;
-			if(ash && !silent)
+			if(ash && !silent) {
+				audio_play("data/sfx/achievement_get_1.mp3", 0.25);
 				ash.data.achievements.unshift(name);
+			}
 		}
 	}
 }
@@ -435,16 +714,18 @@ function achievements_shower_create(g, ae=null) {
 		h: 50,
 		achievements: [],
 		attached_to: ae,
-		time_since_last_deleted_achievement: 0
+		time_since_last_deleted_achievement: 0,
+		animstate: 0
 	};
 	return game_gui_element_create(g, "achievements shower", ash, achievements_shower_update, achievements_shower_draw, achievements_shower_destroy);
 }
 
 function achievements_shower_update(ashe, dt) {
+	ashe.data.animstate += 0.005 * dt;
 	ashe.data.time_since_last_deleted_achievement += dt * (achievement_get(ashe.data.attached_to.data.achievements, "achievements").done ? 1 : 0);
 	if(ashe.data.achievements.length < 1)
 		ashe.data.time_since_last_deleted_achievement = 0;
-	if(ashe.data.time_since_last_deleted_achievement > 10000 || ashe.data.achievements.length > 4) {
+	if(ashe.data.time_since_last_deleted_achievement > 10000 / ashe.data.achievements.length || ashe.data.achievements.length > 14) {
 		ashe.data.achievements.pop();
 		ashe.data.time_since_last_deleted_achievement = 0;
 	}
@@ -472,7 +753,8 @@ function achievements_shower_draw(ashe, ctx) {
 		if(ashe.game.settings.language == "русский")
 			text = "получено достижение: " + achievement_get(ashe.data.attached_to.data.achievements, ach).name_rus + "! нажмите R или J";
 		drawText(ctx, x + 1.25 * size, y + 0.6 * size, text, 20);
-		achievement_icon_draw(ctx, ashe.data.attached_to.data.achievements, ach, x + 0.125 * size, y + 0.125 * size, 0.75 * size, 0.75 * size);
+		achievement_icon_draw(ctx, ashe.data.attached_to.data.achievements, ach, x + 0.125 * size, y + 0.125 * size, 0.75 * size, 0.75 * size,
+				false, 50, 50, 1000, 1000, ashe.data.animstate);
 		ctx.globalAlpha = 1;
 	}
 }

@@ -485,6 +485,16 @@ function enemy_update(enemy_object, dt) {
 			if(target_object && target_object.name == "player") {
 				let p = target_object.data;
 				achievement_do(p.achievements_element.data.achievements, "shoot 'em up", p.achievements_shower_element);
+				if(enemy_object.data.type == "shooting")
+					achievement_do(p.achievements_element.data.achievements, "they can shoot?", p.achievements_shower_element);
+				if(enemy_object.data.type == "shooting red")
+					achievement_do(p.achievements_element.data.achievements, "red shooter", p.achievements_shower_element);
+				if(enemy_object.data.type == "sword")
+					achievement_do(p.achievements_element.data.achievements, "he has a sword?", p.achievements_shower_element);
+				if(enemy_object.data.type == "shooting rocket")
+					achievement_do(p.achievements_element.data.achievements, "rocket shooter", p.achievements_shower_element);
+				if(enemy_object.data.type == "shooting laser")
+					achievement_do(p.achievements_element.data.achievements, "rainbow", p.achievements_shower_element);
 			}
 
 			let N = 1;
@@ -496,16 +506,22 @@ function enemy_update(enemy_object, dt) {
 							item_create(enemy_object.game, ITEM_PLASMA_PISTOL, e.body.position.x, e.body.position.y, false, false);
 						else
 							item_create(enemy_object.game, ITEM_PLASMA_LAUNCHER, e.body.position.x, e.body.position.y, false, false);
+						if(target_object && target_object.name == "player")
+							achievement_do(target_object.data.achievements_element.data.achievements, "big shooting guy", target_object.data.achievements_shower_element);
 					} else if(e.type == "shooting red") {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_RED_SHOTGUN, e.body.position.x, e.body.position.y, false, false);
 						else
 							item_create(enemy_object.game, ITEM_RED_PISTOLS, e.body.position.x, e.body.position.y, false, false);
+						if(target_object && target_object.name == "player")
+							achievement_do(target_object.data.achievements_element.data.achievements, "big red guy", target_object.data.achievements_shower_element);
 					} else if(e.type == "sword") {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_GREEN_GUN, e.body.position.x, e.body.position.y, false, false);
 						else
 							item_create(enemy_object.game, ITEM_SWORD, e.body.position.x, e.body.position.y, false, false);
+						if(target_object && target_object.name == "player")
+							achievement_do(target_object.data.achievements_element.data.achievements, "big guy with a sword", target_object.data.achievements_shower_element);
 					} else if(e.type == "shooting rocket") {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_ROCKET_SHOTGUN, e.body.position.x, e.body.position.y, false, false);
@@ -515,6 +531,8 @@ function enemy_update(enemy_object, dt) {
 							let tank_colors = ["green", "#005533", "#003355", "#aaaa11"];
 							car_create(enemy_object.game, e.body.position.x, e.body.position.y, tank_colors[Math.floor(Math.random() * tank_colors.length)], true, true);
 						}
+						if(target_object && target_object.name == "player")
+							achievement_do(target_object.data.achievements_element.data.achievements, "big military guy", target_object.data.achievements_shower_element);
 					} else if(e.type == "shooting laser") {
 						if(Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_LASER_GUN, e.body.position.x, e.body.position.y, false, false);
@@ -522,6 +540,8 @@ function enemy_update(enemy_object, dt) {
 							item_create(enemy_object.game, ITEM_RAINBOW_PISTOLS, e.body.position.x, e.body.position.y, false, false);
 						for(let j = 0; j < Math.random() * 11 - 4; j++)
 							item_create(enemy_object.game, ITEM_BOSSIFIER, e.body.position.x, e.body.position.y, false, false);
+						if(target_object && target_object.name == "player")
+							achievement_do(target_object.data.achievements_element.data.achievements, "huge rainbow guy", target_object.data.achievements_shower_element);
 					} else if(e.type == "deer") {
 						item_create(enemy_object.game, ITEM_HORN, e.body.position.x, e.body.position.y, false, false);
 						N = N + 1;
@@ -530,6 +550,8 @@ function enemy_update(enemy_object, dt) {
 							item_create(enemy_object.game, ITEM_MINIGUN, e.body.position.x, e.body.position.y, false, false);
 						else
 							item_create(enemy_object.game, ITEM_SHOTGUN, e.body.position.x, e.body.position.y, false, false);
+						if(target_object && target_object.name == "player")
+							achievement_do(target_object.data.achievements_element.data.achievements, "big guy", target_object.data.achievements_shower_element);
 					}
 				} else {
 					N = 5 * Math.random();

@@ -538,7 +538,7 @@ function game_load(g) {
 						for(let j = 0; j < plr.data.inventory_element.data.items[i].length; j++)
 							plr.data.inventory_element.data.items[i][j] = obj.data.items[i][j];
 					}
-					try {
+					try { // without try can break a lot of saves
 						for(let i = 0; i < obj.data.achievements.length; i++)
 							achievement_do(plr.data.achievements_element.data.achievements, obj.data.achievements[i].name, plr.data.achievements_shower_element, true);
 					} catch(e) {
