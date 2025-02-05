@@ -389,10 +389,10 @@ function achievements_draw(ae, ctx) {
 		for(let j = 0; j < achs[i].length; j++)
 			if(x + 2 * i * w < mx && mx < x + 2 * i * w + w && y + 2 * j * h < my && my < y + 2 * j * h + h && achs[i][j]) {
 				if(!achievement_get(as, achs[i][j]).req || achievement_get(as, achievement_get(as, achs[i][j]).req).done) {
-					let text = achievement_get(as, achs[i][j]).name + ": " + achievement_get(as, achs[i][j]).desc;
-					if(ae.game.settings.language == "русский")
-						text = achievement_get(as, achs[i][j]).name_rus + ": " + achievement_get(as, achs[i][j]).desc_rus;
-					drawText(ctx, mx + w, my + h * 1.125, text, 24);
+
+
+					achievement_draw_popup(ctx, ae, achs[i][j], mx + w, my + h * 1.125, w, h);
+
 				}
 			}
 	}
@@ -496,7 +496,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
 	} else if(name == "big military guy") {
 		ctx.fillStyle = c10;
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
@@ -512,7 +512,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c3;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
 	} else if(name == "big shooting guy") {
 		ctx.fillStyle = c14;
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
@@ -528,7 +528,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
 	} else if(name == "big guy with a sword") {
 		ctx.fillStyle = c1;
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
@@ -544,7 +544,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c2;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
 	} else if(name == "big red guy") {
 		ctx.fillStyle = c10;
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
@@ -560,7 +560,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c0;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
 	} else if(name == "big guy") {
 		ctx.fillStyle = c7;
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
@@ -576,7 +576,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", 10);
+		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
 	} else if(name == "get a gun") {
 		ctx.fillStyle = c9;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
@@ -699,7 +699,7 @@ function achievement_do(as, name, ash=null, silent=false) {
 		if(as[i].name == name && !as[i].done && !(achievement_get(as, name).req && !achievement_get(as, achievement_get(as, name).req).done)) {
 			as[i].done = true;
 			if(ash && !silent) {
-				audio_play("data/sfx/achievement_get_1.mp3", 0.25);
+				audio_play("data/sfx/achievement_get_1.mp3", 0.1875);
 				ash.data.achievements.unshift(name);
 			}
 		}
@@ -764,5 +764,50 @@ function achievements_shower_destroy(ashe) {
 		return;
 	ashe.destroyed = true;
 	achievements_destroy(ashe.data.attached_to);
+}
+
+function achievement_draw_popup(ctx, ae, ach, x, y, w, h) {
+	let as = ae.data.achievements;
+
+	let W = 13 * w;
+	let H = 7 * h;
+
+	ctx.fillStyle = "black";
+	ctx.fillRect(x, y, W, H);
+	ctx.strokeStyle = "gray";
+	ctx.strokeRect(x, y, W, H);
+
+	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
+		false, 0, 0, window.innerWidth / get_scale(), window.innerHeight / get_scale(), ae.data.animstate);
+
+
+	let lines = [];
+
+	let name = achievement_get(as, ach).name;
+	if(ae.game.settings.language == "русский")
+		name = achievement_get(as, ach).name_rus;
+	lines.push(name);
+	lines.push("");
+
+	let desc = achievement_get(as, ach).desc;
+	if(ae.game.settings.language == "русский")
+		desc = achievement_get(as, ach).desc_rus;
+
+	let charlim = 33;
+
+	let words = desc.split(' ');
+	let line = "";
+	for(let i = 0; i < words.length; i++) {
+		if((line + words[i]).length > charlim && line.length > 0) {
+			lines.push(line);
+			line = "";
+		}
+		line += words[i] + " ";
+	}
+	lines.push(line);
+
+	for(let i = 0; i < lines.length; i++) {
+		drawText(ctx, x + 3 * h, y + h + i * 30, lines[i], 24);
+	}
 }
 

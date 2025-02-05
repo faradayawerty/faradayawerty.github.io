@@ -521,7 +521,7 @@ function player_update(player_object, dt) {
 			if(!did_pickup) {
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 				if(p.car_object) {
-					audio_play("data/sfx/car_1.mp3", 0.125);
+					audio_play("data/sfx/car_1.mp3", 0.25);
 					achievement_do(p.achievements_element.data.achievements, "get a ride", p.achievements_shower_element);
 				}
 			}
