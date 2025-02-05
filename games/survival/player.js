@@ -144,18 +144,18 @@ function player_update(player_object, dt) {
 	if(!menu1.shown)
 		achievement_do(p.achievements_element.data.achievements, "joining in", p.achievements_shower_element);
 
-	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["regular"] < 16))
-		achievement_do(p.achievements_element.data.achievements, "time to boss", p.achievements_shower_element);
-	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting"] < 16))
-		achievement_do(p.achievements_element.data.achievements, "time to boss, round II", p.achievements_shower_element);
-	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting red"] < 16))
-		achievement_do(p.achievements_element.data.achievements, "red boss", p.achievements_shower_element);
-	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["sword"] < 16))
-		achievement_do(p.achievements_element.data.achievements, "boss with a sword", p.achievements_shower_element);
-	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting rocket"] < 16))
-		achievement_do(p.achievements_element.data.achievements, "boss with a rocket launcher", p.achievements_shower_element);
-	if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting laser"] < 16))
-		achievement_do(p.achievements_element.data.achievements, "rainbow boss", p.achievements_shower_element);
+	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["regular"] < 16))
+	//	achievement_do(p.achievements_element.data.achievements, "time to boss", p.achievements_shower_element);
+	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting"] < 16))
+	//	achievement_do(p.achievements_element.data.achievements, "time to boss, round II", p.achievements_shower_element);
+	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting red"] < 16))
+	//	achievement_do(p.achievements_element.data.achievements, "red boss", p.achievements_shower_element);
+	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["sword"] < 16))
+	//	achievement_do(p.achievements_element.data.achievements, "boss with a sword", p.achievements_shower_element);
+	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting rocket"] < 16))
+	//	achievement_do(p.achievements_element.data.achievements, "boss with a rocket launcher", p.achievements_shower_element);
+	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting laser"] < 16))
+	//	achievement_do(p.achievements_element.data.achievements, "rainbow boss", p.achievements_shower_element);
 
 	let has_empty = false;
 	for(let i = 0; i < p.inventory_element.data.items.length; i++)
@@ -1367,6 +1367,7 @@ function player_item_consume(player_object, id, anywhere=false) {
 			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.0625 + 0.0625));
 			c.data.health += Math.min(c.data.max_health - c.data.health, c.data.max_health * (Math.random() * 0.0625 + 0.0625));
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			achievement_do(p.achievements_element.data.achievements, "fuel up", p.achievements_shower_element);
 		}
 	}
 

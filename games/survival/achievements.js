@@ -15,20 +15,14 @@ function achievements_create(g) {
 		icon_size: 60,
 		animstate: 0,
 		achievements: [
+
+			// game machanics achievements
 			{
 				name: "joining in",
 				desc: "launch the game",
 				name_rus: "к бою",
 				desc_rus: "зайти в игру",
 				req: null,
-				done: false
-			},
-			{
-				name: "first steps",
-				desc: "make first steps using WASD",
-				name_rus: "первые шаги",
-				desc_rus: "совершите первые шаги, используя WASD",
-				req: "joining in",
 				done: false
 			},
 			{
@@ -55,6 +49,16 @@ function achievements_create(g) {
 				req: "joining in",
 				done: false
 			},
+
+			// movement achievements
+			{
+				name: "first steps",
+				desc: "make first steps using WASD",
+				name_rus: "первые шаги",
+				desc_rus: "совершите первые шаги, используя WASD",
+				req: "joining in",
+				done: false
+			},
 			{
 				name: "outside the box",
 				desc: "leave the current level",
@@ -71,36 +75,14 @@ function achievements_create(g) {
 				req: "first steps",
 				done: false
 			},
+
+			// item achievements,
 			{
 				name: "pick an item",
 				desc: "pick up an item by standing close to it and pressing F or SPACE",
 				name_rus: "подобрать предмет",
 				desc_rus: "подберите предмет, подойдя к нему близко и нажав F или SPACE",
 				req: "outside the box",
-				done: false
-			},
-			{
-				name: "get a gun",
-				desc: "find a gun and pick it up",
-				name_rus: "получить оружие",
-				desc_rus: "найдите и подберите оружие",
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "need for ammo",
-				desc: "try shooting a gun without having any ammo for it",
-				name_rus: "нужны патроны",
-				desc_rus: "попробуйте выстрелить из оружия, не имея подходящих патронов",
-				req: "get a gun",
-				done: false
-			},
-			{
-				name: "shoot 'em up",
-				desc: "kill an enemy by shooting at it",
-				name_rus: "зомби шутер",
-				desc_rus: "убейте врага, выстрелив по нему",
-				req: "get a gun",
 				done: false
 			},
 			{
@@ -128,19 +110,47 @@ function achievements_create(g) {
 				done: false
 			},
 			{
-				name: "time to boss",
-				desc: "kill 16 enemies without dying so that a boss can spawn",
-				name_rus: "первый босс",
-				desc_rus: "убейте 16 зомби, не умерев, чтобы мог появиться босс",
-				req: "shoot 'em up",
+				name: "fuel up",
+				desc: "use gasoline to refuel a car",
+				name_rus: "заправка",
+				desc_rus: "воспользуйтесь бензином, чтобы заправить автомобиль",
+				req: "pick an item",
+				done: false
+			},
+
+			// weapon achievements
+			{
+				name: "get a gun",
+				desc: "find a gun and pick it up",
+				name_rus: "получить оружие",
+				desc_rus: "найдите и подберите оружие",
+				req: "pick an item",
+				done: false
+			},
+			{
+				name: "need for ammo",
+				desc: "try shooting a gun without having any ammo for it",
+				name_rus: "нужны патроны",
+				desc_rus: "попробуйте выстрелить из оружия, не имея подходящих патронов",
+				req: "get a gun",
+				done: false
+			},
+
+			// enemy achievements
+			{
+				name: "shoot 'em up",
+				desc: "kill an enemy by shooting at it",
+				name_rus: "зомби шутер",
+				desc_rus: "убейте врага, выстрелив по нему",
+				req: "get a gun",
 				done: false
 			},
 			{
 				name: "big guy",
-				desc: "kill the first boss",
+				desc: "kill the boss; it is able to spawn when enough enemies are killed",
 				name_rus: "большой парень",
-				desc_rus: "убейте первого босса",
-				req: "time to boss",
+				desc_rus: "убейте босса; босс появляется, если игрок убивает достаточное количество врагов",
+				req: "shoot 'em up",
 				done: false
 			},
 			{
@@ -152,18 +162,10 @@ function achievements_create(g) {
 				done: false
 			},
 			{
-				name: "time to boss, round II",
-				desc: "kill 16 shooters without dying so that a new boss can spawn",
-				name_rus: "новый день, новый босс",
-				desc_rus: "убейте 16 стрелков, не умерев, чтобы мог появиться новый босс",
-				req: "big guy",
-				done: false
-			},
-			{
 				name: "big shooting guy",
-				desc: "kill a shooting boss",
+				desc: "kill a shooting boss; it is able to spawn when enough shooting enemies are killed",
 				name_rus: "большой стрелок",
-				desc_rus: "убейте босса стрелка",
+				desc_rus: "убейте босса стрелка; стреляющий босс появляется, если игрок убивает достаточное количество стрелков",
 				req: "big guy",
 				done: false
 			},
@@ -176,18 +178,10 @@ function achievements_create(g) {
 				done: false
 			},
 			{
-				name: "red boss",
-				desc: "kill 16 red shooters without dying so that a new boss can spawn",
-				name_rus: "красный босс",
-				desc_rus: "убейте 16 красных стрелков, не умерев, чтобы мог появиться новый босс",
-				req: "big shooting guy",
-				done: false
-			},
-			{
 				name: "big red guy",
-				desc: "kill red boss",
+				desc: "kill red boss; it is able to spawn when enough red shooting enemies are killed",
 				name_rus: "большой красный парень",
-				desc_rus: "убейте красного босса",
+				desc_rus: "убейте красного босса; красный босс появляется, если игрок убивает достаточное количество красных стрелков",
 				req: "big shooting guy",
 				done: false
 			},
@@ -200,18 +194,10 @@ function achievements_create(g) {
 				done: false
 			},
 			{
-				name: "boss with a sword",
-				desc: "kill 16 yellow enemyes without dying so that a new boss can spawn",
-				name_rus: "босс с мечом",
-				desc_rus: "убейте 16 желтых врагов, не умерев, чтобы мог появиться новый босс",
-				req: "big red guy",
-				done: false
-			},
-			{
 				name: "big guy with a sword",
-				desc: "kill yellow boss",
+				desc: "kill yellow boss; it is able to spawn when enough yellow enemies are killed",
 				name_rus: "большой парень с мечом",
-				desc_rus: "убейте желтого босса",
+				desc_rus: "убейте желтого босса; желтый босс появляется, если игрок убивает достаточное количество желтых врагов",
 				req: "big red guy",
 				done: false
 			},
@@ -224,18 +210,10 @@ function achievements_create(g) {
 				done: false
 			},
 			{
-				name: "boss with a rocket launcher",
-				desc: "kill 16 rocket shooting enemies so that a new boss can spawn",
-				name_rus: "босс с ракетницей",
-				desc_rus: "убейте 16 стрелков с ракетницей, не умерев, чтобы мог появиться новый босс",
-				req: "big guy with a sword",
-				done: false
-			},
-			{
 				name: "big military guy",
-				desc: "kill the boss with a rocket launcher",
+				desc: "kill the boss with a rocket launcher; it is able to spawn when enough rocket shooting enemies are killed",
 				name_rus: "большой военный парень",
-				desc_rus: "убейте босса с ракетницей",
+				desc_rus: "убейте босса с ракетницей; босс с ракетницей появляется, если игрок убивает достаточное количество противников с ракетницей",
 				req: "big guy with a sword",
 				done: false
 			},
@@ -248,18 +226,10 @@ function achievements_create(g) {
 				done: false
 			},
 			{
-				name: "rainbow boss",
-				desc: "kill 16 rainbow enemies so that a new boss can spawn",
-				name_rus: "радужный босс",
-				desc_rus: "убейте 16 радужных противников, не умерев, чтобы мог появиться новый босс",
-				req: "big military guy",
-				done: false
-			},
-			{
 				name: "huge rainbow guy",
-				desc: "kill the rainbow boss",
+				desc: "kill the rainbow boss; it is able to spawn when enough rainbow enemies are killed",
 				name_rus: "гигантский радужный парень",
-				desc_rus: "убейте радужного босса",
+				desc_rus: "убейте радужного босса; радужный босс появляется, если игрок убивает достаточное количество радужных врагов",
 				req: "big military guy",
 				done: false
 			},
@@ -337,10 +307,11 @@ function achievements_draw(ae, ctx) {
 		],
 		[
 			"first steps",
+			"outside the box",
 			"get a ride",
+			"fuel up",
 		],
 		[
-			"outside the box",
 			"pick an item",
 			"yummy",
 			"stay hydrated",
@@ -352,26 +323,20 @@ function achievements_draw(ae, ctx) {
 		],
 		[
 			"shoot 'em up",
-			"time to boss",
 			"big guy",
 			"they can shoot?",
-			"time to boss, round II",
 			"big shooting guy",
 		],
 		[
 			"red shooter",
-			"red boss",
 			"big red guy",
 			"he has a sword?",
-			"boss with a sword",
 			"big guy with a sword",
 		],
 		[
 			"rocket shooter",
-			"boss with a rocket launcher",
 			"big military guy",
 			"rainbow",
-			"rainbow boss",
 			"huge rainbow guy",
 		]
 	]
@@ -426,6 +391,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 	let c12 = "#1177dd";
 	let c13 = "#1177ff";
 	let c14 = "#335544";
+	let c16 = "#cc1111";
 	if(!done) {
 		c0 = "black";
 		c1 = "white";
@@ -442,6 +408,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		c12 = "#777777";
 		c13 = "#777777";
 		c14 = "#333333";
+		c16 = "#111111";
 	}
 
 	let c15 = "black";
@@ -579,6 +546,21 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		ctx.strokeStyle = c10;
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if(name == "fuel up") {
+		ctx.fillStyle = c0;
+		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.05, h * 0.2);
+		ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.05, h * 0.2);
+		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.2, h * 0.05);
+		ctx.lineWidth = 0.01 * w;
+		ctx.strokeStyle = c9;
+		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+		ctx.fillStyle = c1;
+		ctx.fillRect(x + w * 0.55, y + h * 0.15, w * 0.2, h * 0.05);
+		drawLine(ctx, x + w * 0.3, y + h * 0.3, x + w * 0.7, y + h * 0.7, c16, 0.05 * w);
+		drawLine(ctx, x + w * 0.7, y + h * 0.3, x + w * 0.3, y + h * 0.7, c16, 0.05 * w);
+		ctx.fillStyle = c16;
+		ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
 	} else if(name == "yummy") {
 		ctx.fillStyle = c10;
 		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
@@ -773,15 +755,6 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 	if(y + H > window.innerHeight / get_scale())
 		y = y - H;
 
-	ctx.fillStyle = "black";
-	ctx.fillRect(x, y, W, H);
-	ctx.strokeStyle = "gray";
-	ctx.strokeRect(x, y, W, H);
-
-	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
-		false, 0, 0, window.innerWidth / get_scale(), window.innerHeight / get_scale(), ae.data.animstate);
-
-
 	let lines = [];
 
 	let name = achievement_get(as, ach).name;
@@ -807,6 +780,15 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 		line += words[i] + " ";
 	}
 	lines.push(line);
+
+	ctx.fillStyle = "black";
+	ctx.fillRect(x, y, W, H);
+	ctx.strokeStyle = "gray";
+	ctx.strokeRect(x, y, W, H);
+
+	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
+		false, 0, 0, window.innerWidth / get_scale(), window.innerHeight / get_scale(), ae.data.animstate);
+
 
 	for(let i = 0; i < lines.length; i++) {
 		drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i], fontsize);
