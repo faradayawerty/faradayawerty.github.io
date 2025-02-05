@@ -323,22 +323,20 @@ function achievements_draw(ae, ctx) {
 		],
 		[
 			"shoot 'em up",
-			"big guy",
 			"they can shoot?",
-			"big shooting guy",
-		],
-		[
 			"red shooter",
-			"big red guy",
 			"he has a sword?",
-			"big guy with a sword",
+			"rocket shooter",
+			"rainbow",
 		],
 		[
-			"rocket shooter",
+			"big guy",
+			"big shooting guy",
+			"big red guy",
+			"big guy with a sword",
 			"big military guy",
-			"rainbow",
 			"huge rainbow guy",
-		]
+		],
 	]
 
 	let mx = ae.game.input.mouse.x / get_scale();
@@ -673,11 +671,11 @@ function achievement_get(as, name) {
 function achievement_do(as, name, ash=null, silent=false) {
 	for(let i = 0; i < as.length; i++) {
 		if(as[i].name == name && !as[i].done && !(achievement_get(as, name).req && !achievement_get(as, achievement_get(as, name).req).done)) {
-			as[i].done = true;
 			if(ash && !silent) {
 				audio_play("data/sfx/achievement_get_1.mp3", 0.1875);
 				ash.data.achievements.unshift(name);
 			}
+			as[i].done = true;
 		}
 	}
 }

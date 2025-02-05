@@ -20,13 +20,13 @@ function getWishDir(input) {
 
 	let vel = Matter.Vector.create(0, 0);
 
-	if(input.keys.down['d'])
+	if(input.keys.down['d'] || input.keys.down['в'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(1, 0));
-	if(input.keys.down['a'])
+	if(input.keys.down['a'] || input.keys.down['ф'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(-1, 0));
-	if(input.keys.down['s'])
+	if(input.keys.down['s'] || input.keys.down['ы'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, 1));
-	if(input.keys.down['w'])
+	if(input.keys.down['w'] || input.keys.down['ц'])
 		vel = Matter.Vector.add(vel, Matter.Vector.create(0, -1));
 
 	return vel;

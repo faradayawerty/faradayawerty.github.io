@@ -431,7 +431,10 @@ function player_update(player_object, dt) {
 	//if(isKeyDown(player_object.game.input, 'm', true))
 	//	player_create(player_object.game, p.body.position.x, p.body.position.y, false, true);
 
-	if(isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true)) {
+	if(isKeyDown(player_object.game.input, 'e', true)
+		|| isKeyDown(player_object.game.input, 'i', true)
+		|| isKeyDown(player_object.game.input, 'у', true)
+		|| isKeyDown(player_object.game.input, 'ш', true)) {
 		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
 		p.inventory_element.shown = !p.inventory_element.shown;
 		p.hotbar_element.shown = !p.hotbar_element.shown;
@@ -440,7 +443,10 @@ function player_update(player_object, dt) {
 		p.achievements_element.shown = false;
 	}
 
-	if(isKeyDown(p.achievements_element.game.input, 'j', true) || isKeyDown(p.achievements_element.game.input, 'r', true)) {
+	if(isKeyDown(p.achievements_element.game.input, 'j', true)
+		|| isKeyDown(p.achievements_element.game.input, 'r', true)
+		|| isKeyDown(p.achievements_element.game.input, 'о', true)
+		|| isKeyDown(p.achievements_element.game.input, 'к', true)) {
 		p.achievements_element.data.x = 75;
 		p.achievements_element.data.y = 75;
 		achievement_do(p.achievements_element.data.achievements, "achievements", p.achievements_shower_element);
@@ -486,7 +492,7 @@ function player_update(player_object, dt) {
 		//	));
 
 
-		let f_down = isKeyDown(player_object.game.input, 'f', true)
+		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true)
 			|| isKeyDown(player_object.game.input, ' ', true)
 			|| player_object.game.input.touch.length > 0;
 
@@ -590,7 +596,7 @@ function player_update(player_object, dt) {
 		Matter.Body.setVelocity(p.car_object.data.body, vel);
 		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(0, 0)));
 
-		if(isKeyDown(player_object.game.input, 'f', true)
+		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true)
 			//|| isKeyDown(player_object.game.input, ' ', true)
 			|| isKeyDown(player_object.game.input, ' ', true)) {
 			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
