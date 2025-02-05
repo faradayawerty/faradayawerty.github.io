@@ -388,12 +388,8 @@ function achievements_draw(ae, ctx) {
 	for(let i = 0; i < achs.length; i++) {
 		for(let j = 0; j < achs[i].length; j++)
 			if(x + 2 * i * w < mx && mx < x + 2 * i * w + w && y + 2 * j * h < my && my < y + 2 * j * h + h && achs[i][j]) {
-				if(!achievement_get(as, achs[i][j]).req || achievement_get(as, achievement_get(as, achs[i][j]).req).done) {
-
-
+				if(!achievement_get(as, achs[i][j]).req || achievement_get(as, achievement_get(as, achs[i][j]).req).done)
 					achievement_draw_popup(ctx, ae, achs[i][j], mx, my, w, h);
-
-				}
 			}
 	}
 }
@@ -672,10 +668,10 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 		}
 	} else if(name == "achievements") {
 		let cols = [c0, c1, c2, c3, c7];
-		for(let i = 0; i < 6; i++) {
-			for(let j = 0; j < 6; j++) {
+		for(let i = 0; i < 5; i++) {
+			for(let j = 0; j < 5; j++) {
 				ctx.fillStyle = cols[(2*i + j) % cols.length];
-				ctx.fillRect(x + 0.15 * w * i + 0.1 * w, y + 0.15 * h * j + 0.1 * h, 0.1 * w, 0.1 * h);
+				ctx.fillRect(x + 0.15 * w * i + 0.05 * w, y + 0.15 * h * j + 0.05 * h, 0.1 * w, 0.1 * h);
 			}
 		}
 	} else {
@@ -791,7 +787,7 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 	let name = achievement_get(as, ach).name;
 	if(ae.game.settings.language == "русский")
 		name = achievement_get(as, ach).name_rus;
-	lines.push(name);
+	lines.push("** " + name + " **");
 	lines.push("");
 
 	let desc = achievement_get(as, ach).desc;
