@@ -363,7 +363,7 @@ function achievements_translate(lang, text) {
 	return text;
 }
 
-function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000, animstate=null) {
+function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000, animstate=null, back=true) {
 
 	if(x < bbx || x > bbw - 0.2 * w || y < bby || y > bbh - 0.2 * h || !name)
 		return;
@@ -428,16 +428,14 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bb
 
 	ctx.lineWidth = 0.025 * w;
 
-	ctx.globalAlpha *= 0.25;
-	ctx.fillStyle = done ? "green" : "red";
-	ctx.fillRect(x, y, w, h);
-	ctx.strokeStyle = "white";
-	ctx.strokeRect(x, y, w, h);
-	ctx.globalAlpha *= 4;
-
-			//"they can shoot?",
-			//"time to boss, round II",
-			//"big shooting guy",
+	if(back || true) {
+		ctx.globalAlpha *= 0.25;
+		ctx.fillStyle = done ? "green" : "red";
+		ctx.fillRect(x, y, w, h);
+		ctx.strokeStyle = "white";
+		ctx.strokeRect(x, y, w, h);
+		ctx.globalAlpha *= 4;
+	}
 
 	if(name == "joining in") {
 		ctx.fillStyle = c0;
@@ -732,7 +730,7 @@ function achievements_shower_draw(ashe, ctx) {
 			text = "получено достижение: " + achievement_get(ashe.data.attached_to.data.achievements, ach).name_rus + "! нажмите R или J";
 		drawText(ctx, x + 1.25 * size, y + 0.6 * size, text, 20);
 		achievement_icon_draw(ctx, ashe.data.attached_to.data.achievements, ach, x + 0.125 * size, y + 0.125 * size, 0.75 * size, 0.75 * size,
-				false, 50, 50, 1000, 1000, ashe.data.animstate);
+				false, 50, 50, 1000, 1000, ashe.data.animstate, false);
 		ctx.globalAlpha = 1;
 	}
 }
