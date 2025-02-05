@@ -12,7 +12,7 @@ function achievements_create(g) {
 		mxx: 0,
 		myy: 0,
 		clicked: false,
-		icon_size: 40,
+		icon_size: 60,
 		animstate: 0,
 		achievements: [
 			{
@@ -391,7 +391,7 @@ function achievements_draw(ae, ctx) {
 				if(!achievement_get(as, achs[i][j]).req || achievement_get(as, achievement_get(as, achs[i][j]).req).done) {
 
 
-					achievement_draw_popup(ctx, ae, achs[i][j], mx + w, my + h * 1.125, w, h);
+					achievement_draw_popup(ctx, ae, achs[i][j], mx, my, w, h);
 
 				}
 			}
@@ -404,7 +404,7 @@ function achievements_translate(lang, text) {
 
 function achievement_icon_draw(ctx, as, name, x, y, w, h, done=false, bbx=50, bby=50, bbw=1000, bbh=1000, animstate=null) {
 
-	if(x < bbx || x > bbw + 0.25 * bbx || y < bby || y > bbh + 0.25 * bby || !name)
+	if(x < bbx || x > bbw - 0.2 * w || y < bby || y > bbh - 0.2 * h || !name)
 		return;
 
 	let ach = achievement_get(as, name);
@@ -766,11 +766,16 @@ function achievements_shower_destroy(ashe) {
 	achievements_destroy(ashe.data.attached_to);
 }
 
-function achievement_draw_popup(ctx, ae, ach, x, y, w, h) {
+function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 	let as = ae.data.achievements;
 
-	let W = 13 * w;
-	let H = 7 * h;
+	let W = bbw * 0.6;
+	let H = bbh * 0.3;
+
+	if(x + W > window.innerWidth / get_scale())
+		x = x - W;
+	if(y + H > window.innerHeight / get_scale())
+		y = y - H;
 
 	ctx.fillStyle = "black";
 	ctx.fillRect(x, y, W, H);
@@ -793,7 +798,8 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h) {
 	if(ae.game.settings.language == "русский")
 		desc = achievement_get(as, ach).desc_rus;
 
-	let charlim = 33;
+	let fontsize = Math.floor(W / 24);
+	let charlim = Math.floor(1.25 * W / fontsize);
 
 	let words = desc.split(' ');
 	let line = "";
@@ -807,7 +813,7 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h) {
 	lines.push(line);
 
 	for(let i = 0; i < lines.length; i++) {
-		drawText(ctx, x + 3 * h, y + h + i * 30, lines[i], 24);
+		drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i], fontsize);
 	}
 }
 
