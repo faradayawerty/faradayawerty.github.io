@@ -743,8 +743,8 @@ function achievements_shower_destroy(ashe) {
 function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 	let as = ae.data.achievements;
 
-	let W = bbw * 0.7;
-	let H = bbh * 0.3;
+	let W = bbw * 0.75;
+	let H = bbh * 0.35;
 
 	if(x + W > window.innerWidth / get_scale())
 		x = x - W;
@@ -763,7 +763,7 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 	if(ae.game.settings.language == "русский")
 		desc = achievement_get(as, ach).desc_rus;
 
-	let fontsize = Math.floor(W / 24);
+	let fontsize = Math.floor(W / 26);
 	let charlim = Math.floor(1.25 * W / fontsize);
 
 	let words = desc.split(' ');
