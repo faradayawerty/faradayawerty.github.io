@@ -77,7 +77,9 @@ function enemy_create(g, x, y, make_boss=false, make_minion=false, type="random"
 		jump_delay: 4000,
 		sword_rotation: 0,
 		color_gradient: Math.random() * 10000,
-		laser_angle: 0
+		laser_angle: 0,
+		hunt_delay: 1000,
+		hunt_delay_max: 1000
 	};
 	if(type == "shooting") {
 		e.type = "shooting";
@@ -215,7 +217,7 @@ function enemy_destroy(enemy_object, death=true) {
 	enemy_object.destroyed = true;
 }
 
-function enemy_get_target_object(enemy_object) {
+function enemy_get_target_object(enemy_object, dt) {
 	let e = enemy_object.data;
 	let target_object = game_object_find_closest(enemy_object.game, e.body.position.x,e.body.position.y, "player", e.follow_range);
 	if(target_object == null)
@@ -224,6 +226,14 @@ function enemy_get_target_object(enemy_object) {
 		if(target_object.data.car_object)
 			target_object = target_object.data.car_object;
 	}
+	if(dt > -1) {
+		if(target_object)
+			e.hunt_delay -= dt;
+		else
+			e.hunt_delay = e.hunt_delay_max;
+	}
+	if(e.hunt_delay > 0)
+		target_object = null;
 	return target_object;
 }
 
@@ -240,7 +250,7 @@ function enemy_update(enemy_object, dt) {
 	if(e.jump_delay < 4000)
 		e.jump_delay += Math.random() * dt;
 	e.sword_rotation += 0.01 * dt;
-	let target_object = enemy_get_target_object(enemy_object);
+	let target_object = enemy_get_target_object(enemy_object, dt);
 	if(target_object != null) {
 		let tx = target_object.data.body.position.x - e.body.position.x;
 		let ty = target_object.data.body.position.y - e.body.position.y;
@@ -599,7 +609,7 @@ function enemy_draw(enemy_object, ctx) {
 		ctx.fillStyle = "lime";
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h, e.w * e.health / e.max_health, e.h * 0.05);
 	}
-	let target_object = enemy_get_target_object(enemy_object);
+	let target_object = enemy_get_target_object(enemy_object, -1);
 	if(target_object != null) {
 		let px = e.body.position.x - 0.45 * e.w;
 		let py = e.body.position.y - 0.45 * e.h;

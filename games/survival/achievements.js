@@ -684,7 +684,7 @@ function achievements_shower_create(g, ae=null) {
 	let ash = {
 		x: 50,
 		y: 120,
-		w: 700,
+		w: 800,
 		h: 50,
 		achievements: [],
 		attached_to: ae,
@@ -743,7 +743,7 @@ function achievements_shower_destroy(ashe) {
 function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 	let as = ae.data.achievements;
 
-	let W = bbw * 0.6;
+	let W = bbw * 0.7;
 	let H = bbh * 0.3;
 
 	if(x + W > window.innerWidth / get_scale())
