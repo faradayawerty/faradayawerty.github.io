@@ -2,7 +2,7 @@
 ## faradayawerty's projects hosted on github
 
 #### faw_xx4 (WIP)
-tic tac toe with crosses only, 4 by 4, 4 in a row (including diagonals) loses, one or two times a turn
+tic tac toe with crosses only, 4 by 4, 4 in a row (including diagonals) loses, one or two times a turn\
 play here → https://faradayawerty.github.io/minigames/xx4
 
 #### faw_tds
