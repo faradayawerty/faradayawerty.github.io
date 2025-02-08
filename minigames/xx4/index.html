@@ -168,6 +168,7 @@
 			score_computer: 0,
 			paused: false,
 			can_make_turns: 2,
+			made_turns: 0,
 			turn_finished: false
 		};
 
@@ -223,6 +224,7 @@
 					game_state.text = "";
 					game_state.paused = false;
 					game_state.can_make_turns = 2;
+					game_state.made_turns = 0;
 				}
 			} else {
 				game_state.color_restart = COLOR_RESTART_DEFAULT;
@@ -234,6 +236,7 @@
 					if(input1.mouse.leftButtonPressed) {
 						game_state.turn = TURN_PLAYER + TURN_COMPUTER - game_state.turn;
 						game_state.can_make_turns = 2;
+						game_state.made_turns = 0;
 						game_state.turn_finished = true;
 					}
 				} else {
@@ -279,16 +282,20 @@
 							j = Math.floor(Math.random() * 4);
 						}
 						game_state.xx[i][j].has_x = true;
-						if((k < 9 || game_state.can_make_turns == 2) && check_defeat())
+						game_state.made_turns++;
+						if((k < 9 || game_state.can_make_turns == 2 || game_state.made_turns > 1) && check_defeat()) {
 							game_state.xx[i][j].has_x = false;
-						else
+							game_state.made_turns--;
+						} else {
 							break;
+						}
 					}
 
 					game_state.can_make_turns--;
 					if(game_state.can_make_turns < 1) {
 						game_state.turn = TURN_PLAYER;
 						game_state.can_make_turns = 2;
+						game_state.made_turns = 0;
 						game_state.turn_finished = true;
 					}
 				}
@@ -300,9 +307,11 @@
 							if(input1.mouse.leftButtonPressed && !game_state.xx[i][j].has_x && game_state.turn == TURN_PLAYER) {
 								game_state.xx[i][j].has_x = true;
 								game_state.can_make_turns--;
+								game_state.made_turns++;
 								if(game_state.can_make_turns < 1) {
 									game_state.turn = TURN_COMPUTER;
 									game_state.can_make_turns = Math.floor(Math.random() * 2 + 1);
+									game_state.made_turns = 0;
 									game_state.turn_finished = true;
 								}
 							}
