@@ -329,11 +329,11 @@
 				drawText(ctx, 69 + 100 * 4, 205, "move", 16);
 			}
 
-			draw_square(ctx, 50 + 100 * 0, 50 + 100 * 4, 100 * 4 - 20, 80, "#7711ff", 12);
+			draw_square(ctx, 50 + 100 * 0, 50 + 100 * 4, 100 * 4 - 20, 80, "#7711ff", 64);
 			drawText(ctx, 70, 495, "score player: " + game_state.score_player + ", score computer: " + game_state.score_computer, 20);
 
 			if(game_state.text.length > 0) {
-				draw_square(ctx, 50 + 100 * 0, 50 + 100 * 5, 100 * 4 - 20, 80, "#7711ff", 12);
+				draw_square(ctx, 50 + 100 * 0, 50 + 100 * 5, 100 * 4 - 20, 80, "#7711ff", 64);
 				drawText(ctx, 70, 600, game_state.text, 36);
 			}
 		};
@@ -361,7 +361,7 @@
 		function main() {
 			initializeKeyboardInput(input1.keys);
 			initializeMouseInput(input1.mouse, ctx1);
-			initializeTouchInput(input1.touch, input1.joystick, ctx1);
+			//initializeTouchInput(input1.touch, input1.joystick, ctx1);
 			animate(Date.now());
 		}
 
