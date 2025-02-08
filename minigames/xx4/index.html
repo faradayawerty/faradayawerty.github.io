@@ -310,7 +310,7 @@
 								game_state.made_turns++;
 								if(game_state.can_make_turns < 1) {
 									game_state.turn = TURN_COMPUTER;
-									game_state.can_make_turns = Math.floor(Math.random() * 2 + 1);
+									game_state.can_make_turns = Math.random() < 0.75 ? 2 : 1;
 									game_state.made_turns = 0;
 									game_state.turn_finished = true;
 								}
