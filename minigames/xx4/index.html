@@ -1,0 +1,373 @@
+<html>
+
+<head>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<title>faw_xx4</title>
+	<link rel="icon" href="icon.png">
+	<style>
+		* {
+			margin-top: 0px;
+			margin-bottom: 0px;
+			margin-left: 0px;
+			margin-right: 0px;
+			padding: 0;
+			touch-action: none;
+		}
+
+		body {
+			overscroll-behavior: contain;
+		}
+
+		#canvas {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			border: 0px solid;
+			display: block;
+			image-rendering: pixelated;
+		}
+	</style>
+</head>
+
+<body>
+	<a id="downloadAnchorElem" style="display:none"></a>
+	<input id="file-input" type="file" name="name" style="display: none;" />
+	<canvas id="canvas" width=1600 height=1200 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
+	<script src="input.js" type="text/javascript"></script>
+	<script src="util.js" type="text/javascript"></script>
+	<script>
+
+		let cvs1 = document.getElementById("canvas");
+		let ctx1 = cvs1.getContext("2d");
+
+		let input1 = input_create();
+
+		//document.addEventListener("visibilitychange", function() {
+		//	if(document.hidden)
+		//		// pause game
+		//});
+
+		function get_scale() {
+			return Math.min(window.innerWidth / 1200, window.innerHeight / 1200);
+		};
+
+		function draw_square(ctx, x, y, w, h, color, p=6) {
+			let a = 0.5 * w, b = 0.5 * h
+			function x1(t) {
+				return a * Math.cos(t) / Math.pow(
+					Math.abs(
+						Math.pow(Math.abs(Math.cos(t)), p) + Math.pow(Math.abs(Math.sin(t)), p)
+					),
+					1/p
+				);
+			}
+			function y1(t) {
+				return b * Math.sin(t) / Math.pow(
+					Math.abs(
+						Math.pow(Math.abs(Math.cos(t)), p) + Math.pow(Math.abs(Math.sin(t)), p)
+					),
+					1/p
+				);
+			}
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.moveTo(x + 0.5 * w + x1(0), y + 0.5 * h + y1(0));
+			for(let t = 0; t <= 6.28; t += 6.28 / 200) {
+				ctx.lineTo(x + 0.5 * w + x1(t), y + 0.5 * h + y1(t));
+			}
+			ctx.closePath();
+			ctx.fill();
+		}
+
+		function draw_cross(ctx, x, y, w, h, color) {
+			let p = 4;
+			let a = 0.25 * w, b = 1.0 * h
+			function x1(t) {
+				return a * Math.cos(t) / Math.pow(
+					Math.abs(
+						Math.pow(Math.abs(Math.cos(t)), p) + Math.pow(Math.abs(Math.sin(t)), p)
+					),
+					1/p
+				);
+			}
+			function y1(t) {
+				return b * Math.sin(t) / Math.pow(
+					Math.abs(
+						Math.pow(Math.abs(Math.cos(t)), p) + Math.pow(Math.abs(Math.sin(t)), p)
+					),
+					1/p
+				);
+			}
+			function x2(t) {
+				return x1(t) + y1(t);
+			}
+			function y2(t) {
+				return x1(t) - y1(t);
+			}
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.moveTo(x + x2(6.28), y + y2(6.28));
+			for(let t = 0; t < 6.28; t += 6.28 / 200) {
+				ctx.lineTo(x + x2(t), y + y2(t));
+			}
+			ctx.closePath();
+			ctx.fill();
+			ctx.beginPath();
+			ctx.moveTo(x + x2(6.28), y - y2(6.28));
+			for(let t = 0; t < 6.28; t += 6.28 / 200) {
+				ctx.lineTo(x + x2(t), y - y2(t));
+			}
+			ctx.closePath();
+			ctx.fill();
+		}
+
+		let COLOR_DEFAULT = "#1177ff";
+		let COLOR_SELECTED = "#7777ff";
+		let COLOR_X_DEFAULT = "#11ff77";
+		let COLOR_X_SELECTED = "#77ff77";
+		let COLOR_RESTART_DEFAULT = "#ff1111";
+		let COLOR_RESTART_SELECTED = "#ff7777";
+		let COLOR_ENDMOVE_DEFAULT = "#ffff11";
+		let COLOR_ENDMOVE_SELECTED = "#ffff77";
+
+		let TURN_PLAYER = 1;
+		let TURN_COMPUTER = 2;
+
+		let game_state = {
+			xx: [
+				[
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false}
+				],
+				[
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false}
+				],
+				[
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false}
+				],
+				[
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false},
+					{color: "#1177ff", color_x: "#77ff11", has_x: false}
+				],
+			],
+			color_restart: COLOR_RESTART_DEFAULT,
+			color_endmove: COLOR_ENDMOVE_DEFAULT,
+			turn: TURN_PLAYER,
+			text: "",
+			score_player: 0,
+			score_computer: 0,
+			paused: false,
+			can_make_turns: 2,
+			turn_finished: false
+		};
+
+		function check_defeat() {
+			let defeat = true;
+			let row_sums = [0, 0, 0, 0];
+			let column_sums = [0, 0, 0, 0];
+			let diagonal_sums = [0, 0];
+
+			let s = 0;
+
+			for(let i = 0; i < game_state.xx.length; i++) {
+				s = 0;
+				for(let j = 0; j < game_state.xx[i].length; j++)
+					s += game_state.xx[i][j].has_x ? 1 : 0;
+				row_sums[i] = s;
+			}
+
+			for(let i = 0; i < game_state.xx.length; i++) {
+				s = 0;
+				for(let j = 0; j < game_state.xx[i].length; j++)
+					s += game_state.xx[j][i].has_x ? 1 : 0;
+				column_sums[i] = s;
+			}
+
+			s = 0;
+			for(let i = 0; i < 4; i++) {
+				s += game_state.xx[i][i].has_x ? 1 : 0;
+			}
+			diagonal_sums[0] = s;
+
+			s = 0;
+			for(let i = 0; i < 4; i++) {
+				s += game_state.xx[i][3 - i].has_x ? 1 : 0;
+			}
+			diagonal_sums[1] = s;
+
+			if(column_sums.indexOf(4) == -1 && row_sums.indexOf(4) == -1 && diagonal_sums.indexOf(4) == -1)
+				defeat = false;
+
+			return defeat;
+		}
+
+		function game_update(dt) {
+
+			if(50 + 100 * 4 < input1.mouse.x && input1.mouse.x < 130 + 100 * 4 && 50 + 100 * 0 < input1.mouse.y && input1.mouse.y < 130 + 100 * 0) {
+				game_state.color_restart = COLOR_RESTART_SELECTED;
+				if(input1.mouse.leftButtonPressed) {
+					for(let i = 0; i < game_state.xx.length; i++) {
+						for(let j = 0; j < game_state.xx[i].length; j++)
+							game_state.xx[i][j].has_x = false;
+					}
+					game_state.text = "";
+					game_state.paused = false;
+					game_state.can_make_turns = 2;
+				}
+			} else {
+				game_state.color_restart = COLOR_RESTART_DEFAULT;
+			}
+
+			if(game_state.turn == TURN_PLAYER && game_state.can_make_turns == 1) {
+				if(50 + 100 * 4 < input1.mouse.x && input1.mouse.x < 130 + 100 * 4 && 50 + 100 * 1 < input1.mouse.y && input1.mouse.y < 130 + 100 * 1) {
+					game_state.color_endmove = COLOR_ENDMOVE_SELECTED;
+					if(input1.mouse.leftButtonPressed) {
+						game_state.turn = TURN_PLAYER + TURN_COMPUTER - game_state.turn;
+						game_state.can_make_turns = 2;
+						game_state.turn_finished = true;
+					}
+				} else {
+					game_state.color_endmove = COLOR_ENDMOVE_DEFAULT;
+				}
+			}
+
+			for(let i = 0; i < game_state.xx.length; i++) {
+				for(let j = 0; j < game_state.xx[i].length; j++) {
+					game_state.xx[i][j].color = COLOR_DEFAULT;
+					game_state.xx[i][j].color_x = COLOR_X_DEFAULT;
+				}
+			}
+
+			// check if defeat
+			if(game_state.turn_finished) {
+				let defeat = check_defeat();
+
+				if(defeat && game_state.turn == TURN_COMPUTER && !game_state.paused) {
+					game_state.text = "computer wins";
+					game_state.paused = true;
+					game_state.score_computer++;
+				}
+
+				if(defeat && game_state.turn == TURN_PLAYER && !game_state.paused) {
+					game_state.text = "player wins";
+					game_state.paused = true;
+					game_state.score_player++;
+				}
+
+				game_state.turn_finished = false;
+			}
+
+			if(!game_state.paused) {
+				if(game_state.turn == TURN_COMPUTER && !input1.mouse.leftButtonPressed) {
+
+					// shit code but it works for now
+					for(let k = 0; k < 10; k++) {
+						let i = Math.floor(Math.random() * 4);
+						let j = Math.floor(Math.random() * 4);
+						while(game_state.xx[i][j].has_x) {
+							i = Math.floor(Math.random() * 4);
+							j = Math.floor(Math.random() * 4);
+						}
+						game_state.xx[i][j].has_x = true;
+						if(k < 9 && check_defeat())
+							game_state.xx[i][j].has_x = false;
+						else
+							break;
+					}
+
+					game_state.can_make_turns--;
+					if(game_state.can_make_turns < 1) {
+						game_state.turn = TURN_PLAYER;
+						game_state.can_make_turns = 2;
+						game_state.turn_finished = true;
+					}
+				}
+				for(let i = 0; i < game_state.xx.length; i++) {
+					for(let j = 0; j < game_state.xx[i].length; j++) {
+						if(50 + 100 * i < input1.mouse.x && input1.mouse.x < 130 + 100 * i && 50 + 100 * j < input1.mouse.y && input1.mouse.y < 130 + 100 * j) {
+							game_state.xx[i][j].color = COLOR_SELECTED;
+							game_state.xx[i][j].color_x = COLOR_X_SELECTED;
+							if(input1.mouse.leftButtonPressed && !game_state.xx[i][j].has_x && game_state.turn == TURN_PLAYER) {
+								game_state.xx[i][j].has_x = true;
+								game_state.can_make_turns--;
+								if(game_state.can_make_turns < 1) {
+									game_state.turn = TURN_COMPUTER;
+									game_state.can_make_turns = Math.floor(Math.random() * 2 + 1);
+									game_state.turn_finished = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		};
+
+		function game_draw(ctx) {
+			for(let i = 0; i < game_state.xx.length; i++) {
+				for(let j = 0; j < game_state.xx[i].length; j++) {
+					draw_square(ctx, 50 + 100 * i, 50 + 100 * j, 80, 80, game_state.xx[i][j].color, 8);
+					if(game_state.xx[i][j].has_x)
+						draw_cross(ctx, 90 + 100 * i, 90 + 100 * j, 20, 20, game_state.xx[i][j].color_x);
+				}
+			}
+			draw_square(ctx, 50 + 100 * 4, 50 + 100 * 0, 80, 80, game_state.color_restart, 8);
+			drawText(ctx, 65 + 100 * 4, 95, "restart", 16);
+
+			if(game_state.turn == TURN_PLAYER && game_state.can_make_turns == 1) {
+				draw_square(ctx, 50 + 100 * 4, 50 + 100 * 1, 80, 80, game_state.color_endmove, 8);
+				drawText(ctx, 74 + 100 * 4, 185, "end", 16);
+				drawText(ctx, 69 + 100 * 4, 205, "move", 16);
+			}
+
+			draw_square(ctx, 50 + 100 * 0, 50 + 100 * 4, 100 * 4 - 20, 80, "#7711ff", 12);
+			drawText(ctx, 70, 495, "score player: " + game_state.score_player + ", score computer: " + game_state.score_computer, 20);
+
+			if(game_state.text.length > 0) {
+				draw_square(ctx, 50 + 100 * 0, 50 + 100 * 5, 100 * 4 - 20, 80, "#7711ff", 12);
+				drawText(ctx, 70, 600, game_state.text, 36);
+			}
+		};
+
+		function animate(lastUpdateTime) {
+
+			// calculate delta time
+			let delta_time = Date.now() - lastUpdateTime;
+			lastUpdateTime = Date.now();
+
+			ctx1.clearRect(0,0, cvs1.width, cvs1.height);
+			ctx1.canvas.width = window.innerWidth;
+			ctx1.canvas.height = window.innerHeight;
+			ctx1.fillStyle = "#112222";
+			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
+
+			game_update(delta_time);
+			game_draw(ctx1);
+
+			window.requestAnimationFrame(function() {
+				animate(lastUpdateTime);
+			});
+		}
+
+		function main() {
+			initializeKeyboardInput(input1.keys);
+			initializeMouseInput(input1.mouse, ctx1);
+			initializeTouchInput(input1.touch, input1.joystick, ctx1);
+			animate(Date.now());
+		}
+
+		main()
+	</script>
+</body>
+
+</html>
+
