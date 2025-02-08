@@ -279,7 +279,7 @@
 							j = Math.floor(Math.random() * 4);
 						}
 						game_state.xx[i][j].has_x = true;
-						if(k < 9 && check_defeat())
+						if((k < 9 || game_state.can_make_turns == 2) && check_defeat())
 							game_state.xx[i][j].has_x = false;
 						else
 							break;
