@@ -81,7 +81,7 @@ function inventory_update(inventory_element, dt) {
 	//		inv.imove = -1;
 	//		inv.jmove = -1;
 	//	}
-	if(isKeyDown(inventory_element.game.input, 'q', true)) {
+	if(isKeyDown(inventory_element.game.input, 'q', true) || isKeyDown(inventory_element.game.input, 'й', true)) {
 		inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
 		if(inv.iselected == inv.imove && inv.jselected == inv.jmove) {
 			inv.imove = -1;
