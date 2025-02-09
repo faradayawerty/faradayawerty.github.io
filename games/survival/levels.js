@@ -155,8 +155,8 @@ function levels_set(g, level, old_level=null) {
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff7711");
 		else if(Math.random() > 0.995)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#ff1177");
-		else if(Math.random() > 0.999)
-			player_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, false, true);
+		//else if(Math.random() > 0.999)
+		//	player_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, false, true);
 	}
 
 	let tile = g.assigned_tiles[g.visited_levels.indexOf(level)];

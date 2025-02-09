@@ -35,16 +35,20 @@ function inventory_update(inventory_element, dt) {
 
 	inv.animation_state += 0.02 * dt;
 
+	let slot_selected = false;
 	for(let i = 0; i < inv.items.length; i++)
 		for(let j = 0; j < inv.items[i].length; j++)
 			if(doRectsCollide(inventory_element.game.input.mouse.x / get_scale(), inventory_element.game.input.mouse.y / get_scale(), 0, 0,
 				40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size)) {
+				slot_selected = true;
 				inv.iselected = i;
 				inv.jselected = j;
 				if(isMouseLeftButtonPressed(inventory_element.game.input))
 					if(inv.imove < 0 && inv.jmove < 0) {
-						inv.imove = inv.iselected;
-						inv.jmove = inv.jselected;
+						if(inv.items[i][j] > 0) {
+							inv.imove = inv.iselected;
+							inv.jmove = inv.jselected;
+						}
 					} else {
 						let temp = inv.items[inv.iselected][inv.jselected];
 						inv.items[inv.iselected][inv.jselected] = inv.items[inv.imove][inv.jmove];
@@ -53,28 +57,37 @@ function inventory_update(inventory_element, dt) {
 						inv.jmove = -1;
 					}
 			}
+	if(!slot_selected) {
+		inv.iselected = -1;
+		inv.jselected = -1;
+	}
 
-	if(isKeyDown(inventory_element.game.input, 's', true) && inv.iselected < inv.items.length - 1)
-		inv.iselected++;
-	if(isKeyDown(inventory_element.game.input, 'w', true) && inv.iselected > 0)
-		inv.iselected--;
-	if(isKeyDown(inventory_element.game.input, 'd', true) && inv.jselected < inv.items[inv.iselected].length - 1)
-		inv.jselected++;
-	if(isKeyDown(inventory_element.game.input, 'a', true) && inv.jselected > 0)
-		inv.jselected--;
-	if(isKeyDown(inventory_element.game.input, 'enter', true))
-		if(inv.imove < 0 && inv.jmove < 0) {
-			inv.imove = inv.iselected;
-			inv.jmove = inv.jselected;
-		} else {
-			let temp = inv.items[inv.iselected][inv.jselected];
-			inv.items[inv.iselected][inv.jselected] = inv.items[inv.imove][inv.jmove];
-			inv.items[inv.imove][inv.jmove] = temp;
+	//if(isKeyDown(inventory_element.game.input, 's', true) && inv.iselected < inv.items.length - 1)
+	//	inv.iselected++;
+	//if(isKeyDown(inventory_element.game.input, 'w', true) && inv.iselected > 0)
+	//	inv.iselected--;
+	//if(isKeyDown(inventory_element.game.input, 'd', true) && inv.jselected < inv.items[inv.iselected].length - 1)
+	//	inv.jselected++;
+	//if(isKeyDown(inventory_element.game.input, 'a', true) && inv.jselected > 0)
+	//	inv.jselected--;
+	//if(isKeyDown(inventory_element.game.input, 'enter', true))
+	//	if(inv.imove < 0 && inv.jmove < 0) {
+	//		inv.imove = inv.iselected;
+	//		inv.jmove = inv.jselected;
+	//	} else {
+	//		let temp = inv.items[inv.iselected][inv.jselected];
+	//		inv.items[inv.iselected][inv.jselected] = inv.items[inv.imove][inv.jmove];
+	//		inv.items[inv.imove][inv.jmove] = temp;
+	//		inv.imove = -1;
+	//		inv.jmove = -1;
+	//	}
+	if(isKeyDown(inventory_element.game.input, 'q', true)) {
+		inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
+		if(inv.iselected == inv.imove && inv.jselected == inv.jmove) {
 			inv.imove = -1;
 			inv.jmove = -1;
 		}
-	if(isKeyDown(inventory_element.game.input, 'q', true))
-		inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
+	}
 }
 
 function inventory_draw(inventory_element, ctx) {
@@ -97,13 +110,27 @@ function inventory_draw(inventory_element, ctx) {
 				ctx.fillStyle = "blue";
 			ctx.fillRect(40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size);
 			ctx.globalAlpha = 1.0;
-			item_icon_draw(ctx, inv.items[i][j], 40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size, inv.animation_state);
+		}
+	}
+	for(let i = 0; i < inv.items.length; i++) {
+		for(let j = 0; j < inv.items[i].length; j++) {
+			let icon_x = 40 + (inv.slot_size * 1.05) * j;
+			let icon_y = 40 + (inv.slot_size * 1.05) * i;
+			let icon_size = inv.slot_size;
+			if(inv.imove == i && inv.jmove == j) {
+				icon_x = inventory_element.game.input.mouse.x / get_scale();
+				icon_y = inventory_element.game.input.mouse.y / get_scale();
+				icon_size *= 0.75;
+			}
+			item_icon_draw(ctx, inv.items[i][j], icon_x, icon_y, icon_size, icon_size, inv.animation_state);
 		}
 	}
 }
 
 function inventory_drop_item(inventory_element, i, j, death=false) {
 	if(!inventory_element.data.attached_to_object || !inventory_element.data.attached_to_object.data.body)
+		return;
+	if(i < 0 || j < 0)
 		return;
 	if(inventory_element.data.items[i][j] == 0)
 		return;
@@ -181,6 +208,20 @@ function hotbar_draw(hotbar_object, ctx) {
 }
 
 function hotbar_get_selected_item(hotbar_element) {
+	if(!hotbar_element.shown) {
+		if(hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {
+			let inv = hotbar_element.data.attached_to_object.data.inventory_element.data;
+			if(inv.jmove > -1 && inv.imove > -1) {
+				//if((ITEMS_GUNS.concat(ITEMS_MELEE)).includes(inv.items[inv.imove][inv.jmove])) {
+					if(inv.iselected == -1 && inv.jselected == -1)
+						return inv.items[inv.imove][inv.jmove];
+				//} else if(inv.imove == inv.iselected && inv.jmove == inv.jselected) {
+				//	return inv.items[inv.imove][inv.jmove];
+				//}
+			}
+		}
+		return 0;
+	}
 	return hotbar_element.data.row[hotbar_element.data.iselected];
 }
 
@@ -212,6 +253,11 @@ function inventory_count_item(inventory_element, id) {
 }
 
 function inventory_clear_item(inventory_element, id, count, item_i=-1, item_j=-1) {
+
+	if(item_i == inventory_element.data.imove && item_j == inventory_element.data.jmove) {
+		inventory_element.data.imove = -1;
+		inventory_element.data.jmove = -1;
+	}
 
 	if(item_i > -1 && item_j > -1 && inventory_element.data.items[item_i][item_j] == id) {
 		inventory_element.data.items[item_i][item_j] = 0

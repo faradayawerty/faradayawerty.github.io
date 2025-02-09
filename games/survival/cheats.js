@@ -13,6 +13,7 @@ function cheat_all_weapons() {
 	item_create(game1, ITEM_ROCKET_SHOTGUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_RAINBOW_PISTOLS, 1250, 1250, false, false);
 	item_create(game1, ITEM_LASER_GUN, 1250, 1250, false, false);
+	item_create(game1, ITEM_HORN, 1250, 1250, false, false);
 }
 
 function cheat_supplies() {

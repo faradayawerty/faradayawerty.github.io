@@ -437,6 +437,8 @@ function player_update(player_object, dt) {
 		|| isKeyDown(player_object.game.input, 'ш', true)) {
 		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
 		p.inventory_element.shown = !p.inventory_element.shown;
+		p.inventory_element.data.imove = -1;
+		p.inventory_element.data.jmove = -1;
 		p.hotbar_element.shown = !p.hotbar_element.shown;
 		if(p.achievements_element.shown)
 			p.hotbar_element.shown = false;
@@ -465,12 +467,13 @@ function player_update(player_object, dt) {
 		p.achievements_element.shown = false;
 	}
 
-	if(p.inventory_element.shown == false && p.hotbar_element.shown == true && player_object.game.input.mouse.leftButtonPressed)
+	if(player_object.game.input.mouse.leftButtonPressed)
 		player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
 
 	let vel = Matter.Vector.create(0, 0);
 
-	if(!p.inventory_element.shown && !p.achievements_element.shown && !p.car_object) {
+	//if(!p.inventory_element.shown && !p.achievements_element.shown && !p.car_object) {
+	if(!p.car_object) {
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
 
@@ -546,21 +549,21 @@ function player_update(player_object, dt) {
 			player_shoot(player_object, dt);
 			if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
 				achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
-		} else if(player_object.game.input.joystick.left.dx != 0 || player_object.game.input.joystick.left.dy != 0) {
-			player_shoot(player_object, dt,
-				game_object_find_closest(player_object.game,
-					player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.dx,
-					player_object.data.body.position.y + 50 * player_object.game.input.joystick.left.dy,
-					"enemy", 300),
-				player_object.game.input.joystick.left.dx,
-				player_object.game.input.joystick.left.dy				
-			);
+		//} else if(player_object.game.input.joystick.left.dx != 0 || player_object.game.input.joystick.left.dy != 0) {
+		//	player_shoot(player_object, dt,
+		//		game_object_find_closest(player_object.game,
+		//			player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.dx,
+		//			player_object.data.body.position.y + 50 * player_object.game.input.joystick.left.dy,
+		//			"enemy", 300),
+		//		player_object.game.input.joystick.left.dx,
+		//		player_object.game.input.joystick.left.dy				
+		//	);
 		} else {
 			p.laser_sound_has_played = false;
 			p.sword_protection = false;
 		}
 
-		if(isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true))
+		if(p.hotbar_element.shown && (isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true)))
 			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
 
 		if(Matter.Vector.magnitude(vel) > 0)
@@ -569,7 +572,8 @@ function player_update(player_object, dt) {
 		Matter.Body.setVelocity(p.body, vel);
 	}
 
-	if(!p.inventory_element.shown && !p.achievements_element.shown && p.car_object) {
+	//if(!p.inventory_element.shown && !p.achievements_element.shown && p.car_object) {
+	if(p.car_object) {
 		if(player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
 			let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
 			if(closest_item && closest_item.data.id == ITEM_FUEL)
@@ -1358,13 +1362,17 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 function player_item_consume(player_object, id, anywhere=false) {
 	let p = player_object.data;
 
+	let item_i = -1;
+	let item_j = -1;
 
-	let item_i = 0;
-	let item_j = player_object.data.hotbar_element.data.iselected;
+	if(!anywhere && p.hotbar_element.shown) {
+		item_i = 0;
+		item_j = player_object.data.hotbar_element.data.iselected;
+	}
 
-	if(anywhere) {
-		item_i = -1;
-		item_j = -1;
+	if(!anywhere && p.inventory_element.shown) {
+		item_i = p.inventory_element.data.imove;
+		item_j = p.inventory_element.data.jmove;
 	}
 
 	if(id == ITEM_FUEL && true) {
@@ -1372,7 +1380,8 @@ function player_item_consume(player_object, id, anywhere=false) {
 		if(c) {
 			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.0625 + 0.0625));
 			c.data.health += Math.min(c.data.max_health - c.data.health, c.data.max_health * (Math.random() * 0.0625 + 0.0625));
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			//p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 			achievement_do(p.achievements_element.data.achievements, "fuel up", p.achievements_shower_element);
 		}
 	}
@@ -1383,14 +1392,16 @@ function player_item_consume(player_object, id, anywhere=false) {
 		if(ao) {
 			enemy_create(ao.game, ao.data.body.position.x, ao.data.body.position.y, true, false, ao.data.type);
 			animal_destroy(ao, false);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			//p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		} else {
 			eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 500);
 		}
 		if(eo) {
 			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position.y, true, false, eo.data.type);
 			enemy_destroy(eo);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			//p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		}
 	}
 
