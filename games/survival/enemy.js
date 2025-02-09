@@ -338,7 +338,7 @@ function enemy_update(enemy_object, dt) {
 					for(let i = 0; i < N; i++) {
 						let theta =  Math.PI * (i/N - 1/2);
 						bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
-							dx + Math.cos(theta), dy + Math.sin(theta), 25, e.damage * 10, true, e.w * 0.075, 2000,
+							dx + Math.cos(theta), dy + Math.sin(theta), 25, e.damage, true, e.w * 0.075, 2000,
 							"red", "pink");
 					}
 					e.shooting_delay = 0;
