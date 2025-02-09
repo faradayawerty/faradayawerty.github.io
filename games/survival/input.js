@@ -59,9 +59,9 @@ function isKeyDown(input, key, read_once=false) {
 
 function keyHandler(keys, e) {
 	if(e.type === 'keyup')
-		keys.down[e.key] = false;
+		keys.down[e.key.toLowerCase()] = false;
 	else
-		keys.down[e.key] = true;
+		keys.down[e.key.toLowerCase()] = true;
 }
 
 function mouseHandler(mouse, ctx, e) {

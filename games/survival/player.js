@@ -560,7 +560,7 @@ function player_update(player_object, dt) {
 			p.sword_protection = false;
 		}
 
-		if(isKeyDown(player_object.game.input, 'q', true))
+		if(isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true))
 			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
 
 		if(Matter.Vector.magnitude(vel) > 0)
@@ -1378,18 +1378,18 @@ function player_item_consume(player_object, id, anywhere=false) {
 	}
 
 	if(id == ITEM_BOSSIFIER && true) {
-		let ao = null;
-		let eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 500);
-		if(eo) {
-			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position.y, true, false, eo.data.type);
-			enemy_destroy(eo, false);
-			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
-		} else {
-			ao = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 500);
-		}
+		let eo = null;
+		let ao = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 500);
 		if(ao) {
 			enemy_create(ao.game, ao.data.body.position.x, ao.data.body.position.y, true, false, ao.data.type);
-			animal_destroy(ao);
+			animal_destroy(ao, false);
+			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+		} else {
+			eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 500);
+		}
+		if(eo) {
+			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position.y, true, false, eo.data.type);
+			enemy_destroy(eo);
 			p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
 		}
 	}

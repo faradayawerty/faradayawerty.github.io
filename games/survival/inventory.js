@@ -62,7 +62,7 @@ function inventory_update(inventory_element, dt) {
 		inv.jselected++;
 	if(isKeyDown(inventory_element.game.input, 'a', true) && inv.jselected > 0)
 		inv.jselected--;
-	if(isKeyDown(inventory_element.game.input, 'Enter', true))
+	if(isKeyDown(inventory_element.game.input, 'enter', true))
 		if(inv.imove < 0 && inv.jmove < 0) {
 			inv.imove = inv.iselected;
 			inv.jmove = inv.jselected;
