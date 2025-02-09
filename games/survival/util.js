@@ -1,6 +1,6 @@
 
 function drawButton(ctx, x, y, text) {
-	ctx.font = "36px verdana";
+	ctx.font = "36px sans";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
 	ctx.fillStyle = 'white';
@@ -8,7 +8,7 @@ function drawButton(ctx, x, y, text) {
 }
 
 function drawText(ctx, x, y, text, fontsize=18) {
-	ctx.font = fontsize + "px verdana";
+	ctx.font = fontsize + "px sans";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
 	ctx.fillStyle = 'white';
@@ -16,7 +16,7 @@ function drawText(ctx, x, y, text, fontsize=18) {
 }
 
 function drawHint(ctx, x, y, text) {
-	ctx.font = "8px verdana";
+	ctx.font = "8px sans";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
 	ctx.fillStyle = 'white';

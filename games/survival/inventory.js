@@ -114,17 +114,19 @@ function inventory_draw(inventory_element, ctx) {
 	}
 	for(let i = 0; i < inv.items.length; i++) {
 		for(let j = 0; j < inv.items[i].length; j++) {
+			if(inv.imove == i && inv.jmove == j)
+				continue;
 			let icon_x = 40 + (inv.slot_size * 1.05) * j;
 			let icon_y = 40 + (inv.slot_size * 1.05) * i;
 			let icon_size = inv.slot_size;
-			if(inv.imove == i && inv.jmove == j) {
-				icon_x = inventory_element.game.input.mouse.x / get_scale();
-				icon_y = inventory_element.game.input.mouse.y / get_scale();
-				icon_size *= 0.75;
-			}
 			item_icon_draw(ctx, inv.items[i][j], icon_x, icon_y, icon_size, icon_size, inv.animation_state);
 		}
 	}
+	let icon_x = inventory_element.game.input.mouse.x / get_scale();
+	let icon_y = inventory_element.game.input.mouse.y / get_scale();
+	let icon_size = inv.slot_size * 0.75;
+	if(inv.imove > -1 && inv.jmove > -1)
+		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], icon_x, icon_y, icon_size, icon_size, inv.animation_state);
 }
 
 function inventory_drop_item(inventory_element, i, j, death=false) {
