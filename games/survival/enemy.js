@@ -704,9 +704,9 @@ function enemy_draw(enemy_object, ctx) {
 				ctx.stroke();
 			}
 		}
-		if(e.type == "deer")
-			animal_deer_draw_horns(ctx, e.body.position.x, e.body.position.y, e.w, e.h);
 	}
+	if(e.type == "deer")
+		animal_deer_draw_horns(ctx, e.body.position.x, e.body.position.y, e.w, e.h);
 }
 
 function enemy_boss_exists(g) {
