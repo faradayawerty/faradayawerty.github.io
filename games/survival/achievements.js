@@ -35,9 +35,9 @@ function achievements_create(g) {
 			},
 			{
 				name: "full inventory",
-				desc: "fill up the inventory with items fully",
+				desc: "fill up the inventory with items fully; hint: use Q to drop an item from the inventory",
 				name_rus: "полный инвентарь",
-				desc_rus: "полностью заполните инвентарь предметами",
+				desc_rus: "полностью заполните инвентарь предметами; подсказка: используйте Q, чтобы выбросить предмет из инвентаря",
 				req: "discovering inventory",
 				done: false
 			},
