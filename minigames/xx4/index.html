@@ -129,8 +129,8 @@
 		let COLOR_RESTART_SELECTED = "#ff7777";
 		let COLOR_ENDMOVE_DEFAULT = "#ffff11";
 		let COLOR_ENDMOVE_SELECTED = "#ffff77";
-		let COLOR_PLUS_DEFAULT = "#33ff33";
-		let COLOR_PLUS_SELECTED = "#77ff7";
+		let COLOR_PLUS_DEFAULT = "#117777";
+		let COLOR_PLUS_SELECTED = "#339999";
 
 		let TURN_PLAYER = 1;
 		let TURN_COMPUTER = 2;
@@ -174,7 +174,7 @@
 			can_make_turns: 2,
 			made_turns: 0,
 			turn_finished: false,
-			unit: 32
+			unit: 60
 		};
 
 		function check_defeat() {
@@ -229,16 +229,20 @@
 
 			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 2 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 2) {
 				game_state.color_plus = COLOR_PLUS_SELECTED;
-				if(input1.mouse.leftButtonPressed)
+				if(input1.mouse.leftButtonPressed) {
 					game_state.unit *= 1.25;
+					input1.mouse.leftButtonPressed = false;
+				}
 			} else {
 				game_state.color_plus = COLOR_PLUS_DEFAULT;
 			}
 
 			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 3 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 3) {
 				game_state.color_minus = COLOR_PLUS_SELECTED;
-				if(input1.mouse.leftButtonPressed)
+				if(input1.mouse.leftButtonPressed) {
 					game_state.unit *= 1 / 1.25;
+					input1.mouse.leftButtonPressed = false;
+				}
 			} else {
 				game_state.color_minus = COLOR_PLUS_DEFAULT;
 			}
@@ -254,6 +258,7 @@
 					game_state.paused = false;
 					game_state.can_make_turns = 2;
 					game_state.made_turns = 0;
+					input1.mouse.leftButtonPressed = false;
 				}
 			} else {
 				game_state.color_restart = COLOR_RESTART_DEFAULT;
@@ -267,6 +272,7 @@
 						game_state.can_make_turns = 2;
 						game_state.made_turns = 0;
 						game_state.turn_finished = true;
+						input1.mouse.leftButtonPressed = false;
 					}
 				} else {
 					game_state.color_endmove = COLOR_ENDMOVE_DEFAULT;
@@ -343,6 +349,7 @@
 									game_state.made_turns = 0;
 									game_state.turn_finished = true;
 								}
+								input1.mouse.leftButtonPressed = false;
 							}
 						}
 					}
