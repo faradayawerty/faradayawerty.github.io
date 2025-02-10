@@ -177,7 +177,7 @@
 			can_make_turns: 2,
 			made_turns: 0,
 			turn_finished: false,
-			unit: Math.min(window.innerWidth, window.innerHeight) * 0.15,
+			unit: window.innerWidth > window.innerHeight ? window.innerHeight * 0.15 : window.innerWidth * 0.165,
 			debug: [],
 			mobile: false,
 			pvp: false,
