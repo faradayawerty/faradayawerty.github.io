@@ -174,7 +174,8 @@
 			can_make_turns: 2,
 			made_turns: 0,
 			turn_finished: false,
-			unit: 60
+			unit: 60,
+			debug: []
 		};
 
 		function check_defeat() {
@@ -321,8 +322,12 @@
 				game_state.turn_finished = false;
 			}
 
+			game_state.debug.unshift("paused: " + game_state.paused);
+			game_state.debug.unshift("turn: " + game_state.turn);
+			game_state.debug.unshift("lmb: " + input1.mouse.leftButtonPressed);
+
 			if(!game_state.paused) {
-				if(game_state.turn == TURN_COMPUTER && !(input1.mouse.leftButtonPressed || input1.touch.length > 0)) {
+				if(game_state.turn == TURN_COMPUTER && !input1.mouse.leftButtonPressed) {
 
 					// shit code but it works for now
 					for(let k = 0; k < 10; k++) {
@@ -410,6 +415,9 @@
 				draw_square(ctx, 0.5 * unit + unit * 0, 0.5 * unit + unit * 5, unit * 4 - 0.2 * unit, 0.8 * unit, "#7711ff", 64);
 				drawText(ctx, 0.7 * unit, 6 * unit, game_state.text, Math.floor(0.36 * unit));
 			}
+
+			for(let i = 0; i < game_state.debug.length; i++)
+				drawText(ctx, 0.7 * unit, 7 * unit + 0.3 * unit * i, game_state.debug[i], Math.floor(0.2 * unit));
 		};
 
 		function animate(lastUpdateTime) {
