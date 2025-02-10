@@ -129,8 +129,6 @@
 		let COLOR_RESTART_SELECTED = "#ff7777";
 		let COLOR_ENDMOVE_DEFAULT = "#ffff11";
 		let COLOR_ENDMOVE_SELECTED = "#ffff77";
-		let COLOR_PLUS_DEFAULT = "#33ff33";
-		let COLOR_PLUS_SELECTED = "#77ff7";
 
 		let TURN_PLAYER = 1;
 		let TURN_COMPUTER = 2;
@@ -164,8 +162,6 @@
 			],
 			color_restart: COLOR_RESTART_DEFAULT,
 			color_endmove: COLOR_ENDMOVE_DEFAULT,
-			color_plus: COLOR_PLUS_DEFAULT,
-			color_minus: COLOR_PLUS_DEFAULT,
 			turn: TURN_PLAYER,
 			text: "",
 			score_player: 0,
@@ -174,7 +170,7 @@
 			can_make_turns: 2,
 			made_turns: 0,
 			turn_finished: false,
-			unit: 32
+			unit: 75
 		};
 
 		function check_defeat() {
@@ -225,22 +221,6 @@
 				input1.mouse.x = input1.touch[0].x;
 				input1.mouse.y = input1.touch[0].y;
 				input1.mouse.leftButtonPressed = true;
-			}
-
-			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 2 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 2) {
-				game_state.color_plus = COLOR_PLUS_SELECTED;
-				if(input1.mouse.leftButtonPressed)
-					game_state.unit *= 1.25;
-			} else {
-				game_state.color_plus = COLOR_PLUS_DEFAULT;
-			}
-
-			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 3 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 3) {
-				game_state.color_minus = COLOR_PLUS_SELECTED;
-				if(input1.mouse.leftButtonPressed)
-					game_state.unit *= 1 / 1.25;
-			} else {
-				game_state.color_minus = COLOR_PLUS_DEFAULT;
 			}
 
 			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 0 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 0) {
@@ -365,10 +345,10 @@
 			drawText(ctx, 0.65 * unit + unit * 4, 0.95 * unit, "restart", Math.floor(0.16 * unit));
 
 
-			draw_square(ctx, 0.5 * unit + unit * 4, 0.5 * unit + unit * 2, 0.8 * unit, 0.8 * unit, game_state.color_plus, 8);
-			drawText(ctx, 0.775 * unit + unit * 4, 1 * unit + unit * 2, "+", Math.floor(0.36 * unit));
-			draw_square(ctx, 0.5 * unit + unit * 4, 0.5 * unit + unit * 3, 0.8 * unit, 0.8 * unit, game_state.color_minus, 8);
-			drawText(ctx, 0.825 * unit + unit * 4, 1 * unit + unit * 3, "-", Math.floor(0.36 * unit));
+			draw_square(ctx, 0.5 * unit + unit * 4, 0.5 * unit + unit * 2, 0.8 * unit, 0.8 * unit, game_state.color_restart, 8);
+			drawText(ctx, 0.75 * unit + unit * 4, 1.05 * unit + unit * 2, "+", Math.floor(0.36 * unit));
+			draw_square(ctx, 0.5 * unit + unit * 4, 0.5 * unit + unit * 3, 0.8 * unit, 0.8 * unit, game_state.color_restart, 8);
+			drawText(ctx, 0.75 * unit + unit * 4, 1.05 * unit + unit * 3, "-", Math.floor(0.36 * unit));
 
 			if(game_state.turn == TURN_PLAYER && game_state.can_make_turns == 1) {
 				draw_square(ctx, 0.5 * unit + unit * 4, 0.5 * unit + unit * 1, 0.8 * unit, 0.8 * unit, game_state.color_endmove, 8);
