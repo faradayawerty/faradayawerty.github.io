@@ -241,6 +241,7 @@
 				input1.mouse.y = 0;
 				input1.mouse.leftButtonPressed = false;
 				game_state.touches = true;
+				game_state.debug.unshift("set touches LOL: " + game_state.touches);
 			}
 
 			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 2 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 2) {
