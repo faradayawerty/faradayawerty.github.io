@@ -279,8 +279,10 @@
 						game_state.can_make_turns = 2;
 						game_state.made_turns = 0;
 						game_state.pvp = !game_state.pvp;
-						if(game_state.pvp)
+						if(game_state.pvp) {
 							game_state.turn_player = 1;
+							game_state.turn = TURN_PLAYER;
+						}
 						input1.mouse.leftButtonPressed = false;
 						game_state.touches = false;
 					}
@@ -300,8 +302,10 @@
 					game_state.paused = false;
 					game_state.can_make_turns = 2;
 					game_state.made_turns = 0;
-					if(game_state.pvp)
+					if(game_state.pvp) {
 						game_state.turn_player = 1;
+						game_state.turn = TURN_PLAYER;
+					}
 					input1.mouse.leftButtonPressed = false;
 					game_state.touches = false;
 				}
