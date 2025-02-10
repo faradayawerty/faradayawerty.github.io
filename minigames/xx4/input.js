@@ -9,14 +9,14 @@ function input_create() {
 			wheelUp: false,
 			wheelDown: false
 		},
-		joystick: {},
+		//joystick: {},
 		touch: []
 	};
 }
 
 function getWishDir(input) {
-	if(input.touch.length > 0)
-		return {x: input.joystick.right.dx, y: input.joystick.right.dy}
+	//if(input.touch.length > 0)
+	//	return {x: input.joystick.right.dx, y: input.joystick.right.dy}
 
 	let vel = Matter.Vector.create(0, 0);
 
@@ -119,38 +119,38 @@ function touchHandler(touch, joystick, ctx, e) {
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
 
-	joystick.radius = Math.min(w / 16, h / 16);
+	//joystick.radius = Math.min(w / 16, h / 16);
 
-	joystick.left.x = w / 6;
-	joystick.left.y = 5 * h / 6;
-	joystick.right.x = 5 * w / 6;
-	joystick.right.y = 5 * h / 6;
+	//joystick.left.x = w / 6;
+	//joystick.left.y = 5 * h / 6;
+	//joystick.right.x = 5 * w / 6;
+	//joystick.right.y = 5 * h / 6;
 
-	joystick.left.dx = 0;
-	joystick.left.dy = 0;
-	joystick.right.dx = 0;
-	joystick.right.dy = 0;
+	//joystick.left.dx = 0;
+	//joystick.left.dy = 0;
+	//joystick.right.dx = 0;
+	//joystick.right.dy = 0;
 
-	for (let i = 0; i < touch.length; i++) {
-		if (touch[i].x < w / 2 && touch[i].y > h / 2) {
-			joystick.left.dx = -joystick.left.x + touch[i].x;
-			joystick.left.dy = -joystick.left.y + touch[i].y;
-			offset = Math.sqrt(joystick.left.dx * joystick.left.dx + joystick.left.dy * joystick.left.dy);
-			if (offset <= 0)
-				continue;
-			joystick.left.dx = joystick.left.dx / offset;
-			joystick.left.dy = joystick.left.dy / offset;
-		}
-		if (touch[i].x > w / 2 && touch[i].y > h / 2) {
-			joystick.right.dx = -joystick.right.x + touch[i].x;
-			joystick.right.dy = -joystick.right.y + touch[i].y;
-			offset = Math.sqrt(joystick.right.dx * joystick.right.dx + joystick.right.dy * joystick.right.dy);
-			if (offset <= 0)
-				continue;
-			joystick.right.dx = joystick.right.dx / offset;
-			joystick.right.dy = joystick.right.dy / offset;
-		}
-	}
+	//for (let i = 0; i < touch.length; i++) {
+	//	if (touch[i].x < w / 2 && touch[i].y > h / 2) {
+	//		joystick.left.dx = -joystick.left.x + touch[i].x;
+	//		joystick.left.dy = -joystick.left.y + touch[i].y;
+	//		offset = Math.sqrt(joystick.left.dx * joystick.left.dx + joystick.left.dy * joystick.left.dy);
+	//		if (offset <= 0)
+	//			continue;
+	//		joystick.left.dx = joystick.left.dx / offset;
+	//		joystick.left.dy = joystick.left.dy / offset;
+	//	}
+	//	if (touch[i].x > w / 2 && touch[i].y > h / 2) {
+	//		joystick.right.dx = -joystick.right.x + touch[i].x;
+	//		joystick.right.dy = -joystick.right.y + touch[i].y;
+	//		offset = Math.sqrt(joystick.right.dx * joystick.right.dx + joystick.right.dy * joystick.right.dy);
+	//		if (offset <= 0)
+	//			continue;
+	//		joystick.right.dx = joystick.right.dx / offset;
+	//		joystick.right.dy = joystick.right.dy / offset;
+	//	}
+	//}
 }
 
 function initializeTouchInput(touch, joystick, ctx) {
