@@ -232,6 +232,10 @@
 				if(input1.mouse.leftButtonPressed) {
 					game_state.unit *= 1.25;
 					input1.mouse.leftButtonPressed = false;
+					if(input1.touch.length > 0) {
+						input1.mouse.x = 0;
+						input1.mouse.y = 0;
+					}
 				}
 			} else {
 				game_state.color_plus = COLOR_PLUS_DEFAULT;
@@ -242,6 +246,10 @@
 				if(input1.mouse.leftButtonPressed) {
 					game_state.unit *= 1 / 1.25;
 					input1.mouse.leftButtonPressed = false;
+					if(input1.touch.length > 0) {
+						input1.mouse.x = 0;
+						input1.mouse.y = 0;
+					}
 				}
 			} else {
 				game_state.color_minus = COLOR_PLUS_DEFAULT;
@@ -259,6 +267,10 @@
 					game_state.can_make_turns = 2;
 					game_state.made_turns = 0;
 					input1.mouse.leftButtonPressed = false;
+					if(input1.touch.length > 0) {
+						input1.mouse.x = 0;
+						input1.mouse.y = 0;
+					}
 				}
 			} else {
 				game_state.color_restart = COLOR_RESTART_DEFAULT;
@@ -273,6 +285,10 @@
 						game_state.made_turns = 0;
 						game_state.turn_finished = true;
 						input1.mouse.leftButtonPressed = false;
+						if(input1.touch.length > 0) {
+							input1.mouse.x = 0;
+							input1.mouse.y = 0;
+						}
 					}
 				} else {
 					game_state.color_endmove = COLOR_ENDMOVE_DEFAULT;
@@ -350,6 +366,10 @@
 									game_state.turn_finished = true;
 								}
 								input1.mouse.leftButtonPressed = false;
+								if(input1.touch.length > 0) {
+									input1.mouse.x = 0;
+									input1.mouse.y = 0;
+								}
 							}
 						}
 					}
