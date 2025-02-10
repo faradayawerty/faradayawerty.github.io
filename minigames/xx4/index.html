@@ -451,9 +451,9 @@
 
 			draw_square(ctx, 0.5 * unit + unit * 4, 0.5 * unit + unit * 4, 0.8 * unit, 0.8 * unit, game_state.color_pvp, 8);
 
-			let pvptext = "pve";
+			let pvptext = "PvC";
 			if(game_state.pvp)
-				pvptext = "pvp";
+				pvptext = "PvP";
 			drawText(ctx, 0.675 * unit + unit * 4, 0.95 * unit + unit * 4, pvptext, Math.floor(0.24 * unit));
 
 			if(game_state.turn == TURN_PLAYER && game_state.can_make_turns == 1) {
