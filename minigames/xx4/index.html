@@ -241,7 +241,6 @@
 				input1.mouse.y = 0;
 				input1.mouse.leftButtonPressed = false;
 				game_state.touches = true;
-				game_state.debug.unshift("set touches LOL: " + game_state.touches);
 			}
 
 			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 2 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 2) {
@@ -267,26 +266,6 @@
 			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 4 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 4) {
 				game_state.color_pvp = COLOR_PVP_SELECTED;
 				if(input1.mouse.leftButtonPressed) {
-					for(let i = 0; i < game_state.xx.length; i++) {
-						for(let j = 0; j < game_state.xx[i].length; j++)
-							game_state.xx[i][j].has_x = false;
-					}
-					game_state.text = "";
-					game_state.paused = false;
-					game_state.can_make_turns = 2;
-					game_state.made_turns = 0;
-					game_state.pvp = !game_state.pvp;
-					if(game_state.pvp)
-						game_state.turn_player = 1;
-					input1.mouse.leftButtonPressed = false;
-				}
-			} else {
-				game_state.color_pvp = COLOR_PVP_DEFAULT;
-			}
-
-			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 0 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 0) {
-				game_state.color_restart = COLOR_RESTART_SELECTED;
-				if(input1.mouse.leftButtonPressed) {
 					if(!game_state.mobile || game_state.touches) {
 						for(let i = 0; i < game_state.xx.length; i++) {
 							for(let j = 0; j < game_state.xx[i].length; j++)
@@ -296,12 +275,31 @@
 						game_state.paused = false;
 						game_state.can_make_turns = 2;
 						game_state.made_turns = 0;
+						game_state.pvp = !game_state.pvp;
 						if(game_state.pvp)
 							game_state.turn_player = 1;
 						input1.mouse.leftButtonPressed = false;
 						game_state.touches = false;
-						game_state.debug.unshift("set touches: " + game_state.touches);
 					}
+				}
+			} else {
+				game_state.color_pvp = COLOR_PVP_DEFAULT;
+			}
+
+			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 0 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 0) {
+				game_state.color_restart = COLOR_RESTART_SELECTED;
+				if(input1.mouse.leftButtonPressed) {
+					for(let i = 0; i < game_state.xx.length; i++) {
+						for(let j = 0; j < game_state.xx[i].length; j++)
+							game_state.xx[i][j].has_x = false;
+					}
+					game_state.text = "";
+					game_state.paused = false;
+					game_state.can_make_turns = 2;
+					game_state.made_turns = 0;
+					if(game_state.pvp)
+						game_state.turn_player = 1;
+					input1.mouse.leftButtonPressed = false;
 				}
 			} else {
 				game_state.color_restart = COLOR_RESTART_DEFAULT;
@@ -464,8 +462,8 @@
 				drawText(ctx, 0.7 * unit, 6 * unit, game_state.text, Math.floor(0.36 * unit));
 			}
 
-			for(let i = 0; i < game_state.debug.length; i++)
-				drawText(ctx, 0.7 * unit, 7 * unit + 0.3 * unit * i, game_state.debug[i], Math.floor(0.2 * unit));
+			//for(let i = 0; i < game_state.debug.length; i++)
+			//	drawText(ctx, 0.7 * unit, 7 * unit + 0.3 * unit * i, game_state.debug[i], Math.floor(0.2 * unit));
 		};
 
 		function animate(lastUpdateTime) {
