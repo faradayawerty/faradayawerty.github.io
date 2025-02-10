@@ -175,7 +175,8 @@
 			made_turns: 0,
 			turn_finished: false,
 			unit: 60,
-			debug: []
+			debug: [],
+			mobile: true
 		};
 
 		function check_defeat() {
@@ -226,6 +227,11 @@
 				input1.mouse.x = input1.touch[0].x;
 				input1.mouse.y = input1.touch[0].y;
 				input1.mouse.leftButtonPressed = true;
+				game_state.mobile = true;
+			} else if(game_state.movile) {
+				input1.mouse.x = 0;
+				input1.mouse.y = 0;
+				input1.mouse.leftButtonPressed = false;
 			}
 
 			if(0.5 * unit + unit * 4 < input1.mouse.x && input1.mouse.x < 1.3 * unit + unit * 4 && 0.5 * unit + unit * 2 < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * 2) {
@@ -233,10 +239,6 @@
 				if(input1.mouse.leftButtonPressed) {
 					game_state.unit *= 1.25;
 					input1.mouse.leftButtonPressed = false;
-					if(input1.touch.length > 0) {
-						input1.mouse.x = 0;
-						input1.mouse.y = 0;
-					}
 				}
 			} else {
 				game_state.color_plus = COLOR_PLUS_DEFAULT;
@@ -247,10 +249,6 @@
 				if(input1.mouse.leftButtonPressed) {
 					game_state.unit *= 1 / 1.25;
 					input1.mouse.leftButtonPressed = false;
-					if(input1.touch.length > 0) {
-						input1.mouse.x = 0;
-						input1.mouse.y = 0;
-					}
 				}
 			} else {
 				game_state.color_minus = COLOR_PLUS_DEFAULT;
@@ -268,10 +266,6 @@
 					game_state.can_make_turns = 2;
 					game_state.made_turns = 0;
 					input1.mouse.leftButtonPressed = false;
-					if(input1.touch.length > 0) {
-						input1.mouse.x = 0;
-						input1.mouse.y = 0;
-					}
 				}
 			} else {
 				game_state.color_restart = COLOR_RESTART_DEFAULT;
@@ -286,10 +280,6 @@
 						game_state.made_turns = 0;
 						game_state.turn_finished = true;
 						input1.mouse.leftButtonPressed = false;
-						if(input1.touch.length > 0) {
-							input1.mouse.x = 0;
-							input1.mouse.y = 0;
-						}
 					}
 				} else {
 					game_state.color_endmove = COLOR_ENDMOVE_DEFAULT;
@@ -372,10 +362,6 @@
 									game_state.turn_finished = true;
 								}
 								input1.mouse.leftButtonPressed = false;
-								if(input1.touch.length > 0) {
-									input1.mouse.x = 0;
-									input1.mouse.y = 0;
-								}
 							}
 						}
 					}
