@@ -88,6 +88,11 @@ function inventory_update(inventory_element, dt) {
 			inv.jmove = -1;
 		}
 	}
+	if(inventory_element.game.input.mouse.rightButtonPressed) {
+		inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+		inv.imove = -1;
+		inv.jmove = -1;
+	}
 }
 
 function inventory_draw(inventory_element, ctx) {
@@ -154,7 +159,8 @@ function hotbar_create(g, inv, attached_to_object=null) {
 		row: inv.items[0],
 		slot_size: 50,
 		attached_to_object: attached_to_object,
-		animation_state: 0
+		animation_state: 0,
+		mouse_over: false
 	};
 	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update, hotbar_draw, hotbar_destroy);
 	g.gui_elements[ihotbar].shown = true;
@@ -193,6 +199,17 @@ function hotbar_update(hotbar_element, dt) {
 		hb.iselected = Math.min(8, hb.iselected + 1);
 	if(isMouseWheelDown(hotbar_element.game.input))
 		hb.iselected = Math.max(0, hb.iselected - 1);
+	hb.mouse_over = false;
+	for(let i = 0; i < hb.row.length; i++) {
+		if(40 + (hb.slot_size * 1.05) * i < hotbar_element.game.input.mouse.x / get_scale()
+			&& hotbar_element.game.input.mouse.x / get_scale() < 40 + (hb.slot_size * 1.05) * i + hb.slot_size
+			&& 40 < hotbar_element.game.input.mouse.y / get_scale()
+			&& hotbar_element.game.input.mouse.y / get_scale() < 40 + hb.slot_size) {
+			hb.mouse_over = true;
+			if(hotbar_element.game.input.mouse.leftButtonPressed)
+				hb.iselected = i;
+		}
+	}
 }
 
 function hotbar_draw(hotbar_object, ctx) {
@@ -210,6 +227,8 @@ function hotbar_draw(hotbar_object, ctx) {
 }
 
 function hotbar_get_selected_item(hotbar_element) {
+	if(hotbar_element.data.mouse_over)
+		return 0;
 	if(!hotbar_element.shown) {
 		if(hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {
 			let inv = hotbar_element.data.attached_to_object.data.inventory_element.data;

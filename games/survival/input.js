@@ -6,6 +6,7 @@ function input_create() {
 		},
 		mouse: {
 			leftButtonPressed: false,
+			rightButtonPressed: false,
 			wheelUp: false,
 			wheelDown: false
 		},
@@ -66,6 +67,7 @@ function keyHandler(keys, e) {
 
 function mouseHandler(mouse, ctx, e) {
 	mouse.leftButtonPressed = e.buttons === 1 ? true : false;
+	mouse.rightButtonPressed = e.buttons === 2 ? true : false;
 	if(e.deltaY && e.deltaY > 0)
 		mouse.wheelUp = true;
 	else
