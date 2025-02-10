@@ -177,7 +177,7 @@
 			can_make_turns: 2,
 			made_turns: 0,
 			turn_finished: false,
-			unit: window.innerWidth * 0.05,
+			unit: Math.min(window.innerWidth, window.innerHeight) * 0.15,
 			debug: [],
 			mobile: false,
 			pvp: false,
@@ -295,6 +295,7 @@
 					if(game_state.pvp)
 						game_state.turn_player = 1;
 					input1.mouse.leftButtonPressed = false;
+					input1.touch = [];
 				}
 			} else {
 				game_state.color_restart = COLOR_RESTART_DEFAULT;
