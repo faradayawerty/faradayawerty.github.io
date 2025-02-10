@@ -322,7 +322,7 @@
 			}
 
 			if(!game_state.paused) {
-				if(game_state.turn == TURN_COMPUTER && !input1.mouse.leftButtonPressed) {
+				if(game_state.turn == TURN_COMPUTER && !(input1.mouse.leftButtonPressed || input1.touch.length > 0)) {
 
 					// shit code but it works for now
 					for(let k = 0; k < 10; k++) {
