@@ -408,7 +408,7 @@
 							&& 0.5 * unit + unit * j < input1.mouse.y && input1.mouse.y < 1.3 * unit + unit * j) {
 							game_state.xx[i][j].color = COLOR_SELECTED;
 							game_state.xx[i][j].color_x = COLOR_X_SELECTED;
-							if(input1.mouse.leftButtonPressed && !game_state.xx[i][j].has_x && game_state.turn == TURN_PLAYER) {
+							if(input1.mouse.leftButtonPressed && !game_state.xx[i][j].has_x && game_state.turn == TURN_PLAYER && game_state.touches) {
 								game_state.xx[i][j].has_x = true;
 								game_state.can_make_turns--;
 								game_state.made_turns++;
