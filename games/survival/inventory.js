@@ -227,8 +227,6 @@ function hotbar_draw(hotbar_object, ctx) {
 }
 
 function hotbar_get_selected_item(hotbar_element) {
-	if(hotbar_element.data.mouse_over)
-		return 0;
 	if(!hotbar_element.shown) {
 		if(hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {
 			let inv = hotbar_element.data.attached_to_object.data.inventory_element.data;
@@ -241,6 +239,8 @@ function hotbar_get_selected_item(hotbar_element) {
 				//}
 			}
 		}
+		return 0;
+	} else if(hotbar_element.data.mouse_over) {
 		return 0;
 	}
 	return hotbar_element.data.row[hotbar_element.data.iselected];
