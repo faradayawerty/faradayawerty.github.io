@@ -505,33 +505,33 @@ function player_update(player_object, dt) {
 
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
 		if(closest_item && !closest_item.data.dropped && ITEMS_AMMOS.includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down) {
+			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down || player_object.game.mobile) {
 				item_pickup(p.inventory_element, closest_item);
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
 		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down) {
+			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down) || player_object.game.mobile {
 				item_pickup(p.inventory_element, closest_item);
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
-		} else if(closest_item && !closest_item.data.dropped && [ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(closest_item.data.id)) {
+		} else if(closest_item && !closest_item.data.dropped && [ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(closest_item.data.id)) || player_object.game.mobile {
 			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down) {
 				item_pickup(p.inventory_element, closest_item);
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
-		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) {
+		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) || player_object.game.mobile {
 			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down) {
 				item_pickup(p.inventory_element, closest_item);
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
-		} else if(f_down) {
+		} else if(f_down || player_object.game.mobile) {
 			let did_pickup = item_pickup(p.inventory_element, closest_item);
 			if(did_pickup) {
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 				if(closest_item.data.id == ITEM_GUN)
 					achievement_do(p.achievements_element.data.achievements, "get a gun", p.achievements_shower_element);
 			}
-			if(!did_pickup) {
+			if(!did_pickup && f_down) {
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 				if(p.car_object) {
 					audio_play("data/sfx/car_1.mp3", 0.25);
@@ -718,6 +718,10 @@ function player_draw(player_object, ctx) {
 				my = player_object.game.input.mouse.y;
 				cx = 0.5 * ctx.canvas.width;
 				cy = 0.5 * ctx.canvas.height;		
+				if(player_object.game.mobile) {
+					mx = player_object.game.input.joystick.dx + cx;
+					my = player_object.game.input.joystick.dy + cy;
+				}
 			}
 
 			ctx.strokeStyle = "black";
