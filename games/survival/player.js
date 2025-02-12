@@ -136,6 +136,10 @@ function player_die(player_object) {
 
 function player_update(player_object, dt) {
 
+	player_object.game.debug_console.unshift(
+		"mouse " + player_object.game.input.mouse.x + ":" + player_object.game.input.mouse.y + " lmb: " + player_object.game.input.mouse.leftButtonPressed
+	);
+
 	if(dt < 1000/120 && !player_object || player_object.destroyed || !player_object.data.body)
 		return;
 
@@ -1360,6 +1364,9 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 }
 
 function player_item_consume(player_object, id, anywhere=false) {
+
+	
+
 	let p = player_object.data;
 
 	let item_i = -1;
