@@ -26,8 +26,8 @@ function getShootDir(input) {
 	y = input.mouse.y - 0.5 * window.innerHeight;
 
 	if(input.touch.length > 0) {
-		x = input.joystick.left.x;
-		y = input.joystick.left.y;
+		x = input.joystick.left.dx;
+		y = input.joystick.left.dy;
 	}
 
 	let r = Math.sqrt(x*x + y*y);
