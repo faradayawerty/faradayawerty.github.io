@@ -195,6 +195,10 @@ function game_update(g, dt) {
 	}
 	if(g.debug_console.length > 50)
 		g.debug_console.pop();
+	if(g.input.touch.length > 0) {
+		g.input.mouse.x = g.input.touch[0].x;
+		g.input.mouse.y = g.input.touch[0].y;
+	}
 }
 
 function game_draw(g, ctx) {

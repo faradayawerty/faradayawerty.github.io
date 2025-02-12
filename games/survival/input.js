@@ -176,11 +176,6 @@ function touchHandler(touch, joystick, ctx, e) {
 			joystick.right.dy = joystick.right.dy / offset;
 		}
 	}
-
-	if(input.touch.length > 0) {
-		input.mouse.x = input.touch[0].x;
-		input.mouse.y = input.touch[0].y;
-	}
 }
 
 function initializeTouchInput(touch, joystick, ctx) {
