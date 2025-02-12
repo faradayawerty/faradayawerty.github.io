@@ -198,6 +198,7 @@ function game_update(g, dt) {
 	if(g.input.touch.length > 0) {
 		g.input.mouse.x = g.input.touch[0].x;
 		g.input.mouse.y = g.input.touch[0].y;
+		g.input.mouse.leftButtonPressed = g.input.touch.length > 0;
 	}
 }
 
