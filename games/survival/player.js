@@ -611,6 +611,7 @@ function player_update(player_object, dt) {
 
 		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true)
 			//|| isKeyDown(player_object.game.input, ' ', true)
+			|| player_object.game.input.joystick.left.dx*player_object.game.input.joystick.left.dx + player_object.game.input.joystick.left.dy*player_object.game.input.joystick.left.dy > 0
 			|| isKeyDown(player_object.game.input, ' ', true)) {
 			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
 			p.car_object = null;
