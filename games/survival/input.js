@@ -71,7 +71,7 @@ function isMouseWheelDown(input) {
 function isMouseLeftButtonPressed(input) {
 	let val = input.mouse.leftButtonPressed;
 	input.mouse.leftButtonPressed = false;
-	return val;
+	return val || input.touch.length > 0;
 }
 
 function isKeyDown(input, key, read_once=false) {
@@ -175,6 +175,11 @@ function touchHandler(touch, joystick, ctx, e) {
 			joystick.right.dx = joystick.right.dx / offset;
 			joystick.right.dy = joystick.right.dy / offset;
 		}
+	}
+
+	if(input.touch.length > 0) {
+		input.mouse.x = input.touch[0].x;
+		input.mouse.y = input.touch[0].y;
 	}
 }
 
