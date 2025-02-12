@@ -161,7 +161,7 @@ function game_update(g, dt) {
 	g.level_set_delay += dt;
 	if(!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
-		g.scale *= 0.25;
+		g.scale *= 0.5;
 	}
 	if(isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
