@@ -136,6 +136,14 @@ function player_die(player_object) {
 
 function player_update(player_object, dt) {
 
+
+	let mouse_last_x = player_object.game.input.mouse.x;
+	let mouse_last_y = player_object.game.input.mouse.y;
+	if(player_object.game.input.touch.length > 0) {
+		player_object.game.input.mouse.x = player_object.game.input.touch[0].x;
+		player_object.game.input.mouse.y = player_object.game.input.touch[0].y;
+	}
+
 	if(dt < 1000/120 && !player_object || player_object.destroyed || !player_object.data.body)
 		return;
 
@@ -607,6 +615,9 @@ function player_update(player_object, dt) {
 			p.car_object = null;
 		}
 	} 
+
+	player_object.game.input.mouse.x = mouse_last_x;
+	player_object.game.input.mouse.y = mouse_last_y;
 }
 
 function player_draw(player_object, ctx) {
