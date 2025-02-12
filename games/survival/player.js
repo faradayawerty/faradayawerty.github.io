@@ -546,7 +546,7 @@ function player_update(player_object, dt) {
 		}
 
 		if(player_object.game.input.mouse.leftButtonPressed) {
-			player_shoot(player_object, dt);
+			player_shoot(player_object, dt, null, getShootDir(player_object.game.input).x, getShootDir(player_object.game.input).y);
 			if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
 				achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
 		//} else if(player_object.game.input.joystick.left.dx != 0 || player_object.game.input.joystick.left.dy != 0) {
@@ -873,9 +873,9 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 		tx = player_object.game.input.mouse.x
 		ty = player_object.game.input.mouse.y
 		if(shoot_dir_x)
-			tx = shoot_dir_x;
+			tx = shoot_dir_x + sx;
 		if(shoot_dir_y)
-			ty = shoot_dir_y;
+			ty = shoot_dir_y + sy;
 	}
 
 	if(target_body) {

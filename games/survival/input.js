@@ -15,6 +15,29 @@ function input_create() {
 	};
 }
 
+function getShootDir(input) {
+
+	let R = 100;
+
+	let x = 0;
+	let y = 0;
+
+	x = input.mouse.x - 0.5 * window.innerWidth;
+	y = input.mouse.y - 0.5 * window.innerHeight;
+
+	if(input.touch.length > 0) {
+		x = input.joystick.left.x;
+		y = input.joystick.left.y;
+	}
+
+	let r = Math.sqrt(x*x + y*y);
+
+	x = R * x / r;
+	y = R * y / r;
+
+	return {x: x, y: y};
+}
+
 function getWishDir(input) {
 	if(input.touch.length > 0)
 		return {x: input.joystick.right.dx, y: input.joystick.right.dy}
