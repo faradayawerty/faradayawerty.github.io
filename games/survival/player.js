@@ -510,17 +510,17 @@ function player_update(player_object, dt) {
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
 		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down) || player_object.game.mobile {
+			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down || player_object.game.mobile) {
 				item_pickup(p.inventory_element, closest_item);
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
-		} else if(closest_item && !closest_item.data.dropped && [ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(closest_item.data.id)) || player_object.game.mobile {
-			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down) {
+		} else if(closest_item && !closest_item.data.dropped && [ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(closest_item.data.id) || player_object.game.mobile) {
+			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down || player_object.game.mobile) {
 				item_pickup(p.inventory_element, closest_item);
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
-		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) || player_object.game.mobile {
-			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down) {
+		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) {
+			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down || player_object.game.mobile) {
 				item_pickup(p.inventory_element, closest_item);
 				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 			}
