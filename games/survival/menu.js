@@ -15,7 +15,7 @@ function menu_create() {
 		want_ammo_pickup_last: true,
 		want_lose_items: true,
 		want_respawn_here: true,
-		want_debug: true,
+		want_debug: false,
 		want_save: false,
 		want_load: false,
 		want_indicators: {

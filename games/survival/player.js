@@ -501,7 +501,7 @@ function player_update(player_object, dt) {
 
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true)
 			|| isKeyDown(player_object.game.input, ' ', true)
-			|| player_object.game.input.touch.length > 0;
+			|| player_object.game.input.joystick.left.dx*player_object.game.input.joystick.left.dx + player_object.game.input.joystick.left.dy*player_object.game.input.joystick.left.dy > 0;
 
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
 		if(closest_item && !closest_item.data.dropped && ITEMS_AMMOS.includes(closest_item.data.id)) {
