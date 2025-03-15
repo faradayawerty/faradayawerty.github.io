@@ -17,7 +17,7 @@ function input_create() {
 
 function getShootDir(input) {
 
-	let R = 100;
+	let R = 600;
 
 	let x = 0;
 	let y = 0;

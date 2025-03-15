@@ -136,9 +136,9 @@ function player_die(player_object) {
 
 function player_update(player_object, dt) {
 
-	player_object.game.debug_console.unshift(
-		"mouse " + player_object.game.input.mouse.x + ":" + player_object.game.input.mouse.y + " lmb: " + player_object.game.input.mouse.leftButtonPressed
-	);
+	//player_object.game.debug_console.unshift(
+	//	"mouse " + player_object.game.input.mouse.x + ":" + player_object.game.input.mouse.y + " lmb: " + player_object.game.input.mouse.leftButtonPressed
+	//);
 
 	if(dt < 1000/120 && !player_object || player_object.destroyed || !player_object.data.body)
 		return;
