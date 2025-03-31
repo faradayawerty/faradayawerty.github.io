@@ -187,7 +187,8 @@ function enemy_destroy(enemy_object, death=true) {
 		g.enemy_kills[enemy_object.data.type] += 1;
 		g.debug_console.unshift("killed " + enemy_object.data.type + ": " + g.enemy_kills[enemy_object.data.type]);
 		if(enemy_object.data.boss) {
-			g.kills_for_boss = Math.max(16, g.kills_for_boss);
+			if(!g.enemies[(g.enemies.indexOf(enemy_object.data.type) + 1) % g.enemies.length])
+				g.kills_for_boss = Math.max(16, g.kills_for_boss);
 			g.boss_kills += 1;
 			if(enemy_object.data.type == "regular")
 				g.enemies["shooting"] = true;
