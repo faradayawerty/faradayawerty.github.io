@@ -1,0 +1,93 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>medieval alien invasion</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			height: 100%;
+			overflow: hidden;
+		}
+		#fps {
+			position: absolute;
+			top: 1px;
+			left: 1px;
+			background: rgba(0, 0, 0, 0.1);
+			color: lime;
+			padding: 1px 2px;
+			font-family: monospace;
+			border-radius: 2px;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<div id="fps">FPS: 0</div>
+  	<script src="game.js"></script>
+  	<script src="draw.js"></script>
+  	<script src="input.js"></script>
+  	<script src="letters.js"></script>
+  	<script src="menu.js"></script>
+  	<script src="player.js"></script>
+  	<script src="level.js"></script>
+  	<script src="europe.js"></script>
+	<script>
+		let canvas = document.getElementById('canvas');
+		let ctx = canvas.getContext('2d');
+		let fpsDisplay = document.getElementById('fps');
+		let game1 = create_game();
+		let menu1 = create_main_menu(canvas);
+		let lastFrameTime = performance.now();
+		let frameCount = 0;
+		let fps = 0;
+		let lastFpsUpdate = performance.now();
+
+		function resizeCanvas() {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+		}
+
+		function gameloop() {
+			const now = performance.now();
+			const delta = now - lastFrameTime;
+			lastFrameTime = now;
+
+			frameCount++;
+			if (now - lastFpsUpdate >= 1000) {
+				fps = frameCount;
+				frameCount = 0;
+				lastFpsUpdate = now;
+				fpsDisplay.textContent = `FPS: ${fps}`;
+			}
+
+			// update all settings
+			game1.settings = menu1.settings_menu.settings;
+
+			if(inputs.open_menu) {
+				menu_show(menu1);
+				menu_hide(menu1.settings_menu);
+			}
+
+			if(is_menu_shown(menu1)) {
+				draw_menu(ctx, menu1);
+			} else if(is_menu_shown(menu1.settings_menu)) {
+				draw_menu(ctx, menu1.settings_menu);
+			} else {
+				step(delta, game1);
+				draw(ctx, game1);
+			}
+
+			requestAnimationFrame(gameloop);
+		}
+
+		window.addEventListener('resize', resizeCanvas);
+		resizeCanvas();
+		requestAnimationFrame(gameloop);
+	</script>
+</body>
+</html>
