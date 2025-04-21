@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра на Three.js с кубиком</title>
+    <style>
+        body { margin: 0; overflow: hidden; cursor: none; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        let scene, camera, renderer, player, clock;
+        let keyboard = {};
+        let speed = 10;
+        let jumpHeight = 10;
+        let isJumping = false;
+        let velocity = new THREE.Vector3(0, 0, 0);
+        let gravity = -30;
+        let groundLevel = 0;
+
+        let cameraAngleX = 0;
+        let cameraAngleY = 0;
+        let playerRotationY = 0;
+
+        const mapBounds = { x: [-100, 100], z: [-100, 100] };
+
+        function init() {
+            clock = new THREE.Clock();
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 5, 10);
+            camera.lookAt(0, 5, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
+
+            let groundGeometry = new THREE.PlaneGeometry(1000, 1000);
+            let groundMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22, side: THREE.DoubleSide });
+            let ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = Math.PI / 2;
+            ground.position.y = -0.1;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            addGrass();
+
+            let treeTrunkGeometry = new THREE.CylinderGeometry(0.3, 1, 6);
+            let treeTrunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            let treeLeafGeometry = new THREE.DodecahedronGeometry(2, 0);
+            let treeLeafMaterial = new THREE.MeshStandardMaterial({ color: 0x4CAF50 });
+
+            for (let i = -50; i < 50; i += 15) {
+                for (let j = -50; j < 50; j += 15) {
+                    let treeTrunk = new THREE.Mesh(treeTrunkGeometry, treeTrunkMaterial);
+
+				let x = i + Math.random() * 10;
+				let y = j + Math.random() * 10;
+
+                    treeTrunk.position.set(x, 3, y);
+                    treeTrunk.castShadow = true;
+                    scene.add(treeTrunk);
+
+                    let treeLeaf = new THREE.Mesh(treeLeafGeometry, treeLeafMaterial);
+                    treeLeaf.position.set(x, 6, y);
+                    treeLeaf.castShadow = true;
+                    scene.add(treeLeaf);
+                }
+            }
+
+            let cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+            let cubeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+            player = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            player.position.set(0, groundLevel, 0);
+            player.castShadow = true;
+            scene.add(player);
+
+            let sunlight = new THREE.DirectionalLight(0xffffff, 1);
+            sunlight.position.set(10, 20, 10);
+            sunlight.castShadow = true;
+            scene.add(sunlight);
+
+            let ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            window.addEventListener('keydown', onKeyDown, false);
+            window.addEventListener('keyup', onKeyUp, false);
+            document.addEventListener('mousemove', onMouseMove, false);
+            document.addEventListener('click', requestPointerLockOnInput);
+            document.addEventListener('keydown', requestPointerLockOnInput);
+
+            document.addEventListener('pointerlockchange', function () {
+                if (document.pointerLockElement === document.body) {
+                    console.log('Мышь захвачена');
+                } else {
+                    console.log('Мышь покинула экран');
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate();
+        }
+
+        function animate() {
+            let delta = clock.getDelta();
+            updatePlayer(delta);
+            updateCamera();
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        function updatePlayer(delta) {
+            let direction = new THREE.Vector3(0, 0, 0);
+            player.rotation.y = playerRotationY;
+
+            if (keyboard['w']) direction.z = -1;
+            if (keyboard['s']) direction.z = 1;
+            if (keyboard['a']) direction.x = -1;
+            if (keyboard['d']) direction.x = 1;
+
+            direction.applyEuler(new THREE.Euler(0, playerRotationY, 0, 'XYZ'));
+
+            player.position.x += direction.x * speed * delta;
+            player.position.z += direction.z * speed * delta;
+
+            player.position.x = Math.max(mapBounds.x[0], Math.min(mapBounds.x[1], player.position.x));
+            player.position.z = Math.max(mapBounds.z[0], Math.min(mapBounds.z[1], player.position.z));
+
+            if (keyboard[' ']) {
+                if (!isJumping) {
+                    isJumping = true;
+                    velocity.y = jumpHeight;
+                }
+            }
+
+            velocity.y += gravity * delta;
+            player.position.y += velocity.y * delta;
+
+            if (player.position.y <= groundLevel + 0.5) {
+                player.position.y = groundLevel + 0.5;
+                isJumping = false;
+                velocity.y = 0;
+            }
+        }
+
+        function updateCamera() {
+            const distance = 10;
+            const offsetX = distance * Math.sin(cameraAngleY);
+            const offsetZ = distance * Math.cos(cameraAngleY);
+            const offsetY = 7;
+
+            camera.position.x = player.position.x + offsetX;
+            camera.position.y = player.position.y + offsetY;
+            camera.position.z = player.position.z + offsetZ;
+
+            camera.lookAt(player.position);
+        }
+
+        function addGrass() {
+            const grassGeometry = new THREE.PlaneGeometry(0.5, 0.5);
+            const grassMaterial = new THREE.MeshLambertMaterial({ color: 0x32CD32, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+
+            for (let i = -50; i < 50; i += 5) {
+                for (let j = -50; j < 50; j += 5) {
+                    let grass = new THREE.Mesh(grassGeometry, grassMaterial);
+                    grass.rotation.x = Math.PI / 2;
+                    grass.position.set(i + Math.random() * 4, groundLevel, j + Math.random() * 5);
+                    grass.castShadow = false;
+                    grass.receiveShadow = true;
+                    scene.add(grass);
+                }
+            }
+        }
+
+        function requestPointerLockOnInput() {
+            if (document.pointerLockElement !== document.body) {
+                document.body.requestPointerLock();
+            }
+        }
+
+        function onKeyDown(event) {
+            keyboard[event.key.toLowerCase()] = true;
+        }
+
+        function onKeyUp(event) {
+            keyboard[event.key.toLowerCase()] = false;
+        }
+
+        function onMouseMove(event) {
+            if (document.pointerLockElement === document.body) {
+                let movementX = event.movementX || 0;
+                cameraAngleY -= movementX * 0.002;
+                playerRotationY = cameraAngleY;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
