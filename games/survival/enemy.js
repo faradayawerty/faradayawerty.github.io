@@ -187,18 +187,38 @@ function enemy_destroy(enemy_object, death=true) {
 		g.enemy_kills[enemy_object.data.type] += 1;
 		g.debug_console.unshift("killed " + enemy_object.data.type + ": " + g.enemy_kills[enemy_object.data.type]);
 		if(enemy_object.data.boss) {
-			g.kills_for_boss = Math.max(16, g.kills_for_boss);
 			g.boss_kills += 1;
-			if(enemy_object.data.type == "regular")
+			if(enemy_object.data.type == "regular") {
+				if(!g.enemies["shooting"])
+					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["shooting"] = true;
-			if(enemy_object.data.type == "shooting")
+			}
+
+			if(enemy_object.data.type == "shooting") {
+				if(!g.enemies["shooting red"])
+					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["shooting red"] = true;
-			if(enemy_object.data.type == "shooting red")
+			}
+
+			if(enemy_object.data.type == "shooting red") {
+				if(!g.enemies["sword"])
+					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["sword"] = true;
-			if(enemy_object.data.type == "sword")
+			}
+			if(enemy_object.data.type == "sword") {
+				if(!g.enemies["shooting rocket"])
+					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["shooting rocket"] = true;
-			if(enemy_object.data.type == "shooting rocket")
+			}
+			if(enemy_object.data.type == "shooting rocket") {
+				if(!g.enemies["shooting laser"])
+					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["shooting laser"] = true;
+			}
+
+			if(enemy_object.data.type == "shooting laser") {
+				g.kills_for_boss = Math.max(4, g.kills_for_boss);
+			}
 		} else {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
