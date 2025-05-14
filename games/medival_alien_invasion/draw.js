@@ -4,7 +4,10 @@ function draw(ctx, g) {
 
 	ctx.fillStyle = "#000011";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+	
+	ctx.save();
+	ctx.translate(camera_x, camera_y);
+	
 	// draw enemies
 	let es = g.objects.enemies;
 	for(let i = 0; i < es.length; i++) {
@@ -15,14 +18,11 @@ function draw(ctx, g) {
 	let plr = g.objects.player;
 	let camera_x = 0.5 * ctx.canvas.width - plr.x - 0.5 * plr.w;
 	let camera_y = 0.5 * ctx.canvas.height - plr.y - 0.5 * plr.h;
-	
-	//ctx.save();
-	//ctx.translate(camera_x, camera_y);
 
 	// draw player
 	ctx.fillStyle = plr.color;
 	ctx.fillRect(plr.x, plr.y, plr.w, plr.h);
 
-	//ctx.restore();
+	ctx.restore();
 }
 
