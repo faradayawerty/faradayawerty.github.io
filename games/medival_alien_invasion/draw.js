@@ -11,7 +11,7 @@ function draw(ctx, g) {
 	ctx.save();
 	ctx.translate(camera_x, camera_y);
 	
-	let es = g.objects.ai.enemies;
+	let es = g.objects.enemies;
 	for(let i = 0; i < es.length; i++)
 		draw_type(ctx, es[i]);
 	
