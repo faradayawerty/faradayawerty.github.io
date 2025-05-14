@@ -1,5 +1,5 @@
 
-let TYPE_ASTEROID - 3;
+let TYPE_ASTEROID = 3;
 
 function create_asteroid(x_, y_, size) {
   return {
