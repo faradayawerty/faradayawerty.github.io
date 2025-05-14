@@ -24,13 +24,13 @@ function draw_type(ctx, obj) {
 	if(!obj.type)
 		return;
 	switch(obj.type) {
-		case: TYPE_SPACESHIP:
+		case TYPE_SPACESHIP:
 			ctx.fillStyle = "gray";
 			ctx.strokeStyle = "white";
 			ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
 			ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
 			break;
-		case: TYPE_ASTEROID:
+		case TYPE_ASTEROID:
 			ctx.fillStyle = "brown";
 			ctx.strokeStyle = "white";
 			ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
