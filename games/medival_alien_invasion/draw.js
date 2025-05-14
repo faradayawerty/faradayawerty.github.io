@@ -14,6 +14,9 @@ function draw(ctx, g) {
 	let es = g.objects.enemies;
 	for(let i = 0; i < es.length; i++)
 		draw_type(ctx, es[i]);
+	let of = g.objects.functional;
+	for(let i = 0; i < of.length; i++)
+		draw_type(ctx, of[i]);
 	
 	draw_type(ctx, plr);
 	
