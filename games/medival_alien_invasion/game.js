@@ -19,12 +19,14 @@ function create_game() {
 }
 
 function step(dt, g) {
-	let os = g.objects;
-	g.objects.player.color = g.settings.square_color;
-	g.objects.player.x += inputs.walk_dir.x * dt;
-	g.objects.player.y += inputs.walk_dir.y * dt;
+	
+	let plr = g.objects.player;
+	plr.color = g.settings.square_color;
+	plr.x += inputs.walk_dir.x * dt;
+	plr.y += inputs.walk_dir.y * dt;
 
-	for(let i = 0; i < os.enemies[i]; i++) {
-		os.enemies[i].x += 0.75 * dt;
+	let es = g.objects.enemies[i];
+	for(let i = 0; i < es.length; i++) {
+		es[i].x += 0.75 * dt;
 	}
 }
