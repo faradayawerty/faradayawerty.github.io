@@ -9,7 +9,7 @@ function create_game() {
 			scene: 0
 		},
 		objects: {
-			player = create_spaceship(100, 100, 40), // player controlled; has to have x, y
+			player: create_spaceship(100, 100, 40), // player controlled; has to have x, y
 			ai: {
 				enemies: [ // has to have x, y
 					create_spaceship(50, 200, 30),
