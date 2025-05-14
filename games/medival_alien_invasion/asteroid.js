@@ -10,3 +10,4 @@ function create_asteroid(x_, y_, size) {
     h: size,
   };
 }
+

@@ -1,26 +1,22 @@
 
-
 function create_game() {
 	let game = {
 		settings: {
 			square_color: "red"
 		},
 		state: {
-			scene: 0
+			scene: 0,
+			iplayer: 0
 		},
 		objects: {
-			player: create_spaceship(100, 100, 40), // player controlled; has to have x, y
-			enemies: [ // has to have x, y
+			spaceships: [
+				create_spaceship(100, 100, 40),
 				create_spaceship(300, 200, 50)
 			],
-			characters: [
-			],
-			functional: [
+			asteroids: [
 				create_asteroid(50, 210, 30),
 				create_asteroid(150, 220, 30),
 				create_asteroid(250, 230, 30),
-			],
-			decorative: [
 			],
 		}
 	};
@@ -29,26 +25,12 @@ function create_game() {
 
 function step(dt, g) {
 	
-	let plr = g.objects.player;
+	let plr = g.objects.spaceships[g.state.iplayer];
 	plr.x += inputs.walk_dir.x * dt;
 	plr.y += inputs.walk_dir.y * dt;
 
-	let es = g.objects.enemies;
-	for(let i = 0; i < es.length; i++)
-		es[i].x += 0.025 * dt;
-}
-
-function step_type(dt, obj) {
-	if(!obj.type)
-		return;
-	switch(obj.type) {
-		case TYPE_SPACESHIP:
-			break;
-		case TYPE_ASTEROID:
-			break;
-		default:
-			return;
-			break;
-	}
+	let as = g.objects.asteroids;
+	for(let i = 0; i < as.length; i++)
+		as[i].x += 0.025 * dt;
 }
 
