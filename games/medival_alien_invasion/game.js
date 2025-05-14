@@ -10,12 +10,11 @@ function create_game() {
 		},
 		objects: {
 			player: create_spaceship(100, 100, 40), // player controlled; has to have x, y
-			ai: {
-				enemies: [ // has to have x, y
-					create_spaceship(300, 200, 50)
-				],
-				characters: []
-			},
+			enemies: [ // has to have x, y
+				create_spaceship(300, 200, 50)
+			],
+			characters: [
+			],
 			functional: [
 				create_asteroid(50, 210, 30),
 				create_asteroid(150, 220, 30),
@@ -34,7 +33,7 @@ function step(dt, g) {
 	plr.x += inputs.walk_dir.x * dt;
 	plr.y += inputs.walk_dir.y * dt;
 
-	let es = g.objects.ai.enemies;
+	let es = g.objects.enemies;
 	for(let i = 0; i < es.length; i++)
 		es[i].x += 0.025 * dt;
 }
