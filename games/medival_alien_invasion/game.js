@@ -9,10 +9,13 @@ function create_game() {
 			scene: 0
 		},
 		objects: {
-			player: create_player(100, 100),
-			enemies: [
-				create_enemy(50, 200)
-			]
+			player = create_spaceship(100, 100, 40), // has to have x, y
+			ai: {
+				enemies: [
+					create_spaceship(50, 200, 30)
+				],
+				characters: []
+			}
 		}
 	};
 	return game;
@@ -25,8 +28,7 @@ function step(dt, g) {
 	plr.x += inputs.walk_dir.x * dt;
 	plr.y += inputs.walk_dir.y * dt;
 
-	let es = g.objects.enemies;
-	for(let i = 0; i < es.length; i++) {
+	let es = g.objects.ai.enemies;
+	for(let i = 0; i < es.length; i++)
 		es[i].x += 0.025 * dt;
-	}
 }
