@@ -25,7 +25,6 @@ function create_game() {
 function step(dt, g) {
 	
 	let plr = g.objects.player;
-	plr.color = g.settings.square_color;
 	plr.x += inputs.walk_dir.x * dt;
 	plr.y += inputs.walk_dir.y * dt;
 
