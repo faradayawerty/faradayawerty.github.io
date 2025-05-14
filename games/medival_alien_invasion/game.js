@@ -27,6 +27,6 @@ function step(dt, g) {
 
 	let es = g.objects.enemies;
 	for(let i = 0; i < es.length; i++) {
-		es[i].x += 0.75 * dt;
+		es[i].x += 0.025 * dt;
 	}
 }
