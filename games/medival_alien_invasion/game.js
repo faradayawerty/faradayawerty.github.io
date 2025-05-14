@@ -11,8 +11,9 @@ function create_game() {
 		objects: {
 			player = create_spaceship(100, 100, 40), // player controlled; has to have x, y
 			ai: {
-				enemies: [
-					create_spaceship(50, 200, 30)
+				enemies: [ // has to have x, y
+					create_spaceship(50, 200, 30),
+					create_asteroid(50, 200, 30)
 				],
 				characters: []
 			}
