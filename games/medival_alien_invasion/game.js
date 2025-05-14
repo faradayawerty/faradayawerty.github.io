@@ -5,9 +5,11 @@ function create_game() {
 		settings: {
 			square_color: "red"
 		},
+		state: {
+			scene: 0
+		},
 		objects: {
-			player: create_player(100, 100),
-			level: create_level(europe_tilegrid)
+			player: create_player(100, 100)
 		}
 	};
 	return game;
