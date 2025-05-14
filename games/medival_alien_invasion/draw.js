@@ -12,9 +12,6 @@ function draw(ctx, g) {
 	ctx.save();
 	ctx.translate(camera_x, camera_y);
 
-	// draw level
-	drawTilegrid(ctx, g.objects.level.tilegrid, plr.x, plr.y);
-
 	// draw player
 	ctx.fillStyle = plr.color;
 	ctx.fillRect(plr.x, plr.y, plr.w, plr.h);
