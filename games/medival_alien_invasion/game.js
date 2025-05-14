@@ -12,11 +12,17 @@ function create_game() {
 			player: create_spaceship(100, 100, 40), // player controlled; has to have x, y
 			ai: {
 				enemies: [ // has to have x, y
-					create_spaceship(300, 200, 50),
-					create_asteroid(50, 200, 30)
+					create_spaceship(300, 200, 50)
 				],
 				characters: []
-			}
+			},
+			functional: [
+				create_asteroid(50, 210, 30),
+				create_asteroid(150, 220, 30),
+				create_asteroid(250, 230, 30),
+			],
+			decorative: [
+			],
 		}
 	};
 	return game;
