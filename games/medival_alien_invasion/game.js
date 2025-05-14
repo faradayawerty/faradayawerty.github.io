@@ -25,7 +25,7 @@ function step(dt, g) {
 	plr.x += inputs.walk_dir.x * dt;
 	plr.y += inputs.walk_dir.y * dt;
 
-	let es = g.objects.enemies[i];
+	let es = g.objects.enemies;
 	for(let i = 0; i < es.length; i++) {
 		es[i].x += 0.75 * dt;
 	}
