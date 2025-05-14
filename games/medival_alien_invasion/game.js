@@ -37,3 +37,18 @@ function step(dt, g) {
 	for(let i = 0; i < es.length; i++)
 		es[i].x += 0.025 * dt;
 }
+
+function step_type(dt, obj) {
+	if(!obj.type)
+		return;
+	switch(obj.type) {
+		case TYPE_SPACESHIP:
+			break;
+		case TYPE_ASTEROID:
+			break;
+		default:
+			return;
+			break;
+	}
+}
+
