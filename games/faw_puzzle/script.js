@@ -130,19 +130,17 @@ controls.appendChild(hintsBtn);
     checkSolved();
   }
 
-  function applyHints() {
-    pieces.forEach(div => {
-      div.classList.remove('hint-correct', 'hint-wrong');
-      if (!hintsOn) return;
+function applyHints() {
+  puzzle.classList.toggle('hints-on', hintsOn); // добавит или уберёт класс
 
-      const correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
-      if (correct) {
-        div.classList.add('hint-correct');
-      } else {
-        div.classList.add('hint-wrong');
-      }
-    });
-  }
+  pieces.forEach(div => {
+    div.classList.remove('hint-correct', 'hint-wrong');
+    if (!hintsOn) return;
+
+    const correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
+    div.classList.add(correct ? 'hint-correct' : 'hint-wrong');
+  });
+}
 
   function checkSolved() {
     let wrongCount = 0;
