@@ -86,10 +86,10 @@
       }
     }
 
-    if (dragMode) {
-      // Перемешиваем позиции
-      positions = shuffleArray(positions);
-    }
+    //if (dragMode) {
+    //  // Перемешиваем позиции
+    //  positions = shuffleArray(positions);
+    //}
 
     for (let i = 0; i < positions.length; i++) {
       const { row, col } = positions[i];
