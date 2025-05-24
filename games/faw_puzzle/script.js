@@ -13,6 +13,7 @@
   let pieceSizePx;
   let fullSizePx;
 
+  // Заполнение селекта размера
   for (let i = 2; i <= 16; i++) {
     const opt = document.createElement('option');
     opt.value = i;
@@ -20,6 +21,20 @@
     sizeSelect.appendChild(opt);
   }
   sizeSelect.value = size;
+
+  // Создаём кнопку подсказок
+  const hintsBtn = document.createElement('button');
+  hintsBtn.textContent = 'Подсказки';
+  hintsBtn.style.marginLeft = '10px';
+  shuffleBtn.insertAdjacentElement('afterend', hintsBtn);
+
+  let hintsOn = false;
+
+  hintsBtn.addEventListener('click', () => {
+    hintsOn = !hintsOn;
+    hintsBtn.style.backgroundColor = '';
+    applyHints();
+  });
 
   function updatePuzzleGrid() {
     puzzle.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
@@ -114,6 +129,24 @@
     checkSolved();
   }
 
+  function applyHints() {
+    pieces.forEach(div => {
+      if (!hintsOn) {
+        div.style.filter = '';
+        return;
+      }
+
+      const correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
+      if (correct) {
+        // Зеленоватый оттенок
+        div.style.filter = 'drop-shadow(0 0 5px #4caf5077)';
+      } else {
+        // Красноватый оттенок
+        div.style.filter = 'drop-shadow(0 0 5px #f4433677)';
+      }
+    });
+  }
+
   function checkSolved() {
     let wrongCount = 0;
 
@@ -125,6 +158,9 @@
 
     errorCount.textContent = `Не на своём месте: ${wrongCount}`;
     puzzle.style.borderColor = wrongCount === 0 ? 'green' : 'red';
+
+    applyHints();
+
     return wrongCount === 0;
   }
 
