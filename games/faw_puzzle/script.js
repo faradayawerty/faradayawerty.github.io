@@ -23,10 +23,11 @@
   sizeSelect.value = size;
 
   // Создаём кнопку подсказок
-  const hintsBtn = document.createElement('button');
-  hintsBtn.textContent = 'Подсказки';
-  hintsBtn.style.marginLeft = '10px';
-  shuffleBtn.insertAdjacentElement('afterend', hintsBtn);
+const hintsBtn = document.createElement('button');
+hintsBtn.id = 'hintsBtn';
+hintsBtn.textContent = 'Подсказки';
+const controls = document.getElementById('controls');
+controls.appendChild(hintsBtn);
 
   let hintsOn = false;
 
