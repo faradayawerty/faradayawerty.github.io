@@ -13,7 +13,10 @@
     <div id="controls">
       <span id="errorCount">Не на своём месте: 0</span>
       <select id="sizeSelect"></select>
-      <input type="file" id="fileInput" accept="image/*" />
+      <label class="file-label">
+        <span>Файл</span>
+        <input type="file" id="fileInput" hidden>
+      </label>
       <button id="shuffleBtn">Перемешать</button>
       <button id="resetBtn">Сбросить</button>
     </div>
