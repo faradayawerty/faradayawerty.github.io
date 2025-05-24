@@ -131,18 +131,14 @@
 
   function applyHints() {
     pieces.forEach(div => {
-      if (!hintsOn) {
-        div.style.filter = '';
-        return;
-      }
+      div.classList.remove('hint-correct', 'hint-wrong');
+      if (!hintsOn) return;
 
       const correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
       if (correct) {
-        // Зеленоватый оттенок
-        div.style.filter = 'drop-shadow(0 0 5px #4caf5077)';
+        div.classList.add('hint-correct');
       } else {
-        // Красноватый оттенок
-        div.style.filter = 'drop-shadow(0 0 5px #f4433677)';
+        div.classList.add('hint-wrong');
       }
     });
   }
@@ -196,4 +192,3 @@
 
   createPieces();
 })();
-

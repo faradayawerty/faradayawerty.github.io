@@ -117,3 +117,10 @@ select:focus, input[type=file]:focus, button:focus {
   scrollbar-color: #4a6ef7 #121212;
 }
 
+.hint-correct {
+  filter: drop-shadow(0 0 5px #4caf5077);
+}
+
+.hint-wrong {
+  filter: drop-shadow(0 0 5px #f4433677);
+}
