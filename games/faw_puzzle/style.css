@@ -118,9 +118,12 @@ select:focus, input[type=file]:focus, button:focus {
 }
 
 .hint-correct {
-  filter: drop-shadow(0 0 5px #4caf5077);
+  border: 1px solid rgba(76, 175, 80, 0.8);
+  box-sizing: border-box;
 }
 
 .hint-wrong {
-  filter: drop-shadow(0 0 5px #f4433677);
+  border: 1px solid rgba(244, 67, 54, 0.8);
+  box-sizing: border-box;
 }
+
