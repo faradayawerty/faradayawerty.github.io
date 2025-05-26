@@ -11,13 +11,10 @@ var Game = Game || {};
   ns.EMOJIS = { rock: "🪨", paper: "📄", scissors: "✂️" };
   ns.COLORS = { player: "lightblue", enemy: "tomato" };
 
-  ns.MAX_PLAYER_UNITS = 15;
-
   ns.units = [];
   ns.placing = true;
   ns.selectedType = "rock";
   ns.loop = null;
-  ns.playerUnitCount = 0;
   ns.winnerText = "";
 
   // UI elements, инициализируем позже

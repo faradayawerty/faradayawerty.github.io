@@ -162,7 +162,7 @@
 
   // Функция для постановки юнита (при клике/тапе)
   function placeUnit(e) {
-    //if (!ns.placing) return;
+    if (!ns.placing) return;
 
     const pos = getPointerPos(e);
 
@@ -210,6 +210,7 @@
     ns.winnerTeam = null;
     ns.elements.replayButton.style.display = "none";
     ns.elements.startButton.style.display = "none";
+    ns.elements.typeButtons.forEach(btn => btn.style.display = "none");
     ns.loop = setInterval(ns.gameLoop, 30);
   });
 
@@ -221,6 +222,7 @@
     ns.winnerTeam = null;
     ns.elements.replayButton.style.display = "none";
     ns.elements.startButton.style.display = "inline-block";
+    ns.elements.typeButtons.forEach(btn => btn.style.display = "inline-block");
     ns.updateUnitCountDisplay();
     ns.draw();
     requestAnimationFrame(idleLoop);
