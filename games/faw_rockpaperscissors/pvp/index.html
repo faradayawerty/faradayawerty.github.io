@@ -1,877 +1,1621 @@
 
 <!DOCTYPE html>
+
 <html lang="ru">
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta charset="UTF-8" />
-    <title>faw_rockpaperscissors: pvp_3_players</title>
-    <link rel="icon" href="../icon.png">
-    <style>
-        /* Основные стили - ближе к PvE */
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #121212;
-            color: #ddd;
-            margin: 0;
-            padding: 20px;
-        }
 
-        h1 {
-            margin-bottom: 10px;
-            color: #aaddff;
-            text-shadow: 0 0 6px #88ccff88;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-        #gameWrapper {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            align-items: flex-start;
-            max-width: 1100px; /* Увеличим максимальную ширину для 3 игроков */
-            margin: 0 auto;
-            flex-wrap: wrap;
-            padding: 0 10px;
-        }
+    <meta charset="UTF-8" />
 
-        #gameControls {
-            background-color: #1a1a1a;
-            padding: 15px;
-            border-radius: 8px;
-            width: 260px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            border: 1px solid #333;
-            color: #ccc;
-        }
+    <title>faw_rockpaperscissors: pve</title>
 
-        .player-controls {
-            background-color: #2a2a2a;
-            padding: 12px;
-            border-radius: 8px;
-        }
+    <link rel="icon" href="../icon.png">
 
-        .type-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
+    <style>
 
-        .type-button {
-            font-size: 1.1rem;
-            padding: 10px 16px;
-            cursor: pointer;
-            border: 2px solid #555;
-            border-radius: 8px;
-            background-color: #2a2a2a;
-            color: #ddd;
-            user-select: none;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-            width: auto;
-            min-width: 70px;
-            text-align: center;
-            display: inline-block;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
-        }
+        /* Основные стили - ближе к PvE */
 
-        .type-button:hover {
-            background-color: #444;
-            border-color: #88ccff;
-            color: #aaddff;
-        }
+        body {
 
-        .type-button.selected {
-            background-color: #555;
-            border-color: #88ccff;
-            color: #aaddff;
-            font-weight: bold;
-        }
+            font-family: Arial, sans-serif;
 
-        #player1Controls .type-button.selected {
-            border-color: #88ccff; /* светло-голубой */
-        }
+            text-align: center;
 
-        #player2Controls .type-button.selected {
-            border-color: #ff6347; /* томатный, как в PvE */
-            color: #ff9b90;
-        }
-        /* Новый стиль для Игрока 3 */
-        #player3Controls .type-button.selected {
-            border-color: #DAA520; /* Золотистый цвет */
-            color: #FFD700;
-        }
+            background-color: #121212;
+
+            color: #ddd;
+
+            margin: 0;
+
+            padding: 20px;
+
+        }
 
 
-        #gameCanvas {
-            background-color: #1e1e1e;
-            border: 1px solid #444;
-            border-radius: 8px;
-            cursor: crosshair;
-            width: 100%;
-            max-width: 700px;
-            height: auto;
-            touch-action: manipulation;
-        }
 
-        button {
-            font-size: 1.1rem;
-            margin: 5px 0;
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            background-color: #3a8f3a;
-            color: white;
-            transition: background-color 0.3s;
-            width: 100%;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
-        }
+        h1 {
 
-        button:hover {
-            background-color: #5bb75b;
-        }
+            margin-bottom: 10px;
 
-        #actions p {
-            margin: 8px 0;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ddd;
-        }
+            color: #aaddff;
 
-        .type-button.hidden {
-            display: none;
-        }
+            text-shadow: 0 0 6px #88ccff88;
 
-        .menu-button {
-            display: inline-block;
-            font-size: 1rem;
-            margin: 10px 0 0 0;
-            padding: 12px 24px;
-            border-radius: 10px;
-            text-align: center;
-            text-decoration: none;
-            background-color: #555555;
-            color: #ddd;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.3s ease;
-            user-select: none;
-            width: auto;
-            max-width: 200px;
-        }
+        }
 
-        .menu-button:hover {
-            background-color: #777777;
-        }
 
-        .start-button {
-            background-color: #3a8f3a;
-            color: white;
-            font-weight: bold;
-        }
 
-        .start-button:hover {
-            background-color: #5bb75b;
-        }
+        #gameWrapper {
 
-        /* 📱 Мобильная адаптация, как в PvE */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
+            display: flex;
 
-            #gameWrapper {
-                flex-direction: column;
-                align-items: center;
-                padding: 0 10px;
-            }
+            justify-content: center;
 
-            #gameControls {
-                width: 100%;
-                max-width: 400px;
-            }
+            gap: 20px;
 
-            #gameCanvas {
-                width: 100% !important;
-                height: auto !important;
-                max-width: 100%;
-            }
+            align-items: flex-start;
 
-            .type-buttons {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+            max-width: 1100px;
 
-            .type-button {
-                font-size: 1rem;
-                min-width: 60px;
-                padding: 8px 12px;
-            }
+            margin: 0 auto;
 
-            button, .menu-button {
-                font-size: 1rem;
-                padding: 12px;
-            }
+            flex-wrap: wrap;
 
-            h1 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+            padding: 0 10px;
+
+        }
+
+
+
+        #gameControls {
+
+            background-color: #1a1a1a;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            width: 260px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 20px;
+
+            border: 1px solid #333;
+
+            color: #ccc;
+
+        }
+
+
+
+        .player-controls {
+
+            background-color: #2a2a2a;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+        }
+
+
+
+        .type-buttons {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            margin-bottom: 10px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .type-button {
+
+            font-size: 1.1rem;
+
+            padding: 10px 16px;
+
+            cursor: pointer;
+
+            border: 2px solid #555;
+
+            border-radius: 8px;
+
+            background-color: #2a2a2a;
+
+            color: #ddd;
+
+            user-select: none;
+
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+
+            width: auto;
+
+            min-width: 70px;
+
+            text-align: center;
+
+            display: inline-block;
+
+            touch-action: manipulation;
+
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+
+        }
+
+
+
+        .type-button:hover {
+
+            background-color: #444;
+
+            border-color: #88ccff;
+
+            color: #aaddff;
+
+        }
+
+
+
+        .type-button.selected {
+
+            background-color: #555;
+
+            border-color: #88ccff;
+
+            color: #aaddff;
+
+            font-weight: bold;
+
+        }
+
+
+
+        #player1Controls .type-button.selected {
+
+            border-color: #88ccff; /* светло-голубой */
+
+        }
+
+
+
+        #player2Controls .type-button.selected {
+
+            border-color: #ff6347; /* томатный, как в PvE */
+
+            color: #ff9b90;
+
+        }
+
+
+
+        #gameCanvas {
+
+            background-color: #1e1e1e;
+
+            border: 1px solid #444;
+
+            border-radius: 8px;
+
+            cursor: crosshair;
+
+            width: 100%;
+
+            max-width: 700px;
+
+            height: auto;
+
+            touch-action: manipulation;
+
+        }
+
+
+
+        button {
+
+            font-size: 1.1rem;
+
+            margin: 5px 0;
+
+            padding: 10px 20px;
+
+            border-radius: 10px;
+
+            border: none;
+
+            cursor: pointer;
+
+            background-color: #3a8f3a;
+
+            color: white;
+
+            transition: background-color 0.3s;
+
+            width: 100%;
+
+            touch-action: manipulation;
+
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+
+        }
+
+
+
+        button:hover {
+
+            background-color: #5bb75b;
+
+        }
+
+
+
+        #actions p {
+
+            margin: 8px 0;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            color: #ddd;
+
+        }
+
+
+
+        .type-button.hidden {
+
+            display: none;
+
+        }
+
+
+
+        .menu-button {
+
+            display: inline-block;
+
+            font-size: 1rem;
+
+            margin: 10px 0 0 0;
+
+            padding: 12px 24px;
+
+            border-radius: 10px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            background-color: #555555;
+
+            color: #ddd;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            border: none;
+
+            transition: background-color 0.3s ease;
+
+            user-select: none;
+
+            width: auto;
+
+            max-width: 200px;
+
+        }
+
+
+
+        .menu-button:hover {
+
+            background-color: #777777;
+
+        }
+
+
+
+        .start-button {
+
+            background-color: #3a8f3a;
+
+            color: white;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .start-button:hover {
+
+            background-color: #5bb75b;
+
+        }
+
+
+
+        /* 📱 Мобильная адаптация, как в PvE */
+
+        @media (max-width: 768px) {
+
+            body {
+
+                padding: 10px;
+
+            }
+
+
+
+            #gameWrapper {
+
+                flex-direction: column;
+
+                align-items: center;
+
+                padding: 0 10px;
+
+            }
+
+
+
+            #gameControls {
+
+                width: 100%;
+
+                max-width: 400px;
+
+            }
+
+
+
+            #gameCanvas {
+
+                width: 100% !important;
+
+                height: auto !important;
+
+                max-width: 100%;
+
+            }
+
+
+
+            .type-buttons {
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+            }
+
+
+
+            .type-button {
+
+                font-size: 1rem;
+
+                min-width: 60px;
+
+                padding: 8px 12px;
+
+            }
+
+
+
+            button, .menu-button {
+
+                font-size: 1rem;
+
+                padding: 12px;
+
+            }
+
+
+
+            h1 {
+
+                font-size: 1.5rem;
+
+            }
+
+        }
+
+    </style>
+
 </head>
+
 <body>
-    <div id="gameWrapper">
-        <div id="gameControls">
-            <div class="player-controls" id="player1Controls">
-                <h2>Игрок 1 (синий)</h2>
-                <div class="type-buttons">
-                    <button data-type="rock" class="type-button selected">🪨</button>
-                    <button data-type="paper" class="type-button">📄</button>
-                    <button data-type="scissors" class="type-button">✂️ </button>
-                </div>
-                <p>Юниты: <span id="player1UnitsCount">0</span></p>
-            </div>
-
-            <div class="player-controls" id="player2Controls">
-                <h2>Игрок 2 (красный)</h2>
-                <div class="type-buttons">
-                    <button data-type="rock" class="type-button selected">🪨</button>
-                    <button data-type="paper" class="type-button">📄</button>
-                    <button data-type="scissors" class="type-button">✂️ </button>
-                </div>
-                <p>Юниты: <span id="player2UnitsCount">0</span></p>
-            </div>
-
-            <div class="player-controls" id="player3Controls">
-                <h2>Игрок 3 (желтый)</h2>
-                <div class="type-buttons">
-                    <button data-type="rock" class="type-button selected">🪨</button>
-                    <button data-type="paper" class="type-button">📄</button>
-                    <button data-type="scissors" class="type-button">✂️ </button>
-                </div>
-                <p>Юниты: <span id="player3UnitsCount">0</span></p>
-            </div>
-
-            <div id="actions">
-                <p>Активный игрок: <strong id="activePlayer">Игрок 1</strong></p>
-                <button id="startGameBtn" class="start-button">Начать игру</button>
-                <button id="restartGameBtn" class="start-button" style="display:none;">Играть заново</button>
-                <a href="../index.html" class="menu-button">Главное меню</a>
-            </div>
-        </div>
-
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const startButton = document.getElementById("startGameBtn");
-            const restartButton = document.getElementById("restartGameBtn");
-            const typeButtons = document.querySelectorAll(".type-buttons");
-
-            startButton.addEventListener("click", function () {
-                typeButtons.forEach(buttonGroup => {
-                    buttonGroup.style.display = "none";
-                });
-                startButton.style.display = "none";
-                restartButton.style.display = "inline-block";
-            });
-
-            restartButton.addEventListener("click", function () {
-                typeButtons.forEach(buttonGroup => {
-                    buttonGroup.style.display = "flex"; // или "block" — зависит от вашей верстки
-                });
-                restartButton.style.display = "none";
-                startButton.style.display = "inline-block";
-            });
-        });
-
-        const Game = {
-            WIDTH: 800,
-            HEIGHT: 500,
-            TYPES: ["rock", "paper", "scissors"],
-            EMOJIS: { rock: "🪨", paper: "📄", scissors: "✂️" },
-            COLORS: { player1: "#87CEFA", player2: "#FF6347", player3: "#FFD700" }, // Золотой
-            PLAYERS: ["player1", "player2", "player3"], // Массив игроков
-            units: [],
-            placing: true,
-            activePlayer: "player1",
-            selectedTypes: { player1: "rock", player2: "rock", player3: "rock" },
-            loop: null,
-            winnerText: "",
-            winnerPlayer: null,
-            isRunning: false,
-        };
-
-        (function(ns) {
-            class Unit {
-                constructor(x, y, type, player) {
-                    this.x = x;
-                    this.y = y;
-                    this.type = type;
-                    this.player = player;
-                    this.vx = Math.random() * 2 - 1;
-                    this.vy = Math.random() * 2 - 1;
-                    this.radius = 12;
-                    this.spawnTime = Date.now();
-                    this.nextDashTime = Date.now() + this.getRandomDashInterval();
-                }
-
-                getRandomDashInterval() {
-                    return 2000 + Math.random() * 3000;
-                }
-
-                dash() {
-                    const dashStrength = 5 + Math.random() * 10;
-                    const speed = Math.hypot(this.vx, this.vy) || 1;
-                    this.vx += (this.vx / speed) * dashStrength;
-                    this.vy += (this.vy / speed) * dashStrength;
-                    this.nextDashTime = Date.now() + this.getRandomDashInterval();
-                }
-
-                move() {
-                    if (Date.now() >= this.nextDashTime) {
-                        this.dash();
-                    }
-
-                    let target = null;
-                    let minDist = Infinity;
-
-                    for (const other of ns.units) {
-                        if (other === this || other.player === this.player) continue;
-                        if (shouldChase(this.type, other.type) || shouldFlee(this.type, other.type)) {
-                            const dx = wrapDistance(this.x, other.x, ns.WIDTH);
-                            const dy = wrapDistance(this.y, other.y, ns.HEIGHT);
-                            const dist = Math.hypot(dx, dy);
-                            if (dist < minDist) {
-                                minDist = dist;
-                                target = other;
-                            }
-                        }
-                    }
-
-                    const baseSpeed = 1.5;
-                    if (target) {
-                        const dx = wrapDistance(this.x, target.x, ns.WIDTH);
-                        const dy = wrapDistance(this.y, target.y, ns.HEIGHT);
-                        const d = Math.hypot(dx, dy) + 0.01;
-
-                        if (shouldChase(this.type, target.type)) {
-                            this.vx += (dx / d) * baseSpeed * 0.1;
-                            this.vy += (dy / d) * baseSpeed * 0.1;
-                        } else if (shouldFlee(this.type, target.type)) {
-                            this.vx -= (dx / d) * baseSpeed * 0.1;
-                            this.vy -= (dy / d) * baseSpeed * 0.1;
-                        }
-                    }
-
-                    for (const other of ns.units) {
-                        if (other === this || other.player !== this.player) continue;
-                        const dx = wrapDistance(this.x, other.x, ns.WIDTH);
-                        const dy = wrapDistance(this.y, other.y, ns.HEIGHT);
-                        const dist = Math.hypot(dx, dy);
-                        if (dist > 0 && dist < this.radius * 2) {
-                            const repulse = 1.5;
-                            this.vx -= (dx / dist) * repulse * 0.05;
-                            this.vy -= (dy / dist) * repulse * 0.05;
-                        }
-                    }
-
-                    this.vx *= 0.95;
-                    this.vy *= 0.95;
-
-                    this.x = (this.x + this.vx + ns.WIDTH) % ns.WIDTH;
-                    this.y = (this.y + this.vy + ns.HEIGHT) % ns.HEIGHT;
-                }
-
-                draw(ctx) {
-                    ctx.save();
-                    ctx.translate(this.x, this.y);
-                    const age = Date.now() - this.spawnTime;
-                    if (age < 1000) ctx.globalAlpha = 0.5 + 0.5 * (age / 1000);
-                    ctx.font = "20px serif";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.shadowColor = ns.COLORS[this.player];
-                    ctx.shadowBlur = 6;
-                    ctx.fillStyle = ns.COLORS[this.player];
-                    ctx.fillText(ns.EMOJIS[this.type], 0, 0);
-                    ctx.restore();
-                }
-            }
-
-            ns.Unit = Unit;
-
-            function wrapDistance(a, b, size) {
-                let d = b - a;
-                if (Math.abs(d) > size / 2) d -= Math.sign(d) * size;
-                return d;
-            }
-
-            function shouldChase(t1, t2) {
-                const map = { rock: "scissors", scissors: "paper", paper: "rock" };
-                return map[t1] === t2;
-            }
-
-            function shouldFlee(t1, t2) {
-                const map = { rock: "paper", paper: "scissors", scissors: "rock" };
-                return map[t1] === t2;
-            }
-
-            function beats(t1, t2) {
-                return shouldChase(t1, t2);
-            }
-
-            function resolveConflict(a, b) {
-                let changed = false;
-                if (beats(a.type, b.type)) {
-                    b.type = a.type;
-                    b.player = a.player;
-                    changed = true;
-                } else if (beats(b.type, a.type)) {
-                    a.type = b.type;
-                    a.player = b.player;
-                    changed = true;
-                }
-
-                if (changed && Game.ui && typeof Game.ui.updateUI === "function") {
-                    Game.ui.updateUI();
-                }
-            }
-
-            ns.wrapDistance = wrapDistance;
-            ns.shouldChase = shouldChase;
-            ns.shouldFlee = shouldFlee;
-
-            ns.update = function() {
-                if (!ns.isRunning) return;
-                for (let u of ns.units) u.move();
-
-                for (let i = 0; i < ns.units.length; i++) {
-                    for (let j = i + 1; j < ns.units.length; j++) {
-                        const a = ns.units[i];
-                        const b = ns.units[j];
-                        
-                        if (a.player === b.player) continue;
-
-                        const dx = wrapDistance(a.x, b.x, ns.WIDTH);
-                        const dy = wrapDistance(a.y, b.y, ns.HEIGHT);
-                        const dist = Math.hypot(dx, dy);
-
-                        if (dist < 24 && a.type !== b.type) {
-                            resolveConflict(a, b);
-                            const overlap = 24 - dist;
-                            const nx = dx / dist;
-                            const ny = dy / dist;
-                            a.x -= nx * overlap * 0.5;
-                            a.y -= ny * overlap * 0.5;
-                            b.x += nx * overlap * 0.5;
-                            b.y += ny * overlap * 0.5;
-                        }
-                    }
-                }
-
-                checkWinCondition();
-            };
-
-            function checkWinCondition() {
-                if (ns.placing) return;
-
-                const activePlayers = ns.PLAYERS.filter(p => ns.units.some(u => u.player === p));
-
-                if (activePlayers.length <= 1) {
-                    if (activePlayers.length === 1) {
-                        showWinner(`Игрок ${activePlayers[0].replace('player', '')} победил!`, activePlayers[0]);
-                    } else {
-                        showWinner("Ничья!", null);
-                    }
-                    cancelAnimationFrame(ns.loop);
-                    return;
-                }
-
-                let stalemate = true;
-                for (let i = 0; i < activePlayers.length; i++) {
-                    const player1 = activePlayers[i];
-                    const player1Units = ns.units.filter(u => u.player === player1);
-                    if (player1Units.length === 0) continue;
-
-                    let canBeatOpponent = false;
-                    for (let j = 0; j < activePlayers.length; j++) {
-                        if (i === j) continue;
-                        const player2 = activePlayers[j];
-                        const player2Units = ns.units.filter(u => u.player === player2);
-                        if (player2Units.length === 0) continue;
-
-                        if (player1Units.some(u1 => player2Units.some(u2 => shouldChase(u1.type, u2.type)))) {
-                            canBeatOpponent = true;
-                            break;
-                        }
-                    }
-                    if (canBeatOpponent) {
-                        stalemate = false;
-                        break;
-                    }
-                }
-
-                if (stalemate) {
-                    let maxUnits = -1;
-                    let winner = null;
-                    let tie = false;
-
-                    for (const player of ns.PLAYERS) {
-                        const count = ns.units.filter(u => u.player === player).length;
-                        if (count > 0) {
-                            if (count > maxUnits) {
-                                maxUnits = count;
-                                winner = player;
-                                tie = false;
-                            } else if (count === maxUnits) {
-                                tie = true;
-                            }
-                        }
-                    }
-
-                    if (tie || winner === null) {
-                        showWinner("Ничья!", null);
-                    } else {
-                        showWinner(`Игрок ${winner.replace('player', '')} победил!`, winner);
-                    }
-                    cancelAnimationFrame(ns.loop);
-                }
-            }
-
-            function showWinner(text, player) {
-                ns.winnerText = text;
-                ns.winnerPlayer = player;
-                document.getElementById("restartGameBtn").style.display = "block";
-                document.getElementById("startGameBtn").style.display = "none";
-                document.getElementById("player1Controls").style.pointerEvents = "none";
-                document.getElementById("player2Controls").style.pointerEvents = "none";
-                document.getElementById("player3Controls").style.pointerEvents = "none";
-            }
-        })(Game);
-
-        (function(ns) {
-            const canvas = document.getElementById("gameCanvas");
-            const ctx = canvas.getContext("2d");
-
-            const startGameBtn = document.getElementById("startGameBtn");
-            const restartGameBtn = document.getElementById("restartGameBtn");
-            const player1Controls = document.getElementById("player1Controls");
-            const player2Controls = document.getElementById("player2Controls");
-            const player3Controls = document.getElementById("player3Controls");
-
-            ns.isRunning = ns.isRunning || false;
-            ns.units = ns.units || [];
-            ns.placing = true; // Set to true initially for placing phase
-            ns.winnerText = "";
-            ns.winnerPlayer = null;
-            ns.activePlayer = "player1";
-
-
-            ns.spawnRandomUnits = function() {
-                const minUnits = 1;
-                const maxUnits = 5;
-
-                const allTypes = ["rock", "scissors", "paper"];
-
-                function randomInt(min, max) {
-                    return Math.floor(Math.random() * (max - min + 1)) + min;
-                }
-
-                for (const player of ns.PLAYERS) {
-                    const count = Math.min(randomInt(minUnits, maxUnits), allTypes.length);
-                    const shuffledTypes = allTypes.slice().sort(() => Math.random() - 0.5);
-                    const chosenTypes = shuffledTypes.slice(0, count);
-
-                    for (let i = 0; i < count; i++) {
-                        const x = Math.random() * ns.WIDTH;
-                        const y = Math.random() * ns.HEIGHT;
-                        const type = chosenTypes[i];
-                        ns.units.push(new ns.Unit(x, y, type, player));
-                    }
-                }
-            };
-
-            ns.draw = function() {
-                ctx.clearRect(0, 0, ns.WIDTH, ns.HEIGHT);
-
-                const gridSize = 20;
-                ctx.strokeStyle = 'rgba(128, 128, 128, 0.2)';
-                ctx.lineWidth = 1;
-
-                for (let x = 0; x <= ns.WIDTH; x += gridSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, ns.HEIGHT);
-                    ctx.stroke();
-                }
-                for (let y = 0; y <= ns.HEIGHT; y += gridSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(ns.WIDTH, y);
-                    ctx.stroke();
-                }
-
-                for (let u of ns.units) {
-                    u.draw(ctx);
-                }
-
-                if (ns.winnerText) {
-                    const centerX = ns.WIDTH / 2;
-                    const centerY = ns.HEIGHT / 2;
-                    ctx.fillStyle = "rgba(0,0,0,0.7)";
-                    ctx.fillRect(centerX - 150, centerY - 40, 300, 80);
-
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.font = "bold 32px Arial";
-
-                    if (ns.winnerPlayer === "player1") {
-                        ctx.fillStyle = "#87CEFA";
-                        ctx.shadowColor = "#00BFFF";
-                    } else if (ns.winnerPlayer === "player2") {
-                        ctx.fillStyle = "#FF6347";
-                        ctx.shadowColor = "#FF4500";
-                    } else if (ns.winnerPlayer === "player3") {
-                        ctx.fillStyle = "#FFD700";
-                        ctx.shadowColor = "#DAA520";
-                    }
-                     else {
-                        ctx.fillStyle = "white";
-                        ctx.shadowColor = "white";
-                    }
-                    ctx.shadowBlur = 20;
-                    ctx.fillText(ns.winnerText, centerX, centerY);
-                    ctx.shadowBlur = 0;
-                }
-            };
-
-            ns.gameLoop = function() {
-                ns.update();
-                ns.draw();
-                if (!ns.winnerText) {
-                    ns.loop = requestAnimationFrame(ns.gameLoop);
-                } else {
-                    ns.isRunning = false;
-                }
-            };
-
-            startGameBtn.addEventListener("click", () => {
-                if (ns.isRunning) {
-                    return;
-                }
-
-                if (ns.units.length === 0) {
-                    ns.spawnRandomUnits();
-                    ns.ui.updateUI();
-                    ns.draw();
-                }
-
-                ns.placing = false;
-                ns.isRunning = true;
-
-                startGameBtn.style.display = "none";
-                player1Controls.style.pointerEvents = "none";
-                player2Controls.style.pointerEvents = "none";
-                player3Controls.style.pointerEvents = "none";
-
-                ns.loop = requestAnimationFrame(ns.gameLoop);
-            });
-
-            restartGameBtn.addEventListener("click", () => {
-                ns.isRunning = false;
-
-                ns.units = [];
-                ns.placing = true;
-                ns.winnerText = "";
-                ns.winnerPlayer = null;
-                ns.activePlayer = "player1";
-
-                const activePlayerLabel = document.getElementById("activePlayer");
-                activePlayerLabel.textContent = "Игрок 1";
-
-                startGameBtn.style.display = "inline-block";
-                player1Controls.style.pointerEvents = "auto";
-                player2Controls.style.pointerEvents = "auto";
-                player3Controls.style.pointerEvents = "auto";
-                document.getElementById("player1UnitsCount").textContent = "0";
-                document.getElementById("player2UnitsCount").textContent = "0";
-                document.getElementById("player3UnitsCount").textContent = "0";
-                restartGameBtn.style.display = "none";
-
-                ns.ui.updateUI();
-                ns.draw();
-            });
-
-            canvas.addEventListener("click", (e) => {
-                if (!ns.placing) return;
-
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                let clickedUnitIndex = -1;
-                for (let i = ns.units.length - 1; i >= 0; i--) {
-                    const u = ns.units[i];
-                    const dx = u.x - x;
-                    const dy = u.y - y;
-                    const distance = Math.sqrt(dx*dx + dy*dy);
-                    if (distance <= 15) {
-                        clickedUnitIndex = i;
-                        break;
-                    }
-                }
-
-                if (clickedUnitIndex >= 0) {
-                    ns.units.splice(clickedUnitIndex, 1);
-                } else {
-                    const type = ns.selectedTypes[ns.activePlayer];
-                    ns.units.push(new ns.Unit(x, y, type, ns.activePlayer));
-                }
-
-                ns.ui.updateUI();
-                ns.draw();
-            });
-
-            canvas.addEventListener("touchstart", (e) => {
-                if (!ns.placing) return;
-
-                e.preventDefault();
-
-                const rect = canvas.getBoundingClientRect();
-                const touch = e.touches[0];
-
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-
-                const x = (touch.clientX - rect.left) * scaleX;
-                const y = (touch.clientY - rect.top) * scaleY;
-
-                let clickedUnitIndex = -1;
-                for (let i = ns.units.length - 1; i >= 0; i--) {
-                    const u = ns.units[i];
-                    const dx = u.x - x;
-                    const dy = u.y - y;
-                    const distance = Math.sqrt(dx*dx + dy*dy);
-                    if (distance <= 15) {
-                        clickedUnitIndex = i;
-                        break;
-                    }
-                }
-
-                if (clickedUnitIndex >= 0) {
-                    ns.units.splice(clickedUnitIndex, 1);
-                } else {
-                    const type = ns.selectedTypes[ns.activePlayer];
-                    ns.units.push(new ns.Unit(x, y, type, ns.activePlayer));
-                }
-
-                ns.ui.updateUI();
-                ns.draw();
-            }, { passive: false });
-
-            canvas.width = 700;
-            canvas.height = 500;
-
-            ns.WIDTH = canvas.width;
-            ns.HEIGHT = canvas.height;
-        })(Game);
-
-        (function(ns) {
-            const player1Controls = document.getElementById("player1Controls");
-            const player2Controls = document.getElementById("player2Controls");
-            const player3Controls = document.getElementById("player3Controls");
-            const activePlayerLabel = document.getElementById("activePlayer");
-            const player1UnitsCountSpan = document.getElementById("player1UnitsCount");
-            const player2UnitsCountSpan = document.getElementById("player2UnitsCount");
-            const player3UnitsCountSpan = document.getElementById("player3UnitsCount");
-
-            function updatePlayerButtons(container, player) {
-                const buttons = container.querySelectorAll(".type-button");
-                buttons.forEach(btn => {
-                    const type = btn.getAttribute("data-type");
-                    btn.classList.remove("hidden");
-                    if (player === ns.activePlayer) {
-                        btn.classList.toggle("selected", ns.selectedTypes[player] === type);
-                    } else {
-                        btn.classList.remove("selected");
-                    }
-                });
-            }
-
-            function updateUI() {
-                const playerNumber = ns.activePlayer.replace('player', '');
-                activePlayerLabel.textContent = `Игрок ${playerNumber}`;
-
-                updatePlayerButtons(player1Controls, "player1");
-                updatePlayerButtons(player2Controls, "player2");
-                updatePlayerButtons(player3Controls, "player3");
-
-                const p1Count = ns.units.filter(u => u.player === "player1").length;
-                const p2Count = ns.units.filter(u => u.player === "player2").length;
-                const p3Count = ns.units.filter(u => u.player === "player3").length;
-                player1UnitsCountSpan.textContent = p1Count;
-                player2UnitsCountSpan.textContent = p2Count;
-                player3UnitsCountSpan.textContent = p3Count;
-            }
-
-            function setupTypeButtons() {
-                const allButtons = [...player1Controls.querySelectorAll(".type-button"),
-                                     ...player2Controls.querySelectorAll(".type-button"),
-                                     ...player3Controls.querySelectorAll(".type-button")];
-                allButtons.forEach(btn => {
-                    btn.addEventListener("click", () => {
-                        const parent = btn.closest(".player-controls");
-                        let player;
-                        if (parent.id === "player1Controls") {
-                            player = "player1";
-                        } else if (parent.id === "player2Controls") {
-                            player = "player2";
-                        } else if (parent.id === "player3Controls") {
-                            player = "player3";
-                        }
-                        ns.activePlayer = player;
-                        ns.selectedTypes[player] = btn.getAttribute("data-type");
-                        updateUI();
-                    });
-
-                    btn.addEventListener("touchstart", (e) => {
-                        e.preventDefault();
-                        const parent = btn.closest(".player-controls");
-                        let player;
-                        if (parent.id === "player1Controls") {
-                            player = "player1";
-                        } else if (parent.id === "player2Controls") {
-                            player = "player2";
-                        } else if (parent.id === "player3Controls") {
-                            player = "player3";
-                        }
-                        ns.activePlayer = player;
-                        ns.selectedTypes[player] = btn.getAttribute("data-type");
-                        updateUI();
-                    }, { passive: false });
-                });
-            }
-
-            ns.ui = {
-                updateUI,
-                setupTypeButtons,
-            };
-
-            document.addEventListener("DOMContentLoaded", () => {
-                ns.ui.setupTypeButtons();
-                ns.ui.updateUI();
-                ns.draw();
-            });
-
-        })(Game);
-    </script>
+
+    <div id="gameWrapper">
+
+        <div id="gameControls">
+
+            <div class="player-controls" id="player1Controls">
+
+                <h2>Игрок 1 (синий)</h2>
+
+                <div class="type-buttons">
+
+                    <button data-type="rock" class="type-button selected">🪨</button>
+
+                    <button data-type="paper" class="type-button">📄</button>
+
+                    <button data-type="scissors" class="type-button">✂️ </button>
+
+                </div>
+
+                <p>Юниты: <span id="player1UnitsCount">0</span></p>
+
+            </div>
+
+
+
+            <div class="player-controls" id="player2Controls">
+
+                <h2>Игрок 2 (красный)</h2>
+
+                <div class="type-buttons">
+
+                    <button data-type="rock" class="type-button selected">🪨</button>
+
+                    <button data-type="paper" class="type-button">📄</button>
+
+                    <button data-type="scissors" class="type-button">✂️ </button>
+
+                </div>
+
+                <p>Юниты: <span id="player2UnitsCount">0</span></p>
+
+            </div>
+
+
+
+            <div id="actions">
+
+                <p>Активный игрок: <strong id="activePlayer">Игрок 1</strong></p>
+
+                <button id="startGameBtn" class="start-button">Начать игру</button>
+
+                <button id="restartGameBtn" class="start-button" style="display:none;">Играть заново</button>
+
+                <a href="../index.html" class="menu-button">Главное меню</a>
+
+            </div>
+
+        </div>
+
+
+
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+    </div>
+
+
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const startButton = document.getElementById("startGameBtn");
+
+            const restartButton = document.getElementById("restartGameBtn");
+
+            const typeButtons = document.querySelectorAll(".type-buttons");
+
+
+
+            startButton.addEventListener("click", function () {
+
+                typeButtons.forEach(buttonGroup => {
+
+                    buttonGroup.style.display = "none";
+
+                });
+
+                startButton.style.display = "none";
+
+                restartButton.style.display = "inline-block";
+
+            });
+
+
+
+            restartButton.addEventListener("click", function () {
+
+                typeButtons.forEach(buttonGroup => {
+
+                    buttonGroup.style.display = "flex"; // или "block" — зависит от вашей верстки
+
+                });
+
+                restartButton.style.display = "none";
+
+                startButton.style.display = "inline-block";
+
+            });
+
+        });
+
+
+
+        const Game = {
+
+            WIDTH: 800,
+
+            HEIGHT: 500,
+
+            TYPES: ["rock", "paper", "scissors"],
+
+            EMOJIS: { rock: "🪨", paper: "📄", scissors: "✂️" },
+
+            COLORS: { player1: "#87CEFA", player2: "#FF6347" },
+
+            units: [],
+
+            placing: true,
+
+            activePlayer: "player1",
+
+            selectedTypes: { player1: "rock", player2: "rock" },
+
+            loop: null,
+
+            winnerText: "",
+
+            winnerPlayer: null,
+
+            isRunning: false,
+
+        };
+
+
+
+        (function(ns) {
+
+            class Unit {
+
+                constructor(x, y, type, player) {
+
+                    this.x = x;
+
+                    this.y = y;
+
+                    this.type = type;
+
+                    this.player = player;
+
+                    this.vx = Math.random() * 2 - 1;
+
+                    this.vy = Math.random() * 2 - 1;
+
+                    this.radius = 12;
+
+                    this.spawnTime = Date.now();
+
+                    this.nextDashTime = Date.now() + this.getRandomDashInterval();
+
+                }
+
+
+
+                getRandomDashInterval() {
+
+                    return 2000 + Math.random() * 3000;
+
+                }
+
+
+
+                dash() {
+
+                    const dashStrength = 5 + Math.random() * 10;
+
+                    const speed = Math.hypot(this.vx, this.vy) || 1;
+
+                    this.vx += (this.vx / speed) * dashStrength;
+
+                    this.vy += (this.vy / speed) * dashStrength;
+
+                    this.nextDashTime = Date.now() + this.getRandomDashInterval();
+
+                }
+
+
+
+                move() {
+
+                    if (Date.now() >= this.nextDashTime) {
+
+                        this.dash();
+
+                    }
+
+
+
+                    let target = null;
+
+                    let minDist = Infinity;
+
+
+
+                    for (const other of ns.units) {
+
+                        if (other === this || other.player === this.player) continue;
+
+                        if (shouldChase(this.type, other.type) || shouldFlee(this.type, other.type)) {
+
+                            const dx = wrapDistance(this.x, other.x, ns.WIDTH);
+
+                            const dy = wrapDistance(this.y, other.y, ns.HEIGHT);
+
+                            const dist = Math.hypot(dx, dy);
+
+                            if (dist < minDist) {
+
+                                minDist = dist;
+
+                                target = other;
+
+                            }
+
+                        }
+
+                    }
+
+
+
+                    const baseSpeed = 1.5;
+
+                    if (target) {
+
+                        const dx = wrapDistance(this.x, target.x, ns.WIDTH);
+
+                        const dy = wrapDistance(this.y, target.y, ns.HEIGHT);
+
+                        const d = Math.hypot(dx, dy) + 0.01;
+
+
+
+                        if (shouldChase(this.type, target.type)) {
+
+                            this.vx += (dx / d) * baseSpeed * 0.1;
+
+                            this.vy += (dy / d) * baseSpeed * 0.1;
+
+                        } else if (shouldFlee(this.type, target.type)) {
+
+                            this.vx -= (dx / d) * baseSpeed * 0.1;
+
+                            this.vy -= (dy / d) * baseSpeed * 0.1;
+
+                        }
+
+                    }
+
+
+
+                    for (const other of ns.units) {
+
+                        if (other === this || other.player !== this.player) continue;
+
+                        const dx = wrapDistance(this.x, other.x, ns.WIDTH);
+
+                        const dy = wrapDistance(this.y, other.y, ns.HEIGHT);
+
+                        const dist = Math.hypot(dx, dy);
+
+                        if (dist > 0 && dist < this.radius * 2) {
+
+                            const repulse = 1.5;
+
+                            this.vx -= (dx / dist) * repulse * 0.05;
+
+                            this.vy -= (dy / dist) * repulse * 0.05;
+
+                        }
+
+                    }
+
+
+
+                    this.vx *= 0.95;
+
+                    this.vy *= 0.95;
+
+
+
+                    this.x = (this.x + this.vx + ns.WIDTH) % ns.WIDTH;
+
+                    this.y = (this.y + this.vy + ns.HEIGHT) % ns.HEIGHT;
+
+                }
+
+
+
+                draw(ctx) {
+
+                    ctx.save();
+
+                    ctx.translate(this.x, this.y);
+
+                    const age = Date.now() - this.spawnTime;
+
+                    if (age < 1000) ctx.globalAlpha = 0.5 + 0.5 * (age / 1000);
+
+                    ctx.font = "20px serif";
+
+                    ctx.textAlign = "center";
+
+                    ctx.textBaseline = "middle";
+
+                    ctx.shadowColor = ns.COLORS[this.player];
+
+                    ctx.shadowBlur = 6;
+
+                    ctx.fillStyle = ns.COLORS[this.player];
+
+                    ctx.fillText(ns.EMOJIS[this.type], 0, 0);
+
+                    ctx.restore();
+
+                }
+
+            }
+
+
+
+            ns.Unit = Unit;
+
+
+
+            function wrapDistance(a, b, size) {
+
+                let d = b - a;
+
+                if (Math.abs(d) > size / 2) d -= Math.sign(d) * size;
+
+                return d;
+
+            }
+
+
+
+            function shouldChase(t1, t2) {
+
+                const map = { rock: "scissors", scissors: "paper", paper: "rock" };
+
+                return map[t1] === t2;
+
+            }
+
+
+
+            function shouldFlee(t1, t2) {
+
+                const map = { rock: "paper", paper: "scissors", scissors: "rock" };
+
+                return map[t1] === t2;
+
+            }
+
+
+
+            function beats(t1, t2) {
+
+                return shouldChase(t1, t2);
+
+            }
+
+
+
+            function resolveConflict(a, b) {
+
+                let changed = false;
+
+                if (beats(a.type, b.type)) {
+
+                    b.type = a.type;
+
+                    b.player = a.player;
+
+                    changed = true;
+
+                } else if (beats(b.type, a.type)) {
+
+                    a.type = b.type;
+
+                    a.player = b.player;
+
+                    changed = true;
+
+                }
+
+
+
+                if (changed && Game.ui && typeof Game.ui.updateUI === "function") {
+
+                    Game.ui.updateUI();
+
+                }
+
+            }
+
+
+
+            ns.wrapDistance = wrapDistance;
+
+            ns.shouldChase = shouldChase;
+
+            ns.shouldFlee = shouldFlee;
+
+
+
+            ns.update = function() {
+
+                if (!ns.isRunning) return;
+
+                for (let u of ns.units) u.move();
+
+
+
+                for (let i = 0; i < ns.units.length; i++) {
+
+                    for (let j = i + 1; j < ns.units.length; j++) {
+
+                        const a = ns.units[i];
+
+                        const b = ns.units[j];
+
+                        if (a.player === b.player) continue;
+
+
+
+                        const dx = wrapDistance(a.x, b.x, ns.WIDTH);
+
+                        const dy = wrapDistance(a.y, b.y, ns.HEIGHT);
+
+                        const dist = Math.hypot(dx, dy);
+
+
+
+                        if (dist < 24 && a.type !== b.type) {
+
+                            resolveConflict(a, b);
+
+                            const overlap = 24 - dist;
+
+                            const nx = dx / dist;
+
+                            const ny = dy / dist;
+
+                            a.x -= nx * overlap * 0.5;
+
+                            a.y -= ny * overlap * 0.5;
+
+                            b.x += nx * overlap * 0.5;
+
+                            b.y += ny * overlap * 0.5;
+
+                        }
+
+                    }
+
+                }
+
+
+
+                checkWinCondition();
+
+            };
+
+
+
+            function checkWinCondition() {
+
+                if (ns.placing) return;
+
+
+
+                const p1Units = ns.units.filter(u => u.player === "player1");
+
+                const p2Units = ns.units.filter(u => u.player === "player2");
+
+
+
+                if (p1Units.length === 0 && p2Units.length === 0) {
+
+                    showWinner("Ничья!", null);
+
+                    cancelAnimationFrame(ns.loop);
+
+                    return;
+
+                }
+
+
+
+                if (p1Units.length === 0) {
+
+                    showWinner("Игрок 2 победил!", "player2");
+
+                    cancelAnimationFrame(ns.loop);
+
+                    return;
+
+                }
+
+
+
+                if (p2Units.length === 0) {
+
+                    showWinner("Игрок 1 победил!", "player1");
+
+                    cancelAnimationFrame(ns.loop);
+
+                    return;
+
+                }
+
+
+
+                // Проверка на патовую ситуацию
+
+                const p1CanBeat = p1Units.some(u1 =>
+
+                    p2Units.some(u2 => shouldChase(u1.type, u2.type))
+
+                );
+
+                const p2CanBeat = p2Units.some(u2 =>
+
+                    p1Units.some(u1 => shouldChase(u2.type, u1.type))
+
+                );
+
+
+
+                if (!p1CanBeat && !p2CanBeat) {
+
+                    if (p1Units.length > p2Units.length) {
+
+                        showWinner("Игрок 1 победил!", "player1");
+
+                    } else if (p2Units.length > p1Units.length) {
+
+                        showWinner("Игрок 2 победил!", "player2");
+
+                    } else {
+
+                        showWinner("Ничья!", null);
+
+                    }
+
+                    cancelAnimationFrame(ns.loop);
+
+                }
+
+            }
+
+
+
+            function showWinner(text, player) {
+
+                ns.winnerText = text;
+
+                ns.winnerPlayer = player;
+
+                document.getElementById("restartGameBtn").style.display = "block";
+
+                document.getElementById("startGameBtn").style.display = "none";
+
+                document.getElementById("player1Controls").style.pointerEvents = "none";
+
+                document.getElementById("player2Controls").style.pointerEvents = "none";
+
+            }
+
+        })(Game);
+
+
+
+        (function(ns) {
+
+            const canvas = document.getElementById("gameCanvas");
+
+            const ctx = canvas.getContext("2d");
+
+
+
+            const startGameBtn = document.getElementById("startGameBtn");
+
+            const restartGameBtn = document.getElementById("restartGameBtn");
+
+            const player1Controls = document.getElementById("player1Controls");
+
+            const player2Controls = document.getElementById("player2Controls");
+
+
+
+            // Перенесем инициализацию этих полей сюда, чтобы они были доступны в ns
+
+            ns.isRunning = ns.isRunning || false;
+
+            ns.units = ns.units || [];
+
+            ns.placing = ns.placing || true;
+
+            ns.winnerText = ns.winnerText || "";
+
+            ns.winnerPlayer = ns.winnerPlayer || null;
+
+            ns.activePlayer = ns.activePlayer || "player1";
+
+
+
+
+
+            ns.spawnRandomUnits = function() {
+
+                const minUnits = 1;
+
+                const maxUnits = 5;
+
+
+
+                const allTypes = ["rock", "scissors", "paper"];
+
+
+
+                function randomInt(min, max) {
+
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+
+                }
+
+
+
+                for (const player of ["player1", "player2"]) {
+
+                    const count = Math.min(randomInt(minUnits, maxUnits), allTypes.length);
+
+                    const shuffledTypes = allTypes.slice().sort(() => Math.random() - 0.5);
+
+                    const chosenTypes = shuffledTypes.slice(0, count);
+
+
+
+                    for (let i = 0; i < count; i++) {
+
+                        const x = Math.random() * ns.WIDTH;
+
+                        const y = Math.random() * ns.HEIGHT;
+
+                        const type = chosenTypes[i];
+
+                        ns.units.push(new ns.Unit(x, y, type, player));
+
+                    }
+
+                }
+
+            };
+
+
+
+            ns.draw = function() {
+
+                ctx.clearRect(0, 0, ns.WIDTH, ns.HEIGHT);
+
+
+
+                const gridSize = 20;
+
+                ctx.strokeStyle = 'rgba(128, 128, 128, 0.2)';
+
+                ctx.lineWidth = 1;
+
+
+
+                for (let x = 0; x <= ns.WIDTH; x += gridSize) {
+
+                    ctx.beginPath();
+
+                    ctx.moveTo(x, 0);
+
+                    ctx.lineTo(x, ns.HEIGHT);
+
+                    ctx.stroke();
+
+                }
+
+                for (let y = 0; y <= ns.HEIGHT; y += gridSize) {
+
+                    ctx.beginPath();
+
+                    ctx.moveTo(0, y);
+
+                    ctx.lineTo(ns.WIDTH, y);
+
+                    ctx.stroke();
+
+                }
+
+
+
+                for (let u of ns.units) {
+
+                    u.draw(ctx);
+
+                }
+
+
+
+                if (ns.winnerText) {
+
+                    const centerX = ns.WIDTH / 2;
+
+                    const centerY = ns.HEIGHT / 2;
+
+                    ctx.fillStyle = "rgba(0,0,0,0.7)";
+
+                    ctx.fillRect(centerX - 150, centerY - 40, 300, 80);
+
+
+
+                    ctx.textAlign = "center";
+
+                    ctx.textBaseline = "middle";
+
+                    ctx.font = "bold 32px Arial";
+
+
+
+                    if (ns.winnerPlayer === "player1") {
+
+                        ctx.fillStyle = "#87CEFA";
+
+                        ctx.shadowColor = "#00BFFF";
+
+                    } else if (ns.winnerPlayer === "player2") {
+
+                        ctx.fillStyle = "#FF6347";
+
+                        ctx.shadowColor = "#FF4500";
+
+                    } else {
+
+                        ctx.fillStyle = "white";
+
+                        ctx.shadowColor = "white";
+
+                    }
+
+                    ctx.shadowBlur = 20;
+
+                    ctx.fillText(ns.winnerText, centerX, centerY);
+
+                    ctx.shadowBlur = 0;
+
+                }
+
+            };
+
+
+
+            ns.gameLoop = function() {
+
+                ns.update();
+
+                ns.draw();
+
+                if (!ns.winnerText) {
+
+                    ns.loop = requestAnimationFrame(ns.gameLoop);
+
+                } else {
+
+                    ns.isRunning = false;
+
+                }
+
+            };
+
+
+
+            startGameBtn.addEventListener("click", () => {
+
+                if (ns.isRunning) {
+
+                    return;
+
+                }
+
+
+
+                if (ns.units.length === 0) {
+
+                    ns.spawnRandomUnits();
+
+                    ns.ui.updateUI();
+
+                    ns.draw();
+
+                }
+
+
+
+                ns.placing = false;
+
+                ns.isRunning = true;
+
+
+
+                startGameBtn.style.display = "none";
+
+                player1Controls.style.pointerEvents = "none";
+
+                player2Controls.style.pointerEvents = "none";
+
+
+
+                ns.loop = requestAnimationFrame(ns.gameLoop);
+
+            });
+
+
+
+            restartGameBtn.addEventListener("click", () => {
+
+                ns.isRunning = false;
+
+
+
+                ns.units = [];
+
+                ns.placing = true;
+
+                ns.winnerText = "";
+
+                ns.winnerPlayer = null;
+
+                ns.activePlayer = "player1";
+
+
+
+                const activePlayerLabel = document.getElementById("activePlayer");
+
+                activePlayerLabel.textContent = "Игрок 1";
+
+
+
+                startGameBtn.style.display = "inline-block";
+
+                player1Controls.style.pointerEvents = "auto";
+
+                player2Controls.style.pointerEvents = "auto";
+
+                document.getElementById("player1UnitsCount").textContent = "0";
+
+                document.getElementById("player2UnitsCount").textContent = "0";
+
+                restartGameBtn.style.display = "none";
+
+
+
+                ns.ui.updateUI();
+
+                ns.draw();
+
+            });
+
+
+
+            canvas.addEventListener("click", (e) => {
+
+                if (!ns.placing) return;
+
+
+
+                const rect = canvas.getBoundingClientRect();
+
+                const x = e.clientX - rect.left;
+
+                const y = e.clientY - rect.top;
+
+
+
+                let clickedUnitIndex = -1;
+
+                for (let i = ns.units.length - 1; i >= 0; i--) {
+
+                    const u = ns.units[i];
+
+                    const dx = u.x - x;
+
+                    const dy = u.y - y;
+
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+
+                    if (distance <= 15) {
+
+                        clickedUnitIndex = i;
+
+                        break;
+
+                    }
+
+                }
+
+
+
+                if (clickedUnitIndex >= 0) {
+
+                    ns.units.splice(clickedUnitIndex, 1);
+
+                } else {
+
+                    const type = ns.selectedTypes[ns.activePlayer];
+
+                    ns.units.push(new ns.Unit(x, y, type, ns.activePlayer));
+
+                }
+
+
+
+                ns.ui.updateUI();
+
+                ns.draw();
+
+            });
+
+
+
+            canvas.addEventListener("touchstart", (e) => {
+
+                if (!ns.placing) return;
+
+
+
+                e.preventDefault();
+
+
+
+                const rect = canvas.getBoundingClientRect();
+
+                const touch = e.touches[0];
+
+
+
+                const scaleX = canvas.width / rect.width;
+
+                const scaleY = canvas.height / rect.height;
+
+
+
+                const x = (touch.clientX - rect.left) * scaleX;
+
+                const y = (touch.clientY - rect.top) * scaleY;
+
+
+
+                let clickedUnitIndex = -1;
+
+                for (let i = ns.units.length - 1; i >= 0; i--) {
+
+                    const u = ns.units[i];
+
+                    const dx = u.x - x;
+
+                    const dy = u.y - y;
+
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+
+                    if (distance <= 15) {
+
+                        clickedUnitIndex = i;
+
+                        break;
+
+                    }
+
+                }
+
+
+
+                if (clickedUnitIndex >= 0) {
+
+                    ns.units.splice(clickedUnitIndex, 1);
+
+                } else {
+
+                    const type = ns.selectedTypes[ns.activePlayer];
+
+                    ns.units.push(new ns.Unit(x, y, type, ns.activePlayer));
+
+                }
+
+
+
+                ns.ui.updateUI();
+
+                ns.draw();
+
+            }, { passive: false });
+
+
+
+            canvas.width = 700;
+
+            canvas.height = 500;
+
+
+
+            ns.WIDTH = canvas.width;
+
+            ns.HEIGHT = canvas.height;
+
+        })(Game);
+
+
+
+        (function(ns) {
+
+            const player1Controls = document.getElementById("player1Controls");
+
+            const player2Controls = document.getElementById("player2Controls");
+
+            const activePlayerLabel = document.getElementById("activePlayer");
+
+            const player1UnitsCountSpan = document.getElementById("player1UnitsCount");
+
+            const player2UnitsCountSpan = document.getElementById("player2UnitsCount");
+
+
+
+            function updatePlayerButtons(container, player) {
+
+                const buttons = container.querySelectorAll(".type-button");
+
+                buttons.forEach(btn => {
+
+                    const type = btn.getAttribute("data-type");
+
+                    btn.classList.remove("hidden");
+
+                    if (player === ns.activePlayer) {
+
+                        btn.classList.toggle("selected", ns.selectedTypes[player] === type);
+
+                    } else {
+
+                        btn.classList.remove("selected");
+
+                    }
+
+                });
+
+            }
+
+
+
+            function updateUI() {
+
+                activePlayerLabel.textContent = ns.activePlayer === "player1" ? "Игрок 1" : "Игрок 2";
+
+                updatePlayerButtons(player1Controls, "player1");
+
+                updatePlayerButtons(player2Controls, "player2");
+
+
+
+                const p1Count = ns.units.filter(u => u.player === "player1").length;
+
+                const p2Count = ns.units.filter(u => u.player === "player2").length;
+
+                player1UnitsCountSpan.textContent = p1Count;
+
+                player2UnitsCountSpan.textContent = p2Count;
+
+            }
+
+
+
+            function setupTypeButtons() {
+
+                const allButtons = [...player1Controls.querySelectorAll(".type-button"),
+
+                                    ...player2Controls.querySelectorAll(".type-button")];
+
+                allButtons.forEach(btn => {
+
+                    btn.addEventListener("click", () => {
+
+                        const parent = btn.closest(".player-controls");
+
+                        const player = parent.id === "player1Controls" ? "player1" : "player2";
+
+
+
+                        ns.activePlayer = player;
+
+                        ns.selectedTypes[player] = btn.getAttribute("data-type");
+
+                        updateUI();
+
+                    });
+
+
+
+                    btn.addEventListener("touchstart", (e) => {
+
+                        e.preventDefault();
+
+                        const parent = btn.closest(".player-controls");
+
+                        const player = parent.id === "player1Controls" ? "player1" : "player2";
+
+
+
+                        ns.activePlayer = player;
+
+                        ns.selectedTypes[player] = btn.getAttribute("data-type");
+
+                        updateUI();
+
+                    }, { passive: false });
+
+                });
+
+            }
+
+
+
+            ns.ui = {
+
+                updateUI,
+
+                setupTypeButtons,
+
+            };
+
+
+
+            // Вызов setupTypeButtons и updateUI после инициализации Game в main.js
+
+            document.addEventListener("DOMContentLoaded", () => {
+
+                ns.ui.setupTypeButtons();
+
+                ns.ui.updateUI();
+
+                ns.draw(); // Первоначальная отрисовка пустого поля или начальных юнитов
+
+            });
+
+
+
+        })(Game);
+
+    </script>
+
 </body>
+
 </html>
+
+
+
