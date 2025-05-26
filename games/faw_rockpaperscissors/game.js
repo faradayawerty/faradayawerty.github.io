@@ -12,7 +12,6 @@ var Game = Game || {};
   ns.COLORS = { player: "lightblue", enemy: "tomato" };
 
   ns.MAX_PLAYER_UNITS = 15;
-  ns.MAX_ENEMY_UNITS = 15;
 
   ns.units = [];
   ns.placing = true;

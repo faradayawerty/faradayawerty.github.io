@@ -79,7 +79,7 @@
   ns.updateUnitCountDisplay = function() {
     const p = ns.units.filter(u => u.team === "player").length;
     const e = ns.units.filter(u => u.team === "enemy").length;
-    ns.elements.playerUnitsLeftSpan.textContent = `Player units left: ${ns.MAX_PLAYER_UNITS - ns.playerUnitCount}`;
+    ns.elements.playerUnitsLeftSpan.textContent = `Player units: ${p}`;
     ns.elements.enemyUnitsCountSpan.textContent = `Enemy units: ${e}`;
   };
 
@@ -175,7 +175,6 @@
         const dist = Math.hypot(dx, dy);
         if (dist <= u.radius) {
           ns.units.splice(i, 1);
-          ns.playerUnitCount--;
           ns.updateUnitCountDisplay();
           ns.draw();
           return;
@@ -183,10 +182,7 @@
       }
     }
 
-    if (ns.playerUnitCount >= ns.MAX_PLAYER_UNITS) return;
-
     ns.units.push(new ns.Unit(pos.x, pos.y, ns.selectedType, "player"));
-    ns.playerUnitCount++;
     ns.updateUnitCountDisplay();
     ns.draw();
   }
@@ -207,7 +203,7 @@
   });
 
   ns.elements.startButton.addEventListener("click", () => {
-    if (ns.playerUnitCount === 0) return alert("Place at least one unit!");
+    if (ns.getPlayerUnitsCount() === 0) return alert("Place at least one unit!");
     ns.placing = false;
     ns.generateEnemyUnits();
     ns.winnerText = "";
@@ -220,7 +216,6 @@
   ns.elements.replayButton.addEventListener("click", () => {
     clearInterval(ns.loop);
     ns.units = [];
-    ns.playerUnitCount = 0;
     ns.placing = true;
     ns.winnerText = "";
     ns.winnerTeam = null;
@@ -242,6 +237,11 @@
   }
 
   idleLoop();
+
+  ns.getPlayerUnitsCount = function() {
+    const playerUnits = ns.units.filter(u => u.team === "player");
+    return playerUnits.length;
+  }
 
   ns.checkWinCondition = function() {
     if (ns.placing) return;
