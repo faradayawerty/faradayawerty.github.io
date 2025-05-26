@@ -1,12 +1,13 @@
 
 var Levels = (function() {
+  const normalize = (x, y) => ({ x: x, y: y * 4/3 }); // преобразуем из 800x600 в 800x800
+
   return [
-    // Уровень 1 — правильный треугольник, 3 врага, 4 игрока
     {
       name: "Уровень 1",
       maxPlayerUnits: 4,
       enemyUnits: (function() {
-        const centerX = 400, centerY = 300, radius = 150;
+        const centerX = 400, centerY = 400, radius = 200;
         const types = ["rock", "paper", "scissors"];
         let units = [];
         for (let i = 0; i < 3; i++) {
@@ -21,24 +22,25 @@ var Levels = (function() {
       })()
     },
 
-    // Уровень 2 — 4 врага: 2 бумаги и 2 камня, 2 игрока
     {
       name: "Уровень 2",
       maxPlayerUnits: 2,
       enemyUnits: [
-        { x: 150, y: 300, type: "paper" },
-        { x: 300, y: 100, type: "paper" },
-        { x: 650, y: 220, type: "rock" },
-        { x: 550, y: 400, type: "rock" }
-      ]
+        normalize(150, 300),
+        normalize(300, 100),
+        normalize(650, 220),
+        normalize(550, 400)
+      ].map((pos, i) => ({
+        ...pos,
+        type: i < 2 ? "paper" : "rock"
+      }))
     },
 
-    // Уровень 3 — правильный шестиугольник, 6 врагов, 7 игроков
     {
       name: "Уровень 3",
       maxPlayerUnits: 7,
       enemyUnits: (function() {
-        const centerX = 400, centerY = 300, radius = 150;
+        const centerX = 400, centerY = 400, radius = 200;
         const types = ["rock", "paper", "scissors", "rock", "paper", "scissors"];
         let units = [];
         for (let i = 0; i < 6; i++) {
@@ -53,7 +55,6 @@ var Levels = (function() {
       })()
     },
 
-    // Уровень 4 — выдуманный: 8 врагов в случайных позициях, 6 игроков
     {
       name: "Уровень 4",
       maxPlayerUnits: 6,
@@ -65,11 +66,10 @@ var Levels = (function() {
         { x: 550, y: 280, type: "paper" },
         { x: 650, y: 350, type: "scissors" },
         { x: 700, y: 420, type: "rock" },
-        { x: 750, y: 150, type: "paper" }
-      ]
+        { x: 650, y: 150, type: "paper" }
+      ].map(u => ({ ...normalize(u.x, u.y), type: u.type }))
     },
 
-    // Уровень 5 — выдуманный: 10 врагов с равномерным распределением, 10 игроков
     {
       name: "Уровень 5",
       maxPlayerUnits: 10,
@@ -82,23 +82,22 @@ var Levels = (function() {
         { x: 500, y: 300, type: "paper" },
         { x: 580, y: 330, type: "scissors" },
         { x: 660, y: 280, type: "rock" },
-        { x: 740, y: 350, type: "paper" },
-        { x: 800, y: 400, type: "scissors" }
-      ]
+        { x: 700, y: 350, type: "paper" },
+        { x: 500, y: 400, type: "scissors" }
+      ].map(u => ({ ...normalize(u.x, u.y), type: u.type }))
     },
 
-    // Уровень 6 — враги слоями на кругах, 20 игроков
     {
       name: "Уровень 6",
       maxPlayerUnits: 20,
       enemyUnits: (function() {
-        const centerX = 400, centerY = 300;
+        const centerX = 400, centerY = 400;
         let units = [];
-        const radii = [80, 140, 200]; // три слоя
+        const radii = [100, 170, 240];
         const types = ["rock", "paper", "scissors"];
         for (let layer = 0; layer < radii.length; layer++) {
           const radius = radii[layer];
-          const count = (layer + 1) * 6; // 6, 12, 18 юнитов по слоям
+          const count = (layer + 1) * 6;
           for (let i = 0; i < count; i++) {
             const angle = (2 * Math.PI / count) * i - Math.PI / 2;
             units.push({
