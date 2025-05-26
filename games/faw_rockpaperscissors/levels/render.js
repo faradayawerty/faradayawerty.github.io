@@ -4,7 +4,7 @@
     ctx.strokeStyle = "#444";
     ctx.lineWidth = 1;
 
-    // Рисуем сетку в логических координатах (без масштабирования)
+    // Рисуем сетку в логических координатах (с учетом масштаба)
     for (let x = 0; x <= ns.WIDTH; x += ns.CELL_SIZE) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -22,16 +22,18 @@
   ns.draw = function() {
     const ctx = ns.elements.ctx;
 
-    // Сначала рисуем фон и сетку без масштабирования
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // сбрасываем трансформацию
+    // Сначала применяем масштабирование ко всем элементам
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // сбрасываем старые трансформации
+    ctx.scale(ns.scaleFactor, ns.scaleFactor); // масштабируем все
+
+    // Рисуем фон
     ctx.fillStyle = "#222";
     ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT); // рисуем фон
-    ns.drawGrid(ctx); // рисуем сетку
 
-    // Применяем масштаб только для игровых объектов
-    ctx.scale(ns.scaleFactor, ns.scaleFactor); // масштабируем только игровые объекты
+    // Рисуем сетку (с учетом масштаба)
+    ns.drawGrid(ctx);
 
-    // Рисуем юнитов
+    // Рисуем юнитов (с учетом масштаба)
     ns.units.forEach(unit => unit.draw(ctx));
 
     if (ns.placing) {
