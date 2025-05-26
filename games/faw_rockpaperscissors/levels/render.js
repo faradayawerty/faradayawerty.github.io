@@ -7,16 +7,14 @@
     // Рисуем сетку в логических координатах (без масштабирования)
     for (let x = 0; x <= ns.WIDTH; x += ns.CELL_SIZE) {
       ctx.beginPath();
-      // Масштабируем координаты в пиксели
-      ctx.moveTo(x * ns.CANVAS_SIZE / ns.WIDTH, 0);
-      ctx.lineTo(x * ns.CANVAS_SIZE / ns.WIDTH, ns.CANVAS_SIZE);
+      ctx.moveTo(x, 0);  // Используем логические координаты
+      ctx.lineTo(x, ns.HEIGHT);  // Используем логические координаты
       ctx.stroke();
     }
     for (let y = 0; y <= ns.HEIGHT; y += ns.CELL_SIZE) {
       ctx.beginPath();
-      // Масштабируем координаты в пиксели
-      ctx.moveTo(0, y * ns.CANVAS_SIZE / ns.HEIGHT);
-      ctx.lineTo(ns.CANVAS_SIZE, y * ns.CANVAS_SIZE / ns.HEIGHT);
+      ctx.moveTo(0, y);  // Используем логические координаты
+      ctx.lineTo(ns.WIDTH, y);  // Используем логические координаты
       ctx.stroke();
     }
   };
@@ -26,10 +24,10 @@
 
     // Сначала рисуем фон и сетку
     ctx.fillStyle = "#222";
-    ctx.fillRect(0, 0, ns.CANVAS_SIZE, ns.CANVAS_SIZE); // рисуем фон
-    ns.drawGrid(ctx); // рисуем сетку
+    ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT); // Рисуем фон с логическими размерами
+    ns.drawGrid(ctx); // Рисуем сетку без масштабирования
 
-    // Рисуем юнитов с учетом масштабирования
+    // Рисуем юнитов с использованием логических координат
     ns.units.forEach(unit => unit.draw(ctx));
 
     if (ns.placing) {
@@ -39,28 +37,23 @@
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
 
-      // Масштабируем положение вражеских юнитов и радиус
+      // Рисуем радиус вокруг вражеских юнитов, без масштабирования
       ns.units.filter(u => u.team === "enemy").forEach(u => {
         ctx.beginPath();
         
-        // Масштабируем координаты врагов с учетом CANVAS_SIZE
-        const scaledX = u.x * ns.CANVAS_SIZE / ns.WIDTH;
-        const scaledY = u.y * ns.CANVAS_SIZE / ns.HEIGHT;
-
-        // Масштабируем радиус
-        const scaledRadius = 60 * ns.CANVAS_SIZE / ns.WIDTH;
-        ctx.arc(scaledX, scaledY, scaledRadius, 0, 2 * Math.PI);  // Масштабируем радиус
+        // Используем логические координаты без масштабирования
+        ctx.arc(u.x, u.y, 60, 0, 2 * Math.PI);  // Радиус остается фиксированным
         ctx.stroke();
       });
       ctx.restore();
     }
 
-    // Рисуем текст с победой
+    // Рисуем текст с победой, без масштабирования
     if (ns.winnerText) {
       ctx.font = "48px serif";
       ctx.fillStyle = "limegreen";
       ctx.textAlign = "center";
-      ctx.fillText(ns.winnerText, ns.CANVAS_SIZE / 2, ns.CANVAS_SIZE / 2);
+      ctx.fillText(ns.winnerText, ns.WIDTH / 2, ns.HEIGHT / 2);
     }
   };
 })(Game);

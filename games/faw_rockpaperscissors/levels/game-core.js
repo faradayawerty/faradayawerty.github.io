@@ -1,34 +1,35 @@
 
 (function(ns) {
-  function updateCanvasSize() {
-    const canvas = ns.elements.canvas;
-    const ctx = ns.elements.ctx;
+function updateCanvasSize() {
+  const canvas = ns.elements.canvas;
+  const ctx = ns.elements.ctx;
 
-    // Вычисляем размер canvas как меньшую сторону окна (с учетом 95% от размера экрана)
-    const cssSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
+  // Вычисляем размер canvas как меньшую сторону окна (с учетом 95% от размера экрана)
+  const cssSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
 
-    // Устанавливаем реальные размеры canvas (без учета DPR)
-    canvas.width = cssSize;
-    canvas.height = cssSize;
-    canvas.style.width = cssSize + "px";
-    canvas.style.height = cssSize + "px";
+  // Устанавливаем реальные размеры canvas (с учетом DPR)
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = cssSize * dpr; // Реальная ширина (с учетом DPR)
+  canvas.height = cssSize * dpr; // Реальная высота (с учетом DPR)
+  canvas.style.width = cssSize + "px"; // Отображаемая ширина
+  canvas.style.height = cssSize + "px"; // Отображаемая высота
 
-    // Устанавливаем логические размеры игры
-    ns.CANVAS_SIZE = cssSize;
+  // Устанавливаем логические размеры игры
+  ns.CANVAS_SIZE = cssSize;
 
-    const BASE_LOGICAL_SIZE = 800; // базовая ширина/высота логики игры
-    ns.scaleFactor = 1; // Без масштабирования
+  const BASE_LOGICAL_SIZE = 800; // базовая ширина/высота логики игры
+  ns.scaleFactor = cssSize / BASE_LOGICAL_SIZE; // Масштабируем с учетом реального размера канваса
 
-    // Устанавливаем логические размеры для игры
-    ns.WIDTH = BASE_LOGICAL_SIZE;
-    ns.HEIGHT = BASE_LOGICAL_SIZE;
+  // Устанавливаем логические размеры для игры
+  ns.WIDTH = BASE_LOGICAL_SIZE;
+  ns.HEIGHT = BASE_LOGICAL_SIZE;
 
-    // Центрируем canvas
-    canvas.style.position = "absolute";
-    canvas.style.top = "50%";
-    canvas.style.left = "50%";
-    canvas.style.transform = "translate(-50%, -50%)";
-  }
+  // Центрируем canvas
+  canvas.style.position = "absolute";
+  canvas.style.top = "50%";
+  canvas.style.left = "50%";
+  canvas.style.transform = "translate(-50%, -50%)";
+}
 
   ns.init = function() {
     ns.elements.canvas = document.getElementById("gameCanvas");
@@ -41,10 +42,10 @@
     ns.elements.enemyUnitsCount = document.getElementById("enemyUnitsCount");
 
     updateCanvasSize(); // Изначально устанавливаем размеры канваса
-    window.addEventListener("resize", () => {
-      updateCanvasSize();  // Обновляем размеры при изменении окна
-      ns.draw();
-    });
+window.addEventListener("resize", () => {
+  updateCanvasSize();  // Обновляем размеры при изменении окна
+  ns.draw();
+});
 
     // Загрузка уровней в селектор
     Levels.forEach((lvl, i) => {
