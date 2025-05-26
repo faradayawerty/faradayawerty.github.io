@@ -155,6 +155,7 @@ function resolveConflict(a, b) {
   ns.shouldFlee = shouldFlee;
 
   ns.update = function() {
+    if (!ns.isRunning) return;  // если игра не запущена, не двигаем юнитов
     for (let u of ns.units) u.move();
 
     for (let i = 0; i < ns.units.length; i++) {
