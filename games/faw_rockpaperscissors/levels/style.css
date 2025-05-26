@@ -100,9 +100,8 @@ main {
 canvas#gameCanvas {
   background: #000;
   border: 2px solid #555;
-  max-width: 100%;
-  max-height: 100vh;
-  height: auto;
+  width: 800px; /* Устанавливаем фиксированный размер */
+  height: 800px; /* Устанавливаем фиксированный размер */
   user-select: none;
   display: block;
   position: absolute; /* Чтобы мы могли центрировать canvas */
@@ -154,7 +153,7 @@ canvas#gameCanvas {
     height: auto;
     order: 2;
   }
-  
+
   canvas#gameCanvas {
     width: 90vw;   /* Делаем ширину 90% от ширины экрана */
     height: 90vw;  /* Высоту также делаем 90% от ширины экрана для квадратного вида */

@@ -23,12 +23,11 @@
     const ctx = ns.elements.ctx;
 
     // Сначала рисуем фон и сетку без масштабирования
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // сбрасываем старую трансформацию
     ctx.fillStyle = "#222";
     ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT); // рисуем фон
     ns.drawGrid(ctx); // рисуем сетку
 
-    // Рисуем юнитов (с учетом масштаба)
+    // Рисуем юнитов без масштабирования
     ns.units.forEach(unit => unit.draw(ctx));
 
     if (ns.placing) {
