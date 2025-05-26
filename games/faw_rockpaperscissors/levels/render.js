@@ -28,9 +28,6 @@
     ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT); // рисуем фон
     ns.drawGrid(ctx); // рисуем сетку
 
-    // Теперь применяем масштаб для игровых объектов
-    ctx.scale(ns.scaleFactor, ns.scaleFactor); // масштабируем только игровые объекты
-
     // Рисуем юнитов (с учетом масштаба)
     ns.units.forEach(unit => unit.draw(ctx));
 
