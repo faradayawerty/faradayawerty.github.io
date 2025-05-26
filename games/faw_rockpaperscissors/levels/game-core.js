@@ -4,7 +4,7 @@
     const canvas = ns.elements.canvas;
     const ctx = ns.elements.ctx;
 
-    // Вычисляем размер canvas как меньшую сторону окна
+    // Вычисляем размер canvas как меньшую сторону окна (с учетом 95% от размера экрана)
     const cssSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
 
     // Устанавливаем реальные размеры canvas (без учета DPR)
