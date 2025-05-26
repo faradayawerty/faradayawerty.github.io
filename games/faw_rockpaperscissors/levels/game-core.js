@@ -1,22 +1,30 @@
 
 (function(ns) {
-  function updateCanvasSize() {
-    const dpr = window.devicePixelRatio || 1;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+function updateCanvasSize() {
+  const canvas = ns.elements.canvas;
+  const ctx = ns.elements.ctx;
 
-    ns.WIDTH = width * 0.75;
-    ns.HEIGHT = height * 0.85;
+  // Размеры в CSS пикселях
+  const cssWidth = window.innerWidth * 0.75;
+  const cssHeight = window.innerHeight * 0.75;
 
-    if (ns.elements.canvas) {
-      ns.elements.canvas.style.width = ns.WIDTH + "px";
-      ns.elements.canvas.style.height = ns.HEIGHT + "px";
-      ns.elements.canvas.width = ns.WIDTH * dpr;
-      ns.elements.canvas.height = ns.HEIGHT * dpr;
-      ns.elements.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
-      ns.elements.ctx.scale(dpr, dpr); // Scale drawing for high-DPI
-    }
-  }
+  const dpr = window.devicePixelRatio || 1;
+
+  // Устанавливаем размеры canvas в "физических" пикселях
+  canvas.width = cssWidth * dpr;
+  canvas.height = cssHeight * dpr;
+
+  // Устанавливаем размеры canvas в стилях (CSS пиксели)
+  canvas.style.width = cssWidth + "px";
+  canvas.style.height = cssHeight + "px";
+
+  // Преобразуем контекст для корректной отрисовки
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации
+  ctx.scale(dpr, dpr); // масштабируем контекст под плотность пикселей
+
+  ns.WIDTH = cssWidth;
+  ns.HEIGHT = cssHeight;
+}
 
   ns.init = function() {
     ns.elements.canvas = document.getElementById("gameCanvas");
