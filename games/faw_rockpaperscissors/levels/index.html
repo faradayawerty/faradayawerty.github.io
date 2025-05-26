@@ -1,0 +1,1016 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>faw_rockpaperscissors: pvp (Levels)</title>
+    <link rel="icon" href="../icon.png">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ddd;
+            font-family: 'Inter', Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #unitCounters {
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        #playerUnitsLeft {
+            color: lightblue;
+        }
+
+        #enemyUnitsCount {
+            color: tomato;
+        }
+
+        #container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 10px;
+            gap: 20px;
+            position: relative;
+            flex-wrap: wrap;
+            padding: 0 10px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        #controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 140px;
+            flex: 1;
+            max-width: 300px;
+            border-radius: 12px;
+            padding: 10px;
+            background-color: #1a1a1a;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .type-button {
+            padding: 10px 20px;
+            margin: 5px 0;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #555;
+            background-color: #2a2a2a;
+            color: #ddd;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .type-button:hover {
+            background-color: #444;
+            border-color: #aaddff;
+        }
+
+        .type-button.selected {
+            background-color: #555;
+            font-weight: bold;
+            border-color: #88ccff;
+            color: #aaddff;
+            box-shadow: 0 3px 8px rgba(136, 204, 255, 0.4);
+        }
+
+        #startButton,
+        #replayButton {
+            margin-top: 15px;
+            padding: 10px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #3a8f3a;
+            color: white;
+            transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 128, 0, 0.4);
+        }
+
+        #startButton:hover,
+        #replayButton:hover {
+            background-color: #5bb75b;
+            transform: translateY(-2px);
+        }
+
+        #startButton:active,
+        #replayButton:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 128, 0, 0.4);
+        }
+
+        /* Styles for the new dropdown */
+        #levelSelectDropdown {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #555;
+            background-color: #2a2a2a;
+            color: #ddd;
+            width: 100%;
+            appearance: none; /* Remove default dropdown arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23ddd%22%20d%3D%22M287%20197.6l-131.7-131.7c-4.7-4.7-12.3-4.7-17%200L5.4%20197.6c-4.7%204.7-4.7%2012.3%200%2017l11.3%2011.3c4.7%204.7%2012.3%204.7%2017%200l102.7-102.7c4.7-4.7%2012.3-4.7%2017%200l102.7%20102.7c4.7%204.7%2012.3%204.7%2017%200l11.3-11.3c4.7-4.7%204.7-12.3%200-17z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+        }
+
+        #levelSelectDropdown:focus {
+            border-color: #88ccff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(136, 204, 255, 0.5);
+        }
+
+        canvas {
+            border: 1px solid #444;
+            background-color: #1e1e1e;
+            touch-action: none;
+            display: block;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: auto;
+            max-width: 800px;
+            touch-action: manipulation;
+        }
+
+        #canvasOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #winnerMessage {
+            font-size: 36px;
+            font-weight: bold;
+            color: #90ee90;
+            text-shadow: 0 0 8px #90ee90aa;
+            min-width: 300px;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #enemyUnitSetup {
+            display: none;
+        }
+
+        .menu-button {
+            margin-top: 15px;
+            display: inline-block;
+            max-width: 200px;
+            width: auto;
+            padding: 12px 24px;
+            text-align: center;
+            align-self: center;
+            border-radius: 10px;
+            background-color: #555555;
+            color: #ddd;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.1s;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-button:hover {
+            background-color: #777777;
+            transform: translateY(-2px);
+        }
+
+        .menu-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Custom Modal for alerts (now hidden by default) */
+        .custom-modal-overlay {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="unitCounters">
+    <span id="playerUnitsLeft">Player units left: 0 / Max: 0</span> &nbsp;&nbsp;|&nbsp;&nbsp;
+    <span id="enemyUnitsCount">Enemy units: 0</span>
+</div>
+<div id="container">
+    <div id="controls">
+        <button class="type-button selected" data-type="rock">🪨 Rock</button>
+        <button class="type-button" data-type="paper">📄 Paper</button>
+        <button class="type-button" data-type="scissors">✂️ Scissors</button>
+        <select id="levelSelectDropdown"></select>
+        <button id="startButton">Start</button>
+        <button id="replayButton" style="display:none;">Replay</button>
+        <a href="../index.html" class="menu-button">Главное меню</a>
+    </div>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <div id="canvasOverlay"></div>
+</div>
+
+<div id="customAlertModal" class="custom-modal-overlay">
+    <div class="custom-modal">
+        <h3 id="modalTitle"></h3>
+        <p id="modalMessage"></p>
+        <button id="modalCloseButton">OK</button>
+    </div>
+</div>
+
+<script>
+    // game.js content (modified)
+    var Game = Game || {};
+
+    (function(ns) {
+        // Константы и базовые настройки
+        ns.CELL_SIZE = 30; // Более плотная сетка
+        ns.WIDTH = 800;
+        ns.HEIGHT = 500;
+
+        ns.TYPES = ["rock", "paper", "scissors"];
+        ns.EMOJIS = { rock: "🪨", paper: "📄", scissors: "✂️" };
+        ns.COLORS = { player: "lightblue", enemy: "tomato" };
+
+        ns.units = [];
+        ns.placing = true;
+        ns.selectedType = "rock";
+        ns.loop = null;
+        ns.winnerText = "";
+        ns.winnerTeam = null;
+
+        // Новые переменные для уровней
+        ns.levels = [];
+        ns.currentLevelIndex = 0;
+        ns.currentLevelData = null;
+
+        // Радиус зоны, куда нельзя ставить юниты игрока рядом с вражескими
+        ns.NO_PLACEMENT_ZONE_RADIUS = 60;
+
+        // UI elements, инициализируем позже
+        ns.elements = {};
+
+    })(Game);
+
+    // levels.js content (modified - reordered and names/descriptions removed)
+    (function(ns) {
+        ns.levels = [
+            {
+                maxPlayerUnits: 8, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 600, y: 150, type: "scissors" },
+                    { x: 650, y: 200, type: "scissors" },
+                    { x: 700, y: 250, type: "scissors" },
+                    { x: 630, y: 300, type: "rock" },
+                    { x: 670, y: 350, type: "paper" }
+                ]
+            },
+            {
+                maxPlayerUnits: 6, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 650, y: 250, type: "rock" },
+                    { x: 550, y: 250, type: "paper" }
+                ]
+            },
+            {
+                maxPlayerUnits: 10, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 450, y: 200, type: "rock" }, { x: 500, y: 200, type: "rock" },
+                    { x: 450, y: 300, type: "paper" }, { x: 500, y: 300, type: "paper" },
+                    { x: 550, y: 250, type: "scissors" }, { x: 400, y: 250, type: "scissors" }
+                ]
+            },
+            {
+                maxPlayerUnits: 12, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 650, y: 100, type: "rock" }, { x: 600, y: 150, type: "rock" },
+                    { x: 650, y: 400, type: "scissors" }, { x: 600, y: 350, type: "scissors" },
+                    { x: 450, y: 250, type: "paper" }, { x: 500, y: 250, type: "paper" }
+                ]
+            },
+            {
+                maxPlayerUnits: 10, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 600, y: 100, type: "paper" },
+                    { x: 650, y: 200, type: "paper" },
+                    { x: 700, y: 300, type: "paper" },
+                    { x: 620, y: 400, type: "scissors" },
+                    { x: 680, y: 150, type: "rock" },
+                    { x: 720, y: 250, type: "rock" },
+                    { x: 640, y: 350, type: "scissors" }
+                ]
+            },
+            {
+                maxPlayerUnits: 12, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Hexagon formation, adjusted for center
+                    { x: 600, y: 250, type: "rock" }, // Center
+                    { x: 550, y: 200, type: "paper" },
+                    { x: 650, y: 200, type: "scissors" },
+                    { x: 550, y: 300, type: "scissors" },
+                    { x: 650, y: 300, type: "paper" },
+                    { x: 500, y: 250, type: "rock" },
+                    { x: 700, y: 250, type: "rock" }
+                ]
+            },
+            {
+                maxPlayerUnits: 12, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 600, y: 70, type: "rock" },
+                    { x: 650, y: 120, type: "rock" },
+                    { x: 700, y: 170, type: "rock" },
+                    { x: 730, y: 220, type: "rock" },
+                    { x: 620, y: 270, type: "rock" },
+                    { x: 680, y: 320, type: "rock" },
+                    { x: 720, y: 370, type: "rock" },
+                    { x: 600, y: 420, type: "rock" }
+                ]
+            },
+            {
+                maxPlayerUnits: 15, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 600, y: 100, type: "rock" }, { x: 650, y: 120, type: "paper" }, { x: 700, y: 140, type: "scissors" },
+                    { x: 600, y: 250, type: "paper" }, { x: 650, y: 270, type: "scissors" }, { x: 700, y: 290, type: "rock" },
+                    { x: 600, y: 400, type: "scissors" }, { x: 650, y: 420, type: "rock" }, { x: 700, y: 440, type: "paper" }
+                ]
+            },
+            {
+                maxPlayerUnits: 16, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Outer layer (Paper)
+                    { x: 700, y: 70, type: "paper" }, { x: 700, y: 170, type: "paper" }, { x: 700, y: 270, type: "paper" }, { x: 700, y: 370, type: "paper" },
+                    { x: 600, y: 70, type: "paper" }, { x: 600, y: 170, type: "paper" }, { x: 600, y: 270, type: "paper" }, { x: 600, y: 370, type: "paper" },
+                    // Middle layer (Scissors)
+                    { x: 650, y: 120, type: "scissors" }, { x: 650, y: 220, type: "scissors" }, { x: 650, y: 320, type: "scissors" }, { x: 650, y: 420, type: "scissors" },
+                    // Inner layer (Rock)
+                    { x: 650, y: 250, type: "rock" }
+                ]
+            },
+            // New levels start here (10-15)
+            {
+                maxPlayerUnits: 10, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Cross formation
+                    { x: 600, y: 250, type: "rock" }, // Center
+                    { x: 550, y: 250, type: "paper" },
+                    { x: 650, y: 250, type: "scissors" },
+                    { x: 600, y: 200, type: "paper" },
+                    { x: 600, y: 300, type: "scissors" }
+                ]
+            },
+            {
+                maxPlayerUnits: 12, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Snake formation
+                    { x: 700, y: 70, type: "rock" }, { x: 650, y: 70, type: "paper" }, { x: 600, y: 100, type: "scissors" },
+                    { x: 650, y: 130, type: "rock" }, { x: 700, y: 160, type: "paper" }, { x: 650, y: 190, type: "scissors" },
+                    { x: 600, y: 220, type: "rock" }, { x: 650, y: 250, type: "paper" }, { x: 700, y: 280, type: "scissors" },
+                    { x: 650, y: 310, type: "rock" }
+                ]
+            },
+            {
+                maxPlayerUnits: 15, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Defensive Barrier (thick vertical line)
+                    { x: 680, y: 70, type: "rock" }, { x: 680, y: 110, type: "paper" }, { x: 680, y: 150, type: "scissors" }, { x: 680, y: 190, type: "rock" }, { x: 680, y: 230, type: "paper" },
+                    { x: 680, y: 270, type: "scissors" }, { x: 680, y: 310, type: "rock" }, { x: 680, y: 350, type: "paper" }, { x: 680, y: 390, type: "scissors" }, { x: 680, y: 430, type: "rock" },
+                    { x: 720, y: 70, type: "paper" }, { x: 720, y: 110, type: "scissors" }, { x: 720, y: 150, type: "rock" }, { x: 720, y: 190, type: "paper" }, { x: 720, y: 230, type: "scissors" },
+                    { x: 720, y: 270, type: "rock" }, { x: 720, y: 310, type: "paper" }, { x: 720, y: 350, type: "scissors" }, { x: 720, y: 390, type: "rock" }, { x: 720, y: 430, type: "paper" }
+                ]
+            },
+            {
+                maxPlayerUnits: 16, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Encirclement (semi-circle on the right)
+                    { x: 700, y: 100, type: "rock" }, { x: 720, y: 150, type: "paper" }, { x: 730, y: 200, type: "scissors" },
+                    { x: 730, y: 250, type: "rock" }, { x: 730, y: 300, type: "paper" },
+                    { x: 720, y: 350, type: "scissors" }, { x: 700, y: 400, type: "rock" },
+                    { x: 650, y: 120, type: "paper" }, { x: 680, y: 180, type: "scissors" },
+                    { x: 690, y: 250, type: "rock" },
+                    { x: 680, y: 320, type: "paper" }, { x: 650, y: 380, type: "scissors" }
+                ]
+            },
+            {
+                maxPlayerUnits: 18, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // The Maze (lines creating passages)
+                    { x: 600, y: 70, type: "rock" }, { x: 600, y: 120, type: "paper" }, { x: 600, y: 170, type: "scissors" }, { x: 600, y: 220, type: "rock" },
+                    { x: 650, y: 120, type: "paper" }, { x: 650, y: 170, type: "scissors" }, { x: 650, y: 220, type: "rock" }, { x: 650, y: 270, type: "paper" },
+                    { x: 700, y: 70, type: "scissors" }, { x: 700, y: 120, type: "rock" }, { x: 700, y: 170, type: "paper" }, { x: 700, y: 220, type: "scissors" },
+                    { x: 550, y: 270, type: "rock" }, { x: 550, y: 320, type: "paper" }, { x: 550, y: 370, type: "scissors" }, { x: 550, y: 420, type: "rock" },
+                    { x: 600, y: 320, type: "paper" }, { x: 600, y: 370, type: "scissors" }, { x: 600, y: 420, type: "rock" }
+                ]
+            },
+            {
+                maxPlayerUnits: 22, // Reduced
+                initialPlayerUnits: [],
+                enemyUnits: (function() {
+                    const units = [];
+                    const types = ["rock", "paper", "scissors"];
+                    // Adjusted coordinates to be within canvas bounds with NO_PLACEMENT_ZONE_RADIUS
+                    for (let x = 500; x <= 700; x += 50) { // Adjusted x range
+                        for (let y = 70; y <= 430; y += 40) {
+                            units.push({ x: x, y: y, type: types[Math.floor(Math.random() * types.length)] });
+                        }
+                    }
+                    return units;
+                })()
+            }
+        ];
+
+        ns.currentLevelData = ns.levels[ns.currentLevelIndex];
+
+    })(Game);
+
+    // unit.js content (unchanged from previous version)
+    (function(ns) {
+
+        class Unit {
+            constructor(x, y, type, team) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.team = team;
+                this.vx = (Math.random() * 2 - 1);
+                this.vy = (Math.random() * 2 - 1);
+                this.radius = 20;
+                this.spawnTime = Date.now();
+
+                this.canDash = true;
+                this.nextDashTime = Date.now() + this.getRandomDashInterval();
+            }
+
+            getRandomDashInterval() {
+                return 2000 + Math.random() * 3000;
+            }
+
+            dash() {
+                const dashStrength = 5 + Math.random() * 10;
+                const speed = Math.hypot(this.vx, this.vy) || 1;
+                this.vx += (this.vx / speed) * dashStrength;
+                this.vy += (this.vy / speed) * dashStrength;
+                this.nextDashTime = Date.now() + this.getRandomDashInterval();
+            }
+
+            move() {
+                if (Date.now() >= this.nextDashTime) {
+                    this.dash();
+                }
+
+                let target = null;
+                let minDist = Infinity;
+
+                for (let other of ns.units) {
+                    if (other === this || other.team === this.team) continue;
+                    if (ns.shouldChase(this.type, other.type) || ns.shouldFlee(this.type, other.type)) {
+                        let dx = ns.wrapDistance(this.x, other.x, ns.WIDTH);
+                        let dy = ns.wrapDistance(this.y, other.y, ns.HEIGHT);
+                        let dist = Math.hypot(dx, dy);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            target = other;
+                        }
+                    }
+                }
+
+                const speed = 1.5;
+                if (target) {
+                    let dx = ns.wrapDistance(this.x, target.x, ns.WIDTH);
+                    let dy = ns.wrapDistance(this.y, target.y, ns.HEIGHT);
+                    const d = Math.hypot(dx, dy) + 0.01;
+
+                    if (ns.shouldChase(this.type, target.type)) {
+                        this.vx += (dx / d) * speed * 0.1;
+                        this.vy += (dy / d) * speed * 0.1;
+                    } else if (ns.shouldFlee(this.type, target.type)) {
+                        this.vx -= (dx / d) * speed * 0.1;
+                        this.vy -= (dy / d) * speed * 0.1;
+                    }
+                }
+
+                for (let other of ns.units) {
+                    if (other === this || other.team !== this.team) continue;
+                    const dx = ns.wrapDistance(this.x, other.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(this.y, other.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 0 && dist < this.radius * 2) {
+                        const repulse = 1.5;
+                        this.vx -= (dx / dist) * repulse * 0.05;
+                        this.vy -= (dy / dist) * repulse * 0.05;
+                    }
+                }
+
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+
+                this.x = (this.x + this.vx + ns.WIDTH) % ns.WIDTH;
+                this.y = (this.y + this.vy + ns.HEIGHT) % ns.HEIGHT;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                const age = Date.now() - this.spawnTime;
+                if (age < 1000) ctx.globalAlpha = 0.5 + 0.5 * (age / 1000);
+                ctx.font = "20px serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowColor = ns.COLORS[this.team];
+                ctx.shadowBlur = 8;
+                ctx.fillStyle = ns.COLORS[this.team];
+                ctx.fillText(ns.EMOJIS[this.type], 0, 0);
+                ctx.restore();
+            }
+        }
+
+        ns.Unit = Unit;
+
+        ns.wrapDistance = function(a, b, size) {
+            let d = b - a;
+            if (Math.abs(d) > size / 2) d -= Math.sign(d) * size;
+            return d;
+        };
+
+        ns.shouldChase = function(t1, t2) {
+            const map = { rock: "scissors", scissors: "paper", paper: "rock" };
+            return map[t1] === t2;
+        };
+
+        ns.shouldFlee = function(t1, t2) {
+            const map = { rock: "paper", paper: "scissors", scissors: "rock" };
+            return map[t1] === t2;
+        };
+
+    })(Game);
+
+    // gameLogic.js content (unchanged from previous version)
+    (function(ns) {
+
+        ns.resolveConflict = function(a, b) {
+            const map = { rock: "scissors", scissors: "paper", paper: "rock" };
+            if (map[a.type] === b.type) {
+                b.type = a.type;
+                b.team = a.team;
+            } else if (map[b.type] === a.type) {
+                a.type = b.type;
+                a.team = b.team;
+            }
+        };
+
+        ns.checkWinCondition = function() {
+            if (ns.placing) return;
+
+            const playerUnits = ns.units.filter(u => u.team === "player");
+            const enemyUnits = ns.units.filter(u => u.team === "enemy");
+
+            if (playerUnits.length === 0 && enemyUnits.length === 0) {
+                ns.showWinner("It's a draw!", null);
+                ns.stopGame();
+                return;
+            }
+
+            if (playerUnits.length === 0) {
+                ns.showWinner("Enemy wins!", "enemy");
+                ns.stopGame();
+                return;
+            }
+
+            if (enemyUnits.length === 0) {
+                ns.showWinner("Player wins!", "player");
+                ns.stopGame();
+                return;
+            }
+
+            const playerTypes = new Set(playerUnits.map(u => u.type));
+            const enemyTypes = new Set(enemyUnits.map(u => u.type));
+
+            if (playerTypes.size === 1 && enemyTypes.size === 1) {
+                const pType = [...playerTypes][0];
+                const eType = [...enemyTypes][0];
+
+                if (pType === eType) {
+                    if (playerUnits.length > enemyUnits.length) {
+                        ns.showWinner("Player wins!", "player");
+                    } else if (enemyUnits.length > playerUnits.length) {
+                        ns.showWinner("Enemy wins!", "enemy");
+                    } else {
+                        ns.showWinner("It's a draw!", null);
+                    }
+                    ns.stopGame();
+                }
+            }
+        };
+
+        ns.update = function() {
+            for (let u of ns.units) u.move();
+
+            for (let i = 0; i < ns.units.length; i++) {
+                for (let j = i + 1; j < ns.units.length; j++) {
+                    const a = ns.units[i];
+                    const b = ns.units[j];
+
+                    if (a.team === b.team) continue;
+
+                    const dx = ns.wrapDistance(a.x, b.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(a.y, b.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist < (a.radius + b.radius) && a.type !== b.type) {
+                        ns.resolveConflict(a, b);
+                    }
+                }
+            }
+
+            ns.checkWinCondition();
+        };
+
+    })(Game);
+
+    // ui.js content (modified for dropdown)
+    (function(ns) {
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        ns.elements = {
+            playerUnitsLeftSpan: document.getElementById("playerUnitsLeft"),
+            enemyUnitsCountSpan: document.getElementById("enemyUnitsCount"),
+            replayButton: document.getElementById("replayButton"),
+            startButton: document.getElementById("startButton"),
+            typeButtons: document.querySelectorAll(".type-button"),
+            levelSelectDropdown: document.getElementById("levelSelectDropdown")
+        };
+
+        ns.stopGame = function() {
+            if (ns.loop) {
+                clearInterval(ns.loop);
+                ns.loop = null;
+            }
+        };
+
+        ns.showWinner = function(text, team) {
+            ns.winnerText = text;
+            ns.winnerTeam = team || null;
+            ns.elements.replayButton.style.display = "inline-block";
+            ns.stopGame();
+        };
+
+        function drawGrid() {
+            const gridSize = ns.CELL_SIZE;
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+
+            for (let x = 0; x <= ns.WIDTH; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, ns.HEIGHT);
+                ctx.stroke();
+            }
+
+            for (let y = 0; y <= ns.HEIGHT; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(ns.WIDTH, y);
+                ctx.stroke();
+            }
+        }
+
+        /**
+         * Draws transparent grey circles around enemy units to indicate no-placement zones.
+         * Only drawn when in placing mode.
+         */
+        function drawNoPlacementZones() {
+            if (!ns.placing) return; // Draw only during placing phase
+
+            ctx.save();
+            ctx.fillStyle = "rgba(128, 128, 128, 0.1)"; // Transparent grey
+            ctx.strokeStyle = "rgba(128, 128, 128, 0.4)"; // Slightly darker grey outline
+            ctx.lineWidth = 2;
+
+            for (let u of ns.units) {
+                if (u.team === "enemy") {
+                    ctx.beginPath();
+                    ctx.arc(u.x, u.y, ns.NO_PLACEMENT_ZONE_RADIUS, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
+            ctx.restore();
+        }
+
+
+        ns.drawWinnerMessage = function() {
+            if (!ns.winnerText) return;
+
+            const centerX = ns.WIDTH / 2;
+            const centerY = ns.HEIGHT / 2;
+
+            ctx.fillStyle = "rgba(0,0,0,0.7)";
+            ctx.fillRect(centerX - 150, centerY - 40, 300, 80);
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = "bold 32px Arial";
+
+            if (ns.winnerTeam === "player") {
+                ctx.fillStyle = "#87CEFA";
+                ctx.shadowColor = "#00BFFF";
+            } else if (ns.winnerTeam === "enemy") {
+                ctx.fillStyle = "#FF6347";
+                ctx.shadowColor = "#FF4500";
+            } else {
+                ctx.fillStyle = "white";
+                ctx.shadowColor = "white";
+            }
+            ctx.shadowBlur = 20;
+            ctx.fillText(ns.winnerText, centerX, centerY);
+            ctx.shadowBlur = 0;
+        };
+
+        ns.draw = function() {
+            ctx.clearRect(0, 0, ns.WIDTH, ns.HEIGHT);
+            drawGrid();
+            drawNoPlacementZones(); // Draw no-placement zones
+            for (let u of ns.units) u.draw(ctx);
+            ns.drawWinnerMessage();
+        };
+
+        ns.updateUnitCountDisplay = function() {
+            const p = ns.units.filter(u => u.team === "player").length;
+            const e = ns.units.filter(u => u.team === "enemy").length;
+            const maxP = ns.currentLevelData ? ns.currentLevelData.maxPlayerUnits : 0;
+            ns.elements.playerUnitsLeftSpan.textContent = `Player units: ${p} / Max: ${maxP}`;
+            ns.elements.enemyUnitsCountSpan.textContent = `Enemy units: ${e}`;
+        };
+
+        ns.gameLoop = function() {
+            ns.update();
+            ns.draw();
+            ns.updateUnitCountDisplay();
+        };
+
+        let draggingUnit = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function findUnitAtPosition(x, y) {
+            for (let i = ns.units.length - 1; i >= 0; i--) {
+                const u = ns.units[i];
+                const dx = ns.wrapDistance(u.x, x, ns.WIDTH);
+                const dy = ns.wrapDistance(u.y, y, ns.HEIGHT);
+                const dist = Math.hypot(dx, dy);
+                if (dist <= u.radius) {
+                    return u;
+                }
+            }
+            return null;
+        }
+
+        function onPointerDown(e) {
+            if (ns.placing) return;
+            const pos = getPointerPos(e);
+            const unit = findUnitAtPosition(pos.x, pos.y);
+            if (unit && unit.team === "player") {
+                draggingUnit = unit;
+                dragOffsetX = pos.x - unit.x;
+                dragOffsetY = pos.y - unit.y;
+                e.preventDefault();
+            }
+        }
+
+        function onPointerMove(e) {
+            if (!draggingUnit) return;
+            const pos = getPointerPos(e);
+            draggingUnit.x = (pos.x - dragOffsetX + ns.WIDTH) % ns.WIDTH;
+            draggingUnit.y = (pos.y - dragOffsetY + ns.HEIGHT) % ns.HEIGHT;
+            e.preventDefault();
+        }
+
+        function onPointerUp(e) {
+            if (draggingUnit) {
+                draggingUnit = null;
+                e.preventDefault();
+            }
+        }
+
+        canvas.addEventListener("mousedown", onPointerDown);
+        canvas.addEventListener("mousemove", onPointerMove);
+        canvas.addEventListener("mouseup", onPointerUp);
+        canvas.addEventListener("mouseleave", onPointerUp);
+
+        canvas.addEventListener("touchstart", onPointerDown, { passive: false });
+        canvas.addEventListener("touchmove", onPointerMove, { passive: false });
+        canvas.addEventListener("touchend", onPointerUp, { passive: false });
+        canvas.addEventListener("touchcancel", onPointerUp, { passive: false });
+
+        function placeUnit(e) {
+            if (!ns.placing) return;
+
+            const pos = getPointerPos(e);
+
+            // Check if clicking on an existing player unit to remove it
+            for (let i = 0; i < ns.units.length; i++) {
+                const u = ns.units[i];
+                if (u.team === "player") {
+                    const dx = ns.wrapDistance(u.x, pos.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(u.y, pos.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+                    if (dist <= u.radius) {
+                        ns.units.splice(i, 1);
+                        ns.updateUnitCountDisplay();
+                        ns.draw();
+                        return;
+                    }
+                }
+            }
+
+            // Check for placement in no-placement zone
+            for (let u of ns.units) {
+                if (u.team === "enemy") {
+                    const dx = ns.wrapDistance(u.x, pos.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(u.y, pos.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < ns.NO_PLACEMENT_ZONE_RADIUS) {
+                        // Silently prevent placement without alert
+                        return;
+                    }
+                }
+            }
+
+            const playerUnitCount = ns.getPlayerUnitsCount();
+            if (playerUnitCount < ns.currentLevelData.maxPlayerUnits) {
+                ns.units.push(new ns.Unit(pos.x, pos.y, ns.selectedType, "player"));
+                ns.updateUnitCountDisplay();
+                ns.draw();
+            } else {
+                // Silently prevent placement without alert
+                return;
+            }
+        }
+
+        canvas.addEventListener("click", placeUnit);
+        canvas.addEventListener("touchstart", function(e) {
+            if (!ns.placing) return;
+            e.preventDefault();
+            placeUnit(e);
+        }, { passive: false });
+
+        ns.elements.typeButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                ns.elements.typeButtons.forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                ns.selectedType = btn.getAttribute("data-type");
+            });
+        });
+
+        ns.elements.startButton.addEventListener("click", () => {
+            if (ns.getPlayerUnitsCount() === 0) {
+                // Silently prevent start without alert
+                return;
+            }
+            ns.placing = false;
+            ns.winnerText = "";
+            ns.winnerTeam = null;
+            ns.elements.replayButton.style.display = "inline-block";
+            ns.elements.startButton.style.display = "none";
+            ns.elements.typeButtons.forEach(btn => btn.style.display = "none");
+            ns.elements.levelSelectDropdown.style.display = "none"; // Hide dropdown during game
+            ns.loop = setInterval(ns.gameLoop, 30);
+        });
+
+        ns.elements.replayButton.addEventListener("click", () => {
+            resetGameForLevel(ns.currentLevelIndex);
+        });
+
+        ns.getPlayerUnitsCount = function() {
+            return ns.units.filter(u => u.team === "player").length;
+        };
+
+        function idleLoop() {
+            ns.draw();
+            ns.updateUnitCountDisplay();
+            if (ns.placing) requestAnimationFrame(idleLoop);
+        }
+
+        /**
+         * Resets the game to the initial state for a given level.
+         * @param {number} levelIndex - The index of the level to load.
+         */
+        function resetGameForLevel(levelIndex) {
+            ns.stopGame();
+            ns.units = []; // Clear all units
+            ns.placing = true;
+            ns.winnerText = "";
+            ns.winnerTeam = null;
+
+            ns.currentLevelIndex = levelIndex;
+            ns.currentLevelData = ns.levels[levelIndex];
+
+            // Add initial player units if any (currently player places them)
+            if (ns.currentLevelData.initialPlayerUnits && ns.currentLevelData.initialPlayerUnits.length > 0) {
+                for (const unitData of ns.currentLevelData.initialPlayerUnits) {
+                    ns.units.push(new ns.Unit(unitData.x, unitData.y, unitData.type, "player"));
+                }
+            }
+
+            // Add enemy units immediately when level is loaded/reset
+            for (const enemyData of ns.currentLevelData.enemyUnits) {
+                ns.units.push(new ns.Unit(enemyData.x, enemyData.y, enemyData.type, "enemy"));
+            }
+
+            ns.elements.replayButton.style.display = "none";
+            ns.elements.startButton.style.display = "inline-block";
+            ns.elements.typeButtons.forEach(btn => btn.style.display = "inline-block");
+            ns.elements.levelSelectDropdown.style.display = "inline-block"; // Show dropdown
+            ns.elements.levelSelectDropdown.value = levelIndex; // Set dropdown to current level
+            ns.updateUnitCountDisplay();
+            ns.draw();
+            requestAnimationFrame(idleLoop);
+        }
+
+        // Level Selection Dropdown Logic
+        function populateLevelDropdown() {
+            ns.elements.levelSelectDropdown.innerHTML = ''; // Clear previous options
+            ns.levels.forEach((level, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Уровень ${index + 1}`; // Simple "Level X" text
+                ns.elements.levelSelectDropdown.appendChild(option);
+            });
+            ns.elements.levelSelectDropdown.value = ns.currentLevelIndex; // Select the current level
+        }
+
+        ns.elements.levelSelectDropdown.addEventListener("change", (event) => {
+            const selectedIndex = parseInt(event.target.value, 10);
+            resetGameForLevel(selectedIndex);
+        });
+
+        // Initial game setup
+        (function initGame() {
+            document.querySelector(".type-button[data-type='rock']").classList.add("selected");
+            populateLevelDropdown(); // Populate dropdown on init
+            resetGameForLevel(ns.currentLevelIndex); // Load the first level
+        })();
+
+    })(Game);
+</script>
+</body>
+</html>
