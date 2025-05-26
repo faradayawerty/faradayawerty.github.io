@@ -6,26 +6,20 @@
 
     // Вычисляем размер canvas как меньшую сторону окна
     const cssSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
-    const dpr = window.devicePixelRatio || 1;
-    const size = cssSize * dpr;
 
-    // Устанавливаем логические размеры canvas
-    canvas.width = size;
-    canvas.height = size;
+    // Устанавливаем реальные размеры canvas (без учета DPR)
+    canvas.width = cssSize;
+    canvas.height = cssSize;
     canvas.style.width = cssSize + "px";
     canvas.style.height = cssSize + "px";
 
-    // Применяем масштаб под плотность пикселей
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(dpr, dpr);
-
-    // Устанавливаем логическую ширину/высоту для игры
+    // Устанавливаем логические размеры игры
     ns.CANVAS_SIZE = cssSize;
 
     const BASE_LOGICAL_SIZE = 800; // базовая ширина/высота логики игры
-    ns.scaleFactor = cssSize / BASE_LOGICAL_SIZE;
+    ns.scaleFactor = 1; // Без масштабирования
 
-    // Обновляем логические размеры игры
+    // Устанавливаем логические размеры для игры
     ns.WIDTH = BASE_LOGICAL_SIZE;
     ns.HEIGHT = BASE_LOGICAL_SIZE;
 
@@ -113,61 +107,45 @@
     ns.draw();
   };
 
-ns.handleCanvasClick = function(event) {
-  if (!ns.placing) return;
+  ns.handleCanvasClick = function(event) {
+    if (!ns.placing) return;
 
-  // Получаем координаты относительно канваса
-  const rect = ns.elements.canvas.getBoundingClientRect();
+    // Получаем координаты относительно канваса
+    const rect = ns.elements.canvas.getBoundingClientRect();
 
-  // Если это касание, получаем первое касание
-  const touch = event.touches ? event.touches[0] : event;
+    // Если это касание, получаем первое касание
+    const touch = event.touches ? event.touches[0] : event;
 
-  // Координаты относительно канваса
-  const x = touch.clientX - rect.left;
-  const y = touch.clientY - rect.top;
+    // Координаты относительно канваса
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
 
-  // Для отладки: выводим координаты относительно экрана и канваса
-  console.log('Screen coordinates:', touch.clientX, touch.clientY);
-  console.log('Canvas coordinates:', x, y);
+    // Логируем координаты для проверки
+    console.log('Canvas click at:', x, y);
 
-  // Применяем масштаб для канваса и учитываем плотность пикселей
-  const logicalX = (x * window.devicePixelRatio) / ns.scaleFactor;
-  const logicalY = (y * window.devicePixelRatio) / ns.scaleFactor;
+    // Проверка на максимальное количество юнитов
+    if (ns.units.filter(u => u.team === "player").length >= ns.maxPlayerUnits) {
+      console.log("Максимальное количество юнитов достигнуто!");
+      return;
+    }
 
-  // Для отладки: выводим логические координаты
-  console.log('Logical coordinates:', logicalX, logicalY);
-
-  // Проверка на клик по юнитам игрока
-  for (let i = ns.units.length - 1; i >= 0; i--) {
-    const unit = ns.units[i];
-    if (unit.team === "player") {
-      const dx = ns.wrapDistance(logicalX, unit.x, ns.WIDTH);
-      const dy = ns.wrapDistance(logicalY, unit.y, ns.HEIGHT);
-      if (Math.hypot(dx, dy) < unit.radius) {
-        ns.units.splice(i, 1);  // Удаляем юнита
-        ns.updateUnitCounts();
-        ns.draw();
+    // Проверка на запретную зону вокруг врагов
+    const forbiddenRadius = 60;
+    for (let enemyUnit of ns.units.filter(u => u.team === "enemy")) {
+      const dx = ns.wrapDistance(x, enemyUnit.x, ns.WIDTH);
+      const dy = ns.wrapDistance(y, enemyUnit.y, ns.HEIGHT);
+      if (Math.hypot(dx, dy) < forbiddenRadius) {
+        console.log("Точка слишком близка к врагу!");
         return;
       }
     }
-  }
 
-  // Проверка на максимальное количество юнитов
-  if (ns.units.filter(u => u.team === "player").length >= ns.maxPlayerUnits) return;
-
-  // Проверка на запретную зону вокруг врагов
-  const forbiddenRadius = 60;
-  for (let enemyUnit of ns.units.filter(u => u.team === "enemy")) {
-    const dx = ns.wrapDistance(logicalX, enemyUnit.x, ns.WIDTH);
-    const dy = ns.wrapDistance(logicalY, enemyUnit.y, ns.HEIGHT);
-    if (Math.hypot(dx, dy) < forbiddenRadius) return;
-  }
-
-  // Создаем новый юнит игрока в логических координатах
-  ns.units.push(new ns.Unit(logicalX, logicalY, ns.selectedType, "player"));
-  ns.updateUnitCounts();
-  ns.draw();
-};
+    // Создаем новый юнит игрока в логических координатах
+    console.log("Создание юнита на:", x, y);
+    ns.units.push(new ns.Unit(x, y, ns.selectedType, "player"));
+    ns.updateUnitCounts();
+    ns.draw();
+  };
 
   ns.loadLevel = function(index) {
     ns.currentLevelIndex = index;
