@@ -151,19 +151,40 @@ ns.spawnRandomUnits = function() {
     ns.draw();
   });
 
-  canvas.addEventListener("click", (e) => {
-    if (!ns.placing) return;
+canvas.addEventListener("click", (e) => {
+  if (!ns.placing) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
+  // Поиск юнита под курсором (берём последний попавший, если несколько)
+  let clickedUnitIndex = -1;
+  for (let i = ns.units.length - 1; i >= 0; i--) {
+    const u = ns.units[i];
+    // Предполагаем, что у Unit есть метод hitTest(x,y) или аналог, либо проверим по расстоянию
+    // Если такого метода нет — проверим по расстоянию (например, радиус 15)
+    const dx = u.x - x;
+    const dy = u.y - y;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    if (distance <= 15) {
+      clickedUnitIndex = i;
+      break;
+    }
+  }
+
+  if (clickedUnitIndex >= 0) {
+    // Удаляем юнита
+    ns.units.splice(clickedUnitIndex, 1);
+  } else {
+    // Если юнита нет — создаём новый
     const type = ns.selectedTypes[ns.activePlayer];
     ns.units.push(new ns.Unit(x, y, type, ns.activePlayer));
+  }
 
-    ns.ui.updateUI();
-    ns.draw();
-  });
+  ns.ui.updateUI();
+  ns.draw();
+});
 
   canvas.addEventListener("touchstart", (e) => {
     if (!ns.placing) return;
