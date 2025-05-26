@@ -1,6 +1,5 @@
 
 (function(ns) {
-
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
 
@@ -55,22 +54,18 @@
     ctx.textBaseline = "middle";
     ctx.font = "bold 32px Arial";
 
-    // Цвет и свечение в зависимости от победителя
     if (ns.winnerTeam === "player") {
-      ctx.fillStyle = "#87CEFA"; // lightblue
+      ctx.fillStyle = "#87CEFA";
       ctx.shadowColor = "#00BFFF";
     } else if (ns.winnerTeam === "enemy") {
-      ctx.fillStyle = "#FF6347"; // tomato
+      ctx.fillStyle = "#FF6347";
       ctx.shadowColor = "#FF4500";
     } else {
       ctx.fillStyle = "white";
       ctx.shadowColor = "white";
     }
     ctx.shadowBlur = 20;
-
     ctx.fillText(ns.winnerText, centerX, centerY);
-
-    // Сброс тени для остальных отрисовок
     ctx.shadowBlur = 0;
   };
 
@@ -98,10 +93,15 @@
     if (!ns.placing) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-    // Удаление юнита игрока при клике
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
+
     for (let i = 0; i < ns.units.length; i++) {
       const u = ns.units[i];
       if (u.team === "player") {
@@ -127,6 +127,10 @@
   }
 
   canvas.addEventListener("click", placeUnit);
+  canvas.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    placeUnit(e);
+  }, { passive: false });
 
   ns.elements.typeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -173,7 +177,6 @@
 
   idleLoop();
 
-  // Новая улучшенная проверка победы
   ns.checkWinCondition = function() {
     if (ns.placing) return;
 
@@ -198,7 +201,6 @@
       return;
     }
 
-    // Проверяем, все ли юниты у каждой команды одного типа
     const playerTypes = new Set(playerUnits.map(u => u.type));
     const enemyTypes = new Set(enemyUnits.map(u => u.type));
 
@@ -207,22 +209,15 @@
       const eType = [...enemyTypes][0];
 
       if (pType === eType) {
-        // Побеждает команда с большим количеством юнитов данного типа
         if (playerUnits.length > enemyUnits.length) {
           ns.showWinner("Player wins!", "player");
-          ns.stopGame();
-          return;
         } else if (enemyUnits.length > playerUnits.length) {
           ns.showWinner("Enemy wins!", "enemy");
-          ns.stopGame();
-          return;
         } else {
           ns.showWinner("It's a draw!", null);
-          ns.stopGame();
-          return;
         }
+        ns.stopGame();
       }
     }
   };
-
 })(Game);

@@ -6,7 +6,20 @@ body {
   text-align: center;
   margin: 0;
   padding: 0;
-  user-select: none;
+}
+
+#unitCounters {
+  font-size: 18px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+#playerUnitsLeft {
+  color: lightblue;
+}
+
+#enemyUnitsCount {
+  color: tomato;
 }
 
 #container {
@@ -15,6 +28,9 @@ body {
   align-items: flex-start;
   margin-top: 10px;
   gap: 20px;
+  position: relative;
+  flex-wrap: wrap;
+  padding: 0 10px;
 }
 
 #controls {
@@ -22,6 +38,8 @@ body {
   flex-direction: column;
   align-items: flex-start;
   min-width: 140px;
+  flex: 1;
+  max-width: 300px;
 }
 
 .type-button {
@@ -49,7 +67,8 @@ body {
   color: #aaddff;
 }
 
-#startButton, #replayButton {
+#startButton,
+#replayButton {
   margin-top: 15px;
   padding: 10px 30px;
   font-size: 18px;
@@ -62,22 +81,9 @@ body {
   width: 100%;
 }
 
-#startButton:hover, #replayButton:hover {
+#startButton:hover,
+#replayButton:hover {
   background-color: #5bb75b;
-}
-
-#unitCounters {
-  font-size: 18px;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-#playerUnitsLeft {
-  color: lightblue;
-}
-
-#enemyUnitsCount {
-  color: tomato;
 }
 
 canvas {
@@ -88,7 +94,13 @@ canvas {
   position: relative;
 }
 
-/* Разделительная линия горизонтальная по середине канваса */
+#gameCanvas {
+  width: 100%;
+  height: auto;
+  max-width: 800px;
+  touch-action: manipulation;
+}
+
 canvas::before {
   content: "";
   position: absolute;
@@ -99,19 +111,14 @@ canvas::before {
   pointer-events: none;
 }
 
-/* Для обертки canvas и overlay */
-#container {
-  position: relative;
-}
-
-/* Оверлей с сообщением прямо по центру canvas */
 #canvasOverlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 800px;
-  height: 500px;
-  pointer-events: none; /* Чтобы не блокировал клики */
+  width: 100%;
+  max-width: 800px;
+  height: 100%;
+  pointer-events: none;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -171,6 +178,7 @@ canvas::before {
   border-color: #88ccff;
   outline: none;
 }
+
 /* Убираем стрелочки у input[type="number"] в Chrome, Safari, Edge */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
@@ -181,4 +189,44 @@ input[type="number"]::-webkit-inner-spin-button {
 /* Убираем стрелочки в Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+/* 📱 Адаптация под мобильные устройства */
+@media (max-width: 600px) {
+  #container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #controls {
+    width: 100%;
+    align-items: center;
+  }
+
+  .type-button,
+  #startButton,
+  #replayButton {
+    width: 90%;
+    max-width: 300px;
+  }
+
+  #enemyUnitSetup {
+    width: 90%;
+    max-width: 300px;
+  }
+
+  #enemyUnitSetup label {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  #gameCanvas {
+    width: 100%;
+    height: auto;
+  }
+
+  #canvasOverlay {
+    width: 100%;
+    height: auto;
+  }
 }
