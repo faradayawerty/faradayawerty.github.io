@@ -100,11 +100,11 @@ main {
 canvas#gameCanvas {
   background: #000;
   border: 2px solid #555;
-  width: 800px; /* Устанавливаем фиксированный размер */
-  height: 800px; /* Устанавливаем фиксированный размер */
+  width: 100%;   /* Теперь канвас займет всю доступную ширину */
+  height: 100%;  /* Высота будет соответствовать ширине, чтобы сохранить квадратные пропорции */
   user-select: none;
   display: block;
-  position: absolute; /* Чтобы мы могли центрировать canvas */
+  position: absolute;
   top: 50%;  /* Центрируем по вертикали */
   left: 50%; /* Центрируем по горизонтали */
   transform: translate(-50%, -50%); /* Точное центрирование относительно размеров canvas */
@@ -181,3 +181,4 @@ canvas#gameCanvas {
   flex-wrap: nowrap; /* запрет переноса */
   gap: 10px;
 }
+

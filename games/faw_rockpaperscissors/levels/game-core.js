@@ -110,11 +110,9 @@
   ns.handleCanvasClick = function(event) {
     if (!ns.placing) return;
 
-    // Получаем координаты относительно канваса
-    const rect = ns.elements.canvas.getBoundingClientRect();
+    const rect = ns.elements.canvas.getBoundingClientRect(); // Получаем размер канваса
 
-    // Если это касание, получаем первое касание
-    const touch = event.touches ? event.touches[0] : event;
+    const touch = event.touches ? event.touches[0] : event;  // Если это касание, берем первое касание
 
     // Координаты относительно канваса
     const x = touch.clientX - rect.left;
@@ -127,17 +125,6 @@
     if (ns.units.filter(u => u.team === "player").length >= ns.maxPlayerUnits) {
       console.log("Максимальное количество юнитов достигнуто!");
       return;
-    }
-
-    // Проверка на запретную зону вокруг врагов
-    const forbiddenRadius = 60;
-    for (let enemyUnit of ns.units.filter(u => u.team === "enemy")) {
-      const dx = ns.wrapDistance(x, enemyUnit.x, ns.WIDTH);
-      const dy = ns.wrapDistance(y, enemyUnit.y, ns.HEIGHT);
-      if (Math.hypot(dx, dy) < forbiddenRadius) {
-        console.log("Точка слишком близка к врагу!");
-        return;
-      }
     }
 
     // Создаем новый юнит игрока в логических координатах
