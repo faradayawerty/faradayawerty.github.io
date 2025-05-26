@@ -1,0 +1,700 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta charset="UTF-8" />
+    <title>faw_rockpaperscissors: p2p (manual signaling)</title>
+    <link rel="icon" href="../icon.png">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #121212; color: #ddd; margin: 0; padding: 20px; }
+        h1, h2, h3 { color: #aaddff; text-shadow: 0 0 6px #88ccff88; }
+        h1 { margin-bottom: 20px; } h2 { margin-top: 0; margin-bottom: 15px; } h3 { margin-top: 0; margin-bottom: 10px; }
+
+        .screen { padding: 20px; margin: 0 auto; max-width: 600px; background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px; }
+        #roleSelectionScreen, #p2pControlsScreen { margin-bottom: 20px; }
+        
+        .p2p-step { border: 1px solid #444; padding: 15px; margin-top:15px; border-radius: 5px; background-color: #222; }
+        .p2p-instruction { font-size: 0.95em; color: #cceeff; margin-bottom: 10px; line-height: 1.4; }
+        .p2p-step textarea { width: calc(100% - 22px); min-height: 70px; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #555; background-color: #333; color: #eee; font-family: monospace; resize: vertical; box-sizing: border-box; }
+        .p2p-step button, .screen button, #toggleMuteBtnContainer button { font-size: 1rem; padding: 10px 15px; border-radius: 5px; border: none; cursor: pointer; background-color: #4CAF50; color: white; transition: background-color 0.3s; width: auto; margin-top: 5px; margin-right: 10px; }
+        .p2p-step button.secondary, .screen button.secondary, #toggleMuteBtnContainer button.secondary { background-color: #008CBA; }
+        .p2p-step button:hover, .screen button:hover, #toggleMuteBtnContainer button:hover { opacity:0.9; }
+        .p2p-step button:disabled, .screen button:disabled, #toggleMuteBtnContainer button:disabled { background-color: #555; cursor: not-allowed; }
+        .p2p-step hr { border-color: #444; margin: 15px 0; }
+
+        #gameContainer { display: none; }
+        #gameWrapper { display: flex; justify-content: center; gap: 20px; align-items: flex-start; max-width: 1100px; margin: 0 auto; flex-wrap: wrap; padding: 0 10px; }
+        #gameControls { background-color: #1a1a1a; padding: 15px; border-radius: 8px; width: 280px; display: flex; flex-direction: column; gap: 15px; border: 1px solid #333; color: #ccc; }
+        .player-controls { background-color: #2a2a2a; padding: 12px; border-radius: 8px; }
+        .type-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .type-button { font-size: 1.1rem; padding: 10px 16px; cursor: pointer; border: 2px solid #555; border-radius: 8px; background-color: #2a2a2a; color: #ddd; user-select: none; width: auto; min-width: 70px; }
+        .type-button.selected { font-weight: bold; }
+        #player1Controls .type-button.selected { border-color: #88ccff; color: #aaddff; }
+        #player2Controls .type-button.selected { border-color: #ff6347; color: #ff9b90; }
+        #gameCanvas { background-color: #1e1e1e; border: 1px solid #444; border-radius: 8px; cursor: crosshair; width: 100%; max-width: 700px; height: auto; }
+        #actions button, #actions .menu-button { width: 100%; margin-top:10px; box-sizing: border-box; }
+        .menu-button { background-color: #555555; text-decoration:none; display:inline-block; padding: 12px 24px !important; text-align:center;}
+        .start-button { background-color: #3a8f3a; color: white; font-weight: bold; }
+        .ice-status {font-size: 0.8em; color: #aaa; margin-top: -5px; margin-bottom: 5px; display: block;}
+        #readinessCheck p { margin: 5px 0; font-size: 0.9em;}
+        #toggleMuteBtnContainer { margin-top: 15px; padding-top:10px; border-top: 1px solid #444;}
+
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .screen { padding: 15px; }
+            #gameWrapper { flex-direction: column; align-items: center; padding: 0; }
+            #gameControls { width: 100%; max-width: 400px; }
+            #gameCanvas { width: 100% !important; max-width: 100%; }
+            .p2p-step button, .screen button, #toggleMuteBtnContainer button { width: calc(100% - 20px); margin-left:10px; margin-right:10px; box-sizing:border-box; }
+            .p2p-step button:first-of-type { margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Rock, Paper, Scissors: P2P</h1>
+
+    <div id="roleSelectionScreen" class="screen">
+        <h2>1. Выберите вашу роль:</h2>
+        <button id="selectHostBtn" class="start-button">Создать Игру (Хост)</button>
+        <button id="selectClientBtn">Присоединиться к Игре (Клиент)</button>
+    </div>
+
+    <div id="p2pControlsScreen" class="screen" style="display:none;">
+        <h3>P2P Подключение (Шаг за Шагом)</h3>
+        <p>Ваша роль: <strong id="playerRoleDisplay">...</strong> | Статус: <span id="connectionStatus">Ожидание</span></p>
+        <hr>
+
+        <div id="p2pStep_Host_1_CreateOffer" class="p2p-step" style="display:none;">
+            <p class="p2p-instruction">Вы - Хост. Нажмите 'Создать Оффер', чтобы сгенерировать ваши данные для подключения (SDP Оффер).</p>
+            <button id="host_createOfferBtn">Шаг 1: Создать Оффер</button>
+            <textarea id="host_localSdpOfferOutput" placeholder="Ваш SDP Оффер появится здесь..." readonly></textarea>
+            <button id="host_copySdpOfferBtn" style="display:none;">Копировать Мой Оффер</button>
+            <p class="p2p-instruction" id="host_offerCreatedInstruction" style="display:none;">Ваш Оффер создан. Скопируйте его и отправьте Клиенту. Затем нажмите 'Перейти к следующему шагу'.</p>
+            <button id="host_proceedToSetAnswerBtn" style="display:none;">Перейти к следующему шагу</button>
+        </div>
+
+        <div id="p2pStep_Host_2_SetAnswerAndICE" class="p2p-step" style="display:none;">
+            <p class="p2p-instruction"><b>Шаг 2: Прием Ответа от Клиента.</b> Вставьте SDP Ответ от Клиента в поле ниже и нажмите 'Установить SDP Ответ'.</p>
+            <textarea id="host_remoteSdpAnswerInput" placeholder="Вставьте SDP Ответ от Клиента"></textarea>
+            <button id="host_setRemoteSdpAnswerBtn" class="secondary">Установить SDP Ответ Клиента</button>
+            <hr>
+            <p class="p2p-instruction"><b>Шаг 3: Обмен ICE-кандидатами.</b> Ваши ICE-кандидаты (сетевая информация) появятся ниже. Копируйте полный список и отправляйте Клиенту. Вставьте ICE-кандидаты от Клиента и нажмите 'Добавить ICE Клиента'.</p>
+            <textarea id="host_localIceOutput" placeholder="Ваши ICE-кандидаты..." readonly></textarea>
+            <span class="ice-status" id="host_localIceStatus">Ожидание ICE...</span>
+            <button id="host_copyIceBtn">Копировать Мои ICE</button>
+            <textarea id="host_remoteIceInput" placeholder="Вставьте ICE-кандидаты от Клиента"></textarea>
+            <button id="host_addRemoteIceBtn" class="secondary">Добавить ICE Клиента</button>
+        </div>
+
+        <div id="p2pStep_Client_1_PasteOffer" class="p2p-step" style="display:none;">
+            <p class="p2p-instruction">Вы - Клиент. <b>Шаг 1: Получение Оффера.</b> Вставьте SDP Оффер от Хоста в поле ниже и нажмите 'Принять Оффер и Создать Ответ'.</p>
+            <textarea id="client_remoteSdpOfferInput" placeholder="Вставьте SDP Оффер от Хоста"></textarea>
+            <button id="client_acceptOfferAndProceedToAnswerBtn">Принять Оффер и Создать Ответ</button>
+        </div>
+        
+        <div id="p2pStep_Client_2_CreateAnswerAndSend" class="p2p-step" style="display:none;">
+            <p class="p2p-instruction">SDP Оффер от Хоста принят. <b>Шаг 2: Создание и Отправка Ответа.</b> Нажмите 'Создать Мой SDP Ответ'. Ваш Ответ появится ниже. Скопируйте его и отправьте Хосту.</p>
+            <button id="client_createAnswerBtn">Создать Мой SDP Ответ</button>
+            <textarea id="client_localSdpAnswerOutput" placeholder="Ваш SDP Ответ появится здесь..." readonly></textarea>
+            <button id="client_copySdpAnswerBtn" style="display:none;">Копировать Мой Ответ</button>
+            <p class="p2p-instruction" id="client_answerCreatedInstruction" style="display:none;">Ваш Ответ создан. Скопируйте и отправьте его Хосту. Затем нажмите 'Перейти к обмену ICE'.</p>
+            <button id="client_proceedToICEExchangeBtn" style="display:none;">Перейти к обмену ICE</button>
+        </div>
+
+        <div id="p2pStep_Client_3_ExchangeICE" class="p2p-step" style="display:none;">
+            <p class="p2p-instruction"><b>Шаг 3: Обмен ICE-кандидатами.</b> Ваши ICE-кандидаты (сетевая информация) появятся ниже. Копируйте полный список и отправляйте Хосту. Вставьте ICE-кандидаты от Хоста и нажмите 'Добавить ICE Хоста'.</p>
+            <textarea id="client_localIceOutput" placeholder="Ваши ICE-кандидаты..." readonly></textarea>
+            <span class="ice-status" id="client_localIceStatus">Ожидание ICE...</span>
+            <button id="client_copyIceBtn">Копировать Мои ICE</button>
+            <textarea id="client_remoteIceInput" placeholder="Вставьте ICE-кандидаты от Хоста"></textarea>
+            <button id="client_addRemoteIceBtn" class="secondary">Добавить ICE Хоста</button>
+        </div>
+        <div id="toggleMuteBtnContainer" style="display:none;">
+            <button id="toggleMuteBtn" class="secondary">Выключить микрофон</button>
+        </div>
+        <button id="restartP2PConnectionBtn" class="secondary" style="margin-top: 20px; background-color:#c82333;">Начать подключение заново</button>
+    </div>
+
+    <div id="gameContainer">
+        <div id="gameWrapper">
+            <div id="gameControls">
+                <div class="player-controls" id="player1Controls" style="display:none;"> <h2>Игрок 1 (синий)</h2>
+                    <div class="type-buttons">
+                        <button data-type="rock" class="type-button selected">🪨</button>
+                        <button data-type="paper" class="type-button">📄</button>
+                        <button data-type="scissors" class="type-button">✂️ </button>
+                    </div>
+                    <p>Юниты: <span id="player1UnitsCount">0</span></p>
+                </div>
+
+                <div class="player-controls" id="player2Controls" style="display:none;"> <h2>Игрок 2 (красный)</h2>
+                    <div class="type-buttons">
+                        <button data-type="rock" class="type-button selected">🪨</button>
+                        <button data-type="paper" class="type-button">📄</button>
+                        <button data-type="scissors" class="type-button">✂️ </button>
+                    </div>
+                    <p>Юниты: <span id="player2UnitsCount">0</span></p>
+                </div>
+
+                <div id="actions">
+                    <p>Вы играете за: <strong id="activePlayerDisplayInGame">Ожидание</strong></p>
+                    <div id="readinessCheck" style="display:none;">
+                        <p>Готовность: Вы (<span id="localReadyStatus">Не готовы</span>), Оппонент (<span id="remoteReadyStatus">Не готов</span>)</p>
+                    </div>
+                    <button id="playerReadyBtn" class="start-button" style="display:none;">Готов к игре</button>
+                    <button id="restartGameBtn" class="start-button" style="display:none;">Играть заново</button>
+                    <a href="#" id="mainMenuBtnFromGame" class="menu-button">Главное меню (Новое P2P)</a>
+                </div>
+            </div>
+            <canvas id="gameCanvas" width="700" height="500"></canvas>
+        </div>
+    </div>
+    <audio id="remoteAudio" autoplay style="display:none;"></audio>
+
+    <script>
+        const Game = {
+            WIDTH: 700, HEIGHT: 500, TYPES: ["rock", "paper", "scissors"], EMOJIS: { rock: "🪨", paper: "📄", scissors: "✂️" }, COLORS: { player1: "#87CEFA", player2: "#FF6347" },
+            units: [], placing: true, selectedTypes: { player1: "rock", player2: "rock" }, loop: null, winnerText: "", winnerPlayer: null, isRunning: false,
+            isHost: false, peerConnection: null, dataChannel: null, iceCandidates: [], remoteIceCandidatesBuffer: [],
+            localPlayerReady: false, remotePlayerReady: false,
+            localStream: null // For voice chat
+        };
+        // Game class Unit, helper functions (wrapDistance, shouldChase, etc.), Game.update, Game.checkWinCondition, Game.showWinner (mostly unchanged)
+        (function(ns){ /* Class Unit, wrapDistance, shouldChase, shouldFlee, beats, resolveConflict, update, checkWinCondition, showWinner - from previous version */
+            class Unit {
+                constructor(x, y, type, player, id = null) { 
+                    this.id = id || Math.random().toString(36).substr(2, 9); 
+                    this.x = x; this.y = y; this.type = type; this.player = player;
+                    this.vx = Math.random() * 2 - 1; this.vy = Math.random() * 2 - 1;
+                    this.radius = 12; this.spawnTime = Date.now(); this.nextDashTime = Date.now() + this.getRandomDashInterval();
+                }
+                getRandomDashInterval() { return 2000 + Math.random() * 3000; }
+                dash() { const d = 5 + Math.random()*10, s = Math.hypot(this.vx,this.vy)||1; this.vx += (this.vx/s)*d; this.vy += (this.vy/s)*d; this.nextDashTime = Date.now() + this.getRandomDashInterval(); }
+                move() {
+                    if (Date.now() >= this.nextDashTime) this.dash();
+                    let target = null, minDist = Infinity;
+                    for (const other of ns.units) {
+                        if (other === this || other.player === this.player) continue;
+                        if (shouldChase(this.type, other.type) || shouldFlee(this.type, other.type)) {
+                            const dx = wrapDistance(this.x, other.x, ns.WIDTH), dy = wrapDistance(this.y, other.y, ns.HEIGHT), dist = Math.hypot(dx, dy);
+                            if (dist < minDist) { minDist = dist; target = other; }
+                        }
+                    }
+                    const baseSpeed = 1.5;
+                    if (target) {
+                        const dx = wrapDistance(this.x, target.x, ns.WIDTH), dy = wrapDistance(this.y, target.y, ns.HEIGHT), d = Math.hypot(dx, dy) + 0.01;
+                        if (shouldChase(this.type, target.type)) { this.vx += (dx/d)*baseSpeed*0.1; this.vy += (dy/d)*baseSpeed*0.1; }
+                        else if (shouldFlee(this.type, target.type)) { this.vx -= (dx/d)*baseSpeed*0.1; this.vy -= (dy/d)*baseSpeed*0.1; }
+                    }
+                    for (const other of ns.units) {
+                        if (other === this || other.player !== this.player) continue;
+                        const dx = wrapDistance(this.x, other.x, ns.WIDTH), dy = wrapDistance(this.y, other.y, ns.HEIGHT), dist = Math.hypot(dx, dy);
+                        if (dist > 0 && dist < this.radius * 2) { const r = 1.5; this.vx -= (dx/dist)*r*0.05; this.vy -= (dy/dist)*r*0.05; }
+                    }
+                    this.vx *= 0.95; this.vy *= 0.95;
+                    this.x = (this.x + this.vx + ns.WIDTH)%ns.WIDTH; this.y = (this.y + this.vy + ns.HEIGHT)%ns.HEIGHT;
+                }
+                draw(ctx) {
+                    ctx.save(); ctx.translate(this.x, this.y); const age = Date.now() - this.spawnTime;
+                    if (age < 1000) ctx.globalAlpha = 0.5 + 0.5 * (age / 1000);
+                    ctx.font = "20px serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    ctx.shadowColor = ns.COLORS[this.player]; ctx.shadowBlur = 6; ctx.fillStyle = ns.COLORS[this.player];
+                    ctx.fillText(ns.EMOJIS[this.type],0,0); ctx.restore();
+                }
+            }
+            ns.Unit = Unit;
+            function wrapDistance(a,b,size){let d=b-a; if(Math.abs(d)>size/2)d-=Math.sign(d)*size; return d;}
+            function shouldChase(t1,t2){const m={rock:"scissors",scissors:"paper",paper:"rock"}; return m[t1]===t2;}
+            function shouldFlee(t1,t2){const m={rock:"paper",paper:"scissors",scissors:"rock"}; return m[t1]===t2;}
+            function beats(t1,t2){return shouldChase(t1,t2);}
+            function resolveConflict(a,b){
+                let changed=false;
+                if(beats(a.type,b.type)){b.type=a.type;b.player=a.player;changed=true;}
+                else if(beats(b.type,a.type)){a.type=b.type;a.player=b.player;changed=true;}
+                if(changed && ns.ui && typeof ns.ui.updateUI === "function") ns.ui.updateUI();
+            }
+            ns.update = function(){
+                if (!ns.isRunning) return;
+                for(let u of ns.units) u.move();
+                for (let i=0; i<ns.units.length; i++){
+                    for (let j=i+1; j<ns.units.length; j++){
+                        const a=ns.units[i], b=ns.units[j];
+                        if(a.player === b.player) continue;
+                        const dx = wrapDistance(a.x,b.x,ns.WIDTH), dy = wrapDistance(a.y,b.y,ns.HEIGHT), dist = Math.hypot(dx,dy);
+                        if(dist < 24 && a.type !== b.type){
+                            resolveConflict(a,b);
+                            const overlap=24-dist,nx=dx/dist,ny=dy/dist;
+                            a.x-=nx*overlap*0.5;a.y-=ny*overlap*0.5;b.x+=nx*overlap*0.5;b.y+=ny*overlap*0.5;
+                        }
+                    }
+                }
+                checkWinCondition();
+            };
+            function checkWinCondition(){
+                if(ns.placing)return;
+                const p1U=ns.units.filter(u=>u.player==="player1"), p2U=ns.units.filter(u=>u.player==="player2");
+                if(ns.units.length===0 && !ns.placing){showWinner("Ничья! (Нет юнитов)",null); if(ns.loop) cancelAnimationFrame(ns.loop); return;}
+                if(p1U.length===0 && ns.units.length>0){showWinner("Игрок 2 победил!","player2");if(ns.loop) cancelAnimationFrame(ns.loop);return;}
+                if(p2U.length===0 && ns.units.length>0){showWinner("Игрок 1 победил!","player1");if(ns.loop) cancelAnimationFrame(ns.loop);return;}
+                const p1CB=p1U.some(u1=>p2U.some(u2=>shouldChase(u1.type,u2.type))), p2CB=p2U.some(u2=>p1U.some(u1=>shouldChase(u2.type,u1.type)));
+                if(!p1CB && !p2CB && ns.units.length>0){
+                    if(p1U.length>p2U.length)showWinner("Игрок 1 победил!","player1");
+                    else if(p2U.length>p1U.length)showWinner("Игрок 2 победил!","player2");
+                    else showWinner("Ничья!",null);
+                    if(ns.loop) cancelAnimationFrame(ns.loop);
+                }
+            }
+            function showWinner(text,player){
+                ns.winnerText=text; ns.winnerPlayer=player; ns.isRunning=false;
+                if(document.getElementById("restartGameBtn"))document.getElementById("restartGameBtn").style.display="block";
+                if(document.getElementById("playerReadyBtn"))document.getElementById("playerReadyBtn").style.display="none";
+                if(document.getElementById("readinessCheck"))document.getElementById("readinessCheck").style.display="none";
+                document.querySelectorAll(".type-buttons").forEach(c=>c.style.pointerEvents="none");
+            }
+        })(Game);
+        
+        (function(ns) { // ui.js
+            const p1CtrlElement = document.getElementById("player1Controls");
+            const p2CtrlElement = document.getElementById("player2Controls");
+            const activePlayerDispGame = document.getElementById("activePlayerDisplayInGame");
+            const p1UnitsSpan = document.getElementById("player1UnitsCount");
+            const p2UnitsSpan = document.getElementById("player2UnitsCount");
+
+            function updatePlayerButtons(container, player) {
+                container.querySelectorAll(".type-button").forEach(btn => {
+                    btn.classList.toggle("selected", ns.selectedTypes[player] === btn.getAttribute("data-type"));
+                });
+            }
+            ns.ui = {
+                updateUI: function() {
+                    if (ns.isHost) {
+                        activePlayerDispGame.textContent = "Игрок 1 (Вы - синий)";
+                        p1CtrlElement.style.display = "block";
+                        p1CtrlElement.style.pointerEvents = (ns.placing || !ns.isRunning) ? "auto" : "none";
+                        p2CtrlElement.style.display = "none";
+                        updatePlayerButtons(p1CtrlElement, "player1");
+                    } else { // Client
+                        activePlayerDispGame.textContent = "Игрок 2 (Вы - красный)";
+                        p1CtrlElement.style.display = "none";
+                        p2CtrlElement.style.display = "block";
+                        p2CtrlElement.style.pointerEvents = (ns.placing || !ns.isRunning) ? "auto" : "none";
+                        updatePlayerButtons(p2CtrlElement, "player2");
+                    }
+                                        
+                    p1UnitsSpan.textContent = ns.units.filter(u=>u.player==="player1").length;
+                    p2UnitsSpan.textContent = ns.units.filter(u=>u.player==="player2").length;
+                },
+                setupTypeButtons: function() {
+                    [...p1CtrlElement.querySelectorAll(".type-button"), ...p2CtrlElement.querySelectorAll(".type-button")].forEach(btn => {
+                        const handler = () => {
+                            const player = btn.closest(".player-controls").id === "player1Controls" ? "player1" : "player2";
+                            if ((ns.isHost && player === "player1") || (!ns.isHost && player === "player2")) {
+                                ns.selectedTypes[player] = btn.getAttribute("data-type");
+                                if (!ns.isHost && player === "player2") {
+                                     sendMessageP2P("selected_type", { player: "player2", type: ns.selectedTypes.player2 });
+                                }
+                            } else return;
+                            ns.ui.updateUI();
+                        };
+                        btn.addEventListener("click", handler);
+                        btn.addEventListener("touchstart", e=>{ e.preventDefault(); handler(); }, {passive:false});
+                    });
+                }
+            };
+        })(Game);
+
+        let sendMessageP2P; 
+        document.addEventListener("DOMContentLoaded", function () {
+            const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }] };
+            const roleScreen = document.getElementById("roleSelectionScreen");
+            const p2pScreen = document.getElementById("p2pControlsScreen");
+            const gameScreen = document.getElementById("gameContainer");
+
+            const playerRoleDisp = document.getElementById("playerRoleDisplay");
+            const connectionStatusSpan = document.getElementById("connectionStatus");
+            
+            const hostStep1 = document.getElementById("p2pStep_Host_1_CreateOffer");
+            const hostStep2 = document.getElementById("p2pStep_Host_2_SetAnswerAndICE");
+            const clientStep1 = document.getElementById("p2pStep_Client_1_PasteOffer");
+            const clientStep2 = document.getElementById("p2pStep_Client_2_CreateAnswerAndSend");
+            const clientStep3 = document.getElementById("p2pStep_Client_3_ExchangeICE");
+
+            const host_createOfferBtn = document.getElementById("host_createOfferBtn");
+            const host_localSdpOfferOutput = document.getElementById("host_localSdpOfferOutput");
+            const host_copySdpOfferBtn = document.getElementById("host_copySdpOfferBtn");
+            const host_offerCreatedInstruction = document.getElementById("host_offerCreatedInstruction");
+            const host_proceedToSetAnswerBtn = document.getElementById("host_proceedToSetAnswerBtn");
+            const host_remoteSdpAnswerInput = document.getElementById("host_remoteSdpAnswerInput");
+            const host_setRemoteSdpAnswerBtn = document.getElementById("host_setRemoteSdpAnswerBtn");
+            const host_localIceOutput = document.getElementById("host_localIceOutput");
+            const host_localIceStatus = document.getElementById("host_localIceStatus");
+            const host_copyIceBtn = document.getElementById("host_copyIceBtn");
+            const host_remoteIceInput = document.getElementById("host_remoteIceInput");
+            const host_addRemoteIceBtn = document.getElementById("host_addRemoteIceBtn");
+
+            const client_remoteSdpOfferInput = document.getElementById("client_remoteSdpOfferInput");
+            const client_acceptOfferAndProceedToAnswerBtn = document.getElementById("client_acceptOfferAndProceedToAnswerBtn");
+            const client_createAnswerBtn = document.getElementById("client_createAnswerBtn");
+            const client_localSdpAnswerOutput = document.getElementById("client_localSdpAnswerOutput");
+            const client_copySdpAnswerBtn = document.getElementById("client_copySdpAnswerBtn");
+            const client_answerCreatedInstruction = document.getElementById("client_answerCreatedInstruction");
+            const client_proceedToICEExchangeBtn = document.getElementById("client_proceedToICEExchangeBtn");
+            const client_localIceOutput = document.getElementById("client_localIceOutput");
+            const client_localIceStatus = document.getElementById("client_localIceStatus");
+            const client_copyIceBtn = document.getElementById("client_copyIceBtn");
+            const client_remoteIceInput = document.getElementById("client_remoteIceInput");
+            const client_addRemoteIceBtn = document.getElementById("client_addRemoteIceBtn");
+            
+            const restartP2PBtn = document.getElementById("restartP2PConnectionBtn");
+            const mainMenuFromGameBtn = document.getElementById("mainMenuBtnFromGame");
+            const toggleMuteBtnContainer = document.getElementById("toggleMuteBtnContainer");
+            const toggleMuteBtn = document.getElementById("toggleMuteBtn");
+            const remoteAudioElement = document.getElementById("remoteAudio");
+
+
+            const playerReadyBtn = document.getElementById("playerReadyBtn");
+            const restartGameBtn = document.getElementById("restartGameBtn");
+            const readinessCheckDiv = document.getElementById("readinessCheck");
+            const localReadyStatusSpan = document.getElementById("localReadyStatus");
+            const remoteReadyStatusSpan = document.getElementById("remoteReadyStatus");
+            const canvas = document.getElementById("gameCanvas");
+            const ctx = canvas.getContext("2d");
+
+            function updateP2PStatus(statusText) { connectionStatusSpan.textContent = statusText; }
+            function showP2PStep(stepIdToShow) {
+                [hostStep1, hostStep2, clientStep1, clientStep2, clientStep3].forEach(s => s.style.display = 'none');
+                if (document.getElementById(stepIdToShow)) document.getElementById(stepIdToShow).style.display = 'block';
+            }
+            function resetP2PStateAndUI(showAlert = true, message = "Соединение сброшено. Пожалуйста, начните заново.") {
+                if (showAlert && !resetP2PStateAndUI.isResetting) { 
+                    resetP2PStateAndUI.isResetting = true; alert(message); resetP2PStateAndUI.isResetting = false;
+                }
+                if (Game.peerConnection) { Game.peerConnection.close(); Game.peerConnection = null; }
+                if (Game.dataChannel) { Game.dataChannel.close(); Game.dataChannel = null; }
+                if (Game.localStream) { Game.localStream.getTracks().forEach(track => track.stop()); Game.localStream = null; toggleMuteBtnContainer.style.display = 'none';}
+
+                Game.isHost = false; Game.iceCandidates = []; Game.remoteIceCandidatesBuffer = [];
+                Game.localPlayerReady = false; Game.remotePlayerReady = false;
+                
+                [host_localSdpOfferOutput, host_remoteSdpAnswerInput, host_localIceOutput, host_remoteIceInput,
+                 client_remoteSdpOfferInput, client_localSdpAnswerOutput, client_localIceOutput, client_remoteIceInput]
+                 .forEach(ta => { if(ta) ta.value = ""; });
+                [host_copySdpOfferBtn, host_offerCreatedInstruction, host_proceedToSetAnswerBtn, 
+                 client_copySdpAnswerBtn, client_answerCreatedInstruction, client_proceedToICEExchangeBtn]
+                 .forEach(el => { if(el) el.style.display = "none"; });
+
+                host_localIceStatus.textContent = "Ожидание ICE..."; client_localIceStatus.textContent = "Ожидание ICE...";
+                roleScreen.style.display = 'block'; p2pScreen.style.display = 'none'; gameScreen.style.display = 'none';
+                updateP2PStatus("Отключено");
+            }
+            resetP2PStateAndUI.isResetting = false;
+
+            restartP2PBtn.addEventListener("click", () => resetP2PStateAndUI(false));
+            mainMenuFromGameBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                resetP2PStateAndUI(false); 
+                Game.units = []; Game.winnerText = ""; Game.isRunning = false; if(Game.loop) cancelAnimationFrame(Game.loop); Game.draw();
+            });
+
+            let isMuted = false;
+            toggleMuteBtn.addEventListener('click', () => {
+                if (Game.localStream) {
+                    Game.localStream.getAudioTracks().forEach(track => {
+                        track.enabled = !track.enabled;
+                    });
+                    isMuted = !Game.localStream.getAudioTracks()[0]?.enabled;
+                    toggleMuteBtn.textContent = isMuted ? "Включить микрофон" : "Выключить микрофон";
+                }
+            });
+
+
+            sendMessageP2P = function(type, payload) {
+                if (Game.dataChannel && Game.dataChannel.readyState === "open") {
+                    Game.dataChannel.send(JSON.stringify({ type, payload }));
+                } else console.warn("DataChannel not open for P2P message:", type);
+            }
+
+            async function initPeerConnection() {
+                if (Game.peerConnection) { Game.peerConnection.close(); }
+                Game.iceCandidates = []; 
+                const localIceOut = Game.isHost ? host_localIceOutput : client_localIceOutput;
+                const localIceStat = Game.isHost ? host_localIceStatus : client_localIceStatus;
+                localIceOut.value = ""; localIceStat.textContent = "Сбор ICE...";
+
+                Game.peerConnection = new RTCPeerConnection(rtcConfig);
+
+                if (Game.localStream) { // Add local audio tracks if available
+                    Game.localStream.getTracks().forEach(track => {
+                        Game.peerConnection.addTrack(track, Game.localStream);
+                    });
+                }
+
+                Game.peerConnection.ontrack = event => {
+                    console.log("Remote track received:", event.track, event.streams);
+                    if (remoteAudioElement && event.streams && event.streams[0]) {
+                        if (remoteAudioElement.srcObject !== event.streams[0]) {
+                             remoteAudioElement.srcObject = event.streams[0];
+                             console.log("Remote audio stream assigned.");
+                        }
+                    }
+                };
+
+                Game.peerConnection.onicecandidate = event => {
+                    if (event.candidate) {
+                        Game.iceCandidates.push(event.candidate.toJSON());
+                        localIceOut.value = JSON.stringify(Game.iceCandidates, null, 2);
+                    } else {
+                        localIceStat.textContent = "Все локальные ICE-кандидаты собраны.";
+                        localIceOut.value = JSON.stringify(Game.iceCandidates, null, 2);
+                    }
+                };
+                Game.peerConnection.onconnectionstatechange = () => {
+                    const state = Game.peerConnection.connectionState;
+                    updateP2PStatus(state);
+                    if (state === "failed" || state === "disconnected" || state === "closed") {
+                         if (!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true, `P2P соединение ${state}. Попробуйте снова.`);
+                    }
+                };
+                if (Game.isHost) {
+                    Game.dataChannel = Game.peerConnection.createDataChannel("gameChannel");
+                    setupDataChannelEvents(Game.dataChannel);
+                } else {
+                    Game.peerConnection.ondatachannel = event => {
+                        Game.dataChannel = event.channel;
+                        setupDataChannelEvents(Game.dataChannel);
+                    };
+                }
+            }
+            
+            function setupDataChannelEvents(channel) {
+                channel.onopen = () => {
+                    updateP2PStatus("P2P Канал Открыт - Соединено!");
+                    p2pScreen.style.display = 'none'; gameScreen.style.display = 'block';
+                    Game.placing = true; Game.localPlayerReady = false; Game.remotePlayerReady = false;
+                    readinessCheckDiv.style.display = 'block';
+                    localReadyStatusSpan.textContent = 'Не готовы'; remoteReadyStatusSpan.textContent = 'Не готов';
+                    playerReadyBtn.textContent = "Готов к игре"; playerReadyBtn.style.display = 'inline-block'; playerReadyBtn.disabled = false;
+                    Game.ui.updateUI(); Game.draw();
+                };
+                channel.onmessage = event => {
+                    try { const msg = JSON.parse(event.data); handleP2PMessage(msg.type, msg.payload); }
+                    catch (e) { console.error("Error parsing P2P message:", e, event.data); }
+                };
+                channel.onclose = () => { if(!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,"P2P Канал данных закрыт.") };
+                channel.onerror = error => { if(!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,`Ошибка P2P Канала данных: ${error}`) };
+            }
+            
+            function handleP2PMessage(type, payload) { // Logic from previous version
+                switch (type) {
+                    case "unit_added":
+                        const newUnitData = payload;
+                        const newUnit = new Game.Unit(newUnitData.x, newUnitData.y, newUnitData.type, newUnitData.player, newUnitData.id);
+                        if (!Game.units.some(u => u.id === newUnit.id)) Game.units.push(newUnit);
+                        break;
+                    case "unit_removed": Game.units = Game.units.filter(u => u.id !== payload.id); break;
+                    case "player_readiness":
+                        Game.remotePlayerReady = payload.ready;
+                        remoteReadyStatusSpan.textContent = Game.remotePlayerReady ? 'Готов' : 'Не готов';
+                        checkStartConditions();
+                        break;
+                    case "selected_type": 
+                        if (Game.isHost && payload.player === "player2") Game.selectedTypes.player2 = payload.type;
+                        break;
+                    case "force_restart_game":
+                        restartGameLogic();
+                        break;
+                    default: console.warn("Unknown P2P message type:", type);
+                }
+                Game.ui.updateUI(); Game.draw();
+            }
+
+            async function initializeRole(isHostRole) {
+                Game.isHost = isHostRole;
+                playerRoleDisp.textContent = isHostRole ? "Хост (Игрок 1)" : "Клиент (Игрок 2)";
+                let roleTextSuffix = isHostRole ? "" : " (Без звука)";
+
+                try {
+                    Game.localStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true }, video: false });
+                    console.log("Microphone access granted.");
+                    toggleMuteBtnContainer.style.display = 'block';
+                    toggleMuteBtn.textContent = "Выключить микрофон";
+                    isMuted = false;
+                    roleTextSuffix = ""; // Clear "no sound" suffix if successful
+                } catch (err) {
+                    console.error("Error accessing microphone:", err);
+                    alert("Не удалось получить доступ к микрофону. Голосовой чат будет недоступен. Ошибка: " + err.message);
+                    Game.localStream = null; // Ensure it's null if error
+                }
+                playerRoleDisp.textContent = (isHostRole ? "Хост (Игрок 1)" : "Клиент (Игрок 2)") + roleTextSuffix;
+                
+                roleScreen.style.display = 'none'; p2pScreen.style.display = 'block';
+                if (isHostRole) {
+                    showP2PStep('p2pStep_Host_1_CreateOffer'); updateP2PStatus("Ожидание создания Оффера" + roleTextSuffix);
+                } else {
+                    showP2PStep('p2pStep_Client_1_PasteOffer'); updateP2PStatus("Ожидание Оффера от Хоста" + roleTextSuffix);
+                }
+            }
+
+            document.getElementById("selectHostBtn").addEventListener("click", () => initializeRole(true));
+            document.getElementById("selectClientBtn").addEventListener("click", () => initializeRole(false));
+            
+            // P2P button listeners (host_createOfferBtn, etc. - mostly unchanged from previous)
+            host_createOfferBtn.addEventListener("click", async () => { /* ... */ 
+                await initPeerConnection();
+                try {
+                    const offer = await Game.peerConnection.createOffer();
+                    await Game.peerConnection.setLocalDescription(offer);
+                    host_localSdpOfferOutput.value = JSON.stringify(offer);
+                    host_copySdpOfferBtn.style.display = 'inline-block';
+                    host_offerCreatedInstruction.style.display = 'block';
+                    host_proceedToSetAnswerBtn.style.display = 'inline-block';
+                    updateP2PStatus("Оффер создан. Отправьте его Клиенту.");
+                } catch (e) { resetP2PStateAndUI(true, `Ошибка создания Оффера: ${e}`); }
+            });
+            host_copySdpOfferBtn.addEventListener("click", () => copyToClipboard('host_localSdpOfferOutput', 'SDP Оффер'));
+            host_proceedToSetAnswerBtn.addEventListener("click", () => showP2PStep('p2pStep_Host_2_SetAnswerAndICE'));
+            host_setRemoteSdpAnswerBtn.addEventListener("click", async () => { /* ... */ 
+                if (!Game.peerConnection) { alert("Соединение не инициализировано!"); return; }
+                if (!host_remoteSdpAnswerInput.value) { alert("Вставьте SDP Ответ от Клиента!"); return; }
+                try {
+                    const answer = JSON.parse(host_remoteSdpAnswerInput.value);
+                    await Game.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                    updateP2PStatus("SDP Ответ Клиента установлен. Обменивайтесь ICE.");
+                    Game.remoteIceCandidatesBuffer.forEach(candidate => Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(e=>console.error("Error adding buffered ICE:",e)));
+                    Game.remoteIceCandidatesBuffer = [];
+                } catch (e) { alert(`Ошибка установки SDP Ответа: ${e}. Убедитесь, что формат корректен.`); }
+            });
+            host_copyIceBtn.addEventListener("click", () => copyToClipboard('host_localIceOutput', 'ICE кандидаты Хоста'));
+            host_addRemoteIceBtn.addEventListener("click", async () => { /* ... */ 
+                if (!Game.peerConnection) { alert("Соединение не инициализировано!"); return; }
+                if (!host_remoteIceInput.value) { alert("Вставьте ICE от Клиента!"); return; }
+                try {
+                    const candidates = JSON.parse(host_remoteIceInput.value);
+                    for (const candidate of candidates) {
+                        if (candidate) {
+                            if (Game.peerConnection.remoteDescription) await Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                            else Game.remoteIceCandidatesBuffer.push(candidate);
+                        }
+                    }
+                    host_remoteIceInput.value = ""; 
+                    updateP2PStatus(Game.peerConnection.connectionState + " (ICE Клиента добавлены)");
+                } catch (e) { alert(`Ошибка добавления ICE Клиента: ${e}. Ожидается массив JSON.`); }
+            });
+
+            client_acceptOfferAndProceedToAnswerBtn.addEventListener("click", async () => { /* ... */ 
+                if (!client_remoteSdpOfferInput.value) { alert("Вставьте SDP Оффер от Хоста!"); return; }
+                await initPeerConnection(); 
+                try {
+                    const offer = JSON.parse(client_remoteSdpOfferInput.value);
+                    await Game.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                    showP2PStep('p2pStep_Client_2_CreateAnswerAndSend');
+                    updateP2PStatus("Оффер Хоста принят. Создайте свой Ответ.");
+                } catch (e) { resetP2PStateAndUI(true, `Ошибка принятия Оффера: ${e}. Убедитесь, что формат корректен.`);}
+            });
+            client_createAnswerBtn.addEventListener("click", async () => { /* ... */ 
+                if (!Game.peerConnection || !Game.peerConnection.remoteDescription) { alert("Сначала примите Оффер Хоста!"); return; }
+                try {
+                    const answer = await Game.peerConnection.createAnswer();
+                    await Game.peerConnection.setLocalDescription(answer);
+                    client_localSdpAnswerOutput.value = JSON.stringify(answer);
+                    client_copySdpAnswerBtn.style.display = 'inline-block';
+                    client_answerCreatedInstruction.style.display = 'block';
+                    client_proceedToICEExchangeBtn.style.display = 'inline-block';
+                    updateP2PStatus("SDP Ответ создан. Отправьте его Хосту.");
+                } catch (e) { resetP2PStateAndUI(true, `Ошибка создания Ответа: ${e}`); }
+            });
+            client_copySdpAnswerBtn.addEventListener("click", () => copyToClipboard('client_localSdpAnswerOutput', 'SDP Ответ Клиента'));
+            client_proceedToICEExchangeBtn.addEventListener("click", () => showP2PStep('p2pStep_Client_3_ExchangeICE'));
+            client_copyIceBtn.addEventListener("click", () => copyToClipboard('client_localIceOutput', 'ICE кандидаты Клиента'));
+            client_addRemoteIceBtn.addEventListener("click", async () => { /* ... */ 
+                if (!Game.peerConnection) { alert("Соединение не инициализировано!"); return; }
+                if (!client_remoteIceInput.value) { alert("Вставьте ICE от Хоста!"); return; }
+                try {
+                    const candidates = JSON.parse(client_remoteIceInput.value);
+                     for (const candidate of candidates) {
+                        if (candidate) await Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                    }
+                    client_remoteIceInput.value = ""; 
+                    updateP2PStatus(Game.peerConnection.connectionState + " (ICE Хоста добавлены)");
+                } catch (e) { alert(`Ошибка добавления ICE Хоста: ${e}. Ожидается массив JSON.`); }
+            });
+
+
+            playerReadyBtn.addEventListener("click", () => { /* ... Same as previous version ... */
+                Game.localPlayerReady = !Game.localPlayerReady; 
+                localReadyStatusSpan.textContent = Game.localPlayerReady ? 'Готов' : 'Не готовы';
+                playerReadyBtn.textContent = Game.localPlayerReady ? "Ожидание оппонента..." : "Готов к игре";
+                playerReadyBtn.disabled = Game.localPlayerReady; 
+                sendMessageP2P("player_readiness", { ready: Game.localPlayerReady });
+                checkStartConditions();
+            });
+            function checkStartConditions() { if (Game.localPlayerReady && Game.remotePlayerReady) startGameLogic(); }
+            function startGameLogic() { /* ... Same as previous version ... */
+                if(Game.isRunning)return; Game.placing=false; Game.isRunning=true;
+                readinessCheckDiv.style.display='none'; playerReadyBtn.style.display='none';
+                document.querySelectorAll(".type-buttons").forEach(b=>b.style.pointerEvents="none");
+                Game.loop = requestAnimationFrame(Game.gameLoop); Game.ui.updateUI();
+            }
+            restartGameBtn.addEventListener("click", () => { sendMessageP2P("force_restart_game", null); restartGameLogic(); });
+            function restartGameLogic() { /* ... Same as previous version ... */
+                if(Game.loop)cancelAnimationFrame(Game.loop); 
+                Game.isRunning=false; Game.units=[]; Game.placing=true; Game.winnerText=""; Game.winnerPlayer=null;
+                Game.localPlayerReady = false; Game.remotePlayerReady = false;
+
+                if(Game.dataChannel && Game.dataChannel.readyState === 'open'){
+                    readinessCheckDiv.style.display = 'block';
+                    localReadyStatusSpan.textContent = 'Не готовы'; remoteReadyStatusSpan.textContent = 'Не готов';
+                    playerReadyBtn.textContent = "Готов к игре"; playerReadyBtn.style.display = 'inline-block'; playerReadyBtn.disabled = false;
+                    canvas.style.pointerEvents = "auto"; 
+                    Game.ui.updateUI(); // This will correctly show/hide player controls based on role and enable them
+                } else { 
+                    if (!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,"Соединение потеряно. Невозможно перезапустить игру."); 
+                    return; 
+                }
+                restartGameBtn.style.display="none"; Game.draw();
+            }
+            
+            Game.draw = function() { /* ... Same as previous ... */ 
+                ctx.clearRect(0,0,Game.WIDTH,Game.HEIGHT); const gs=20; ctx.strokeStyle='rgba(128,128,128,0.2)';ctx.lineWidth=1;
+                for(let x=0;x<=Game.WIDTH;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,Game.HEIGHT);ctx.stroke();} 
+                for(let y=0;y<=Game.HEIGHT;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(Game.WIDTH,y);ctx.stroke();}
+                for(let u of Game.units)u.draw(ctx);
+                if(Game.winnerText){
+                    const cx=Game.WIDTH/2,cy=Game.HEIGHT/2; ctx.fillStyle="rgba(0,0,0,0.7)";ctx.fillRect(cx-150,cy-40,300,80);
+                    ctx.textAlign="center";ctx.textBaseline="middle";ctx.font="bold 32px Arial";
+                    if(Game.winnerPlayer==="player1"){ctx.fillStyle=Game.COLORS.player1;ctx.shadowColor="#00BFFF";}
+                    else if(Game.winnerPlayer==="player2"){ctx.fillStyle=Game.COLORS.player2;ctx.shadowColor="#FF4500";}
+                    else{ctx.fillStyle="white";ctx.shadowColor="white";}
+                    ctx.shadowBlur=20;ctx.fillText(Game.winnerText,cx,cy);ctx.shadowBlur=0;
+                }
+            };
+            Game.gameLoop = function() { Game.update(); Game.draw(); if (Game.isRunning && !Game.winnerText) Game.loop = requestAnimationFrame(Game.gameLoop); else Game.isRunning = false; };
+            
+            function handleCanvasInteraction(clientX, clientY) { /* ... Same as previous version (player places/removes their own units) ... */
+                if (!Game.placing || !Game.dataChannel || Game.dataChannel.readyState !== 'open') return;
+                const rect=canvas.getBoundingClientRect(),sX=canvas.width/rect.width,sY=canvas.height/rect.height,x=(clientX-rect.left)*sX,y=(clientY-rect.top)*sY;
+                let clickedUnitIdx=-1, clickedUnit=null;
+                for(let i=Game.units.length-1;i>=0;i--){const u=Game.units[i],dx=u.x-x,dy=u.y-y; if(Math.hypot(dx,dy)<=15){clickedUnitIdx=i;clickedUnit=u;break;}}
+                const currentPlayerRole = Game.isHost ? "player1" : "player2";
+                if(clickedUnit){ 
+                    if (clickedUnit.player === currentPlayerRole) {
+                        Game.units.splice(clickedUnitIdx,1); sendMessageP2P("unit_removed",{id:clickedUnit.id});
+                    } else { alert("Вы можете удалять только свои юниты!"); }
+                } else {
+                    const type=Game.selectedTypes[currentPlayerRole],newU=new Game.Unit(x,y,type,currentPlayerRole); Game.units.push(newU);
+                    sendMessageP2P("unit_added",{id:newU.id,x:newU.x,y:newU.y,type:newU.type,player:newU.player});
+                }
+                Game.ui.updateUI();Game.draw();
+            }
+            canvas.addEventListener("click", e => handleCanvasInteraction(e.clientX, e.clientY));
+            canvas.addEventListener("touchstart", e => { if(!Game.placing)return; e.preventDefault(); handleCanvasInteraction(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
+
+            Game.ui.setupTypeButtons();
+            resetP2PStateAndUI(false); 
+            Game.draw(); 
+        });
+    </script>
+</body>
+</html>
