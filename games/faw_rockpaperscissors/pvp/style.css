@@ -1,4 +1,5 @@
 
+/* Базовые стили */
 body {
   font-family: Arial, sans-serif;
   text-align: center;
@@ -39,13 +40,14 @@ h1 {
 
 .type-buttons {
   display: flex;
-  justify-content: center; /* выравнивание по центру */
-  gap: 10px; /* расстояние между кнопками */
+  justify-content: center;
+  gap: 10px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .type-button {
-  font-size: 24px;
+  font-size: 1.4rem;
   padding: 8px 12px;
   cursor: pointer;
   border: 2px solid transparent;
@@ -54,15 +56,14 @@ h1 {
   color: #eee;
   user-select: none;
   transition: background-color 0.2s, border-color 0.2s;
-  /* убираем растяжение на всю ширину */
   width: auto;
   min-width: 60px;
   text-align: center;
   display: inline-block;
 
-  /* тач-оптимизация */
+  /* Тач-оптимизация */
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(255,255,255,0.2);
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
 }
 
 .type-button.selected {
@@ -83,10 +84,13 @@ h1 {
   border: 2px solid #555;
   border-radius: 8px;
   cursor: crosshair;
+  width: 100%;
+  max-width: 700px;
+  height: auto;
 }
 
 button {
-  font-size: 16px;
+  font-size: 1rem;
   margin: 5px 0;
   padding: 8px 14px;
   border-radius: 6px;
@@ -97,9 +101,9 @@ button {
   transition: background-color 0.2s;
   width: 100%;
 
-  /* тач-оптимизация */
+  /* Тач-оптимизация */
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(255,255,255,0.2);
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
 }
 
 button:hover {
@@ -115,9 +119,10 @@ button:hover {
 .type-button.hidden {
   display: none;
 }
+
 .menu-button {
   display: inline-block;
-  font-size: 16px;
+  font-size: 1rem;
   margin: 5px 0;
   padding: 8px 14px;
   border-radius: 6px;
@@ -128,19 +133,64 @@ button:hover {
   transition: background-color 0.2s;
   width: 90%;
 
-  /* тач-оптимизация */
+  /* Тач-оптимизация */
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(255,255,255,0.2);
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
 }
 
 .menu-button:hover {
   background-color: #777;
 }
+
 .start-button {
-  background-color: #4CAF50; /* зелёный */
+  background-color: #4CAF50;
   color: white;
 }
 
 .start-button:hover {
-  background-color: #45a049; /* темнее при наведении */
+  background-color: #45a049;
+}
+
+/* 📱 Мобильная адаптация */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  #gameWrapper {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+
+  #gameControls {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  #gameCanvas {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+  }
+
+  .type-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .type-button {
+    font-size: 1.2rem;
+    min-width: 50px;
+    padding: 6px 10px;
+  }
+
+  button, .menu-button {
+    font-size: 1rem;
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
 }
