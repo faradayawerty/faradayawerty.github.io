@@ -289,7 +289,15 @@
     (function(ns) {
         ns.levels = [
             {
-                maxPlayerUnits: 8, // Reduced
+                maxPlayerUnits: 3, // Enemy: 2 -> Player Max: 3
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    { x: 650, y: 250, type: "rock" },
+                    { x: 550, y: 250, type: "paper" }
+                ]
+            },
+            {
+                maxPlayerUnits: 6, // Enemy: 5 -> Player Max: 6
                 initialPlayerUnits: [],
                 enemyUnits: [
                     { x: 600, y: 150, type: "scissors" },
@@ -300,15 +308,19 @@
                 ]
             },
             {
-                maxPlayerUnits: 6, // Reduced
+                maxPlayerUnits: 6, // Enemy: 5 -> Player Max: 6
                 initialPlayerUnits: [],
                 enemyUnits: [
-                    { x: 650, y: 250, type: "rock" },
-                    { x: 550, y: 250, type: "paper" }
+                    // Cross formation
+                    { x: 600, y: 250, type: "rock" }, // Center
+                    { x: 550, y: 250, type: "paper" },
+                    { x: 650, y: 250, type: "scissors" },
+                    { x: 600, y: 200, type: "paper" },
+                    { x: 600, y: 300, type: "scissors" }
                 ]
             },
             {
-                maxPlayerUnits: 10, // Reduced
+                maxPlayerUnits: 7, // Enemy: 6 -> Player Max: 7
                 initialPlayerUnits: [],
                 enemyUnits: [
                     { x: 450, y: 200, type: "rock" }, { x: 500, y: 200, type: "rock" },
@@ -317,7 +329,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 12, // Reduced
+                maxPlayerUnits: 7, // Enemy: 6 -> Player Max: 7
                 initialPlayerUnits: [],
                 enemyUnits: [
                     { x: 650, y: 100, type: "rock" }, { x: 600, y: 150, type: "rock" },
@@ -326,7 +338,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 10, // Reduced
+                maxPlayerUnits: 8, // Enemy: 7 -> Player Max: 8
                 initialPlayerUnits: [],
                 enemyUnits: [
                     { x: 600, y: 100, type: "paper" },
@@ -339,7 +351,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 12, // Reduced
+                maxPlayerUnits: 8, // Enemy: 7 -> Player Max: 8
                 initialPlayerUnits: [],
                 enemyUnits: [
                     // Hexagon formation, adjusted for center
@@ -353,7 +365,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 12, // Reduced
+                maxPlayerUnits: 9, // Enemy: 8 -> Player Max: 9
                 initialPlayerUnits: [],
                 enemyUnits: [
                     { x: 600, y: 70, type: "rock" },
@@ -367,7 +379,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 15, // Reduced
+                maxPlayerUnits: 10, // Enemy: 9 -> Player Max: 10
                 initialPlayerUnits: [],
                 enemyUnits: [
                     { x: 600, y: 100, type: "rock" }, { x: 650, y: 120, type: "paper" }, { x: 700, y: 140, type: "scissors" },
@@ -376,33 +388,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 16, // Reduced
-                initialPlayerUnits: [],
-                enemyUnits: [
-                    // Outer layer (Paper)
-                    { x: 700, y: 70, type: "paper" }, { x: 700, y: 170, type: "paper" }, { x: 700, y: 270, type: "paper" }, { x: 700, y: 370, type: "paper" },
-                    { x: 600, y: 70, type: "paper" }, { x: 600, y: 170, type: "paper" }, { x: 600, y: 270, type: "paper" }, { x: 600, y: 370, type: "paper" },
-                    // Middle layer (Scissors)
-                    { x: 650, y: 120, type: "scissors" }, { x: 650, y: 220, type: "scissors" }, { x: 650, y: 320, type: "scissors" }, { x: 650, y: 420, type: "scissors" },
-                    // Inner layer (Rock)
-                    { x: 650, y: 250, type: "rock" }
-                ]
-            },
-            // New levels start here (10-15)
-            {
-                maxPlayerUnits: 10, // Reduced
-                initialPlayerUnits: [],
-                enemyUnits: [
-                    // Cross formation
-                    { x: 600, y: 250, type: "rock" }, // Center
-                    { x: 550, y: 250, type: "paper" },
-                    { x: 650, y: 250, type: "scissors" },
-                    { x: 600, y: 200, type: "paper" },
-                    { x: 600, y: 300, type: "scissors" }
-                ]
-            },
-            {
-                maxPlayerUnits: 12, // Reduced
+                maxPlayerUnits: 11, // Enemy: 10 -> Player Max: 11
                 initialPlayerUnits: [],
                 enemyUnits: [
                     // Snake formation
@@ -413,18 +399,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 15, // Reduced
-                initialPlayerUnits: [],
-                enemyUnits: [
-                    // Defensive Barrier (thick vertical line)
-                    { x: 680, y: 70, type: "rock" }, { x: 680, y: 110, type: "paper" }, { x: 680, y: 150, type: "scissors" }, { x: 680, y: 190, type: "rock" }, { x: 680, y: 230, type: "paper" },
-                    { x: 680, y: 270, type: "scissors" }, { x: 680, y: 310, type: "rock" }, { x: 680, y: 350, type: "paper" }, { x: 680, y: 390, type: "scissors" }, { x: 680, y: 430, type: "rock" },
-                    { x: 720, y: 70, type: "paper" }, { x: 720, y: 110, type: "scissors" }, { x: 720, y: 150, type: "rock" }, { x: 720, y: 190, type: "paper" }, { x: 720, y: 230, type: "scissors" },
-                    { x: 720, y: 270, type: "rock" }, { x: 720, y: 310, type: "paper" }, { x: 720, y: 350, type: "scissors" }, { x: 720, y: 390, type: "rock" }, { x: 720, y: 430, type: "paper" }
-                ]
-            },
-            {
-                maxPlayerUnits: 16, // Reduced
+                maxPlayerUnits: 11, // Enemy: 12 -> Player Max: 11 (1 less)
                 initialPlayerUnits: [],
                 enemyUnits: [
                     // Encirclement (semi-circle on the right)
@@ -437,7 +412,31 @@
                 ]
             },
             {
-                maxPlayerUnits: 18, // Reduced
+                maxPlayerUnits: 12, // Enemy: 13 -> Player Max: 12 (1 less)
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Outer layer (Paper)
+                    { x: 700, y: 70, type: "paper" }, { x: 700, y: 170, type: "paper" }, { x: 700, y: 270, type: "paper" }, { x: 700, y: 370, type: "paper" },
+                    { x: 600, y: 70, type: "paper" }, { x: 600, y: 170, type: "paper" }, { x: 600, y: 270, type: "paper" }, { x: 600, y: 370, type: "paper" },
+                    // Middle layer (Scissors)
+                    { x: 650, y: 120, type: "scissors" }, { x: 650, y: 220, type: "scissors" }, { x: 650, y: 320, type: "scissors" }, { x: 650, y: 420, type: "scissors" },
+                    // Inner layer (Rock)
+                    { x: 650, y: 250, type: "rock" }
+                ]
+            },
+            {
+                maxPlayerUnits: 15, // Enemy: 20 -> Player Max: 15 (5 less)
+                initialPlayerUnits: [],
+                enemyUnits: [
+                    // Defensive Barrier (thick vertical line)
+                    { x: 680, y: 70, type: "rock" }, { x: 680, y: 110, type: "paper" }, { x: 680, y: 150, type: "scissors" }, { x: 680, y: 190, type: "rock" }, { x: 680, y: 230, type: "paper" },
+                    { x: 680, y: 270, type: "scissors" }, { x: 680, y: 310, type: "rock" }, { x: 680, y: 350, type: "paper" }, { x: 680, y: 390, type: "scissors" }, { x: 680, y: 430, type: "rock" },
+                    { x: 720, y: 70, type: "paper" }, { x: 720, y: 110, type: "scissors" }, { x: 720, y: 150, type: "rock" }, { x: 720, y: 190, type: "paper" }, { x: 720, y: 230, type: "scissors" },
+                    { x: 720, y: 270, type: "rock" }, { x: 720, y: 310, type: "paper" }, { x: 720, y: 350, type: "scissors" }, { x: 720, y: 390, type: "rock" }, { x: 720, y: 430, type: "paper" }
+                ]
+            },
+            {
+                maxPlayerUnits: 15, // Enemy: 20 -> Player Max: 15 (5 less)
                 initialPlayerUnits: [],
                 enemyUnits: [
                     // The Maze (lines creating passages)
@@ -449,7 +448,7 @@
                 ]
             },
             {
-                maxPlayerUnits: 22, // Reduced
+                maxPlayerUnits: 20, // Enemy: ~40 -> Player Max: 20 (20 less)
                 initialPlayerUnits: [],
                 enemyUnits: (function() {
                     const units = [];
