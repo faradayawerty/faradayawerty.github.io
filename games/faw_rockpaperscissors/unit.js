@@ -22,18 +22,18 @@
       return 2000 + Math.random() * 3000;
     }
 
-    dash() {
-      // Сила прыжка
-      const dashStrength = 10;
+dash() {
+  // Случайная сила прыжка от 5 до 15
+  const dashStrength = 5 + Math.random() * 10;
 
-      // Нормализуем текущую скорость и умножаем на силу прыжка
-      const speed = Math.hypot(this.vx, this.vy) || 1;
-      this.vx += (this.vx / speed) * dashStrength;
-      this.vy += (this.vy / speed) * dashStrength;
+  // Нормализуем текущую скорость и умножаем на силу прыжка
+  const speed = Math.hypot(this.vx, this.vy) || 1;
+  this.vx += (this.vx / speed) * dashStrength;
+  this.vy += (this.vy / speed) * dashStrength;
 
-      // Следующий прыжок через случайное время
-      this.nextDashTime = Date.now() + this.getRandomDashInterval();
-    }
+  // Следующий прыжок через случайное время
+  this.nextDashTime = Date.now() + this.getRandomDashInterval();
+}
 
     move() {
       // Проверяем, можно ли совершить прыжок

@@ -89,24 +89,89 @@
     ns.updateUnitCountDisplay();
   };
 
-  function placeUnit(e) {
-    if (!ns.placing) return;
+  // --- Drag & Drop переменные ---
+  let draggingUnit = null;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
 
+  // Получить координаты указателя относительно canvas с учётом масштабирования
+  function getPointerPos(e) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
 
-    const x = (clientX - rect.left) * scaleX;
-    const y = (clientY - rect.top) * scaleY;
+  // Найти юнит под координатами
+  function findUnitAtPosition(x, y) {
+    // Ищем в обратном порядке, чтобы при наложении выбирать верхний
+    for (let i = ns.units.length - 1; i >= 0; i--) {
+      const u = ns.units[i];
+      const dx = ns.wrapDistance(u.x, x, ns.WIDTH);
+      const dy = ns.wrapDistance(u.y, y, ns.HEIGHT);
+      const dist = Math.hypot(dx, dy);
+      if (dist <= u.radius) {
+        return u;
+      }
+    }
+    return null;
+  }
 
+  // Обработчики для drag & drop
+  function onPointerDown(e) {
+    if (ns.placing) return; // нельзя перетаскивать при расстановке
+    const pos = getPointerPos(e);
+    const unit = findUnitAtPosition(pos.x, pos.y);
+    if (unit) {
+      draggingUnit = unit;
+      dragOffsetX = pos.x - unit.x;
+      dragOffsetY = pos.y - unit.y;
+      e.preventDefault();
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!draggingUnit) return;
+    const pos = getPointerPos(e);
+    draggingUnit.x = (pos.x - dragOffsetX + ns.WIDTH) % ns.WIDTH;
+    draggingUnit.y = (pos.y - dragOffsetY + ns.HEIGHT) % ns.HEIGHT;
+    e.preventDefault();
+  }
+
+  function onPointerUp(e) {
+    if (draggingUnit) {
+      draggingUnit = null;
+      e.preventDefault();
+    }
+  }
+
+  canvas.addEventListener("mousedown", onPointerDown);
+  canvas.addEventListener("mousemove", onPointerMove);
+  canvas.addEventListener("mouseup", onPointerUp);
+  canvas.addEventListener("mouseleave", onPointerUp);
+
+  canvas.addEventListener("touchstart", onPointerDown, { passive: false });
+  canvas.addEventListener("touchmove", onPointerMove, { passive: false });
+  canvas.addEventListener("touchend", onPointerUp, { passive: false });
+  canvas.addEventListener("touchcancel", onPointerUp, { passive: false });
+
+  // Функция для постановки юнита (при клике/тапе)
+  function placeUnit(e) {
+    if (!ns.placing) return;
+
+    const pos = getPointerPos(e);
+
+    // Проверка на удаление игрока
     for (let i = 0; i < ns.units.length; i++) {
       const u = ns.units[i];
       if (u.team === "player") {
-        const dx = ns.wrapDistance(u.x, x, ns.WIDTH);
-        const dy = ns.wrapDistance(u.y, y, ns.HEIGHT);
+        const dx = ns.wrapDistance(u.x, pos.x, ns.WIDTH);
+        const dy = ns.wrapDistance(u.y, pos.y, ns.HEIGHT);
         const dist = Math.hypot(dx, dy);
         if (dist <= u.radius) {
           ns.units.splice(i, 1);
@@ -120,7 +185,7 @@
 
     if (ns.playerUnitCount >= ns.MAX_PLAYER_UNITS) return;
 
-    ns.units.push(new ns.Unit(x, y, ns.selectedType, "player"));
+    ns.units.push(new ns.Unit(pos.x, pos.y, ns.selectedType, "player"));
     ns.playerUnitCount++;
     ns.updateUnitCountDisplay();
     ns.draw();
@@ -128,6 +193,7 @@
 
   canvas.addEventListener("click", placeUnit);
   canvas.addEventListener("touchstart", function(e) {
+    if (!ns.placing) return;
     e.preventDefault();
     placeUnit(e);
   }, { passive: false });
@@ -220,4 +286,5 @@
       }
     }
   };
+
 })(Game);
