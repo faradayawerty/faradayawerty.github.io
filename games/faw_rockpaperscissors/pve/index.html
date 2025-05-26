@@ -2,38 +2,814 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>faw_rockpaperscissors: pvp</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="../icon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>faw_rockpaperscissors: pvp</title>
+    <link rel="icon" href="../icon.png">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ddd;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #unitCounters {
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        #playerUnitsLeft {
+            color: lightblue;
+        }
+
+        #enemyUnitsCount {
+            color: tomato;
+        }
+
+        #container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 10px;
+            gap: 20px;
+            position: relative;
+            flex-wrap: wrap;
+            padding: 0 10px;
+        }
+
+        #controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 140px;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .type-button {
+            padding: 10px 20px;
+            margin: 5px 0;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #555;
+            background-color: #2a2a2a;
+            color: #ddd;
+            transition: background-color 0.3s;
+            width: 100%;
+            text-align: left;
+        }
+
+        .type-button:hover {
+            background-color: #444;
+        }
+
+        .type-button.selected {
+            background-color: #555;
+            font-weight: bold;
+            border-color: #88ccff;
+            color: #aaddff;
+        }
+
+        #startButton,
+        #replayButton {
+            margin-top: 15px;
+            padding: 10px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #3a8f3a;
+            color: white;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        #startButton:hover,
+        #replayButton:hover {
+            background-color: #5bb75b;
+        }
+
+        canvas {
+            border: 1px solid #444;
+            background-color: #1e1e1e;
+            touch-action: none;
+            display: block;
+            position: relative;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: auto;
+            max-width: 800px;
+            touch-action: manipulation;
+        }
+
+        canvas::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            border-top: 2px dashed #666;
+            pointer-events: none;
+        }
+
+        #canvasOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #winnerMessage {
+            font-size: 36px;
+            font-weight: bold;
+            color: #90ee90;
+            text-shadow: 0 0 8px #90ee90aa;
+            min-width: 300px;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #enemyUnitSetup {
+            background-color: #1a1a1a;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-top: 10px;
+            color: #ccc;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #enemyUnitSetup h4 {
+            margin: 0 0 6px 0;
+            color: #88ccff;
+            font-size: 14px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+            padding-bottom: 2px;
+        }
+
+        #enemyUnitSetup label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 3px 0;
+            font-size: 14px;
+        }
+
+        #enemyUnitSetup input[type="number"] {
+            width: 45px;
+            padding: 4px;
+            background-color: #2a2a2a;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #ddd;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        #enemyUnitSetup input[type="number"]:focus {
+            border-color: #88ccff;
+            outline: none;
+        }
+
+        /* Убираем стрелочки у input[type="number"] в Chrome, Safari, Edge */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Убираем стрелочки в Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* 📱 Адаптация под мобильные устройства */
+        @media (max-width: 600px) {
+            #container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #controls {
+                width: 100%;
+                align-items: center;
+            }
+
+            .type-button,
+            #startButton,
+            #replayButton {
+                width: 90%;
+                max-width: 300px;
+            }
+
+            #enemyUnitSetup {
+                width: 90%;
+                max-width: 300px;
+            }
+
+            #enemyUnitSetup label {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            #gameCanvas {
+                width: 100%;
+                height: auto;
+            }
+
+            #canvasOverlay {
+                width: 100%;
+                height: auto;
+            }
+        }
+        .menu-button {
+            margin-top: 15px;
+            display: inline-block;
+            max-width: 200px;
+            width: auto;
+            padding: 12px 24px;
+            text-align: center;
+            align-self: center;
+            border-radius: 10px;
+            background-color: #555555; /* средний серый */
+            color: #ddd;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+
+        .menu-button:hover {
+            background-color: #777777; /* светлее при наведении */
+        }
+    </style>
 </head>
 <body>
 <div id="unitCounters">
-  <span id="playerUnitsLeft">Player units left: 15</span> &nbsp;&nbsp;|&nbsp;&nbsp;
-  <span id="enemyUnitsCount">Enemy units: 0</span>
+    <span id="playerUnitsLeft">Player units left: 15</span> &nbsp;&nbsp;|&nbsp;&nbsp;
+    <span id="enemyUnitsCount">Enemy units: 0</span>
 </div>
 <div id="container">
-  <div id="controls">
-    <button class="type-button selected" data-type="rock">🪨 Rock</button>
-    <button class="type-button" data-type="paper">📄 Paper</button>
-    <button class="type-button" data-type="scissors">✂️ Scissors</button>
-    <div id="enemyUnitSetup">
-      <h4>Enemy Units</h4>
-      <label>🪨 Rock<input type="number" id="enemyRockCount" min="0" value="5"></label>
-      <label>📄 Paper<input type="number" id="enemyPaperCount" min="0" value="5"></label>
-      <label>✂️  Scissors<input type="number" id="enemyScissorsCount" min="0" value="5"></label>
+    <div id="controls">
+        <button class="type-button selected" data-type="rock">🪨 Rock</button>
+        <button class="type-button" data-type="paper">📄 Paper</button>
+        <button class="type-button" data-type="scissors">✂️ Scissors</button>
+        <div id="enemyUnitSetup">
+            <h4>Enemy Units</h4>
+            <label>🪨 Rock<input type="number" id="enemyRockCount" min="0" value="5"></label>
+            <label>📄 Paper<input type="number" id="enemyPaperCount" min="0" value="5"></label>
+            <label>✂️  Scissors<input type="number" id="enemyScissorsCount" min="0" value="5"></label>
+        </div>
+        <button id="startButton">Start</button>
+        <button id="replayButton" style="display:none;">Replay</button>
+        <a href="../index.html" class="menu-button">Главное меню</a>
     </div>
-    <button id="startButton">Start</button>
-    <button id="replayButton" style="display:none;">Replay</button>
-  <a href="../index.html" class="menu-button">Главное меню</a>
-  </div>
-  <canvas id="gameCanvas" width="800" height="500"></canvas>
-  <div id="canvasOverlay"></div>
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <div id="canvasOverlay"></div>
 </div>
-<script src="game.js"></script>
-<script src="unit.js"></script>
-<script src="gameLogic.js"></script>
-<script src="ui.js"></script>
+
+<script>
+    var Game = Game || {};
+
+    (function(ns) {
+        // game.js
+        // Константы и базовые настройки
+        ns.CELL_SIZE = 50;
+        ns.WIDTH = 800;
+        ns.HEIGHT = 500;
+
+        ns.TYPES = ["rock", "paper", "scissors"];
+        ns.EMOJIS = { rock: "🪨", paper: "📄", scissors: "✂️" };
+        ns.COLORS = { player: "lightblue", enemy: "tomato" };
+
+        ns.units = [];
+        ns.placing = true;
+        ns.selectedType = "rock";
+        ns.loop = null;
+        ns.winnerText = "";
+
+        // UI elements, инициализируем позже
+        ns.elements = {};
+
+    })(Game);
+
+    (function(ns) {
+        // gameLogic.js
+
+        ns.randomType = function() {
+            return ns.TYPES[Math.floor(Math.random() * ns.TYPES.length)];
+        };
+
+        ns.generateEnemyUnits = function() {
+            const rock = parseInt(document.getElementById("enemyRockCount").value, 10) || 0;
+            const paper = parseInt(document.getElementById("enemyPaperCount").value, 10) || 0;
+            const scissors = parseInt(document.getElementById("enemyScissorsCount").value, 10) || 0;
+
+            function spawn(type, count) {
+                for (let i = 0; i < count; i++) {
+                    const x = Math.random() * Game.WIDTH;
+                    const y = Math.random() * Game.HEIGHT;
+                    Game.units.push(new Game.Unit(x, y, type, "enemy"));
+                }
+            }
+
+            spawn("rock", rock);
+            spawn("paper", paper);
+            spawn("scissors", scissors);
+        };
+
+        ns.resolveConflict = function(a, b) {
+            const map = { rock: "scissors", scissors: "paper", paper: "rock" };
+            if (map[a.type] === b.type) {
+                b.type = a.type;
+                b.team = a.team;
+            } else if (map[b.type] === a.type) {
+                a.type = b.type;
+                a.team = b.team;
+            }
+        };
+
+        ns.checkWinCondition = function() {
+            // Эта функция дублируется в ui.js. Для объединенного файла оставляем версию из ui.js, так как она более полная.
+            // ns.checkWinCondition здесь не будет использоваться, но оставлен для полноты объединения кода,
+            // чтобы не менять логику ui.js.
+        };
+
+        ns.update = function() {
+            for (let u of ns.units) u.move();
+
+            for (let i = 0; i < ns.units.length; i++) {
+                for (let j = i + 1; j < ns.units.length; j++) {
+                    const a = ns.units[i];
+                    const b = ns.units[j];
+                    if (a.team === b.team) continue;
+                    const dx = ns.wrapDistance(a.x, b.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(a.y, b.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < 30 && a.type !== b.type) ns.resolveConflict(a, b);
+                }
+            }
+
+            // Вызываем ns.checkWinCondition из ui.js, который более полный
+            ns.checkWinCondition();
+        };
+
+    })(Game);
+
+    (function(ns) {
+        // unit.js
+
+        class Unit {
+            constructor(x, y, type, team) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.team = team;
+                this.vx = (Math.random() * 2 - 1);
+                this.vy = (Math.random() * 2 - 1);
+                this.radius = 20;
+                this.spawnTime = Date.now();
+
+                // Для dash:
+                this.canDash = true;
+                this.nextDashTime = Date.now() + this.getRandomDashInterval();
+            }
+
+            getRandomDashInterval() {
+                // Случайный интервал от 2 до 5 секунд
+                return 2000 + Math.random() * 3000;
+            }
+
+            dash() {
+                // Случайная сила прыжка от 5 до 15
+                const dashStrength = 5 + Math.random() * 10;
+
+                // Нормализуем текущую скорость и умножаем на силу прыжка
+                const speed = Math.hypot(this.vx, this.vy) || 1;
+                this.vx += (this.vx / speed) * dashStrength;
+                this.vy += (this.vy / speed) * dashStrength;
+
+                // Следующий прыжок через случайное время
+                this.nextDashTime = Date.now() + this.getRandomDashInterval();
+            }
+
+            move() {
+                // Проверяем, можно ли совершить прыжок
+                if (Date.now() >= this.nextDashTime) {
+                    this.dash();
+                }
+
+                let target = null;
+                let minDist = Infinity;
+
+                for (let other of ns.units) {
+                    if (other === this || other.team === this.team) continue;
+                    if (ns.shouldChase(this.type, other.type) || ns.shouldFlee(this.type, other.type)) {
+                        let dx = ns.wrapDistance(this.x, other.x, ns.WIDTH);
+                        let dy = ns.wrapDistance(this.y, other.y, ns.HEIGHT);
+                        let dist = Math.hypot(dx, dy);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            target = other;
+                        }
+                    }
+                }
+
+                const speed = 1.5;
+                if (target) {
+                    let dx = ns.wrapDistance(this.x, target.x, ns.WIDTH);
+                    let dy = ns.wrapDistance(this.y, target.y, ns.HEIGHT);
+                    const d = Math.hypot(dx, dy) + 0.01;
+
+                    if (ns.shouldChase(this.type, target.type)) {
+                        this.vx += (dx / d) * speed * 0.1;
+                        this.vy += (dy / d) * speed * 0.1;
+                    } else if (ns.shouldFlee(this.type, target.type)) {
+                        this.vx -= (dx / d) * speed * 0.1;
+                        this.vy -= (dy / d) * speed * 0.1;
+                    }
+                }
+
+                // Avoid allies
+                for (let other of ns.units) {
+                    if (other === this || other.team !== this.team) continue;
+                    const dx = ns.wrapDistance(this.x, other.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(this.y, other.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 0 && dist < this.radius * 2) {
+                        const repulse = 1.5;
+                        this.vx -= (dx / dist) * repulse * 0.05;
+                        this.vy -= (dy / dist) * repulse * 0.05;
+                    }
+                }
+
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+
+                this.x = (this.x + this.vx + ns.WIDTH) % ns.WIDTH;
+                this.y = (this.y + this.vy + ns.HEIGHT) % ns.HEIGHT;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                const age = Date.now() - this.spawnTime;
+                if (age < 1000) ctx.globalAlpha = 0.5 + 0.5 * (age / 1000);
+                ctx.font = "32px serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowColor = ns.COLORS[this.team];
+                ctx.shadowBlur = 8;
+                ctx.fillStyle = ns.COLORS[this.team];
+                ctx.fillText(ns.EMOJIS[this.type], 0, 0);
+                ctx.restore();
+            }
+        }
+
+        ns.Unit = Unit;
+
+        ns.wrapDistance = function(a, b, size) {
+            let d = b - a;
+            if (Math.abs(d) > size / 2) d -= Math.sign(d) * size;
+            return d;
+        };
+
+        ns.shouldChase = function(t1, t2) {
+            const map = { rock: "scissors", scissors: "paper", paper: "rock" };
+            return map[t1] === t2;
+        };
+
+        ns.shouldFlee = function(t1, t2) {
+            const map = { rock: "paper", paper: "scissors", scissors: "rock" };
+            return map[t1] === t2;
+        };
+
+    })(Game);
+
+    (function(ns) {
+        // ui.js (частично, так как есть дублирование ns.checkWinCondition)
+
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        ns.elements = {
+            playerUnitsLeftSpan: document.getElementById("playerUnitsLeft"),
+            enemyUnitsCountSpan: document.getElementById("enemyUnitsCount"),
+            replayButton: document.getElementById("replayButton"),
+            startButton: document.getElementById("startButton"),
+            typeButtons: document.querySelectorAll(".type-button"),
+        };
+
+        ns.stopGame = function() {
+            clearInterval(ns.loop);
+            ns.loop = null;
+        };
+
+        ns.showWinner = function(text, team) {
+            ns.winnerText = text;
+            ns.winnerTeam = team || null;
+            ns.elements.replayButton.style.display = "inline-block";
+            clearInterval(ns.loop);
+        };
+
+        function drawGrid() {
+            const gridSize = ns.CELL_SIZE;
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+
+            for (let x = 0; x <= ns.WIDTH; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, ns.HEIGHT);
+                ctx.stroke();
+            }
+
+            for (let y = 0; y <= ns.HEIGHT; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(ns.WIDTH, y);
+                ctx.stroke();
+            }
+        }
+
+        ns.drawWinnerMessage = function() {
+            if (!ns.winnerText) return;
+            const centerX = ns.WIDTH / 2;
+            const centerY = ns.HEIGHT / 2;
+            ctx.fillStyle = "rgba(0,0,0,0.7)";
+            ctx.fillRect(centerX - 150, centerY - 40, 300, 80);
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = "bold 32px Arial";
+
+            if (ns.winnerTeam === "player") {
+                ctx.fillStyle = "#87CEFA";
+                ctx.shadowColor = "#00BFFF";
+            } else if (ns.winnerTeam === "enemy") {
+                ctx.fillStyle = "#FF6347";
+                ctx.shadowColor = "#FF4500";
+            } else {
+                ctx.fillStyle = "white";
+                ctx.shadowColor = "white";
+            }
+            ctx.shadowBlur = 20;
+            ctx.fillText(ns.winnerText, centerX, centerY);
+            ctx.shadowBlur = 0;
+        };
+
+        ns.draw = function() {
+            ctx.clearRect(0, 0, ns.WIDTH, ns.HEIGHT);
+            drawGrid();
+            for (let u of ns.units) u.draw(ctx);
+            ns.drawWinnerMessage();
+        };
+
+        ns.updateUnitCountDisplay = function() {
+            const p = ns.units.filter(u => u.team === "player").length;
+            const e = ns.units.filter(u => u.team === "enemy").length;
+            ns.elements.playerUnitsLeftSpan.textContent = `Player units: ${p}`;
+            ns.elements.enemyUnitsCountSpan.textContent = `Enemy units: ${e}`;
+        };
+
+        ns.gameLoop = function() {
+            ns.update(); // ns.update из gameLogic.js
+            ns.draw();
+            ns.updateUnitCountDisplay();
+        };
+
+        // --- Drag & Drop переменные ---
+        let draggingUnit = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        // Получить координаты указателя относительно canvas с учётом масштабирования
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        // Найти юнит под координатами
+        function findUnitAtPosition(x, y) {
+            // Ищем в обратном порядке, чтобы при наложении выбирать верхний
+            for (let i = ns.units.length - 1; i >= 0; i--) {
+                const u = ns.units[i];
+                const dx = ns.wrapDistance(u.x, x, ns.WIDTH);
+                const dy = ns.wrapDistance(u.y, y, ns.HEIGHT);
+                const dist = Math.hypot(dx, dy);
+                if (dist <= u.radius) {
+                    return u;
+                }
+            }
+            return null;
+        }
+
+        // Обработчики для drag & drop
+        function onPointerDown(e) {
+            if (ns.placing) return; // нельзя перетаскивать при расстановке
+            const pos = getPointerPos(e);
+            const unit = findUnitAtPosition(pos.x, pos.y);
+            if (unit && unit.team === "player") { // Только юниты игрока могут быть перетащены
+                draggingUnit = unit;
+                dragOffsetX = pos.x - unit.x;
+                dragOffsetY = pos.y - unit.y;
+                e.preventDefault();
+            }
+        }
+
+        function onPointerMove(e) {
+            if (!draggingUnit) return;
+            const pos = getPointerPos(e);
+            draggingUnit.x = (pos.x - dragOffsetX + ns.WIDTH) % ns.WIDTH;
+            draggingUnit.y = (pos.y - dragOffsetY + ns.HEIGHT) % ns.HEIGHT;
+            e.preventDefault();
+        }
+
+        function onPointerUp(e) {
+            if (draggingUnit) {
+                draggingUnit = null;
+                e.preventDefault();
+            }
+        }
+
+        canvas.addEventListener("mousedown", onPointerDown);
+        canvas.addEventListener("mousemove", onPointerMove);
+        canvas.addEventListener("mouseup", onPointerUp);
+        canvas.addEventListener("mouseleave", onPointerUp);
+
+        canvas.addEventListener("touchstart", onPointerDown, { passive: false });
+        canvas.addEventListener("touchmove", onPointerMove, { passive: false });
+        canvas.addEventListener("touchend", onPointerUp, { passive: false });
+        canvas.addEventListener("touchcancel", onPointerUp, { passive: false });
+
+        // Функция для постановки юнита (при клике/тапе)
+        function placeUnit(e) {
+            if (!ns.placing) return;
+
+            const pos = getPointerPos(e);
+
+            // Проверка на удаление игрока
+            for (let i = 0; i < ns.units.length; i++) {
+                const u = ns.units[i];
+                if (u.team === "player") {
+                    const dx = ns.wrapDistance(u.x, pos.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(u.y, pos.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+                    if (dist <= u.radius) {
+                        ns.units.splice(i, 1);
+                        ns.updateUnitCountDisplay();
+                        ns.draw();
+                        return;
+                    }
+                }
+            }
+
+            ns.units.push(new ns.Unit(pos.x, pos.y, ns.selectedType, "player"));
+            ns.updateUnitCountDisplay();
+            ns.draw();
+        }
+
+        // Для предотвращения drag-действия на мобильных при тапе (для добавления/удаления юнитов)
+        canvas.addEventListener("click", placeUnit);
+        canvas.addEventListener("touchstart", function(e) {
+            // Только если не происходит drag
+            if (ns.placing && !draggingUnit) {
+                e.preventDefault();
+                placeUnit(e);
+            }
+        }, { passive: false });
+
+
+        ns.elements.typeButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                ns.elements.typeButtons.forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                ns.selectedType = btn.getAttribute("data-type");
+            });
+        });
+
+        ns.elements.startButton.addEventListener("click", () => {
+            if (ns.getPlayerUnitsCount() === 0) return alert("Place at least one unit!");
+            ns.placing = false;
+            ns.generateEnemyUnits();
+            ns.winnerText = "";
+            ns.winnerTeam = null;
+            ns.elements.replayButton.style.display = "inline-block";
+            ns.elements.startButton.style.display = "none";
+            // Скрываем кнопки выбора типа юнитов и блок настройки вражеских юнитов
+            ns.elements.typeButtons.forEach(btn => btn.style.display = "none");
+            document.getElementById("enemyUnitSetup").style.display = "none"; // Добавлено скрытие
+            ns.loop = setInterval(ns.gameLoop, 30);
+        });
+
+        ns.elements.replayButton.addEventListener("click", () => {
+            clearInterval(ns.loop);
+            ns.units = [];
+            ns.placing = true;
+            ns.winnerText = "";
+            ns.winnerTeam = null;
+            ns.elements.replayButton.style.display = "none";
+            ns.elements.startButton.style.display = "inline-block";
+            // Показываем кнопки выбора типа юнитов и блок настройки вражеских юнитов
+            ns.elements.typeButtons.forEach(btn => btn.style.display = "inline-block");
+            document.getElementById("enemyUnitSetup").style.display = "block"; // Добавлено отображение
+            ns.updateUnitCountDisplay();
+            ns.draw();
+            requestAnimationFrame(idleLoop);
+        });
+
+        // Инициализация выбранной кнопки
+        ns.elements.typeButtons.forEach(btn => btn.classList.remove("selected"));
+        document.querySelector(".type-button[data-type='rock']").classList.add("selected");
+
+        ns.updateUnitCountDisplay();
+
+        function idleLoop() {
+            ns.draw();
+            if (ns.placing) requestAnimationFrame(idleLoop);
+        }
+
+        idleLoop();
+
+        ns.getPlayerUnitsCount = function() {
+            const playerUnits = ns.units.filter(u => u.team === "player");
+            return playerUnits.length;
+        }
+
+        // Эта функция ns.checkWinCondition переопределяет ту, что была в gameLogic.js,
+        // так как она более полная и обрабатывает ничью.
+        ns.checkWinCondition = function() {
+            if (ns.placing) return;
+
+            const playerUnits = ns.units.filter(u => u.team === "player");
+            const enemyUnits = ns.units.filter(u => u.team === "enemy");
+
+            if (playerUnits.length === 0 && enemyUnits.length === 0) {
+                ns.showWinner("It's a draw!", null);
+                ns.stopGame();
+                return;
+            }
+
+            if (playerUnits.length === 0) {
+                ns.showWinner("Enemy wins!", "enemy");
+                ns.stopGame();
+                return;
+            }
+
+            if (enemyUnits.length === 0) {
+                ns.showWinner("Player wins!", "player");
+                ns.stopGame();
+                return;
+            }
+
+            const playerTypes = new Set(playerUnits.map(u => u.type));
+            const enemyTypes = new Set(enemyUnits.map(u => u.type));
+
+            // Если остался только один тип юнитов у игрока и один тип у врага, и эти типы одинаковы
+            if (playerTypes.size === 1 && enemyTypes.size === 1) {
+                const pType = [...playerTypes][0];
+                const eType = [...enemyTypes][0];
+
+                if (pType === eType) {
+                    if (playerUnits.length > enemyUnits.length) {
+                        ns.showWinner("Player wins!", "player");
+                    } else if (enemyUnits.length > playerUnits.length) {
+                        ns.showWinner("Enemy wins!", "enemy");
+                    } else {
+                        ns.showWinner("It's a draw!", null);
+                    }
+                    ns.stopGame();
+                }
+            }
+        };
+
+    })(Game);
+</script>
 </body>
 </html>
