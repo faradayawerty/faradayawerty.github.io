@@ -119,23 +119,32 @@ ns.handleCanvasClick = function(event) {
   // Получаем координаты относительно канваса
   const rect = ns.elements.canvas.getBoundingClientRect();
 
-  // Определяем, если это касание или клик
-  const touch = event.touches ? event.touches[0] : event; // Если событие - touch, то используем первое касание
-  const x = touch.clientX - rect.left;  // X координата относительно канваса
-  const y = touch.clientY - rect.top;   // Y координата относительно канваса
+  // Если это касание, получаем первое касание
+  const touch = event.touches ? event.touches[0] : event;
 
-  // Преобразуем координаты в логические координаты с учетом масштаба
-  const logicalX = x / ns.scaleFactor;
-  const logicalY = y / ns.scaleFactor;
+  // Координаты относительно канваса
+  const x = touch.clientX - rect.left;
+  const y = touch.clientY - rect.top;
 
-  // Проверка на клик по игрокам
+  // Для отладки: выводим координаты относительно экрана и канваса
+  console.log('Screen coordinates:', touch.clientX, touch.clientY);
+  console.log('Canvas coordinates:', x, y);
+
+  // Применяем масштаб для канваса и учитываем плотность пикселей
+  const logicalX = (x * window.devicePixelRatio) / ns.scaleFactor;
+  const logicalY = (y * window.devicePixelRatio) / ns.scaleFactor;
+
+  // Для отладки: выводим логические координаты
+  console.log('Logical coordinates:', logicalX, logicalY);
+
+  // Проверка на клик по юнитам игрока
   for (let i = ns.units.length - 1; i >= 0; i--) {
     const unit = ns.units[i];
     if (unit.team === "player") {
       const dx = ns.wrapDistance(logicalX, unit.x, ns.WIDTH);
       const dy = ns.wrapDistance(logicalY, unit.y, ns.HEIGHT);
       if (Math.hypot(dx, dy) < unit.radius) {
-        ns.units.splice(i, 1); // Удаление юнита
+        ns.units.splice(i, 1);  // Удаляем юнита
         ns.updateUnitCounts();
         ns.draw();
         return;
