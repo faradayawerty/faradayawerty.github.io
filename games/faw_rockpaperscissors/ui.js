@@ -162,7 +162,7 @@
 
   // Функция для постановки юнита (при клике/тапе)
   function placeUnit(e) {
-    if (!ns.placing) return;
+    //if (!ns.placing) return;
 
     const pos = getPointerPos(e);
 
