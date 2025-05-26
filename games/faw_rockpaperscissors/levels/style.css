@@ -105,6 +105,10 @@ canvas#gameCanvas {
   height: auto;
   user-select: none;
   display: block;
+  position: absolute; /* Чтобы мы могли центрировать canvas */
+  top: 50%;  /* Центрируем по вертикали */
+  left: 50%; /* Центрируем по горизонтали */
+  transform: translate(-50%, -50%); /* Точное центрирование относительно размеров canvas */
 }
 
 /* Кнопка-ссылка в стиле простая и с выравниванием */
@@ -150,10 +154,14 @@ canvas#gameCanvas {
     height: auto;
     order: 2;
   }
+  
   canvas#gameCanvas {
-    width: 100%;
-    height: auto;
+    width: 90vw;   /* Делаем ширину 90% от ширины экрана */
+    height: 90vw;  /* Высоту также делаем 90% от ширины экрана для квадратного вида */
+    max-width: 100%; /* Ограничиваем максимальную ширину */
+    max-height: 90vh; /* Ограничиваем максимальную высоту */
   }
+
   .button-group {
     flex-wrap: wrap;
     justify-content: center;
