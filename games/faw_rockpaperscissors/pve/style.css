@@ -230,3 +230,26 @@ input[type="number"] {
     height: auto;
   }
 }
+.menu-button {
+  margin-top: 15px;
+  display: inline-block;
+  max-width: 200px;
+  width: auto;
+  padding: 12px 24px;
+  text-align: center;
+  align-self: center;
+  border-radius: 10px;
+  background-color: #555555; /* средний серый */
+  color: #ddd;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.menu-button:hover {
+  background-color: #777777; /* светлее при наведении */
+}

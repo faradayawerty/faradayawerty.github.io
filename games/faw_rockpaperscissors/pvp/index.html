@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RPS Battle — 2 Players</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="gameWrapper">
+    <div id="gameControls">
+      <div class="player-controls" id="player1Controls">
+        <h2>Игрок 1 (синий)</h2>
+        <div class="type-buttons">
+          <button data-type="rock" class="type-button selected">🪨</button>
+          <button data-type="paper" class="type-button">📄</button>
+          <button data-type="scissors" class="type-button">✂️ </button>
+        </div>
+        <p>Юниты: <span id="player1UnitsCount">0</span></p>
+      </div>
+
+      <div class="player-controls" id="player2Controls">
+        <h2>Игрок 2 (красный)</h2>
+        <div class="type-buttons">
+          <button data-type="rock" class="type-button selected">🪨</button>
+          <button data-type="paper" class="type-button">📄</button>
+          <button data-type="scissors" class="type-button">✂️ </button>
+        </div>
+        <p>Юниты: <span id="player2UnitsCount">0</span></p>
+      </div>
+
+      <div id="actions">
+        <p>Активный игрок: <strong id="activePlayer">Игрок 1</strong></p>
+         <button id="startGameBtn" class="start-button">Начать игру</button>
+        <button id="restartGameBtn" class="start-button" style="display:none;">Играть заново</button>
+        <a href="../index.html" class="menu-button">Главное меню</a>
+      </div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+  </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const startButton = document.getElementById("startGameBtn");
+    const restartButton = document.getElementById("restartGameBtn");
+    const typeButtons = document.querySelectorAll(".type-buttons");
+
+    startButton.addEventListener("click", function () {
+      typeButtons.forEach(buttonGroup => {
+        buttonGroup.style.display = "none";
+      });
+      startButton.style.display = "none";
+      restartButton.style.display = "inline-block";
+    });
+
+    restartButton.addEventListener("click", function () {
+      typeButtons.forEach(buttonGroup => {
+        buttonGroup.style.display = "flex"; // или "block" — зависит от вашей верстки
+      });
+      restartButton.style.display = "none";
+      startButton.style.display = "inline-block";
+    });
+  });
+</script>
+<script src="game.js"></script>
+<script src="ui.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
