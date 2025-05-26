@@ -186,26 +186,45 @@ canvas.addEventListener("click", (e) => {
   ns.draw();
 });
 
-  canvas.addEventListener("touchstart", (e) => {
-    if (!ns.placing) return;
+canvas.addEventListener("touchstart", (e) => {
+  if (!ns.placing) return;
 
-    e.preventDefault();
+  e.preventDefault();
 
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches[0];
 
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
 
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
+  const x = (touch.clientX - rect.left) * scaleX;
+  const y = (touch.clientY - rect.top) * scaleY;
 
+  // Поиск юнита под пальцем (радиус 15)
+  let clickedUnitIndex = -1;
+  for (let i = ns.units.length - 1; i >= 0; i--) {
+    const u = ns.units[i];
+    const dx = u.x - x;
+    const dy = u.y - y;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+    if (distance <= 15) {
+      clickedUnitIndex = i;
+      break;
+    }
+  }
+
+  if (clickedUnitIndex >= 0) {
+    // Удаляем юнита
+    ns.units.splice(clickedUnitIndex, 1);
+  } else {
+    // Добавляем нового юнита
     const type = ns.selectedTypes[ns.activePlayer];
     ns.units.push(new ns.Unit(x, y, type, ns.activePlayer));
+  }
 
-    ns.ui.updateUI();
-    ns.draw();
-  }, { passive: false });
+  ns.ui.updateUI();
+  ns.draw();
+}, { passive: false });
 
   canvas.width = 700;
   canvas.height = 500;
