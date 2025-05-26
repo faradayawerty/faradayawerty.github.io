@@ -119,14 +119,12 @@ ns.handleCanvasClick = function(event) {
   // Получаем координаты относительно канваса
   const rect = ns.elements.canvas.getBoundingClientRect();
 
-  // Для касания получаем координаты касания относительно канваса
+  // Определяем, если это касание или клик
   const touch = event.touches ? event.touches[0] : event; // Если событие - touch, то используем первое касание
+  const x = touch.clientX - rect.left;  // X координата относительно канваса
+  const y = touch.clientY - rect.top;   // Y координата относительно канваса
 
-  // Преобразуем координаты касания/клика в координаты канваса
-  const x = touch.clientX - rect.left;
-  const y = touch.clientY - rect.top;
-
-  // Преобразуем координаты в логические координаты (с учетом масштаба)
+  // Преобразуем координаты в логические координаты с учетом масштаба
   const logicalX = x / ns.scaleFactor;
   const logicalY = y / ns.scaleFactor;
 
@@ -137,7 +135,7 @@ ns.handleCanvasClick = function(event) {
       const dx = ns.wrapDistance(logicalX, unit.x, ns.WIDTH);
       const dy = ns.wrapDistance(logicalY, unit.y, ns.HEIGHT);
       if (Math.hypot(dx, dy) < unit.radius) {
-        ns.units.splice(i, 1);
+        ns.units.splice(i, 1); // Удаление юнита
         ns.updateUnitCounts();
         ns.draw();
         return;
