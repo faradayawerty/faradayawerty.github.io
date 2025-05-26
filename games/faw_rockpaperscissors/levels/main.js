@@ -3,6 +3,24 @@ var Game = Game || {};
 
 (function(ns) {
   ns.CELL_SIZE = 30;
+
+  // Функция для обновления размеров с учетом DPR
+  function updateCanvasSize() {
+    const dpr = window.devicePixelRatio || 1;
+    ns.WIDTH = window.innerWidth * 0.8;
+    ns.HEIGHT = window.innerHeight * 0.8;
+
+    if (ns.elements.canvas) {
+      ns.elements.canvas.style.width = ns.WIDTH + "px";
+      ns.elements.canvas.style.height = ns.HEIGHT + "px";
+      ns.elements.canvas.width = ns.WIDTH * dpr;
+      ns.elements.canvas.height = ns.HEIGHT * dpr;
+
+      // Масштабируем контекст
+      ns.elements.ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс
+      ns.elements.ctx.scale(dpr, dpr);
+    }
+  }
   ns.WIDTH = window.innerWidth * 0.8;
   ns.HEIGHT = window.innerHeight * 0.8;
 
@@ -169,6 +187,21 @@ var Game = Game || {};
       ns.draw();
     });
 
+    // Поддержка touchstart и touchend для кликов по канвасу
+    ns.elements.canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      // Берём первый палец
+      const touch = e.touches[0];
+      ns.handleCanvasClick(touch);
+    }, { passive: false });
+
+    updateCanvasSize();
+
+    window.addEventListener("resize", () => {
+      updateCanvasSize();
+      ns.draw();
+    });
+
     Levels.forEach((lvl, i) => {
       const option = document.createElement("option");
       option.value = i;
@@ -228,6 +261,11 @@ var Game = Game || {};
 
   ns.handleCanvasClick = function(event) {
     if (!ns.placing) return;
+
+    const rect = ns.elements.canvas.getBoundingClientRect();
+    // Для мобильных event.clientX/Y уже правильные (в т.ч. для touch)
+    const x = (event.clientX || event.pageX) - rect.left;
+    const y = (event.clientY || event.pageY) - rect.top;
 
     const rect = ns.elements.canvas.getBoundingClientRect();
     const x = (event.clientX || event.pageX) - rect.left;
