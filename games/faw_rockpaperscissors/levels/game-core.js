@@ -4,26 +4,31 @@ function updateCanvasSize() {
   const canvas = ns.elements.canvas;
   const ctx = ns.elements.ctx;
 
-  // Размеры в CSS пикселях
-  const cssWidth = window.innerWidth * 0.75;
-  const cssHeight = window.innerHeight * 0.75;
-
+  // Вычисляем квадратный размер, равный меньшей стороне окна
+  const cssSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
   const dpr = window.devicePixelRatio || 1;
+  const size = cssSize * dpr;
 
-  // Устанавливаем размеры canvas в "физических" пикселях
-  canvas.width = cssWidth * dpr;
-  canvas.height = cssHeight * dpr;
+  // Устанавливаем размеры canvas
+  canvas.width = size;
+  canvas.height = size;
+  canvas.style.width = cssSize + "px";
+  canvas.style.height = cssSize + "px";
 
-  // Устанавливаем размеры canvas в стилях (CSS пиксели)
-  canvas.style.width = cssWidth + "px";
-  canvas.style.height = cssHeight + "px";
+  // Устанавливаем масштаб под плотность пикселей
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
 
-  // Преобразуем контекст для корректной отрисовки
-  ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации
-  ctx.scale(dpr, dpr); // масштабируем контекст под плотность пикселей
+  // Устанавливаем логическую ширину/высоту
+  ns.CANVAS_SIZE = cssSize;
 
-  ns.WIDTH = cssWidth;
-  ns.HEIGHT = cssHeight;
+  // Применяем масштаб для логики отрисовки
+  const BASE_LOGICAL_SIZE = 800; // например, базовая ширина/высота логики игры
+  ns.scaleFactor = cssSize / BASE_LOGICAL_SIZE;
+
+  // Обновляем ширину/высоту игрового пространства
+  ns.WIDTH = BASE_LOGICAL_SIZE;
+  ns.HEIGHT = BASE_LOGICAL_SIZE;
 }
 
   ns.init = function() {

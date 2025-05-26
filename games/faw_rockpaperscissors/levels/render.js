@@ -20,6 +20,8 @@
 
   ns.draw = function() {
     const ctx = ns.elements.ctx;
+ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации
+ctx.scale(ns.scaleFactor, ns.scaleFactor); // применяем масштаб
 
     ctx.fillStyle = "#222";
     ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT);
