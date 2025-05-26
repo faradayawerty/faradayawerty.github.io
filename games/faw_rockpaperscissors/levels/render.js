@@ -21,20 +21,17 @@
 
   ns.draw = function() {
     const ctx = ns.elements.ctx;
-    
-    // Сбрасываем трансформации и применяем масштаб только для игрового контента
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации
-    ctx.scale(ns.scaleFactor, ns.scaleFactor); // применяем масштаб только к игровым объектам
 
-    // Заливка фона (цвет фона не должен быть масштабирован)
+    // Сначала рисуем фон и сетку без масштабирования
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // сбрасываем трансформацию
     ctx.fillStyle = "#222";
-    ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT);
+    ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT); // рисуем фон
+    ns.drawGrid(ctx); // рисуем сетку
 
-    // Рисуем сетку без масштабирования
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации перед рисованием сетки
-    ns.drawGrid(ctx); // рисуем сетку в логических координатах
+    // Применяем масштаб только для игровых объектов
+    ctx.scale(ns.scaleFactor, ns.scaleFactor); // масштабируем только игровые объекты
 
-    // Отображаем объекты игры
+    // Рисуем юнитов
     ns.units.forEach(unit => unit.draw(ctx));
 
     if (ns.placing) {

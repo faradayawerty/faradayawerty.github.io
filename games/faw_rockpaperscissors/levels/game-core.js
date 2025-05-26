@@ -113,40 +113,51 @@
     ns.draw();
   };
 
-  ns.handleCanvasClick = function(event) {
-    if (!ns.placing) return;
+ns.handleCanvasClick = function(event) {
+  if (!ns.placing) return;
 
-    const rect = ns.elements.canvas.getBoundingClientRect();
-    const x = (event.clientX || event.pageX) - rect.left;
-    const y = (event.clientY || event.pageY) - rect.top;
+  // Получаем координаты относительно канваса
+  const rect = ns.elements.canvas.getBoundingClientRect();
 
-    for (let i = ns.units.length - 1; i >= 0; i--) {
-      const unit = ns.units[i];
-      if (unit.team === "player") {
-        const dx = ns.wrapDistance(x, unit.x, ns.WIDTH);
-        const dy = ns.wrapDistance(y, unit.y, ns.HEIGHT);
-        if (Math.hypot(dx, dy) < unit.radius) {
-          ns.units.splice(i, 1);
-          ns.updateUnitCounts();
-          ns.draw();
-          return;
-        }
+  // Преобразуем клиентские координаты в координаты относительно канваса
+  const x = (event.clientX || event.pageX) - rect.left;
+  const y = (event.clientY || event.pageY) - rect.top;
+
+  // Преобразуем координаты в логические координаты
+  const logicalX = x / ns.scaleFactor;
+  const logicalY = y / ns.scaleFactor;
+
+  // Проверка на клик по игрокам
+  for (let i = ns.units.length - 1; i >= 0; i--) {
+    const unit = ns.units[i];
+    if (unit.team === "player") {
+      const dx = ns.wrapDistance(logicalX, unit.x, ns.WIDTH);
+      const dy = ns.wrapDistance(logicalY, unit.y, ns.HEIGHT);
+      if (Math.hypot(dx, dy) < unit.radius) {
+        ns.units.splice(i, 1);
+        ns.updateUnitCounts();
+        ns.draw();
+        return;
       }
     }
+  }
 
-    if (ns.units.filter(u => u.team === "player").length >= ns.maxPlayerUnits) return;
+  // Проверка на максимальное количество юнитов
+  if (ns.units.filter(u => u.team === "player").length >= ns.maxPlayerUnits) return;
 
-    const forbiddenRadius = 60;
-    for (let enemyUnit of ns.units.filter(u => u.team === "enemy")) {
-      const dx = ns.wrapDistance(x, enemyUnit.x, ns.WIDTH);
-      const dy = ns.wrapDistance(y, enemyUnit.y, ns.HEIGHT);
-      if (Math.hypot(dx, dy) < forbiddenRadius) return;
-    }
+  // Проверка на запретную зону вокруг врагов
+  const forbiddenRadius = 60;
+  for (let enemyUnit of ns.units.filter(u => u.team === "enemy")) {
+    const dx = ns.wrapDistance(logicalX, enemyUnit.x, ns.WIDTH);
+    const dy = ns.wrapDistance(logicalY, enemyUnit.y, ns.HEIGHT);
+    if (Math.hypot(dx, dy) < forbiddenRadius) return;
+  }
 
-    ns.units.push(new ns.Unit(x, y, ns.selectedType, "player"));
-    ns.updateUnitCounts();
-    ns.draw();
-  };
+  // Создаем новый юнит игрока в логических координатах
+  ns.units.push(new ns.Unit(logicalX, logicalY, ns.selectedType, "player"));
+  ns.updateUnitCounts();
+  ns.draw();
+};
 
   ns.loadLevel = function(index) {
     ns.currentLevelIndex = index;
