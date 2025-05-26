@@ -4,6 +4,7 @@
     ctx.strokeStyle = "#444";
     ctx.lineWidth = 1;
 
+    // Рисуем сетку в логических координатах (без масштабирования)
     for (let x = 0; x <= ns.WIDTH; x += ns.CELL_SIZE) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
@@ -20,15 +21,24 @@
 
   ns.draw = function() {
     const ctx = ns.elements.ctx;
-ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации
-ctx.scale(ns.scaleFactor, ns.scaleFactor); // применяем масштаб
+    
+    // Сбрасываем трансформации и применяем масштаб только для игрового контента
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации
+    ctx.scale(ns.scaleFactor, ns.scaleFactor); // применяем масштаб только к игровым объектам
 
+    // Заливка фона (цвет фона не должен быть масштабирован)
     ctx.fillStyle = "#222";
     ctx.fillRect(0, 0, ns.WIDTH, ns.HEIGHT);
 
-    ns.drawGrid(ctx);
+    // Рисуем сетку без масштабирования
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // сброс трансформации перед рисованием сетки
+    ns.drawGrid(ctx); // рисуем сетку в логических координатах
+
+    // Отображаем объекты игры
+    ns.units.forEach(unit => unit.draw(ctx));
 
     if (ns.placing) {
+      // Рисуем маркеры для расположения врагов
       ctx.save();
       ctx.strokeStyle = "red";
       ctx.lineWidth = 2;
@@ -41,8 +51,7 @@ ctx.scale(ns.scaleFactor, ns.scaleFactor); // применяем масштаб
       ctx.restore();
     }
 
-    ns.units.forEach(unit => unit.draw(ctx));
-
+    // Рисуем текст с победой
     if (ns.winnerText) {
       ctx.font = "48px serif";
       ctx.fillStyle = "limegreen";
