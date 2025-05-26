@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>faw_rockpaperscissors</title>
+  <title>faw_rockpaperscissors: pvp</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="icon.png">
+  <link rel="icon" href="../icon.png">
 </head>
 <body>
 <div id="unitCounters">
@@ -18,14 +18,14 @@
     <button class="type-button selected" data-type="rock">🪨 Rock</button>
     <button class="type-button" data-type="paper">📄 Paper</button>
     <button class="type-button" data-type="scissors">✂️ Scissors</button>
-    <button id="startButton">Start</button>
-    <button id="replayButton" style="display:none;">Replay</button>
     <div id="enemyUnitSetup">
       <h4>Enemy Units</h4>
       <label>🪨 Rock<input type="number" id="enemyRockCount" min="0" value="5"></label>
       <label>📄 Paper<input type="number" id="enemyPaperCount" min="0" value="5"></label>
       <label>✂️  Scissors<input type="number" id="enemyScissorsCount" min="0" value="5"></label>
     </div>
+    <button id="startButton">Start</button>
+    <button id="replayButton" style="display:none;">Replay</button>
   <a href="../index.html" class="menu-button">Главное меню</a>
   </div>
   <canvas id="gameCanvas" width="800" height="500"></canvas>

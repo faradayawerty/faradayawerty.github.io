@@ -217,11 +217,11 @@ function checkWinCondition() {
 
   if (!p1CanBeat && !p2CanBeat) {
     if (p1Units.length > p2Units.length) {
-      showWinner("Игрок 1 победил по численности!", "player1");
+      showWinner("Игрок 1 победил!", "player1");
     } else if (p2Units.length > p1Units.length) {
-      showWinner("Игрок 2 победил по численности!", "player2");
+      showWinner("Игрок 2 победил!", "player2");
     } else {
-      showWinner("Ничья по численности!", null);
+      showWinner("Ничья!", null);
     }
     cancelAnimationFrame(ns.loop);
   }

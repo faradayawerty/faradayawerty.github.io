@@ -8,6 +8,42 @@
   const player1Controls = document.getElementById("player1Controls");
   const player2Controls = document.getElementById("player2Controls");
 
+  ns.isRunning = false;  // Флаг состояния игры
+  ns.units = ns.units || []; // Если массив не инициализирован
+  ns.placing = true;     // Флаг размещения юнитов
+  ns.winnerText = "";
+  ns.winnerPlayer = null;
+  ns.activePlayer = "player1";
+
+ns.spawnRandomUnits = function() {
+  const minUnits = 1;
+  const maxUnits = 5;
+
+  const allTypes = ["rock", "scissors", "paper"];
+
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  for (const player of ["player1", "player2"]) {
+    // Сколько юнитов сгенерировать — не больше количества типов
+    const count = Math.min(randomInt(minUnits, maxUnits), allTypes.length);
+
+    // Перемешиваем типы, чтобы выбрать уникальные
+    const shuffledTypes = allTypes.slice().sort(() => Math.random() - 0.5);
+
+    const chosenTypes = shuffledTypes.slice(0, count);
+
+    for (let i = 0; i < count; i++) {
+      const x = Math.random() * ns.WIDTH;
+      const y = Math.random() * ns.HEIGHT;
+
+      const type = chosenTypes[i];
+      ns.units.push(new ns.Unit(x, y, type, player));
+    }
+  }
+};
+
   ns.draw = function() {
     ctx.clearRect(0, 0, ns.WIDTH, ns.HEIGHT);
 
@@ -66,22 +102,35 @@
     ns.draw();
     if (!ns.winnerText) {
       ns.loop = requestAnimationFrame(ns.gameLoop);
+    } else {
+      ns.isRunning = false;  // Игра закончилась
     }
   };
 
   startGameBtn.addEventListener("click", () => {
-    if (ns.units.length === 0) {
-      alert("Поставьте хотя бы по одному юниту каждому игроку!");
+    if (ns.isRunning) {
       return;
     }
+
+    if (ns.units.length === 0) {
+      ns.spawnRandomUnits();
+      ns.ui.updateUI();
+      ns.draw();
+    }
+
     ns.placing = false;
+    ns.isRunning = true;
+
     startGameBtn.style.display = "none";
     player1Controls.style.pointerEvents = "none";
     player2Controls.style.pointerEvents = "none";
+
     ns.loop = requestAnimationFrame(ns.gameLoop);
   });
 
   restartGameBtn.addEventListener("click", () => {
+    ns.isRunning = false;
+
     ns.units = [];
     ns.placing = true;
     ns.winnerText = "";
@@ -116,7 +165,6 @@
     ns.draw();
   });
 
-  // Добавляем поддержку тач-управления
   canvas.addEventListener("touchstart", (e) => {
     if (!ns.placing) return;
 
@@ -124,8 +172,12 @@
 
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
 
     const type = ns.selectedTypes[ns.activePlayer];
     ns.units.push(new ns.Unit(x, y, type, ns.activePlayer));
@@ -133,6 +185,12 @@
     ns.ui.updateUI();
     ns.draw();
   }, { passive: false });
+
+  canvas.width = 700;
+  canvas.height = 500;
+
+  ns.WIDTH = canvas.width;
+  ns.HEIGHT = canvas.height;
 
   ns.ui.setupTypeButtons();
   ns.ui.updateUI();

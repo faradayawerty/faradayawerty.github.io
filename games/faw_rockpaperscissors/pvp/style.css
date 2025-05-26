@@ -1,16 +1,18 @@
 
-/* Базовые стили */
+/* Основные стили - ближе к PvE */
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background: #222;
-  color: #eee;
+  background-color: #121212;
+  color: #ddd;
   margin: 0;
   padding: 20px;
 }
 
 h1 {
   margin-bottom: 10px;
+  color: #aaddff;
+  text-shadow: 0 0 6px #88ccff88;
 }
 
 #gameWrapper {
@@ -20,20 +22,24 @@ h1 {
   align-items: flex-start;
   max-width: 1100px;
   margin: 0 auto;
+  flex-wrap: wrap;
+  padding: 0 10px;
 }
 
 #gameControls {
-  background: #333;
+  background-color: #1a1a1a;
   padding: 15px;
   border-radius: 8px;
   width: 260px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  border: 1px solid #333;
+  color: #ccc;
 }
 
 .player-controls {
-  background: #444;
+  background-color: #2a2a2a;
   padding: 12px;
   border-radius: 8px;
 }
@@ -47,73 +53,80 @@ h1 {
 }
 
 .type-button {
-  font-size: 1.4rem;
-  padding: 8px 12px;
+  font-size: 1.1rem;
+  padding: 10px 16px;
   cursor: pointer;
-  border: 2px solid transparent;
-  border-radius: 6px;
-  background: #555;
-  color: #eee;
+  border: 2px solid #555;
+  border-radius: 8px;
+  background-color: #2a2a2a;
+  color: #ddd;
   user-select: none;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
   width: auto;
-  min-width: 60px;
+  min-width: 70px;
   text-align: center;
   display: inline-block;
-
-  /* Тач-оптимизация */
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
 }
 
+.type-button:hover {
+  background-color: #444;
+  border-color: #88ccff;
+  color: #aaddff;
+}
+
 .type-button.selected {
-  border-color: yellow;
-  background-color: #777;
+  background-color: #555;
+  border-color: #88ccff;
+  color: #aaddff;
+  font-weight: bold;
 }
 
 #player1Controls .type-button.selected {
-  border-color: #87CEFA;
+  border-color: #88ccff; /* светло-голубой */
 }
 
 #player2Controls .type-button.selected {
-  border-color: #FF6347;
+  border-color: #ff6347; /* томатный, как в PvE */
+  color: #ff9b90;
 }
 
 #gameCanvas {
-  background: #111;
-  border: 2px solid #555;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
   border-radius: 8px;
   cursor: crosshair;
   width: 100%;
   max-width: 700px;
   height: auto;
+  touch-action: manipulation;
 }
 
 button {
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin: 5px 0;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 10px 20px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  background-color: #555;
-  color: #eee;
-  transition: background-color 0.2s;
+  background-color: #3a8f3a;
+  color: white;
+  transition: background-color 0.3s;
   width: 100%;
-
-  /* Тач-оптимизация */
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
 }
 
 button:hover {
-  background-color: #777;
+  background-color: #5bb75b;
 }
 
 #actions p {
   margin: 8px 0;
   font-size: 18px;
   font-weight: bold;
+  color: #ddd;
 }
 
 .type-button.hidden {
@@ -123,35 +136,37 @@ button:hover {
 .menu-button {
   display: inline-block;
   font-size: 1rem;
-  margin: 5px 0;
-  padding: 8px 14px;
-  border-radius: 6px;
+  margin: 10px 0 0 0;
+  padding: 12px 24px;
+  border-radius: 10px;
   text-align: center;
   text-decoration: none;
-  background-color: #555;
-  color: #eee;
-  transition: background-color 0.2s;
-  width: 90%;
-
-  /* Тач-оптимизация */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+  background-color: #555555;
+  color: #ddd;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+  user-select: none;
+  width: auto;
+  max-width: 200px;
 }
 
 .menu-button:hover {
-  background-color: #777;
+  background-color: #777777;
 }
 
 .start-button {
-  background-color: #4CAF50;
+  background-color: #3a8f3a;
   color: white;
+  font-weight: bold;
 }
 
 .start-button:hover {
-  background-color: #45a049;
+  background-color: #5bb75b;
 }
 
-/* 📱 Мобильная адаптация */
+/* 📱 Мобильная адаптация, как в PvE */
 @media (max-width: 768px) {
   body {
     padding: 10px;
@@ -160,7 +175,7 @@ button:hover {
   #gameWrapper {
     flex-direction: column;
     align-items: center;
-    padding: 10px;
+    padding: 0 10px;
   }
 
   #gameControls {
@@ -180,14 +195,14 @@ button:hover {
   }
 
   .type-button {
-    font-size: 1.2rem;
-    min-width: 50px;
-    padding: 6px 10px;
+    font-size: 1rem;
+    min-width: 60px;
+    padding: 8px 12px;
   }
 
   button, .menu-button {
     font-size: 1rem;
-    padding: 10px;
+    padding: 12px;
   }
 
   h1 {
