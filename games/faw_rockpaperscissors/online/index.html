@@ -137,7 +137,7 @@
     <audio id="remoteAudio" autoplay style="display:none;"></audio>
 
     <script>
-        const Game = {
+const Game = {
             WIDTH: 700, HEIGHT: 500, TYPES: ["rock", "paper", "scissors"], EMOJIS: { rock: "🪨", paper: "📄", scissors: "✂️" }, COLORS: { player1: "#87CEFA", player2: "#FF6347" },
             units: [],
             targetUnitsState: [], // Новое: для хранения целевых позиций, полученных от хоста
@@ -559,6 +559,16 @@
                             Game.isRunning = payload.isRunning;
                             Game.placing = payload.placing;
 
+                            // NEW: If gameReset flag is true, explicitly reset client's local readiness
+                            if (payload.gameReset) {
+                                Game.localPlayerReady = false;
+                                // Also ensure the readiness UI is updated for the client itself
+                                localReadyStatusSpan.textContent = 'Не готовы';
+                                playerReadyBtn.textContent = "Готов к игре";
+                                playerReadyBtn.style.display = 'inline-block'; // Ensure button is visible
+                                readinessCheckDiv.style.display = 'block'; // Ensure readiness status is visible
+                            }
+
                             // If the game state update means game is running, ensure client's loop starts
                             // Or if placing, ensure client's loop starts to render units
                             if ((Game.isRunning || Game.placing) && !Game.loop) { // Modified condition here
@@ -629,28 +639,26 @@
                     await Game.peerConnection.setLocalDescription(offer);
 
                     let iceCandidates = [];
-                    let iceGatheringComplete = false;
+                    // Use a Promise to wait for ICE gathering to complete or timeout
+                    const iceGatheringPromise = new Promise(resolve => {
+                        Game.peerConnection.onicecandidate = event => {
+                            if (event.candidate) {
+                                iceCandidates.push(event.candidate.toJSON());
+                            } else {
+                                // null candidate indicates end of ICE gathering
+                                resolve();
+                            }
+                        };
+                        // Fallback timeout for ICE gathering completion (some browsers might not send null candidate consistently)
+                        setTimeout(() => {
+                            resolve(); // Resolve anyway after timeout
+                        }, 2000); // Wait 2 seconds for ICE candidates
+                    });
 
-                    Game.peerConnection.onicecandidate = event => {
-                        if (event.candidate) {
-                            iceCandidates.push(event.candidate.toJSON());
-                        } else {
-                            // null candidate indicates end of ICE gathering
-                            iceGatheringComplete = true;
-                            console.log("ICE gathering complete.");
-                            outputCombinedOffer(iceCandidates);
-                        }
-                    };
+                    await iceGatheringPromise; // Wait for ICE gathering to finish or timeout
 
-                    // Fallback timeout for ICE gathering completion (some browsers might not send null candidate consistently)
-                    setTimeout(() => {
-                        if (!iceGatheringComplete) {
-                            console.warn("ICE gathering timeout. Outputting offer with current candidates.");
-                            outputCombinedOffer(iceCandidates);
-                        }
-                    }, 2000); // Wait 2 seconds for ICE candidates
-
-                    updateP2PStatus("Создание Оффера и сбор ICE...");
+                    outputCombinedOffer(iceCandidates);
+                    updateP2PStatus("Оффер и ICE созданы. Отправьте их Клиенту.");
 
                 } catch (e) { resetP2PStateAndUI(true, `Ошибка создания Оффера: ${e}`); }
             });
@@ -658,14 +666,13 @@
             function outputCombinedOffer(iceCandidates) {
                 if (Game.peerConnection && Game.peerConnection.localDescription) {
                     const combinedOffer = {
-                        sdp: Game.peerConnection.localDescription.sdp,
+                        sdp: btoa(Game.peerConnection.localDescription.sdp), // Encode SDP
                         type: Game.peerConnection.localDescription.type,
-                        iceCandidates: iceCandidates
+                        iceCandidates: btoa(JSON.stringify(iceCandidates)) // Encode ICE candidates
                     };
                     host_localSdpOfferOutput.value = JSON.stringify(combinedOffer, null, 2);
                     host_offerCreatedInstruction.style.display = 'block';
                     host_proceedToSetAnswerBtn.style.display = 'inline-block';
-                    updateP2PStatus("Оффер и ICE созданы. Отправьте их Клиенту.");
                 } else {
                     console.error("Cannot output combined offer: PeerConnection or localDescription is null.");
                 }
@@ -678,8 +685,22 @@
                 if (!Game.peerConnection) { alert("Соединение не инициализировано!"); return; }
                 if (!host_remoteSdpAnswerInput.value) { alert("Вставьте SDP Ответ от Клиента!"); return; }
                 try {
-                    const answer = JSON.parse(host_remoteSdpAnswerInput.value);
+                    const combinedAnswer = JSON.parse(host_remoteSdpAnswerInput.value);
+                    const sdp = atob(combinedAnswer.sdp); // Decode SDP
+                    const answer = { sdp: sdp, type: combinedAnswer.type };
+
                     await Game.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+
+                    const iceCandidates = JSON.parse(atob(combinedAnswer.iceCandidates || btoa('[]'))); // Decode ICE candidates
+                    for (const candidate of iceCandidates) {
+                        if (candidate) {
+                            try {
+                                await Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                            } catch (e) {
+                                console.warn("Error adding ICE candidate (Host):", e);
+                            }
+                        }
+                    }
                     updateP2PStatus("SDP Ответ Клиента установлен. Соединение устанавливается.");
                 } catch (e) { alert(`Ошибка установки SDP Ответа: ${e}. Убедитесь, что формат корректен.`); }
             });
@@ -690,22 +711,33 @@
                 await initPeerConnection();
                 try {
                     const combinedOffer = JSON.parse(client_remoteSdpOfferInput.value);
-                    const offer = { sdp: combinedOffer.sdp, type: combinedOffer.type };
-                    const iceCandidates = combinedOffer.iceCandidates || [];
+                    const sdp = atob(combinedOffer.sdp); // Decode SDP
+                    const offer = { sdp: sdp, type: combinedOffer.type };
+                    const iceCandidates = JSON.parse(atob(combinedOffer.iceCandidates || btoa('[]'))); // Decode ICE candidates
 
                     await Game.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
                     
                     // Add Host's ICE candidates
                     for (const candidate of iceCandidates) {
                         if (candidate) {
-                            await Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                            try {
+                                await Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                            } catch (e) {
+                                console.warn("Error adding ICE candidate (Client):", e);
+                            }
                         }
                     }
                     
                     const answer = await Game.peerConnection.createAnswer();
                     await Game.peerConnection.setLocalDescription(answer);
 
-                    client_localSdpAnswerOutput.value = JSON.stringify(answer, null, 2);
+                    const combinedAnswer = {
+                        sdp: btoa(answer.sdp), // Encode SDP
+                        type: answer.type,
+                        iceCandidates: btoa(JSON.stringify([])) // Client doesn't gather candidates for the answer
+                    };
+
+                    client_localSdpAnswerOutput.value = JSON.stringify(combinedAnswer, null, 2);
                     client_answerCreatedInstruction.style.display = 'block';
                     showP2PStep('p2pStep_Client_2_CreateAnswerAndSend');
                     updateP2PStatus("Оффер Хоста принят. Ваш Ответ создан. Отправьте его Хосту.");
@@ -802,8 +834,8 @@
                 Game.placing=true; 
                 Game.winnerText=""; 
                 Game.winnerPlayer=null;
-                Game.localPlayerReady = false; 
-                Game.remotePlayerReady = false;
+                Game.localPlayerReady = false; // Set local readiness to false
+                Game.remotePlayerReady = false; // Set remote readiness to false
 
                 // Clear any pending timeout
                 if (readyCheckTimeout) {
@@ -813,7 +845,7 @@
 
                 if(Game.dataChannel && Game.dataChannel.readyState === 'open'){
                     readinessCheckDiv.style.display = 'block';
-                    localReadyStatusSpan.textContent = 'Не готовы'; 
+                    localReadyStatusSpan.textContent = 'Не готовы'; // Explicitly set client's local readiness to "Не готовы"
                     remoteReadyStatusSpan.textContent = 'Не готов';
                     playerReadyBtn.textContent = "Готов к игре"; 
                     playerReadyBtn.style.display = 'inline-block'; 
@@ -834,7 +866,8 @@
                         winnerText: Game.winnerText,
                         winnerPlayer: Game.winnerPlayer,
                         isRunning: Game.isRunning,
-                        placing: Game.placing
+                        placing: Game.placing,
+                        gameReset: true // <--- NEW: Signal to client that a game reset occurred
                     });
                 }
             }
