@@ -486,7 +486,7 @@ const Game = {
                     Game.placing = true; Game.localPlayerReady = false; Game.remotePlayerReady = false;
                     readinessCheckDiv.style.display = 'block';
                     localReadyStatusSpan.textContent = 'Не готовы'; remoteReadyStatusSpan.textContent = 'Не готов';
-                    playerReadyBtn.textContent = "Готов к игре"; playerReadyBtn.style.display = 'inline-block'; // playerReadyBtn.disabled = false; removed disable
+                    playerReadyBtn.textContent = "Готов к игре"; playerReadyBtn.style.display = 'inline-block';
                     Game.units = []; // Очищаем юниты при новом подключении
                     Game.targetUnitsState = []; // Очищаем целевое состояние
                     Game.ui.updateUI(); Game.draw(); // Initial draw with current units
@@ -517,7 +517,6 @@ const Game = {
                     case "request_restart_game": // NEW: Client requests host to restart game
                         if (Game.isHost) {
                             restartGameLogic(); // Host restarts
-                            // Host will automatically broadcast game_state_update due to restartGameLogic() and Game.update()
                         }
                         break;
                     case "start_game": // New message type: Host tells client to start game
@@ -559,26 +558,26 @@ const Game = {
                             Game.isRunning = payload.isRunning;
                             Game.placing = payload.placing;
 
-                            // NEW: If gameReset flag is true, explicitly reset client's local readiness
+                            // NEW: If gameReset flag is true, explicitly reset client's local and remote readiness for visual consistency
                             if (payload.gameReset) {
                                 Game.localPlayerReady = false;
-                                // Also ensure the readiness UI is updated for the client itself
+                                Game.remotePlayerReady = false; // Added to reset remote status as well
                                 localReadyStatusSpan.textContent = 'Не готовы';
+                                remoteReadyStatusSpan.textContent = 'Не готов'; // Explicitly update remote status
                                 playerReadyBtn.textContent = "Готов к игре";
-                                playerReadyBtn.style.display = 'inline-block'; // Ensure button is visible
-                                readinessCheckDiv.style.display = 'block'; // Ensure readiness status is visible
+                                playerReadyBtn.style.display = 'inline-block';
+                                readinessCheckDiv.style.display = 'block';
                             }
 
                             // If the game state update means game is running, ensure client's loop starts
                             // Or if placing, ensure client's loop starts to render units
-                            if ((Game.isRunning || Game.placing) && !Game.loop) { // Modified condition here
+                            if ((Game.isRunning || Game.placing) && !Game.loop) {
                                 Game.loop = requestAnimationFrame(Game.gameLoop);
                             } else if (!Game.isRunning && Game.loop && Game.winnerText) {
                                 // If game stopped and there's a winner, cancel animation frame
                                 cancelAnimationFrame(Game.loop);
                                 Game.loop = null;
                             }
-
 
                             Game.ui.updateUI();
                             Game.draw(); // Force a draw on the client after state update for immediate visual feedback
@@ -613,7 +612,6 @@ const Game = {
                     isMuted = false;
                 } catch (err) {
                     console.error("Error accessing microphone:", err);
-                    // Simply set stream to null and hide the mute button, no alert
                     Game.localStream = null;
                     toggleMuteBtnContainer.style.display = 'none';
                     roleTextSuffix = " (Без звука)";
@@ -639,23 +637,20 @@ const Game = {
                     await Game.peerConnection.setLocalDescription(offer);
 
                     let iceCandidates = [];
-                    // Use a Promise to wait for ICE gathering to complete or timeout
                     const iceGatheringPromise = new Promise(resolve => {
                         Game.peerConnection.onicecandidate = event => {
                             if (event.candidate) {
                                 iceCandidates.push(event.candidate.toJSON());
                             } else {
-                                // null candidate indicates end of ICE gathering
-                                resolve();
+                                resolve(); // null candidate indicates end of ICE gathering
                             }
                         };
-                        // Fallback timeout for ICE gathering completion (some browsers might not send null candidate consistently)
                         setTimeout(() => {
-                            resolve(); // Resolve anyway after timeout
-                        }, 2000); // Wait 2 seconds for ICE candidates
+                            resolve();
+                        }, 5000); // Increased timeout to 5 seconds
                     });
 
-                    await iceGatheringPromise; // Wait for ICE gathering to finish or timeout
+                    await iceGatheringPromise;
 
                     outputCombinedOffer(iceCandidates);
                     updateP2PStatus("Оффер и ICE созданы. Отправьте их Клиенту.");
@@ -752,15 +747,12 @@ const Game = {
                 Game.localPlayerReady = !Game.localPlayerReady;
                 localReadyStatusSpan.textContent = Game.localPlayerReady ? 'Готов' : 'Не готовы';
                 playerReadyBtn.textContent = Game.localPlayerReady ? "Ожидание оппонента..." : "Готов к игре";
-                // playerReadyBtn.disabled = Game.localPlayerReady; // Убрано отключение кнопки
                 sendMessageP2P("player_readiness", { ready: Game.localPlayerReady });
                 if (Game.isHost) checkStartConditions();
             });
 
             function checkStartConditions() {
                 if (Game.isHost && Game.localPlayerReady && Game.remotePlayerReady) {
-                    // Оба готовы, пытаемся начать игру.
-                    // Отправляем сообщение start_game, а также устанавливаем таймаут на повторную отправку.
                     startGameLogic();
                     sendMessageP2P("start_game", {
                         units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
@@ -770,8 +762,6 @@ const Game = {
                         winnerPlayer: Game.winnerPlayer
                     });
 
-                    // Установим таймаут для повторной отправки, если игра не началась
-                    // (т.е. если Game.isRunning все еще false через некоторое время)
                     if (!Game.isRunning && readyCheckTimeout === null) {
                         readyCheckTimeout = setTimeout(() => {
                             if (Game.isHost && Game.localPlayerReady && Game.remotePlayerReady && !Game.isRunning) {
@@ -783,15 +773,12 @@ const Game = {
                                     winnerText: Game.winnerText,
                                     winnerPlayer: Game.winnerPlayer
                                 });
-                                // Можно установить новый таймаут или просто ждать следующего обновления состояния
-                                // Для простоты, здесь просто однократная повторная отправка после таймаута
                             }
-                            readyCheckTimeout = null; // Сбросить таймаут
-                        }, 5000); // 5 секунд, можно настроить (например, 10 секунд)
+                            readyCheckTimeout = null;
+                        }, 5000);
                     }
 
                 } else {
-                    // Если кто-то не готов, или изменил статус, очищаем таймаут
                     if (readyCheckTimeout) {
                         clearTimeout(readyCheckTimeout);
                         readyCheckTimeout = null;
@@ -819,9 +806,7 @@ const Game = {
             }
 
             restartGameBtn.addEventListener("click", () => {
-                // Client no longer alerts, just sends request to host
                 sendMessageP2P("request_restart_game", null); 
-                // Client also immediately restarts its local state for responsiveness
                 restartGameLogic();
             });
 
@@ -834,8 +819,8 @@ const Game = {
                 Game.placing=true; 
                 Game.winnerText=""; 
                 Game.winnerPlayer=null;
-                Game.localPlayerReady = false; // Set local readiness to false
-                Game.remotePlayerReady = false; // Set remote readiness to false
+                Game.localPlayerReady = false;
+                Game.remotePlayerReady = false;
 
                 // Clear any pending timeout
                 if (readyCheckTimeout) {
@@ -845,14 +830,13 @@ const Game = {
 
                 if(Game.dataChannel && Game.dataChannel.readyState === 'open'){
                     readinessCheckDiv.style.display = 'block';
-                    localReadyStatusSpan.textContent = 'Не готовы'; // Explicitly set client's local readiness to "Не готовы"
+                    localReadyStatusSpan.textContent = 'Не готовы';
                     remoteReadyStatusSpan.textContent = 'Не готов';
                     playerReadyBtn.textContent = "Готов к игре"; 
                     playerReadyBtn.style.display = 'inline-block'; 
-                    // playerReadyBtn.disabled = false; removed disable
                     canvas.style.pointerEvents = "auto";
-                    document.getElementById("restartGameBtn").style.display = "none"; // Hide restart button
-                    document.querySelectorAll(".type-buttons").forEach(c => c.style.pointerEvents = "auto"); // Re-enable unit type selection
+                    document.getElementById("restartGameBtn").style.display = "none";
+                    document.querySelectorAll(".type-buttons").forEach(c => c.style.pointerEvents = "auto");
                     Game.ui.updateUI();
                 } else {
                     if (!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,"Соединение потеряно. Невозможно перезапустить игру.");
@@ -860,14 +844,13 @@ const Game = {
                 }
                 Game.draw();
                 if (Game.isHost) {
-                    // Host should also broadcast the reset state to the client
                     sendMessageP2P("game_state_update", {
                         units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
                         winnerText: Game.winnerText,
                         winnerPlayer: Game.winnerPlayer,
                         isRunning: Game.isRunning,
                         placing: Game.placing,
-                        gameReset: true // <--- NEW: Signal to client that a game reset occurred
+                        gameReset: true
                     });
                 }
             }
@@ -887,54 +870,44 @@ const Game = {
                 }
             };
             Game.gameLoop = function() {
-                // Only host updates the game state
                 if (Game.isHost) {
                     Game.update();
-                } else { // Client updates its units based on received targetUnitsState
-                    // If game has ended for client, no need to interpolate, just display the final state
+                } else {
                     if (!Game.isRunning && Game.winnerText) {
-                        // Client just draws the final state received
-                        // No interpolation needed if game is over
                     } else {
-                        // Create a new array for next Game.units state based on targetUnitsState
                         const nextUnits = [];
 
                         Game.targetUnitsState.forEach(targetUnitData => {
                             let currentUnit = Game.units.find(u => u.id === targetUnitData.id);
 
                             if (currentUnit) {
-                                // Interpolate existing unit's position, accounting for wrapping around edges
                                 let dx = targetUnitData.x - currentUnit.x;
                                 if (Math.abs(dx) > Game.WIDTH / 2) {
-                                    dx -= Math.sign(dx) * Game.WIDTH; // Adjust for wrapping
+                                    dx -= Math.sign(dx) * Game.WIDTH;
                                 }
                                 currentUnit.x = (currentUnit.x + dx * Game.interpolationFactor + Game.WIDTH) % Game.WIDTH;
 
                                 let dy = targetUnitData.y - currentUnit.y;
                                 if (Math.abs(dy) > Game.HEIGHT / 2) {
-                                    dy -= Math.sign(dy) * Game.HEIGHT; // Adjust for wrapping
+                                    dy -= Math.sign(dy) * Game.HEIGHT;
                                 }
                                 currentUnit.y = (currentUnit.y + dy * Game.interpolationFactor + Game.HEIGHT) % Game.HEIGHT;
-                                currentUnit.type = targetUnitData.type; // Update type and player immediately
+                                currentUnit.type = targetUnitData.type;
                                 currentUnit.player = targetUnitData.player;
                             } else {
-                                // New unit: create it at the target position.
                                 currentUnit = new Game.Unit(targetUnitData.x, targetUnitData.y, targetUnitData.type, targetUnitData.player, targetUnitData.id);
                             }
                             nextUnits.push(currentUnit);
                         });
 
-                        Game.units = nextUnits; // Update client's actual units array
+                        Game.units = nextUnits;
                     }
                 }
-                // Both host and client draw the current game state
                 Game.draw();
-                // Loop continues if game is running or if we are placing and need to sync
                 if ((Game.isRunning && !Game.winnerText) || Game.placing) {
                     Game.loop = requestAnimationFrame(Game.gameLoop);
                 } else {
-                    Game.isRunning = false; // Ensure isRunning is false if game loop stops
-                    // If game has ended, clear the loop to prevent further calls
+                    Game.isRunning = false;
                     if (Game.loop) {
                         cancelAnimationFrame(Game.loop);
                         Game.loop = null;
@@ -948,7 +921,6 @@ const Game = {
                 let clickedUnitIdToRemove = null;
                 const currentPlayerRole = Game.isHost ? "player1" : "player2";
 
-                // Find if a unit at the click location belongs to the current player
                 for(let i=Game.units.length-1;i>=0;i--){
                     const u=Game.units[i];
                     const dx=u.x-x,dy=u.y-y;
@@ -957,51 +929,45 @@ const Game = {
                             clickedUnitIdToRemove = u.id;
                             break;
                         } else {
-                            // If clicked on opponent's unit, do nothing.
                             return;
                         }
                     }
                 }
 
-                if (Game.isHost) { // If host, directly modify units and broadcast
+                if (Game.isHost) {
                     if (clickedUnitIdToRemove) {
                         Game.units = Game.units.filter(u => u.id !== clickedUnitIdToRemove);
                     } else {
                         const type = Game.selectedTypes[currentPlayerRole], newU = new Game.Unit(x, y, type, currentPlayerRole);
                         Game.units.push(newU);
                     }
-                    // Host's targetUnitsState is always its Game.units
                     Game.targetUnitsState = Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player }));
 
-                    Game.ui.updateUI(); // Update host's UI immediately
-                    Game.draw(); // Explicitly redraw for host's local unit placement
-                    sendMessageP2P("game_state_update", { // Force broadcast after placement
-                        units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })), // Send serializable data
+                    Game.ui.updateUI();
+                    Game.draw();
+                    sendMessageP2P("game_state_update", {
+                        units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
                         winnerText: Game.winnerText,
                         winnerPlayer: Game.winnerPlayer,
                         isRunning: Game.isRunning,
                         placing: Game.placing
                     });
-                } else { // If client, send request to host
+                } else {
                     if (clickedUnitIdToRemove) {
                         sendMessageP2P("unit_placement_request", { player: currentPlayerRole, unitIdToRemove: clickedUnitIdToRemove });
-                        // Local removal for immediate feedback
                         Game.units = Game.units.filter(u => u.id !== clickedUnitIdToRemove);
-                        // Also remove from targetUnitsState for client's immediate display
                         Game.targetUnitsState = Game.targetUnitsState.filter(u => u.id !== clickedUnitIdToRemove);
 
                     } else {
                         const type = Game.selectedTypes[currentPlayerRole];
-                        const newId = Math.random().toString(36).substr(2, 9); // Generate ID locally for immediate use
+                        const newId = Math.random().toString(36).substr(2, 9);
                         sendMessageP2P("unit_placement_request", { player: currentPlayerRole, x: x, y: y, unitId: newId });
-                        // Local addition for immediate feedback
                         const newU = new Game.Unit(x, y, type, currentPlayerRole, newId);
                         Game.units.push(newU);
-                        // Also add to targetUnitsState for smooth interpolation as soon as state update arrives
                         Game.targetUnitsState.push({ id: newU.id, x: newU.x, y: newU.y, type: newU.type, player: newU.player });
                     }
-                    Game.ui.updateUI(); // Update client's UI
-                    Game.draw(); // Force a draw on the client immediately
+                    Game.ui.updateUI();
+                    Game.draw();
                 }
             }
             canvas.addEventListener("click", e => handleCanvasInteraction(e.clientX, e.clientY));
