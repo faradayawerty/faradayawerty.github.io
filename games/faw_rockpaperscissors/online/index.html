@@ -503,8 +503,14 @@
                         if (payload.player === "player2") Game.selectedTypes.player2 = payload.type;
                         Game.ui.updateUI(); // Update UI for changes in selected types
                         break;
-                    case "force_restart_game":
+                    case "force_restart_game": // OLD, not used anymore if client requests restart
                         restartGameLogic();
+                        break;
+                    case "request_restart_game": // NEW: Client requests host to restart game
+                        if (Game.isHost) {
+                            restartGameLogic(); // Host restarts
+                            // Host will automatically broadcast game_state_update due to restartGameLogic() and Game.update()
+                        }
                         break;
                     case "start_game": // New message type: Host tells client to start game
                         if (!Game.isHost) { // Only client needs to react to this
@@ -740,12 +746,10 @@
             }
 
             restartGameBtn.addEventListener("click", () => {
-                if (Game.isHost) {
-                    sendMessageP2P("force_restart_game", null);
-                    restartGameLogic();
-                } else {
-                    alert("Только хост может перезапустить игру.");
-                }
+                // Client no longer alerts, just sends request to host
+                sendMessageP2P("request_restart_game", null); 
+                // Client also immediately restarts its local state for responsiveness
+                restartGameLogic();
             });
 
             function restartGameLogic() {
