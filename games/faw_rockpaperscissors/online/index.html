@@ -800,9 +800,18 @@
                         let currentUnit = Game.units.find(u => u.id === targetUnitData.id);
 
                         if (currentUnit) {
-                            // Interpolate existing unit's position
-                            currentUnit.x = currentUnit.x + (targetUnitData.x - currentUnit.x) * Game.interpolationFactor;
-                            currentUnit.y = currentUnit.y + (targetUnitData.y - currentUnit.y) * Game.interpolationFactor;
+                            // Interpolate existing unit's position, accounting for wrapping around edges
+                            let dx = targetUnitData.x - currentUnit.x;
+                            if (Math.abs(dx) > Game.WIDTH / 2) {
+                                dx -= Math.sign(dx) * Game.WIDTH; // Adjust for wrapping
+                            }
+                            currentUnit.x = (currentUnit.x + dx * Game.interpolationFactor + Game.WIDTH) % Game.WIDTH;
+
+                            let dy = targetUnitData.y - currentUnit.y;
+                            if (Math.abs(dy) > Game.HEIGHT / 2) {
+                                dy -= Math.sign(dy) * Game.HEIGHT; // Adjust for wrapping
+                            }
+                            currentUnit.y = (currentUnit.y + dy * Game.interpolationFactor + Game.HEIGHT) % Game.HEIGHT;
                             currentUnit.type = targetUnitData.type; // Update type and player immediately
                             currentUnit.player = targetUnitData.player;
                         } else {
