@@ -729,11 +729,6 @@
                 }
             }
 
-            // Limit player units to the left half
-            if (pos.x > ns.WIDTH / 2) {
-                return; // Просто ничего не происходит
-            }
-
             // НОВАЯ ПРОВЕРКА: Проверка на зону запрета вокруг вражеских юнитов
             for (let u of ns.units) {
                 if (u.team === "enemy") {
