@@ -535,14 +535,15 @@
                             // Or if placing, ensure client's loop starts to render units
                             if ((Game.isRunning || Game.placing) && !Game.loop) { // Modified condition here
                                 Game.loop = requestAnimationFrame(Game.gameLoop);
-                            } else if (!Game.isRunning && Game.loop) {
-                                // If game stopped, cancel animation frame
+                            } else if (!Game.isRunning && Game.loop && Game.winnerText) {
+                                // If game stopped and there's a winner, cancel animation frame
                                 cancelAnimationFrame(Game.loop);
                                 Game.loop = null;
                             }
 
 
                             Game.ui.updateUI();
+                            Game.draw(); // Force a draw on the client after state update for immediate visual feedback
 
                             if (!Game.isRunning && Game.winnerText) {
                                 document.getElementById("restartGameBtn").style.display = "block";
@@ -753,13 +754,24 @@
                     playerReadyBtn.style.display = 'inline-block'; 
                     playerReadyBtn.disabled = false;
                     canvas.style.pointerEvents = "auto";
+                    document.getElementById("restartGameBtn").style.display = "none"; // Hide restart button
+                    document.querySelectorAll(".type-buttons").forEach(c => c.style.pointerEvents = "auto"); // Re-enable unit type selection
                     Game.ui.updateUI();
                 } else {
                     if (!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,"Соединение потеряно. Невозможно перезапустить игру.");
                     return;
                 }
-                restartGameBtn.style.display="none"; 
                 Game.draw();
+                if (Game.isHost) {
+                    // Host should also broadcast the reset state to the client
+                    sendMessageP2P("game_state_update", {
+                        units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
+                        winnerText: Game.winnerText,
+                        winnerPlayer: Game.winnerPlayer,
+                        isRunning: Game.isRunning,
+                        placing: Game.placing
+                    });
+                }
             }
             
             Game.draw = function() {
