@@ -76,7 +76,8 @@
         }
 
         #startButton,
-        #replayButton {
+        #replayButton,
+        #randomizeEnemyButton {
             margin-top: 15px;
             padding: 10px 30px;
             font-size: 18px;
@@ -89,9 +90,17 @@
             width: 100%;
         }
 
+        #randomizeEnemyButton {
+            background-color: #555; /* Средний серый для новой кнопки */
+        }
+
         #startButton:hover,
         #replayButton:hover {
             background-color: #5bb75b;
+        }
+
+        #randomizeEnemyButton:hover {
+            background-color: #777;
         }
 
         canvas {
@@ -213,7 +222,8 @@
 
             .type-button,
             #startButton,
-            #replayButton {
+            #replayButton,
+            #randomizeEnemyButton {
                 width: 90%;
                 max-width: 300px;
             }
@@ -278,6 +288,7 @@
             <label>🪨 Rock<input type="number" id="enemyRockCount" min="0" value="5"></label>
             <label>📄 Paper<input type="number" id="enemyPaperCount" min="0" value="5"></label>
             <label>✂️  Scissors<input type="number" id="enemyScissorsCount" min="0" value="5"></label>
+            <button id="randomizeEnemyButton">Randomize</button>
         </div>
         <button id="startButton">Start</button>
         <button id="replayButton" style="display:none;">Replay</button>
@@ -293,7 +304,7 @@
     (function(ns) {
         // game.js
         // Константы и базовые настройки
-        ns.CELL_SIZE = 50;
+        ns.CELL_SIZE = 30; // Уменьшено для более плотной сетки
         ns.WIDTH = 800;
         ns.HEIGHT = 500;
 
@@ -310,6 +321,8 @@
         // UI elements, инициализируем позже
         ns.elements = {};
 
+        ns.ENEMY_PLACEMENT_BUFFER = 40; // Уменьшено, так как юниты и сетка меньше
+
     })(Game);
 
     (function(ns) {
@@ -320,21 +333,28 @@
         };
 
         ns.generateEnemyUnits = function() {
+            // Clear existing enemy units
+            ns.units = ns.units.filter(u => u.team === "player");
+
             const rock = parseInt(document.getElementById("enemyRockCount").value, 10) || 0;
             const paper = parseInt(document.getElementById("enemyPaperCount").value, 10) || 0;
             const scissors = parseInt(document.getElementById("enemyScissorsCount").value, 10) || 0;
 
-            function spawn(type, count) {
+            function spawn(type, count, startX, endX, startY, endY) {
                 for (let i = 0; i < count; i++) {
-                    const x = Math.random() * Game.WIDTH;
-                    const y = Math.random() * Game.HEIGHT;
+                    const x = startX + Math.random() * (endX - startX);
+                    const y = startY + Math.random() * (endY - startY);
                     Game.units.push(new Game.Unit(x, y, type, "enemy"));
                 }
             }
 
-            spawn("rock", rock);
-            spawn("paper", paper);
-            spawn("scissors", scissors);
+            // Spawn enemy units on the right half
+            // Диапазоны скорректированы под новую плотность
+            spawn("rock", rock, ns.WIDTH / 16, 15 * ns.WIDTH / 16, 50, ns.HEIGHT - 50);
+            spawn("paper", paper, ns.WIDTH / 16, 15 * ns.WIDTH / 16, 50, ns.HEIGHT - 50);
+            spawn("scissors", scissors, ns.WIDTH / 16, 15 * ns.WIDTH / 16, 50, ns.HEIGHT - 50);
+            ns.updateUnitCountDisplay();
+            ns.draw();
         };
 
         ns.resolveConflict = function(a, b) {
@@ -365,7 +385,7 @@
                     const dx = ns.wrapDistance(a.x, b.x, ns.WIDTH);
                     const dy = ns.wrapDistance(a.y, b.y, ns.HEIGHT);
                     const dist = Math.hypot(dx, dy);
-                    if (dist < 30 && a.type !== b.type) ns.resolveConflict(a, b);
+                    if (dist < a.radius + b.radius && a.type !== b.type) ns.resolveConflict(a, b); // Учитываем радиусы
                 }
             }
 
@@ -386,7 +406,7 @@
                 this.team = team;
                 this.vx = (Math.random() * 2 - 1);
                 this.vy = (Math.random() * 2 - 1);
-                this.radius = 20;
+                this.radius = 12; // Уменьшено
                 this.spawnTime = Date.now();
 
                 // Для dash:
@@ -474,7 +494,7 @@
                 ctx.translate(this.x, this.y);
                 const age = Date.now() - this.spawnTime;
                 if (age < 1000) ctx.globalAlpha = 0.5 + 0.5 * (age / 1000);
-                ctx.font = "32px serif";
+                ctx.font = "20px serif"; // Уменьшен размер шрифта для эмодзи
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.shadowColor = ns.COLORS[this.team];
@@ -517,6 +537,10 @@
             replayButton: document.getElementById("replayButton"),
             startButton: document.getElementById("startButton"),
             typeButtons: document.querySelectorAll(".type-button"),
+            enemyRockCount: document.getElementById("enemyRockCount"),
+            enemyPaperCount: document.getElementById("enemyPaperCount"),
+            enemyScissorsCount: document.getElementById("enemyScissorsCount"),
+            randomizeEnemyButton: document.getElementById("randomizeEnemyButton"),
         };
 
         ns.stopGame = function() {
@@ -580,6 +604,19 @@
         ns.draw = function() {
             ctx.clearRect(0, 0, ns.WIDTH, ns.HEIGHT);
             drawGrid();
+
+            // Отрисовка зон запрета размещения вокруг вражеских юнитов
+            if (ns.placing) {
+                ctx.fillStyle = "rgba(100, 100, 100, 0.3)"; // Прозрачный серый
+                for (let u of ns.units) {
+                    if (u.team === "enemy") {
+                        ctx.beginPath();
+                        ctx.arc(u.x, u.y, ns.ENEMY_PLACEMENT_BUFFER, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+
             for (let u of ns.units) u.draw(ctx);
             ns.drawWinnerMessage();
         };
@@ -632,14 +669,15 @@
 
         // Обработчики для drag & drop
         function onPointerDown(e) {
-            if (ns.placing) return; // нельзя перетаскивать при расстановке
-            const pos = getPointerPos(e);
-            const unit = findUnitAtPosition(pos.x, pos.y);
-            if (unit && unit.team === "player") { // Только юниты игрока могут быть перетащены
-                draggingUnit = unit;
-                dragOffsetX = pos.x - unit.x;
-                dragOffsetY = pos.y - unit.y;
-                e.preventDefault();
+            if (ns.placing) { // Only allow drag if placing mode is active (for player units)
+                const pos = getPointerPos(e);
+                const unit = findUnitAtPosition(pos.x, pos.y);
+                if (unit && unit.team === "player") { // Only player units can be dragged
+                    draggingUnit = unit;
+                    dragOffsetX = pos.x - unit.x;
+                    dragOffsetY = pos.y - unit.y;
+                    e.preventDefault();
+                }
             }
         }
 
@@ -648,6 +686,7 @@
             const pos = getPointerPos(e);
             draggingUnit.x = (pos.x - dragOffsetX + ns.WIDTH) % ns.WIDTH;
             draggingUnit.y = (pos.y - dragOffsetY + ns.HEIGHT) % ns.HEIGHT;
+            ns.draw(); // Redraw during drag
             e.preventDefault();
         }
 
@@ -690,6 +729,23 @@
                 }
             }
 
+            // Limit player units to the left half
+            if (pos.x > ns.WIDTH / 2) {
+                return; // Просто ничего не происходит
+            }
+
+            // НОВАЯ ПРОВЕРКА: Проверка на зону запрета вокруг вражеских юнитов
+            for (let u of ns.units) {
+                if (u.team === "enemy") {
+                    const dx = ns.wrapDistance(u.x, pos.x, ns.WIDTH);
+                    const dy = ns.wrapDistance(u.y, pos.y, ns.HEIGHT);
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < ns.ENEMY_PLACEMENT_BUFFER) {
+                        return; // Просто ничего не происходит
+                    }
+                }
+            }
+
             ns.units.push(new ns.Unit(pos.x, pos.y, ns.selectedType, "player"));
             ns.updateUnitCountDisplay();
             ns.draw();
@@ -715,13 +771,13 @@
         });
 
         ns.elements.startButton.addEventListener("click", () => {
-            if (ns.getPlayerUnitsCount() === 0) return alert("Place at least one unit!");
+            if (ns.getPlayerUnitsCount() === 0) return; // Убрали alert
             ns.placing = false;
-            ns.generateEnemyUnits();
             ns.winnerText = "";
             ns.winnerTeam = null;
             ns.elements.replayButton.style.display = "inline-block";
             ns.elements.startButton.style.display = "none";
+            ns.elements.randomizeEnemyButton.style.display = "none"; // Hide randomize button
             // Скрываем кнопки выбора типа юнитов и блок настройки вражеских юнитов
             ns.elements.typeButtons.forEach(btn => btn.style.display = "none");
             document.getElementById("enemyUnitSetup").style.display = "none"; // Добавлено скрытие
@@ -736,13 +792,21 @@
             ns.winnerTeam = null;
             ns.elements.replayButton.style.display = "none";
             ns.elements.startButton.style.display = "inline-block";
+            ns.elements.randomizeEnemyButton.style.display = "block"; // Show randomize button
             // Показываем кнопки выбора типа юнитов и блок настройки вражеских юнитов
             ns.elements.typeButtons.forEach(btn => btn.style.display = "inline-block");
             document.getElementById("enemyUnitSetup").style.display = "block"; // Добавлено отображение
+            // Regenerate enemy units on replay as well
+            ns.generateEnemyUnits();
             ns.updateUnitCountDisplay();
             ns.draw();
             requestAnimationFrame(idleLoop);
         });
+
+        ns.elements.randomizeEnemyButton.addEventListener("click", () => {
+            ns.generateEnemyUnits();
+        });
+
 
         // Инициализация выбранной кнопки
         ns.elements.typeButtons.forEach(btn => btn.classList.remove("selected"));
@@ -755,6 +819,8 @@
             if (ns.placing) requestAnimationFrame(idleLoop);
         }
 
+        // Initial setup for enemy units
+        ns.generateEnemyUnits();
         idleLoop();
 
         ns.getPlayerUnitsCount = function() {
