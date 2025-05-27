@@ -40,6 +40,7 @@
         .ice-status {font-size: 0.8em; color: #aaa; margin-top: -5px; margin-bottom: 5px; display: block;}
         #readinessCheck p { margin: 5px 0; font-size: 0.9em;}
         #toggleMuteBtnContainer { margin-top: 15px; padding-top:10px; border-top: 1px solid #444;}
+        #p2pMessage { margin-top: 15px; padding: 10px; background-color: #333; border: 1px solid #555; border-radius: 5px; color: #eee; min-height: 20px;}
 
 
         @media (max-width: 768px) {
@@ -69,30 +70,37 @@
         <hr>
 
         <div id="p2pStep_Host_1_CreateOffer" class="p2p-step" style="display:none;">
-            <p class="p2p-instruction">Вы - Хост. Нажмите 'Создать Оффер', чтобы сгенерировать ваши данные для подключения (SDP Оффер и ICE-кандидаты). Скопируйте текст из поля ниже и отправьте его Клиенту.</p>
+            <p class="p2p-instruction">Вы - Хост. Нажмите 'Создать Оффер', чтобы сгенерировать ваше SDP-предложение.</p>
             <button id="host_createOfferBtn">Создать Оффер</button>
-            <textarea id="host_localSdpOfferOutput" placeholder="Ваш SDP Оффер и ICE-кандидаты появятся здесь..." readonly></textarea>
-            <p class="p2p-instruction" id="host_offerCreatedInstruction" style="display:none;">Ваш Оффер и ICE-кандидаты созданы. Скопируйте их и отправьте Клиенту. Затем нажмите 'Перейти к следующему шагу'.</p>
+            <textarea id="host_localSdpOfferOutput" placeholder="Ваш SDP-Оффер появится здесь..." readonly></textarea>
+            <p class="ice-status" id="host_iceStatus">Сбор ICE-кандидатов...</p>
+            <textarea id="host_localIceCandidatesOutput" placeholder="Ваши ICE-кандидаты появятся здесь..." readonly></textarea>
+            <p class="p2p-instruction" id="host_offerCreatedInstruction" style="display:none;">Оффер и ICE-кандидаты созданы. Скопируйте каждый из них и отправьте Клиенту. Затем нажмите 'Перейти к следующему шагу'.</p>
             <button id="host_proceedToSetAnswerBtn" style="display:none;">Перейти к следующему шагу</button>
         </div>
 
         <div id="p2pStep_Host_2_SetAnswer" class="p2p-step" style="display:none;">
-            <p class="p2p-instruction"><b>Прием Ответа от Клиента.</b> Вставьте SDP Ответ от Клиента в поле ниже и нажмите 'Установить SDP Ответ'.</p>
+            <p class="p2p-instruction"><b>Прием Ответа от Клиента.</b> Вставьте SDP Ответ от Клиента в первое поле, а его ICE-кандидаты во второе. Затем нажмите 'Установить Ответ и Кандидаты'.</p>
             <textarea id="host_remoteSdpAnswerInput" placeholder="Вставьте SDP Ответ от Клиента"></textarea>
-            <button id="host_setRemoteSdpAnswerBtn" class="secondary">Установить SDP Ответ Клиента</button>
+            <textarea id="host_remoteIceCandidatesInput" placeholder="Вставьте ICE-кандидаты от Клиента"></textarea>
+            <button id="host_setRemoteSdpAnswerBtn" class="secondary">Установить Ответ и Кандидаты Клиента</button>
         </div>
 
         <div id="p2pStep_Client_1_PasteOffer" class="p2p-step" style="display:none;">
-            <p class="p2p-instruction">Вы - Клиент. Вставьте SDP Оффер и ICE-кандидаты от Хоста в поле ниже и нажмите 'Принять Оффер и Создать Ответ'.</p>
-            <textarea id="client_remoteSdpOfferInput" placeholder="Вставьте SDP Оффер и ICE-кандидаты от Хоста"></textarea>
+            <p class="p2p-instruction">Вы - Клиент. Вставьте SDP Оффер от Хоста в первое поле, а его ICE-кандидаты во второе. Затем нажмите 'Принять Оффер и Создать Ответ'.</p>
+            <textarea id="client_remoteSdpOfferInput" placeholder="Вставьте SDP Оффер от Хоста"></textarea>
+            <textarea id="client_remoteIceCandidatesInput" placeholder="Вставьте ICE-кандидаты от Хоста"></textarea>
             <button id="client_acceptOfferAndProceedToAnswerBtn">Принять Оффер и Создать Ответ</button>
         </div>
         
         <div id="p2pStep_Client_2_CreateAnswerAndSend" class="p2p-step" style="display:none;">
-            <p class="p2p-instruction">Ваш SDP Ответ появится ниже. Скопируйте его и отправьте Хосту.</p>
+            <p class="p2p-instruction">Ваш SDP Ответ появится в первом поле, а ваши ICE-кандидаты во втором. Скопируйте каждый из них и отправьте Хосту.</p>
             <textarea id="client_localSdpAnswerOutput" placeholder="Ваш SDP Ответ появится здесь..." readonly></textarea>
-            <p class="p2p-instruction" id="client_answerCreatedInstruction" style="display:none;">Ваш Ответ создан. Скопируйте и отправьте его Хосту.</p>
+            <p class="ice-status" id="client_iceStatus">Сбор ICE-кандидатов...</p>
+            <textarea id="client_localIceCandidatesOutput" placeholder="Ваши ICE-кандидаты появятся здесь..." readonly></textarea>
+            <p class="p2p-instruction" id="client_answerCreatedInstruction" style="display:none;">Ваш Ответ и ICE-кандидаты созданы. Скопируйте их и отправьте Хосту.</p>
         </div>
+        <div id="p2pMessage" style="display:none;"></div>
 
         <div id="toggleMuteBtnContainer" style="display:none;">
             <button id="toggleMuteBtn" class="secondary">Выключить микрофон</button>
@@ -339,7 +347,8 @@ const Game = {
 
             const playerRoleDisp = document.getElementById("playerRoleDisplay");
             const connectionStatusSpan = document.getElementById("connectionStatus");
-            
+            const p2pMessageDiv = document.getElementById("p2pMessage"); // New element for messages
+
             const hostStep1 = document.getElementById("p2pStep_Host_1_CreateOffer");
             const hostStep2 = document.getElementById("p2pStep_Host_2_SetAnswer");
             const clientStep1 = document.getElementById("p2pStep_Client_1_PasteOffer");
@@ -347,14 +356,20 @@ const Game = {
 
             const host_createOfferBtn = document.getElementById("host_createOfferBtn");
             const host_localSdpOfferOutput = document.getElementById("host_localSdpOfferOutput");
+            const host_localIceCandidatesOutput = document.getElementById("host_localIceCandidatesOutput"); // New
+            const host_iceStatus = document.getElementById("host_iceStatus"); // New
             const host_offerCreatedInstruction = document.getElementById("host_offerCreatedInstruction");
             const host_proceedToSetAnswerBtn = document.getElementById("host_proceedToSetAnswerBtn");
             const host_remoteSdpAnswerInput = document.getElementById("host_remoteSdpAnswerInput");
+            const host_remoteIceCandidatesInput = document.getElementById("host_remoteIceCandidatesInput"); // New
             const host_setRemoteSdpAnswerBtn = document.getElementById("host_setRemoteSdpAnswerBtn");
 
             const client_remoteSdpOfferInput = document.getElementById("client_remoteSdpOfferInput");
+            const client_remoteIceCandidatesInput = document.getElementById("client_remoteIceCandidatesInput"); // New
             const client_acceptOfferAndProceedToAnswerBtn = document.getElementById("client_acceptOfferAndProceedToAnswerBtn");
             const client_localSdpAnswerOutput = document.getElementById("client_localSdpAnswerOutput");
+            const client_localIceCandidatesOutput = document.getElementById("client_localIceCandidatesOutput"); // New
+            const client_iceStatus = document.getElementById("client_iceStatus"); // New
             const client_answerCreatedInstruction = document.getElementById("client_answerCreatedInstruction");
             
             const restartP2PBtn = document.getElementById("restartP2PConnectionBtn");
@@ -372,41 +387,71 @@ const Game = {
             const canvas = document.getElementById("gameCanvas");
             const ctx = canvas.getContext("2d");
 
-            let readyCheckTimeout = null; // Для таймаута проверки готовности
-
             function updateP2PStatus(statusText) { connectionStatusSpan.textContent = statusText; }
+            function showP2PMessage(message, isError = false) {
+                p2pMessageDiv.textContent = message;
+                p2pMessageDiv.style.display = 'block';
+                p2pMessageDiv.style.backgroundColor = isError ? '#882222' : '#333';
+                p2pMessageDiv.style.borderColor = isError ? '#FF0000' : '#555';
+            }
+            function clearP2PMessage() {
+                p2pMessageDiv.textContent = '';
+                p2pMessageDiv.style.display = 'none';
+            }
+
             function showP2PStep(stepIdToShow) {
                 [hostStep1, hostStep2, clientStep1, clientStep2].forEach(s => s.style.display = 'none');
                 if (document.getElementById(stepIdToShow)) document.getElementById(stepIdToShow).style.display = 'block';
+                clearP2PMessage(); // Clear message when changing steps
             }
-            function resetP2PStateAndUI(showAlert = true, message = "Соединение сброшено. Пожалуйста, начните заново.") {
-                if (showAlert && !resetP2PStateAndUI.isResetting) {
-                    resetP2PStateAndUI.isResetting = true; alert(message); resetP2PStateAndUI.isResetting = false;
+            function resetP2PStateAndUI(showMessage = true, message = "Соединение сброшено. Пожалуйста, начните заново.") {
+                console.log("Resetting P2P state and UI...");
+                if (showMessage && !resetP2PStateAndUI.isResetting) {
+                    resetP2PStateAndUI.isResetting = true; 
+                    showP2PMessage(message, true); // Show error message
+                    resetP2PStateAndUI.isResetting = false;
                 }
-                if (Game.peerConnection) { Game.peerConnection.close(); Game.peerConnection = null; }
-                if (Game.dataChannel) { Game.dataChannel.close(); Game.dataChannel = null; }
-                if (Game.localStream) { Game.localStream.getTracks().forEach(track => track.stop()); Game.localStream = null; toggleMuteBtnContainer.style.display = 'none';}
+                if (Game.peerConnection) { 
+                    console.log("Closing existing PeerConnection.");
+                    Game.peerConnection.close(); 
+                    Game.peerConnection = null; 
+                }
+                if (Game.dataChannel) { 
+                    console.log("Closing existing DataChannel.");
+                    Game.dataChannel.close(); 
+                    Game.dataChannel = null; 
+                }
+                if (Game.localStream) { 
+                    console.log("Stopping local media tracks.");
+                    Game.localStream.getTracks().forEach(track => track.stop()); 
+                    Game.localStream = null; 
+                    toggleMuteBtnContainer.style.display = 'none';
+                }
 
                 Game.isHost = false;
-                Game.localPlayerReady = false; Game.remotePlayerReady = false;
+                Game.localPlayerReady = false; 
+                Game.remotePlayerReady = false;
                 
-                // Clear any pending timeout
-                if (readyCheckTimeout) {
-                    clearTimeout(readyCheckTimeout);
-                    readyCheckTimeout = null;
-                }
-
-                [host_localSdpOfferOutput, host_remoteSdpAnswerInput,
-                 client_remoteSdpOfferInput, client_localSdpAnswerOutput]
+                [host_localSdpOfferOutput, host_localIceCandidatesOutput, host_remoteSdpAnswerInput, host_remoteIceCandidatesInput,
+                 client_remoteSdpOfferInput, client_remoteIceCandidatesInput, client_localSdpAnswerOutput, client_localIceCandidatesOutput]
                  .forEach(ta => { if(ta) ta.value = ""; });
+                
                 [
                     host_offerCreatedInstruction, host_proceedToSetAnswerBtn,
                     client_answerCreatedInstruction
                 ]
                  .forEach(el => { if(el) el.style.display = "none"; });
 
-                roleScreen.style.display = 'block'; p2pScreen.style.display = 'none'; gameScreen.style.display = 'none';
+                // Reset ICE status indicators
+                if (host_iceStatus) host_iceStatus.textContent = "Сбор ICE-кандидатов...";
+                if (client_iceStatus) client_iceStatus.textContent = "Сбор ICE-кандидатов...";
+
+
+                roleScreen.style.display = 'block'; 
+                p2pScreen.style.display = 'none'; 
+                gameScreen.style.display = 'none';
                 updateP2PStatus("Отключено");
+                console.log("P2P state reset complete.");
             }
             resetP2PStateAndUI.isResetting = false;
 
@@ -425,6 +470,7 @@ const Game = {
                     });
                     isMuted = !Game.localStream.getAudioTracks()[0]?.enabled;
                     toggleMuteBtn.textContent = isMuted ? "Включить микрофон" : "Выключить микрофон";
+                    console.log(`Microphone is now ${isMuted ? 'muted' : 'unmuted'}.`);
                 }
             });
 
@@ -433,6 +479,7 @@ const Game = {
                 if (Game.dataChannel && Game.dataChannel.readyState === "open") {
                     try {
                         Game.dataChannel.send(JSON.stringify({ type, payload }));
+                        console.log("Sent P2P message:", type, payload);
                     } catch (e) {
                         console.error("Error sending P2P message:", e);
                     }
@@ -442,13 +489,15 @@ const Game = {
             }
 
             async function initPeerConnection() {
-                if (Game.peerConnection) { Game.peerConnection.close(); }
+                console.log("Initializing PeerConnection...");
+                if (Game.peerConnection) { Game.peerConnection.close(); } // Ensure a clean slate
                 Game.peerConnection = new RTCPeerConnection(rtcConfig);
 
                 if (Game.localStream) {
                     Game.localStream.getTracks().forEach(track => {
                         Game.peerConnection.addTrack(track, Game.localStream);
                     });
+                    console.log("Added local audio track to PeerConnection.");
                 }
 
                 Game.peerConnection.ontrack = event => {
@@ -464,19 +513,25 @@ const Game = {
                 Game.peerConnection.onconnectionstatechange = () => {
                     const state = Game.peerConnection.connectionState;
                     updateP2PStatus(state);
+                    console.log("PeerConnection state changed:", state);
                     if (state === "failed" || state === "disconnected" || state === "closed") {
                          if (!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true, `P2P соединение ${state}. Попробуйте снова.`);
                     }
                 };
+
+                // Host creates data channel
                 if (Game.isHost) {
                     Game.dataChannel = Game.peerConnection.createDataChannel("gameChannel");
+                    console.log("DataChannel created by Host.");
                     setupDataChannelEvents(Game.dataChannel);
-                } else {
+                } else { // Client receives data channel
                     Game.peerConnection.ondatachannel = event => {
                         Game.dataChannel = event.channel;
+                        console.log("DataChannel received by Client.");
                         setupDataChannelEvents(Game.dataChannel);
                     };
                 }
+                console.log("PeerConnection initialized.");
             }
             
             function setupDataChannelEvents(channel) {
@@ -490,16 +545,29 @@ const Game = {
                     Game.units = []; // Очищаем юниты при новом подключении
                     Game.targetUnitsState = []; // Очищаем целевое состояние
                     Game.ui.updateUI(); Game.draw(); // Initial draw with current units
+                    clearP2PMessage(); // Clear any messages
+                    console.log("DataChannel opened.");
                 };
                 channel.onmessage = event => {
-                    try { const msg = JSON.parse(event.data); handleP2PMessage(msg.type, msg.payload); }
+                    try { 
+                        const msg = JSON.parse(event.data); 
+                        console.log("Received P2P message:", msg.type, msg.payload);
+                        handleP2PMessage(msg.type, msg.payload); 
+                    }
                     catch (e) { console.error("Error parsing P2P message:", e, event.data); }
                 };
-                channel.onclose = () => { if(!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,"P2P Канал данных закрыт.") };
-                channel.onerror = error => { if(!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,`Ошибка P2P Канала данных: ${error}`) };
+                channel.onclose = () => { 
+                    console.log("DataChannel closed.");
+                    if(!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,"P2P Канал данных закрыт.") 
+                };
+                channel.onerror = error => { 
+                    console.error("DataChannel error:", error);
+                    if(!resetP2PStateAndUI.isResetting) resetP2PStateAndUI(true,`Ошибка P2P Канала данных: ${error.message || error}`) 
+                };
             }
             
-            function handleP2PMessage(type, payload) {
+            // Make handleP2PMessage async because it uses await
+            async function handleP2PMessage(type, payload) {
                 switch (type) {
                     case "player_readiness":
                         Game.remotePlayerReady = payload.ready;
@@ -511,37 +579,31 @@ const Game = {
                         if (payload.player === "player2") Game.selectedTypes.player2 = payload.type;
                         Game.ui.updateUI(); // Update UI for changes in selected types
                         break;
-                    case "force_restart_game": // OLD, not used anymore if client requests restart
-                        restartGameLogic();
-                        break;
-                    case "request_restart_game": // NEW: Client requests host to restart game
+                    case "request_restart_game": // Client requests host to restart game
                         if (Game.isHost) {
                             restartGameLogic(); // Host restarts
                         }
                         break;
-                    case "start_game": // New message type: Host tells client to start game
+                    case "start_game": // Host tells client to start game
                         if (!Game.isHost) { // Only client needs to react to this
                             startGameLogic();
                         }
                         break;
                     case "unit_placement_request": // Client requests unit placement/removal
                         if (Game.isHost) {
-                            const { x, y, unitIdToRemove, player, unitId } = payload; // Added unitId for client-generated ID
-                            if (unitIdToRemove) { // Remove unit
+                            const { x, y, unitIdToRemove, player, unitId } = payload; 
+                            if (unitIdToRemove) { 
                                 Game.units = Game.units.filter(u => u.id !== unitIdToRemove);
-                            } else { // Add unit
+                            } else { 
                                 const type = Game.selectedTypes[player];
-                                // Use client-provided unitId if available, otherwise generate new
                                 const newU = new Game.Unit(x, y, type, player, unitId); 
                                 Game.units.push(newU);
                             }
-                            // Host processes and then broadcasts new state
-                            Game.ui.updateUI(); // Update host's UI immediately
-                            Game.draw(); // Force draw on host immediately after client's unit placement
-                            // Host's targetUnitsState is always its Game.units
+                            Game.ui.updateUI(); 
+                            Game.draw(); 
                             Game.targetUnitsState = Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player }));
-                            sendMessageP2P("game_state_update", { // Force broadcast after placement
-                                units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })), // Send serializable data
+                            sendMessageP2P("game_state_update", { 
+                                units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })), 
                                 winnerText: Game.winnerText,
                                 winnerPlayer: Game.winnerPlayer,
                                 isRunning: Game.isRunning,
@@ -551,36 +613,31 @@ const Game = {
                         break;
                     case "game_state_update": // Client receives state update from Host
                         if (!Game.isHost) {
-                            // Update target state and game status variables
-                            Game.targetUnitsState = payload.units; // Directly use the payload units as target
+                            Game.targetUnitsState = payload.units; 
                             Game.winnerText = payload.winnerText;
                             Game.winnerPlayer = payload.winnerPlayer;
                             Game.isRunning = payload.isRunning;
                             Game.placing = payload.placing;
 
-                            // NEW: If gameReset flag is true, explicitly reset client's local and remote readiness for visual consistency
                             if (payload.gameReset) {
                                 Game.localPlayerReady = false;
-                                Game.remotePlayerReady = false; // Added to reset remote status as well
+                                Game.remotePlayerReady = false; 
                                 localReadyStatusSpan.textContent = 'Не готовы';
-                                remoteReadyStatusSpan.textContent = 'Не готов'; // Explicitly update remote status
+                                remoteReadyStatusSpan.textContent = 'Не готов'; 
                                 playerReadyBtn.textContent = "Готов к игре";
                                 playerReadyBtn.style.display = 'inline-block';
                                 readinessCheckDiv.style.display = 'block';
                             }
 
-                            // If the game state update means game is running, ensure client's loop starts
-                            // Or if placing, ensure client's loop starts to render units
                             if ((Game.isRunning || Game.placing) && !Game.loop) {
                                 Game.loop = requestAnimationFrame(Game.gameLoop);
                             } else if (!Game.isRunning && Game.loop && Game.winnerText) {
-                                // If game stopped and there's a winner, cancel animation frame
                                 cancelAnimationFrame(Game.loop);
                                 Game.loop = null;
                             }
 
                             Game.ui.updateUI();
-                            Game.draw(); // Force a draw on the client after state update for immediate visual feedback
+                            Game.draw(); 
 
                             if (!Game.isRunning && Game.winnerText) {
                                 document.getElementById("restartGameBtn").style.display = "block";
@@ -591,9 +648,28 @@ const Game = {
                                 document.getElementById("restartGameBtn").style.display = "none";
                                 document.getElementById("playerReadyBtn").style.display = "inline-block";
                                 document.getElementById("readinessCheck").style.display = "block";
-                                document.querySelectorAll(".type-buttons").forEach(c => c.style.pointerEvents = "auto"); // Re-enable for client to select type
+                                document.querySelectorAll(".type-buttons").forEach(c => c.style.pointerEvents = "auto"); 
                             }
                         }
+                        break;
+                    // --- NEW P2P SIGNALING MESSAGES (FOR MANUAL COPY/PASTE) ---
+                    // These cases are now mainly informational as SDP and ICE are manually exchanged.
+                    // The actual setting of remote SDP and adding ICE candidates happens when the user
+                    // clicks "Установить Ответ и Кандидаты Клиента" or "Принять Оффер и Создать Ответ"
+                    case "sdp_offer":
+                        console.log("Client received SDP Offer. (Informational only for manual signaling)");
+                        if (!Game.isHost) {
+                            client_remoteSdpOfferInput.value = payload.sdp;
+                        }
+                        break;
+                    case "sdp_answer":
+                        console.log("Host received SDP Answer. (Informational only for manual signaling)");
+                        if (Game.isHost) {
+                            host_remoteSdpAnswerInput.value = payload.sdp;
+                        }
+                        break;
+                    case "ice_candidate":
+                        console.log("Received ICE Candidate. (Informational only for manual signaling, will be part of full paste)");
                         break;
                     default: console.warn("Unknown P2P message type:", type);
                 }
@@ -620,126 +696,160 @@ const Game = {
                 
                 roleScreen.style.display = 'none'; p2pScreen.style.display = 'block';
                 if (isHostRole) {
-                    showP2PStep('p2pStep_Host_1_CreateOffer'); updateP2PStatus("Ожидание создания Оффера");
+                    showP2PStep('p2pStep_Host_1_CreateOffer'); 
+                    updateP2PStatus("Ожидание создания Оффера");
                 } else {
-                    showP2PStep('p2pStep_Client_1_PasteOffer'); updateP2PStatus("Ожидание Оффера от Хоста");
+                    showP2PStep('p2pStep_Client_1_PasteOffer'); 
+                    updateP2PStatus("Ожидание Оффера от Хоста");
                 }
             }
 
             document.getElementById("selectHostBtn").addEventListener("click", () => initializeRole(true));
             document.getElementById("selectClientBtn").addEventListener("click", () => initializeRole(false));
             
+            let localIceCandidates = []; // For storing ICE candidates before display/sending
+
             // Host creates Offer and gathers ICE candidates
             host_createOfferBtn.addEventListener("click", async () => {
+                console.log("Host: Create Offer button clicked.");
+                host_createOfferBtn.disabled = true;
+                host_localSdpOfferOutput.value = "Генерация SDP оффера...";
+                host_localIceCandidatesOutput.value = "Сбор ICE-кандидатов...";
+                host_iceStatus.textContent = "Сбор ICE-кандидатов...";
+                localIceCandidates = []; // Clear previous candidates
+                clearP2PMessage();
+
                 await initPeerConnection();
+
+                Game.peerConnection.onicecandidate = event => {
+                    if (event.candidate) {
+                        localIceCandidates.push(event.candidate.toJSON());
+                        host_localIceCandidatesOutput.value = JSON.stringify(localIceCandidates, null, 2);
+                        console.log("Host ICE candidate:", event.candidate);
+                    } else {
+                        host_iceStatus.textContent = "Сбор ICE-кандидатов завершен.";
+                        console.log("Host: ICE gathering complete.");
+                    }
+                };
+
                 try {
                     const offer = await Game.peerConnection.createOffer();
                     await Game.peerConnection.setLocalDescription(offer);
+                    host_localSdpOfferOutput.value = JSON.stringify(offer);
+                    console.log("Host: SDP Offer created and set as local description.", offer);
+                    
+                    setTimeout(() => {
+                        host_offerCreatedInstruction.style.display = 'block';
+                        host_proceedToSetAnswerBtn.style.display = 'inline-block';
+                        host_createOfferBtn.disabled = false;
+                        updateP2PStatus("Оффер и ICE созданы. Отправьте их Клиенту.");
+                        showP2PMessage("Ваш SDP Оффер и ICE-кандидаты созданы. Скопируйте их из полей и отправьте Клиенту.", false);
+                    }, 2000); // Wait 2 seconds for candidates to gather
 
-                    let iceCandidates = [];
-                    const iceGatheringPromise = new Promise(resolve => {
-                        Game.peerConnection.onicecandidate = event => {
-                            if (event.candidate) {
-                                iceCandidates.push(event.candidate.toJSON());
-                            } else {
-                                resolve(); // null candidate indicates end of ICE gathering
-                            }
-                        };
-                        setTimeout(() => {
-                            resolve();
-                        }, 5000); // Increased timeout to 5 seconds
-                    });
-
-                    await iceGatheringPromise;
-
-                    outputCombinedOffer(iceCandidates);
-                    updateP2PStatus("Оффер и ICE созданы. Отправьте их Клиенту.");
-
-                } catch (e) { resetP2PStateAndUI(true, `Ошибка создания Оффера: ${e}`); }
-            });
-
-            function outputCombinedOffer(iceCandidates) {
-                if (Game.peerConnection && Game.peerConnection.localDescription) {
-                    const combinedOffer = {
-                        sdp: btoa(Game.peerConnection.localDescription.sdp), // Encode SDP
-                        type: Game.peerConnection.localDescription.type,
-                        iceCandidates: btoa(JSON.stringify(iceCandidates)) // Encode ICE candidates
-                    };
-                    host_localSdpOfferOutput.value = JSON.stringify(combinedOffer, null, 2);
-                    host_offerCreatedInstruction.style.display = 'block';
-                    host_proceedToSetAnswerBtn.style.display = 'inline-block';
-                } else {
-                    console.error("Cannot output combined offer: PeerConnection or localDescription is null.");
+                } catch (e) { 
+                    console.error("Host: Error creating offer:", e);
+                    resetP2PStateAndUI(true, `Ошибка создания Оффера: ${e.message}`); 
                 }
-            }
+            });
 
             host_proceedToSetAnswerBtn.addEventListener("click", () => showP2PStep('p2pStep_Host_2_SetAnswer'));
             
-            // Host sets Remote SDP Answer
+            // Host sets Remote SDP Answer and adds ICE candidates
             host_setRemoteSdpAnswerBtn.addEventListener("click", async () => {
-                if (!Game.peerConnection) { alert("Соединение не инициализировано!"); return; }
-                if (!host_remoteSdpAnswerInput.value) { alert("Вставьте SDP Ответ от Клиента!"); return; }
+                console.log("Host: Set Remote SDP Answer button clicked.");
+                clearP2PMessage();
+                if (!Game.peerConnection) { showP2PMessage("Соединение не инициализировано!", true); return; }
+                if (!host_remoteSdpAnswerInput.value) { showP2PMessage("Вставьте SDP Ответ от Клиента!", true); return; }
+                if (!host_remoteIceCandidatesInput.value) { showP2PMessage("Вставьте ICE-кандидаты от Клиента!", true); return; }
+
                 try {
-                    const combinedAnswer = JSON.parse(host_remoteSdpAnswerInput.value);
-                    const sdp = atob(combinedAnswer.sdp); // Decode SDP
-                    const answer = { sdp: sdp, type: combinedAnswer.type };
+                    const answerSdp = JSON.parse(host_remoteSdpAnswerInput.value);
+                    const answer = new RTCSessionDescription(answerSdp);
+                    await Game.peerConnection.setRemoteDescription(answer);
+                    console.log("Host: Remote SDP Answer set.", answer);
 
-                    await Game.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-
-                    const iceCandidates = JSON.parse(atob(combinedAnswer.iceCandidates || btoa('[]'))); // Decode ICE candidates
+                    const iceCandidates = JSON.parse(host_remoteIceCandidatesInput.value);
                     for (const candidate of iceCandidates) {
                         if (candidate) {
                             try {
                                 await Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                                console.log("Host: Added remote ICE candidate:", candidate);
                             } catch (e) {
-                                console.warn("Error adding ICE candidate (Host):", e);
+                                console.warn("Host: Error adding remote ICE candidate:", e, candidate);
                             }
                         }
                     }
-                    updateP2PStatus("SDP Ответ Клиента установлен. Соединение устанавливается.");
-                } catch (e) { alert(`Ошибка установки SDP Ответа: ${e}. Убедитесь, что формат корректен.`); }
+                    updateP2PStatus("SDP Ответ Клиента и ICE-кандидаты установлены. Соединение устанавливается.");
+                    showP2PMessage("SDP Ответ Клиента и ICE-кандидаты установлены. Соединение устанавливается. Ожидайте статуса 'Соединено!'", false);
+                } catch (e) { 
+                    console.error("Host: Error setting remote SDP Answer or ICE candidates:", e);
+                    showP2PMessage(`Ошибка установки SDP Ответа или ICE-кандидатов: ${e.message}. Убедитесь, что формат корректен.`, true); 
+                }
             });
 
             // Client accepts Offer and creates Answer
             client_acceptOfferAndProceedToAnswerBtn.addEventListener("click", async () => {
-                if (!client_remoteSdpOfferInput.value) { alert("Вставьте SDP Оффер и ICE-кандидаты от Хоста!"); return; }
-                await initPeerConnection();
-                try {
-                    const combinedOffer = JSON.parse(client_remoteSdpOfferInput.value);
-                    const sdp = atob(combinedOffer.sdp); // Decode SDP
-                    const offer = { sdp: sdp, type: combinedOffer.type };
-                    const iceCandidates = JSON.parse(atob(combinedOffer.iceCandidates || btoa('[]'))); // Decode ICE candidates
+                console.log("Client: Accept Offer button clicked.");
+                client_acceptOfferAndProceedToAnswerBtn.disabled = true;
+                client_localSdpAnswerOutput.value = "Генерация SDP ответа...";
+                client_localIceCandidatesOutput.value = "Сбор ICE-кандидатов...";
+                client_iceStatus.textContent = "Сбор ICE-кандидатов...";
+                localIceCandidates = []; // Clear previous candidates
+                clearP2PMessage();
 
-                    await Game.peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+                if (!client_remoteSdpOfferInput.value) { showP2PMessage("Вставьте SDP Оффер от Хоста!", true); client_acceptOfferAndProceedToAnswerBtn.disabled = false; return; }
+                if (!client_remoteIceCandidatesInput.value) { showP2PMessage("Вставьте ICE-кандидаты от Хоста!", true); client_acceptOfferAndProceedToAnswerBtn.disabled = false; return; }
+
+                await initPeerConnection();
+
+                Game.peerConnection.onicecandidate = event => {
+                    if (event.candidate) {
+                        localIceCandidates.push(event.candidate.toJSON());
+                        client_localIceCandidatesOutput.value = JSON.stringify(localIceCandidates, null, 2);
+                        console.log("Client ICE candidate:", event.candidate);
+                    } else {
+                        client_iceStatus.textContent = "Сбор ICE-кандидатов завершен.";
+                        console.log("Client: ICE gathering complete.");
+                    }
+                };
+
+                try {
+                    const offerSdp = JSON.parse(client_remoteSdpOfferInput.value);
+                    const offer = new RTCSessionDescription(offerSdp);
+                    await Game.peerConnection.setRemoteDescription(offer);
+                    console.log("Client: Remote SDP Offer set.", offer);
                     
                     // Add Host's ICE candidates
-                    for (const candidate of iceCandidates) {
+                    const remoteIceCandidates = JSON.parse(client_remoteIceCandidatesInput.value);
+                    for (const candidate of remoteIceCandidates) {
                         if (candidate) {
                             try {
                                 await Game.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                                console.log("Client: Added remote ICE candidate:", candidate);
                             } catch (e) {
-                                console.warn("Error adding ICE candidate (Client):", e);
+                                console.warn("Client: Error adding remote ICE candidate:", e, candidate);
                             }
                         }
                     }
                     
                     const answer = await Game.peerConnection.createAnswer();
                     await Game.peerConnection.setLocalDescription(answer);
+                    client_localSdpAnswerOutput.value = JSON.stringify(answer);
+                    console.log("Client: SDP Answer created and set as local description.", answer);
 
-                    const combinedAnswer = {
-                        sdp: btoa(answer.sdp), // Encode SDP
-                        type: answer.type,
-                        iceCandidates: btoa(JSON.stringify([])) // Client doesn't gather candidates for the answer
-                    };
+                    setTimeout(() => {
+                        client_answerCreatedInstruction.style.display = 'block';
+                        showP2PStep('p2pStep_Client_2_CreateAnswerAndSend');
+                        client_acceptOfferAndProceedToAnswerBtn.disabled = false;
+                        updateP2PStatus("Оффер Хоста принят. Ваш Ответ и ICE созданы. Отправьте их Хосту.");
+                        showP2PMessage("Ваш SDP Ответ и ICE-кандидаты созданы. Скопируйте их из полей и отправьте Хосту.", false);
+                    }, 2000); // Wait 2 seconds for candidates to gather
 
-                    client_localSdpAnswerOutput.value = JSON.stringify(combinedAnswer, null, 2);
-                    client_answerCreatedInstruction.style.display = 'block';
-                    showP2PStep('p2pStep_Client_2_CreateAnswerAndSend');
-                    updateP2PStatus("Оффер Хоста принят. Ваш Ответ создан. Отправьте его Хосту.");
-
-                    Game.peerConnection.onicecandidate = null; // Detach to avoid unnecessary console logs
-
-                } catch (e) { resetP2PStateAndUI(true, `Ошибка принятия Оффера или создания Ответа: ${e}. Убедитесь, что формат корректен.`);}
+                } catch (e) { 
+                    console.error("Client: Error accepting offer or creating answer:", e);
+                    showP2PMessage(`Ошибка принятия Оффера или создания Ответа: ${e.message}. Убедитесь, что формат корректен.`, true);
+                }
             });
 
 
@@ -761,28 +871,6 @@ const Game = {
                         winnerText: Game.winnerText,
                         winnerPlayer: Game.winnerPlayer
                     });
-
-                    if (!Game.isRunning && readyCheckTimeout === null) {
-                        readyCheckTimeout = setTimeout(() => {
-                            if (Game.isHost && Game.localPlayerReady && Game.remotePlayerReady && !Game.isRunning) {
-                                console.warn("Timeout: Both players ready, but game not started. Resending start_game message.");
-                                sendMessageP2P("start_game", {
-                                    units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
-                                    placing: Game.placing,
-                                    isRunning: Game.isRunning,
-                                    winnerText: Game.winnerText,
-                                    winnerPlayer: Game.winnerPlayer
-                                });
-                            }
-                            readyCheckTimeout = null;
-                        }, 5000);
-                    }
-
-                } else {
-                    if (readyCheckTimeout) {
-                        clearTimeout(readyCheckTimeout);
-                        readyCheckTimeout = null;
-                    }
                 }
             }
 
@@ -793,16 +881,12 @@ const Game = {
                 readinessCheckDiv.style.display='none'; 
                 playerReadyBtn.style.display='none';
                 document.querySelectorAll(".type-buttons").forEach(b=>b.style.pointerEvents="none");
-                // Clear any pending timeout when game actually starts
-                if (readyCheckTimeout) {
-                    clearTimeout(readyCheckTimeout);
-                    readyCheckTimeout = null;
-                }
                 // Ensure game loop starts only once
                 if (!Game.loop) {
                     Game.loop = requestAnimationFrame(Game.gameLoop);
                 }
                 Game.ui.updateUI();
+                console.log("Game started!");
             }
 
             restartGameBtn.addEventListener("click", () => {
@@ -811,6 +895,7 @@ const Game = {
             });
 
             function restartGameLogic() {
+                console.log("Restarting game logic...");
                 if(Game.loop)cancelAnimationFrame(Game.loop);
                 Game.loop = null; // Reset loop reference
                 Game.isRunning=false; 
@@ -821,12 +906,6 @@ const Game = {
                 Game.winnerPlayer=null;
                 Game.localPlayerReady = false;
                 Game.remotePlayerReady = false;
-
-                // Clear any pending timeout
-                if (readyCheckTimeout) {
-                    clearTimeout(readyCheckTimeout);
-                    readyCheckTimeout = null;
-                }
 
                 if(Game.dataChannel && Game.dataChannel.readyState === 'open'){
                     readinessCheckDiv.style.display = 'block';
@@ -850,9 +929,10 @@ const Game = {
                         winnerPlayer: Game.winnerPlayer,
                         isRunning: Game.isRunning,
                         placing: Game.placing,
-                        gameReset: true
+                        gameReset: true // Signal to client that game state was reset
                     });
                 }
+                console.log("Game logic restarted. Placing phase enabled.");
             }
             
             Game.draw = function() {
@@ -874,6 +954,7 @@ const Game = {
                     Game.update();
                 } else {
                     if (!Game.isRunning && Game.winnerText) {
+                        // Game ended, no need to interpolate if winner is shown
                     } else {
                         const nextUnits = [];
 
@@ -881,6 +962,7 @@ const Game = {
                             let currentUnit = Game.units.find(u => u.id === targetUnitData.id);
 
                             if (currentUnit) {
+                                // Interpolate towards target position for smoother movement
                                 let dx = targetUnitData.x - currentUnit.x;
                                 if (Math.abs(dx) > Game.WIDTH / 2) {
                                     dx -= Math.sign(dx) * Game.WIDTH;
@@ -895,18 +977,22 @@ const Game = {
                                 currentUnit.type = targetUnitData.type;
                                 currentUnit.player = targetUnitData.player;
                             } else {
+                                // If a unit is in targetState but not in current units, create it
                                 currentUnit = new Game.Unit(targetUnitData.x, targetUnitData.y, targetUnitData.type, targetUnitData.player, targetUnitData.id);
                             }
                             nextUnits.push(currentUnit);
                         });
 
-                        Game.units = nextUnits;
+                        // Filter out units that are no longer in targetUnitsState
+                        Game.units = nextUnits.filter(u => Game.targetUnitsState.some(t => t.id === u.id));
                     }
                 }
                 Game.draw();
+                // Continue loop if game is running or in placing phase
                 if ((Game.isRunning && !Game.winnerText) || Game.placing) {
                     Game.loop = requestAnimationFrame(Game.gameLoop);
                 } else {
+                    // Game ended and winner is displayed, stop loop
                     Game.isRunning = false;
                     if (Game.loop) {
                         cancelAnimationFrame(Game.loop);
@@ -929,12 +1015,13 @@ const Game = {
                             clickedUnitIdToRemove = u.id;
                             break;
                         } else {
-                            return;
+                            return; // Cannot remove opponent's units
                         }
                     }
                 }
 
                 if (Game.isHost) {
+                    // Host directly modifies game state and broadcasts
                     if (clickedUnitIdToRemove) {
                         Game.units = Game.units.filter(u => u.id !== clickedUnitIdToRemove);
                     } else {
@@ -944,7 +1031,7 @@ const Game = {
                     Game.targetUnitsState = Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player }));
 
                     Game.ui.updateUI();
-                    Game.draw();
+                    Game.draw(); // Force draw on host immediately
                     sendMessageP2P("game_state_update", {
                         units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
                         winnerText: Game.winnerText,
@@ -953,29 +1040,31 @@ const Game = {
                         placing: Game.placing
                     });
                 } else {
+                    // Client sends request to host, updates local state speculatively
                     if (clickedUnitIdToRemove) {
                         sendMessageP2P("unit_placement_request", { player: currentPlayerRole, unitIdToRemove: clickedUnitIdToRemove });
+                        // Speculative update for client's UI
                         Game.units = Game.units.filter(u => u.id !== clickedUnitIdToRemove);
-                        Game.targetUnitsState = Game.targetUnitsState.filter(u => u.id !== clickedUnitIdToRemove);
-
+                        Game.targetUnitsState = Game.targetUnitsState.filter(u => u.id !== clickedUnitIdToRemove); // Update target state too
                     } else {
                         const type = Game.selectedTypes[currentPlayerRole];
-                        const newId = Math.random().toString(36).substr(2, 9);
+                        const newId = Math.random().toString(36).substr(2, 9); // Client generates ID for its unit
                         sendMessageP2P("unit_placement_request", { player: currentPlayerRole, x: x, y: y, unitId: newId });
+                        // Speculative update for client's UI
                         const newU = new Game.Unit(x, y, type, currentPlayerRole, newId);
                         Game.units.push(newU);
-                        Game.targetUnitsState.push({ id: newU.id, x: newU.x, y: newU.y, type: newU.type, player: newU.player });
+                        Game.targetUnitsState.push({ id: newU.id, x: newU.x, y: newU.y, type: newU.type, player: newU.player }); // Update target state too
                     }
                     Game.ui.updateUI();
-                    Game.draw();
+                    Game.draw(); // Force draw on client immediately after interaction
                 }
             }
             canvas.addEventListener("click", e => handleCanvasInteraction(e.clientX, e.clientY));
             canvas.addEventListener("touchstart", e => { if(!Game.placing)return; e.preventDefault(); handleCanvasInteraction(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
 
             Game.ui.setupTypeButtons();
-            resetP2PStateAndUI(false);
-            Game.draw();
+            resetP2PStateAndUI(false); // Initial reset
+            Game.draw(); // Initial draw
         });
     </script>
 </body>
