@@ -372,6 +372,8 @@
             const canvas = document.getElementById("gameCanvas");
             const ctx = canvas.getContext("2d");
 
+            let readyCheckTimeout = null; // Для таймаута проверки готовности
+
             function updateP2PStatus(statusText) { connectionStatusSpan.textContent = statusText; }
             function showP2PStep(stepIdToShow) {
                 [hostStep1, hostStep2, clientStep1, clientStep2].forEach(s => s.style.display = 'none');
@@ -388,6 +390,12 @@
                 Game.isHost = false;
                 Game.localPlayerReady = false; Game.remotePlayerReady = false;
                 
+                // Clear any pending timeout
+                if (readyCheckTimeout) {
+                    clearTimeout(readyCheckTimeout);
+                    readyCheckTimeout = null;
+                }
+
                 [host_localSdpOfferOutput, host_remoteSdpAnswerInput,
                  client_remoteSdpOfferInput, client_localSdpAnswerOutput]
                  .forEach(ta => { if(ta) ta.value = ""; });
@@ -478,7 +486,7 @@
                     Game.placing = true; Game.localPlayerReady = false; Game.remotePlayerReady = false;
                     readinessCheckDiv.style.display = 'block';
                     localReadyStatusSpan.textContent = 'Не готовы'; remoteReadyStatusSpan.textContent = 'Не готов';
-                    playerReadyBtn.textContent = "Готов к игре"; playerReadyBtn.style.display = 'inline-block'; playerReadyBtn.disabled = false;
+                    playerReadyBtn.textContent = "Готов к игре"; playerReadyBtn.style.display = 'inline-block'; // playerReadyBtn.disabled = false; removed disable
                     Game.units = []; // Очищаем юниты при новом подключении
                     Game.targetUnitsState = []; // Очищаем целевое состояние
                     Game.ui.updateUI(); Game.draw(); // Initial draw with current units
@@ -712,15 +720,16 @@
                 Game.localPlayerReady = !Game.localPlayerReady;
                 localReadyStatusSpan.textContent = Game.localPlayerReady ? 'Готов' : 'Не готовы';
                 playerReadyBtn.textContent = Game.localPlayerReady ? "Ожидание оппонента..." : "Готов к игре";
-                playerReadyBtn.disabled = Game.localPlayerReady;
+                // playerReadyBtn.disabled = Game.localPlayerReady; // Убрано отключение кнопки
                 sendMessageP2P("player_readiness", { ready: Game.localPlayerReady });
                 if (Game.isHost) checkStartConditions();
             });
 
             function checkStartConditions() {
                 if (Game.isHost && Game.localPlayerReady && Game.remotePlayerReady) {
+                    // Оба готовы, пытаемся начать игру.
+                    // Отправляем сообщение start_game, а также устанавливаем таймаут на повторную отправку.
                     startGameLogic();
-                    // Host tells client to start the game
                     sendMessageP2P("start_game", {
                         units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
                         placing: Game.placing,
@@ -728,6 +737,33 @@
                         winnerText: Game.winnerText,
                         winnerPlayer: Game.winnerPlayer
                     });
+
+                    // Установим таймаут для повторной отправки, если игра не началась
+                    // (т.е. если Game.isRunning все еще false через некоторое время)
+                    if (!Game.isRunning && readyCheckTimeout === null) {
+                        readyCheckTimeout = setTimeout(() => {
+                            if (Game.isHost && Game.localPlayerReady && Game.remotePlayerReady && !Game.isRunning) {
+                                console.warn("Timeout: Both players ready, but game not started. Resending start_game message.");
+                                sendMessageP2P("start_game", {
+                                    units: Game.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
+                                    placing: Game.placing,
+                                    isRunning: Game.isRunning,
+                                    winnerText: Game.winnerText,
+                                    winnerPlayer: Game.winnerPlayer
+                                });
+                                // Можно установить новый таймаут или просто ждать следующего обновления состояния
+                                // Для простоты, здесь просто однократная повторная отправка после таймаута
+                            }
+                            readyCheckTimeout = null; // Сбросить таймаут
+                        }, 5000); // 5 секунд, можно настроить (например, 10 секунд)
+                    }
+
+                } else {
+                    // Если кто-то не готов, или изменил статус, очищаем таймаут
+                    if (readyCheckTimeout) {
+                        clearTimeout(readyCheckTimeout);
+                        readyCheckTimeout = null;
+                    }
                 }
             }
 
@@ -738,6 +774,11 @@
                 readinessCheckDiv.style.display='none'; 
                 playerReadyBtn.style.display='none';
                 document.querySelectorAll(".type-buttons").forEach(b=>b.style.pointerEvents="none");
+                // Clear any pending timeout when game actually starts
+                if (readyCheckTimeout) {
+                    clearTimeout(readyCheckTimeout);
+                    readyCheckTimeout = null;
+                }
                 // Ensure game loop starts only once
                 if (!Game.loop) {
                     Game.loop = requestAnimationFrame(Game.gameLoop);
@@ -764,13 +805,19 @@
                 Game.localPlayerReady = false; 
                 Game.remotePlayerReady = false;
 
+                // Clear any pending timeout
+                if (readyCheckTimeout) {
+                    clearTimeout(readyCheckTimeout);
+                    readyCheckTimeout = null;
+                }
+
                 if(Game.dataChannel && Game.dataChannel.readyState === 'open'){
                     readinessCheckDiv.style.display = 'block';
                     localReadyStatusSpan.textContent = 'Не готовы'; 
                     remoteReadyStatusSpan.textContent = 'Не готов';
                     playerReadyBtn.textContent = "Готов к игре"; 
                     playerReadyBtn.style.display = 'inline-block'; 
-                    playerReadyBtn.disabled = false;
+                    // playerReadyBtn.disabled = false; removed disable
                     canvas.style.pointerEvents = "auto";
                     document.getElementById("restartGameBtn").style.display = "none"; // Hide restart button
                     document.querySelectorAll(".type-buttons").forEach(c => c.style.pointerEvents = "auto"); // Re-enable unit type selection
