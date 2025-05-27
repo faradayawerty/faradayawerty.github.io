@@ -242,15 +242,29 @@
             function checkWinCondition(){
                 if(ns.placing)return;
                 const p1U=ns.units.filter(u=>u.player==="player1"), p2U=ns.units.filter(u=>u.player==="player2");
-                if(ns.units.length===0 && !ns.placing){showWinner("Ничья! (Нет юнитов)",null); if(ns.loop) cancelAnimationFrame(ns.loop); return;}
-                if(p1U.length===0 && ns.units.length>0){showWinner("Игрок 2 победил!","player2");if(ns.loop) cancelAnimationFrame(ns.loop);return;}
-                if(p2U.length===0 && ns.units.length>0){showWinner("Игрок 1 победил!","player1");if(ns.loop) cancelAnimationFrame(ns.loop);return;}
-                const p1CB=p1U.some(u1=>p2U.some(u2=>shouldChase(u1.type,u2.type))), p2CB=p2U.some(u2=>p1U.some(u1=>shouldChase(u2.type,u1.type)));
-                if(!p1CB && !p2CB && ns.units.length>0){
-                    if(p1U.length>p2U.length)showWinner("Игрок 1 победил!","player1");
-                    else if(p2U.length>p1U.length)showWinner("Игрок 2 победил!","player2");
-                    else showWinner("Ничья!",null);
-                    if(ns.loop) cancelAnimationFrame(ns.loop);
+                let gameEnded = false; // Флаг, чтобы знать, закончилась ли игра
+                if(ns.units.length===0 && !ns.placing){showWinner("Ничья! (Нет юнитов)",null); gameEnded = true;}
+                else if(p1U.length===0 && ns.units.length>0){showWinner("Игрок 2 победил!","player2"); gameEnded = true;}
+                else if(p2U.length===0 && ns.units.length>0){showWinner("Игрок 1 победил!","player1"); gameEnded = true;}
+                else {
+                    const p1CB=p1U.some(u1=>p2U.some(u2=>shouldChase(u1.type,u2.type))), p2CB=p2U.some(u2=>p1U.some(u1=>shouldChase(u2.type,u1.type)));
+                    if(!p1CB && !p2CB && ns.units.length>0){
+                        if(p1U.length>p2U.length)showWinner("Игрок 1 победил!","player1");
+                        else if(p2U.length>p1U.length)showWinner("Игрок 2 победил!","player2");
+                        else showWinner("Ничья!",null);
+                        gameEnded = true;
+                    }
+                }
+
+                if (gameEnded && ns.isHost) {
+                    // Отправляем немедленное обновление состояния, если игра закончилась
+                    sendMessageP2P("game_state_update", {
+                        units: ns.units.map(u => ({ id: u.id, x: u.x, y: u.y, type: u.type, player: u.player })),
+                        winnerText: ns.winnerText,
+                        winnerPlayer: ns.winnerPlayer,
+                        isRunning: ns.isRunning, // Это будет false после showWinner
+                        placing: ns.placing
+                    });
                 }
             }
             function showWinner(text,player){
@@ -793,43 +807,54 @@
                 if (Game.isHost) {
                     Game.update();
                 } else { // Client updates its units based on received targetUnitsState
-                    // Create a new array for next Game.units state based on targetUnitsState
-                    const nextUnits = [];
+                    // If game has ended for client, no need to interpolate, just display the final state
+                    if (!Game.isRunning && Game.winnerText) {
+                        // Client just draws the final state received
+                        // No interpolation needed if game is over
+                    } else {
+                        // Create a new array for next Game.units state based on targetUnitsState
+                        const nextUnits = [];
 
-                    Game.targetUnitsState.forEach(targetUnitData => {
-                        let currentUnit = Game.units.find(u => u.id === targetUnitData.id);
+                        Game.targetUnitsState.forEach(targetUnitData => {
+                            let currentUnit = Game.units.find(u => u.id === targetUnitData.id);
 
-                        if (currentUnit) {
-                            // Interpolate existing unit's position, accounting for wrapping around edges
-                            let dx = targetUnitData.x - currentUnit.x;
-                            if (Math.abs(dx) > Game.WIDTH / 2) {
-                                dx -= Math.sign(dx) * Game.WIDTH; // Adjust for wrapping
+                            if (currentUnit) {
+                                // Interpolate existing unit's position, accounting for wrapping around edges
+                                let dx = targetUnitData.x - currentUnit.x;
+                                if (Math.abs(dx) > Game.WIDTH / 2) {
+                                    dx -= Math.sign(dx) * Game.WIDTH; // Adjust for wrapping
+                                }
+                                currentUnit.x = (currentUnit.x + dx * Game.interpolationFactor + Game.WIDTH) % Game.WIDTH;
+
+                                let dy = targetUnitData.y - currentUnit.y;
+                                if (Math.abs(dy) > Game.HEIGHT / 2) {
+                                    dy -= Math.sign(dy) * Game.HEIGHT; // Adjust for wrapping
+                                }
+                                currentUnit.y = (currentUnit.y + dy * Game.interpolationFactor + Game.HEIGHT) % Game.HEIGHT;
+                                currentUnit.type = targetUnitData.type; // Update type and player immediately
+                                currentUnit.player = targetUnitData.player;
+                            } else {
+                                // New unit: create it at the target position.
+                                currentUnit = new Game.Unit(targetUnitData.x, targetUnitData.y, targetUnitData.type, targetUnitData.player, targetUnitData.id);
                             }
-                            currentUnit.x = (currentUnit.x + dx * Game.interpolationFactor + Game.WIDTH) % Game.WIDTH;
+                            nextUnits.push(currentUnit);
+                        });
 
-                            let dy = targetUnitData.y - currentUnit.y;
-                            if (Math.abs(dy) > Game.HEIGHT / 2) {
-                                dy -= Math.sign(dy) * Game.HEIGHT; // Adjust for wrapping
-                            }
-                            currentUnit.y = (currentUnit.y + dy * Game.interpolationFactor + Game.HEIGHT) % Game.HEIGHT;
-                            currentUnit.type = targetUnitData.type; // Update type and player immediately
-                            currentUnit.player = targetUnitData.player;
-                        } else {
-                            // New unit: create it at the target position.
-                            currentUnit = new Game.Unit(targetUnitData.x, targetUnitData.y, targetUnitData.type, targetUnitData.player, targetUnitData.id);
-                        }
-                        nextUnits.push(currentUnit);
-                    });
-
-                    Game.units = nextUnits; // Update client's actual units array
+                        Game.units = nextUnits; // Update client's actual units array
+                    }
                 }
                 // Both host and client draw the current game state
                 Game.draw();
                 // Loop continues if game is running or if we are placing and need to sync
-                if ((Game.isRunning && !Game.winnerText) || (Game.placing)) {
+                if ((Game.isRunning && !Game.winnerText) || Game.placing) {
                     Game.loop = requestAnimationFrame(Game.gameLoop);
                 } else {
                     Game.isRunning = false; // Ensure isRunning is false if game loop stops
+                    // If game has ended, clear the loop to prevent further calls
+                    if (Game.loop) {
+                        cancelAnimationFrame(Game.loop);
+                        Game.loop = null;
+                    }
                 }
             };
             
