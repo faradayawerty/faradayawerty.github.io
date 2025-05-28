@@ -7,21 +7,13 @@
   const resetBtn = document.getElementById('resetBtn');
   const errorCount = document.getElementById('errorCount');
 
-  // Modal elements for cropping
-  const cropModal = document.getElementById('cropModal');
-  const closeCropModalBtn = document.getElementById('closeCropModal');
-  const cropperImage = document.getElementById('cropperImage');
-  const applyCropBtn = document.getElementById('applyCropBtn');
-  const cancelCropBtn = document.getElementById('cancelCropBtn');
+  let imgSrc = 'img.jpg';
+  let size = 3;
+  let pieces = [];
+  let pieceSizePx;
+  let fullSizePx;
 
-  let imgSrc = 'img.jpg'; // Default image
-  let size = 3; // Default puzzle size
-  let pieces = []; // Array to hold puzzle pieces
-  let pieceSizePx; // Size of a single puzzle piece in pixels
-  let fullSizePx; // Full size of the puzzle grid in pixels
-  let cropper; // Cropper.js instance
-
-  // Controls and buttons
+  // Контролы и кнопки
   const controls = document.getElementById('controls');
 
   const modeBtn = document.createElement('button');
@@ -34,12 +26,12 @@
   hintsBtn.textContent = 'Подсказки: ВЫКЛ';
   controls.appendChild(hintsBtn);
 
-  // Mode variables
-  let dragMode = false; // false - flips, true - drag
+  // Переменные режима
+  let dragMode = false; // false - перевороты, true - перетаскивание
   let selectedPiece = null;
   let hintsOn = false;
 
-  // Populate size select dropdown
+  // Заполнение селекта размера
   for (let i = 2; i <= 16; i++) {
     const opt = document.createElement('option');
     opt.value = i;
@@ -266,66 +258,17 @@
     createPieces();
   });
 
-  // --- Cropping functionality integration ---
   fileInput.addEventListener('change', e => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = ev => {
-        // Show modal and load image into cropper
-        cropModal.classList.add('active');
-        cropperImage.src = ev.target.result;
-
-        if (cropper) {
-          cropper.destroy(); // Destroy previous instance if any
-        }
-        // Initialize Cropper.js with responsive options
-        cropper = new Cropper(cropperImage, {
-          aspectRatio: 1, // You can change this, e.g., to 1 for square, or null for free
-          viewMode: 1, // Crop box can't exceed the size of the canvas
-          autoCropArea: 1, // Full image area is selected by default
-          responsive: true, // Make cropper responsive
-          background: false, // Don't show the grid background
-          zoomable: true, // Allow zooming
-          movable: true, // Allow moving image within crop box
-        });
+        imgSrc = ev.target.result;
+        createPieces();
       };
       reader.readAsDataURL(file);
     }
   });
-
-  applyCropBtn.addEventListener('click', () => {
-    if (cropper) {
-      // Get the cropped image data URL
-      imgSrc = cropper.getCroppedCanvas({
-        width: 1000, // Desired width for the cropped image
-        height: 1000, // Desired height for the cropped image (adjust as needed for aspect ratio)
-        fillColor: '#fff', // Background color for transparent areas
-      }).toDataURL('image/jpeg'); // Or 'image/png'
-
-      cropModal.classList.remove('active'); // Close modal
-      cropper.destroy(); // Destroy cropper instance
-      createPieces(); // Recreate puzzle with cropped image
-    }
-  });
-
-  cancelCropBtn.addEventListener('click', () => {
-    cropModal.classList.remove('active'); // Close modal
-    if (cropper) {
-      cropper.destroy(); // Destroy cropper instance
-    }
-    fileInput.value = ''; // Clear file input
-  });
-
-  closeCropModalBtn.addEventListener('click', () => {
-    cropModal.classList.remove('active'); // Close modal
-    if (cropper) {
-      cropper.destroy(); // Destroy cropper instance
-    }
-    fileInput.value = ''; // Clear file input
-  });
-  // --- End Cropping functionality integration ---
-
 
   shuffleBtn.addEventListener('click', shuffleFlips);
   resetBtn.addEventListener('click', resetFlips);
@@ -348,7 +291,7 @@
     });
   });
 
-  // Drag & Drop handlers
+  // Drag & Drop обработчики
   function dragStart(e) {
     selectedPiece = e.target;
     e.dataTransfer.effectAllowed = 'move';
@@ -409,3 +352,4 @@
 
   createPieces();
 })();
+
