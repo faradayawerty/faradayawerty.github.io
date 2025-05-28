@@ -855,7 +855,8 @@ ns.levels = [
             const pos = getPointerPos(e);
             const unit = findUnitAtPosition(pos.x, pos.y);
             if (unit && unit.team === "player") {
-                draggingUnit = unit;
+                //draggingUnit = unit;
+                draggingUnit = null; // disable dragging
                 dragOffsetX = pos.x - unit.x;
                 dragOffsetY = pos.y - unit.y;
                 e.preventDefault();

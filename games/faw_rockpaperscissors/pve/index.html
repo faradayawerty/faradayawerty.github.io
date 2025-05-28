@@ -106,7 +106,7 @@
         canvas {
             border: 1px solid #444;
             background-color: #1e1e1e;
-            touch-action: none;
+            touch-action: manipulation; /* Изменено, чтобы разрешить тапы без задержки, но предотвратить жесты */
             display: block;
             position: relative;
         }
@@ -115,7 +115,6 @@
             width: 100%;
             height: auto;
             max-width: 800px;
-            touch-action: manipulation;
         }
 
         canvas::before {
@@ -304,7 +303,7 @@
     (function(ns) {
         // game.js
         // Константы и базовые настройки
-        ns.CELL_SIZE = 30; // Уменьшено для более плотной сетки
+        ns.CELL_SIZE = 30;
         ns.WIDTH = 800;
         ns.HEIGHT = 500;
 
@@ -313,7 +312,7 @@
         ns.COLORS = { player: "lightblue", enemy: "tomato" };
 
         ns.units = [];
-        ns.initialEnemyUnits = []; // <-- Новый массив для хранения изначальных вражеских юнитов
+        ns.initialEnemyUnits = [];
         ns.placing = true;
         ns.selectedType = "rock";
         ns.loop = null;
@@ -322,7 +321,7 @@
         // UI elements, инициализируем позже
         ns.elements = {};
 
-        ns.ENEMY_PLACEMENT_BUFFER = 40; // Уменьшено, так как юниты и сетка меньше
+        ns.ENEMY_PLACEMENT_BUFFER = 40;
 
     })(Game);
 
@@ -334,9 +333,8 @@
         };
 
         ns.generateEnemyUnits = function() {
-            // Clear existing enemy units
-            ns.units = ns.units.filter(u => u.team === "player"); // Оставляем только юнитов игрока
-            ns.initialEnemyUnits = []; // Очищаем массив для изначальных юнитов
+            ns.units = ns.units.filter(u => u.team === "player");
+            ns.initialEnemyUnits = [];
 
             const rock = parseInt(document.getElementById("enemyRockCount").value, 10) || 0;
             const paper = parseInt(document.getElementById("enemyPaperCount").value, 10) || 0;
@@ -348,13 +346,10 @@
                     const y = startY + Math.random() * (endY - startY);
                     const newEnemy = new Game.Unit(x, y, type, "enemy");
                     ns.units.push(newEnemy);
-                    // Копируем юнита для сохранения изначальной позиции
-                    ns.initialEnemyUnits.push(Object.assign({}, newEnemy)); // <-- Сохраняем копию
+                    ns.initialEnemyUnits.push(Object.assign({}, newEnemy));
                 }
             }
 
-            // Spawn enemy units on the right half
-            // Диапазоны скорректированы под новую плотность
             spawn("rock", rock, ns.WIDTH / 16, 15 * ns.WIDTH / 16, 50, ns.HEIGHT - 50);
             spawn("paper", paper, ns.WIDTH / 16, 15 * ns.WIDTH / 16, 50, ns.HEIGHT - 50);
             spawn("scissors", scissors, ns.WIDTH / 16, 15 * ns.WIDTH / 16, 50, ns.HEIGHT - 50);
@@ -374,9 +369,7 @@
         };
 
         ns.checkWinCondition = function() {
-            // Эта функция дублируется в ui.js. Для объединенного файла оставляем версию из ui.js, так как она более полная.
-            // ns.checkWinCondition здесь не будет использоваться, но оставлен для полноты объединения кода,
-            // чтобы не менять логику ui.js.
+            // Placeholder, actual logic in ui.js
         };
 
         ns.update = function() {
@@ -390,11 +383,10 @@
                     const dx = ns.wrapDistance(a.x, b.x, ns.WIDTH);
                     const dy = ns.wrapDistance(a.y, b.y, ns.HEIGHT);
                     const dist = Math.hypot(dx, dy);
-                    if (dist < a.radius + b.radius && a.type !== b.type) ns.resolveConflict(a, b); // Учитываем радиусы
+                    if (dist < a.radius + b.radius && a.type !== b.type) ns.resolveConflict(a, b);
                 }
             }
 
-            // Вызываем ns.checkWinCondition из ui.js, который более полный
             ns.checkWinCondition();
         };
 
@@ -411,34 +403,26 @@
                 this.team = team;
                 this.vx = (Math.random() * 2 - 1);
                 this.vy = (Math.random() * 2 - 1);
-                this.radius = 15; // Увеличено для более легкого попадания
+                this.radius = 15;
                 this.spawnTime = Date.now();
 
-                // Для dash:
                 this.canDash = true;
                 this.nextDashTime = Date.now() + this.getRandomDashInterval();
             }
 
             getRandomDashInterval() {
-                // Случайный интервал от 2 до 5 секунд
                 return 2000 + Math.random() * 3000;
             }
 
             dash() {
-                // Случайная сила прыжка от 5 до 15
                 const dashStrength = 5 + Math.random() * 10;
-
-                // Нормализуем текущую скорость и умножаем на силу прыжка
                 const speed = Math.hypot(this.vx, this.vy) || 1;
                 this.vx += (this.vx / speed) * dashStrength;
                 this.vy += (this.vy / speed) * dashStrength;
-
-                // Следующий прыжок через случайное время
                 this.nextDashTime = Date.now() + this.getRandomDashInterval();
             }
 
             move() {
-                // Проверяем, можно ли совершить прыжок
                 if (Date.now() >= this.nextDashTime) {
                     this.dash();
                 }
@@ -499,7 +483,7 @@
                 ctx.translate(this.x, this.y);
                 const age = Date.now() - this.spawnTime;
                 if (age < 1000) ctx.globalAlpha = 0.5 + 0.5 * (age / 1000);
-                ctx.font = "20px serif"; // Уменьшен размер шрифта для эмодзи
+                ctx.font = "20px serif";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.shadowColor = ns.COLORS[this.team];
@@ -531,7 +515,7 @@
     })(Game);
 
     (function(ns) {
-        // ui.js (частично, так как есть дублирование ns.checkWinCondition)
+        // ui.js
 
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
@@ -610,9 +594,8 @@
             ctx.clearRect(0, 0, ns.WIDTH, ns.HEIGHT);
             drawGrid();
 
-            // Отрисовка зон запрета размещения вокруг вражеских юнитов
             if (ns.placing) {
-                ctx.fillStyle = "rgba(100, 100, 100, 0.3)"; // Прозрачный серый
+                ctx.fillStyle = "rgba(100, 100, 100, 0.3)";
                 for (let u of ns.units) {
                     if (u.team === "enemy") {
                         ctx.beginPath();
@@ -634,18 +617,18 @@
         };
 
         ns.gameLoop = function() {
-            ns.update(); // ns.update из gameLogic.js
+            ns.update();
             ns.draw();
             ns.updateUnitCountDisplay();
         };
 
-        // --- Drag & Drop переменные ---
-        let draggingUnit = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-        let isDragging = false; // Флаг для определения, происходит ли перетаскивание
+        // --- Удаляем все переменные для drag & drop ---
+        // let draggingUnit = null;
+        // let dragStartX = 0;
+        // let dragStartY = 0;
+        // let isDragging = false;
+        // let isTouchStartOnPlayerUnit = false;
 
-        // Получить координаты указателя относительно canvas с учётом масштабирования
         function getPointerPos(e) {
             const rect = canvas.getBoundingClientRect();
             const scaleX = canvas.width / rect.width;
@@ -658,9 +641,7 @@
             };
         }
 
-        // Найти юнит под координатами
         function findUnitAtPosition(x, y) {
-            // Ищем в обратном порядке, чтобы при наложении выбирать верхний
             for (let i = ns.units.length - 1; i >= 0; i--) {
                 const u = ns.units[i];
                 const dx = ns.wrapDistance(u.x, x, ns.WIDTH);
@@ -673,75 +654,27 @@
             return null;
         }
 
-        // Обработчики для drag & drop
-        function onPointerDown(e) {
-            if (ns.placing) {
-                const pos = getPointerPos(e);
-                const unit = findUnitAtPosition(pos.x, pos.y);
-                if (unit && unit.team === "player") {
-                    draggingUnit = unit;
-                    dragOffsetX = pos.x - unit.x;
-                    dragOffsetY = pos.y - unit.y;
-                    isDragging = false; // Сброс флага перетаскивания
-                    e.preventDefault(); // Предотвращаем прокрутку страницы на мобильных при начале тапа
-                }
-            }
-        }
-
-        function onPointerMove(e) {
-            if (!draggingUnit) return;
-            const pos = getPointerPos(e);
-            draggingUnit.x = (pos.x - dragOffsetX + ns.WIDTH) % ns.WIDTH;
-            draggingUnit.y = (pos.y - dragOffsetY + ns.HEIGHT) % ns.HEIGHT;
-            ns.draw(); // Redraw during drag
-            isDragging = true; // Устанавливаем флаг перетаскивания
-            e.preventDefault(); // Предотвращаем прокрутку страницы во время перетаскивания
-        }
-
-        function onPointerUp(e) {
-            if (draggingUnit) {
-                draggingUnit = null;
-                // isDragging остается, чтобы `click` не сработал после перетаскивания
-                // `e.preventDefault()` здесь не нужен, так как событие уже завершено.
-            }
-        }
-
-        canvas.addEventListener("mousedown", onPointerDown);
-        canvas.addEventListener("mousemove", onPointerMove);
-        canvas.addEventListener("mouseup", onPointerUp);
-        canvas.addEventListener("mouseleave", onPointerUp);
-
-        canvas.addEventListener("touchstart", onPointerDown, { passive: false });
-        canvas.addEventListener("touchmove", onPointerMove, { passive: false });
-        canvas.addEventListener("touchend", onPointerUp, { passive: false });
-        canvas.addEventListener("touchcancel", onPointerUp, { passive: false });
-
-
-        // Функция для постановки/удаления юнита (при клике/тапе)
-        function handleCanvasClick(e) {
-            if (!ns.placing || isDragging) { // Если не режим расстановки или произошло перетаскивание
-                isDragging = false; // Сбросить флаг перетаскивания после клика
-                return;
-            }
+        // Единый обработчик для добавления/удаления юнитов
+        function handlePlacementClick(e) {
+            if (!ns.placing) return; // Действие только в режиме расстановки
 
             const pos = getPointerPos(e);
 
-            // Проверка на удаление игрока
-            for (let i = 0; i < ns.units.length; i++) {
-                const u = ns.units[i];
-                if (u.team === "player") {
-                    const dx = ns.wrapDistance(u.x, pos.x, ns.WIDTH);
-                    const dy = ns.wrapDistance(u.y, pos.y, ns.HEIGHT);
-                    const dist = Math.hypot(dx, dy);
-                    if (dist <= u.radius) {
-                        ns.units.splice(i, 1);
-                        ns.updateUnitCountDisplay();
-                        ns.draw();
-                        return; // Юнит удален, выходим
-                    }
+            // 1. Попытка удалить юнит игрока
+            const unitToModify = findUnitAtPosition(pos.x, pos.y);
+            if (unitToModify && unitToModify.team === "player") {
+                const index = ns.units.indexOf(unitToModify);
+                if (index > -1) {
+                    ns.units.splice(index, 1);
+                    ns.updateUnitCountDisplay();
+                    ns.draw();
+                    // Предотвращаем стандартный click, если это был тач, чтобы избежать "фантомных" событий
+                    if (e.cancelable) e.preventDefault();
+                    return; // Юнит удален, выходим
                 }
             }
 
+            // 2. Если юнит не был удален, пытаемся добавить новый
             // Проверка на зону запрета вокруг вражеских юнитов
             for (let u of ns.units) {
                 if (u.team === "enemy") {
@@ -749,35 +682,32 @@
                     const dy = ns.wrapDistance(u.y, pos.y, ns.HEIGHT);
                     const dist = Math.hypot(dx, dy);
                     if (dist < ns.ENEMY_PLACEMENT_BUFFER) {
-                        return; // Просто ничего не происходит, юнит нельзя разместить
+                        return; // Нельзя разместить в запретной зоне
                     }
                 }
             }
 
-            // Если не удалили и не попали в запретную зону, то добавляем новый юнит
+            // Добавляем новый юнит
             ns.units.push(new ns.Unit(pos.x, pos.y, ns.selectedType, "player"));
             ns.updateUnitCountDisplay();
             ns.draw();
+            // Предотвращаем стандартный click, если это был тач
+            if (e.cancelable) e.preventDefault();
         }
 
-        canvas.addEventListener("click", handleCanvasClick);
-        // touchstart больше не вызывает placeUnit напрямую, полагаемся на click
-        // Это позволит `click` корректно срабатывать для коротких тапов
-        canvas.addEventListener("touchstart", function(e) {
-            // Если не начинается перетаскивание, позволим событию click сработать
-            // Но предотвратим прокрутку, если мы потенциально будем перетаскивать
-            const pos = getPointerPos(e);
-            const unit = findUnitAtPosition(pos.x, pos.y);
-            if (unit && unit.team === "player") {
-                // Если тапнули на юнита игрока, потенциально для перетаскивания,
-                // то предотвращаем прокрутку.
-                e.preventDefault();
-            }
-            // Если тапнули по пустому месту, то по умолчанию не предотвращаем,
-            // даем сработать клику для добавления, если это не перетаскивание.
-            // Но мы уже добавили `touch-action: none` к canvas, что часто само по себе
-            // предотвращает прокрутку и позволяет клику срабатывать.
-        }, { passive: false });
+        // Привязываем события click и touchend к новому обработчику
+        canvas.addEventListener("click", handlePlacementClick);
+        canvas.addEventListener("touchend", handlePlacementClick, { passive: false }); // passive: false для preventDefault
+
+        // Удаляем все обработчики mousedown, mousemove, mouseup, mouseleave, touchstart, touchmove, touchcancel
+        // так как они были частью механики drag & drop.
+        // canvas.addEventListener("mousedown", onPointerDown);
+        // canvas.addEventListener("mousemove", onPointerMove);
+        // canvas.addEventListener("mouseup", onPointerUp);
+        // canvas.addEventListener("mouseleave", onPointerUp);
+        // canvas.addEventListener("touchstart", onPointerDown, { passive: false });
+        // canvas.addEventListener("touchmove", onPointerMove, { passive: false });
+        // canvas.addEventListener("touchcancel", onPointerUp, { passive: false });
 
 
         ns.elements.typeButtons.forEach(btn => {
@@ -789,25 +719,22 @@
         });
 
         ns.elements.startButton.addEventListener("click", () => {
-            if (ns.getPlayerUnitsCount() === 0) return; // Убрали alert
+            if (ns.getPlayerUnitsCount() === 0) return;
             ns.placing = false;
             ns.winnerText = "";
             ns.winnerTeam = null;
             ns.elements.replayButton.style.display = "inline-block";
             ns.elements.startButton.style.display = "none";
-            ns.elements.randomizeEnemyButton.style.display = "none"; // Hide randomize button
-            // Скрываем кнопки выбора типа юнитов и блок настройки вражеских юнитов
+            ns.elements.randomizeEnemyButton.style.display = "none";
             ns.elements.typeButtons.forEach(btn => btn.style.display = "none");
-            document.getElementById("enemyUnitSetup").style.display = "none"; // Добавлено скрытие
+            document.getElementById("enemyUnitSetup").style.display = "none";
             ns.loop = setInterval(ns.gameLoop, 30);
         });
 
         ns.elements.replayButton.addEventListener("click", () => {
             clearInterval(ns.loop);
-            ns.units = []; // Очищаем все юниты
-            // Восстанавливаем вражеских юнитов из сохраненного состояния
+            ns.units = [];
             for (const initialUnitData of ns.initialEnemyUnits) {
-                // Создаем новый экземпляр Unit на основе сохраненных данных
                 ns.units.push(new ns.Unit(initialUnitData.x, initialUnitData.y, initialUnitData.type, initialUnitData.team));
             }
             ns.placing = true;
@@ -815,10 +742,9 @@
             ns.winnerTeam = null;
             ns.elements.replayButton.style.display = "none";
             ns.elements.startButton.style.display = "inline-block";
-            ns.elements.randomizeEnemyButton.style.display = "block"; // Show randomize button
-            // Показываем кнопки выбора типа юнитов и блок настройки вражеских юнитов
+            ns.elements.randomizeEnemyButton.style.display = "block";
             ns.elements.typeButtons.forEach(btn => btn.style.display = "inline-block");
-            document.getElementById("enemyUnitSetup").style.display = "block"; // Добавлено отображение
+            document.getElementById("enemyUnitSetup").style.display = "block";
             ns.updateUnitCountDisplay();
             ns.draw();
             requestAnimationFrame(idleLoop);
@@ -829,7 +755,6 @@
         });
 
 
-        // Инициализация выбранной кнопки
         ns.elements.typeButtons.forEach(btn => btn.classList.remove("selected"));
         document.querySelector(".type-button[data-type='rock']").classList.add("selected");
 
@@ -840,7 +765,6 @@
             if (ns.placing) requestAnimationFrame(idleLoop);
         }
 
-        // Initial setup for enemy units
         ns.generateEnemyUnits();
         idleLoop();
 
@@ -849,8 +773,6 @@
             return playerUnits.length;
         }
 
-        // Эта функция ns.checkWinCondition переопределяет ту, что была в gameLogic.js,
-        // так как она более полная и обрабатывает ничью.
         ns.checkWinCondition = function() {
             if (ns.placing) return;
 
@@ -878,7 +800,6 @@
             const playerTypes = new Set(playerUnits.map(u => u.type));
             const enemyTypes = new Set(enemyUnits.map(u => u.type));
 
-            // Если остался только один тип юнитов у игрока и один тип у врага, и эти типы одинаковы
             if (playerTypes.size === 1 && enemyTypes.size === 1) {
                 const pType = [...playerTypes][0];
                 const eType = [...enemyTypes][0];
