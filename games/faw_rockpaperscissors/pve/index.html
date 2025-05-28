@@ -728,6 +728,13 @@
             ns.elements.randomizeEnemyButton.style.display = "none";
             ns.elements.typeButtons.forEach(btn => btn.style.display = "none");
             document.getElementById("enemyUnitSetup").style.display = "none";
+
+            const dashDelay = 5000; // 5 секунд задержки
+            for (let unit of ns.units) {
+                // Устанавливаем следующее время рывка, чтобы оно было не раньше, чем через 5 секунд от старта
+                unit.nextDashTime = Date.now() + dashDelay + unit.getRandomDashInterval();
+            }
+
             ns.loop = setInterval(ns.gameLoop, 30);
         });
 
