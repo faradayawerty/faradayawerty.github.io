@@ -961,7 +961,7 @@ ns.levels = [
             ns.elements.typeButtons.forEach(btn => btn.style.display = "none");
             ns.elements.levelSelectDropdown.style.display = "none"; // Hide dropdown during game
 
-            const dashDelay = 5000; // 5 секунд задержки в миллисекундах
+            const dashDelay = 1000; // секунда задержки
             for (let unit of ns.units) {
                 // Устанавливаем следующее время рывка, чтобы оно было не раньше, чем через 5 секунд от старта игры
                 unit.nextDashTime = Date.now() + dashDelay + unit.getRandomDashInterval();
