@@ -262,7 +262,7 @@
         const SUN_MASS = 1.989e30;
 
         // Orbit trail settings
-        const ORBIT_TRAIL_LENGTH = 20000; 
+        const ORBIT_TRAIL_LENGTH = 1000; 
         const ORBIT_TRAIL_ALPHA = 0.6; 
         const ORBIT_TRAIL_WIDTH = 1.5; 
 
@@ -760,6 +760,9 @@
             }
 
             for (const body of celestialBodies) {
+                // Removed the line that cleared the trail if the body was not the centerBody.
+                // The trail will now naturally disappear over time based on ORBIT_TRAIL_LENGTH
+                // by continually shifting out old points as new ones are added.
                 body.update(celestialBodies);
             }
 
