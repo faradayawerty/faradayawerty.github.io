@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Solar System Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars */
+            background-color: #000; /* Black background for space */
+            cursor: default; /* Default cursor */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            /* Prevent text selection on touch devices */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            /* Prevent zooming via double-tap on iOS/Android (handled by our script) */
+            touch-action: none; 
+        }
+
+        canvas {
+            display: block; /* Remove extra space below canvas */
+        }
+
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 200; /* Ensure controls are above other elements */
+        }
+
+        #controls div {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+        }
+
+        #controls label {
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        #controls button {
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 2px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Default button styles, overridden by specific classes/inline styles */
+        #controls button:not(.speed-button):not(.radius-button) {
+            filter: brightness(0.9); /* Slightly darker default for contrast */
+        }
+
+        #controls button:hover:not(.speed-button):not(.radius-button) {
+            filter: brightness(1.2); /* Slight brightness increase on hover */
+        }
+
+        #controls button.speed-button {
+            background-color: #008CBA; /* Blue */
+        }
+
+        #controls button.speed-button:hover {
+            background-color: #007bb5;
+        }
+
+        /* Styles for radius buttons based on the body type they control */
+        #controls button.radius-sun {
+            background-color: #DAA520; /* Goldenrod for Sun radius buttons */
+        }
+        #controls button.radius-sun:hover {
+            background-color: #c7951e;
+        }
+
+        #controls button.radius-terrestrial {
+            background-color: #F4A460; /* SandyBrown for terrestrial planet radius buttons */
+        }
+        #controls button.radius-terrestrial:hover {
+            background-color: #e0924e;
+        }
+
+        #controls button.radius-gas-giant {
+            background-color: #6A5ACD; /* SlateBlue for gas giant radius buttons */
+        }
+        #controls button.radius-gas-giant:hover {
+            background-color: #5d4aae;
+        }
+
+        #currentSpeedDisplay, 
+        #currentSunVisualRadiusScale, 
+        #currentTerrestrialVisualRadiusScale,
+        #currentGasGiantVisualRadiusScale {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #FFD700; /* Gold color for visibility */
+        }
+
+        #infoDisplay {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none; /* Hidden by default */
+            pointer-events: none; /* Allow mouse events to pass through */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            white-space: nowrap; /* Prevent text wrapping */
+            z-index: 100; /* Ensure it's above other elements */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="solarSystemCanvas"></canvas>
+    <div id="infoDisplay"></div>
+
+    <div id="controls">
+        <div>
+            <label>Center On:</label>
+            <div id="planetSelectionButtons"></div>
+        </div>
+        <div>
+            <label>Simulation Speed:</label>
+            <button id="slowDownBtn" class="speed-button">Slow Down</button>
+            <button id="speedUpBtn" class="speed-button">Speed Up</button>
+            <span id="currentSpeedDisplay">Speed: 1x</span>
+        </div>
+        <hr style="border-color: #555; width: 90%;"> <div>
+            <label>Sun Visual Size:</label>
+            <button id="decreaseSunRadiusBtn" class="radius-sun">Smaller</button>
+            <button id="increaseSunRadiusBtn" class="radius-sun">Bigger</button>
+            <span id="currentSunVisualRadiusScale">Scale: 1x</span>
+        </div>
+        <div>
+            <label>Terrestrial Visual Size:</label>
+            <button id="decreaseTerrestrialRadiusBtn" class="radius-terrestrial">Smaller</button>
+            <button id="increaseTerrestrialRadiusBtn" class="radius-terrestrial">Bigger</button>
+            <span id="currentTerrestrialVisualRadiusScale">Scale: 1x</span>
+        </div>
+        <div>
+            <label>Gas Giant Visual Size:</label>
+            <button id="decreaseGasGiantRadiusBtn" class="radius-gas-giant">Smaller</button>
+            <button id="increaseGasGiantRadiusBtn" class="radius-gas-giant">Bigger</button>
+            <span id="currentGasGiantVisualRadiusScale">Scale: 1x</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('solarSystemCanvas');
+        const ctx = canvas.getContext('2d');
+        const infoDisplay = document.getElementById('infoDisplay');
+        const planetSelectionButtonsContainer = document.getElementById('planetSelectionButtons'); // Combined container
+        const slowDownBtn = document.getElementById('slowDownBtn');
+        const speedUpBtn = document.getElementById('speedUpBtn');
+        const currentSpeedDisplay = document.getElementById('currentSpeedDisplay');
+        
+        // New radius control elements for each type
+        const decreaseSunRadiusBtn = document.getElementById('decreaseSunRadiusBtn');
+        const increaseSunRadiusBtn = document.getElementById('increaseSunRadiusBtn');
+        const currentSunVisualRadiusScale = document.getElementById('currentSunVisualRadiusScale');
+
+        const decreaseTerrestrialRadiusBtn = document.getElementById('decreaseTerrestrialRadiusBtn');
+        const increaseTerrestrialRadiusBtn = document.getElementById('increaseTerrestrialRadiusBtn');
+        const currentTerrestrialVisualRadiusScale = document.getElementById('currentTerrestrialVisualRadiusScale');
+
+        const decreaseGasGiantRadiusBtn = document.getElementById('decreaseGasGiantRadiusBtn');
+        const increaseGasGiantRadiusBtn = document.getElementById('increaseGasGiantRadiusBtn');
+        const currentGasGiantVisualRadiusScale = document.getElementById('currentGasGiantVisualRadiusScale');
+
+
+        // Set canvas dimensions
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- Simulation Constants ---
+        const G = 6.6743e-11; // Gravitational constant (m^3 kg^-1 s^-2)
+        const AU_TO_KM = 149.6e6; // 1 AU in kilometers
+        let KM_TO_PIXELS_SCALE = 20e-7; // Увеличенный масштаб
+        
+        let SUN_VISUAL_RADIUS_FACTOR = 1; // Множитель для визуального радиуса Солнца
+        let TERRESTRIAL_VISUAL_RADIUS_FACTOR = 1; // Множитель для земных планет
+        let GAS_GIANT_VISUAL_RADIUS_FACTOR = 1; // Множитель для газовых гигантов
+
+        let TIME_STEP = 3600 * 24; // One Earth day in seconds for simulation step (может изменяться)
+
+        // Define Sun's mass explicitly as a constant (kg)
+        const SUN_MASS = 1.989e30;
+
+        // Orbit trail settings
+        const ORBIT_TRAIL_LENGTH = 20000; // ЗНАЧИТЕЛЬНО УВЕЛИЧЕНО! (20000 дней ~ 54 года)
+        const ORBIT_TRAIL_ALPHA = 0.6; // Немного увеличена непрозрачность хвостика
+        const ORBIT_TRAIL_WIDTH = 1.5; // Увеличена толщина линии хвостика
+
+        // --- Camera/Viewport Variables ---
+        let cameraX = 0;
+        let cameraY = 0;
+        let zoom = 1;
+        const MAX_ZOOM = 1000;
+        let centerBody = null;
+
+        // --- Touch Event Variables ---
+        let isDragging = false;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+        let initialPinchDistance = 0;
+        let lastTapTime = 0;
+        const DOUBLE_TAP_TIME = 300; // milliseconds
+        const DRAG_THRESHOLD = 5; // pixels, to differentiate tap from drag
+
+
+        // --- Celestial Body Class ---
+        class CelestialBody {
+            constructor(name, baseRadiusKM, massKG, color, orbitalRadiusAU, periodDays, initialAngle = 0, type = 'planet') {
+                this.name = name;
+                this.baseRadius = baseRadiusKM; // in kilometers
+                this.mass = massKG; // in kilograms
+                this.color = color;
+                this.orbitalRadius = orbitalRadiusAU * AU_TO_KM; // Convert AU to KM
+                this.type = type; // 'sun', 'terrestrial', 'gas_giant'
+
+                this.x = Math.cos(initialAngle) * this.orbitalRadius; // in kilometers (absolute position)
+                this.y = Math.sin(initialAngle) * this.orbitalRadius; // in kilometers (absolute position)
+
+                // Initial velocity for a stable circular orbit around the Sun (approximation)
+                if (orbitalRadiusAU > 0) {
+                    const v = Math.sqrt(G * SUN_MASS / (this.orbitalRadius * 1000)); // Convert orbitalRadius to meters for calculation
+                    this.vx = -Math.sin(initialAngle) * v; // in m/s
+                    this.vy = Math.cos(initialAngle) * v; // in m/s
+                } else {
+                    this.vx = 0;
+                    this.vy = 0;
+                }
+
+                this.trail = []; // Stores past positions relative to the *current* centerBody
+            }
+
+            get visualRadius() {
+                // Apply the correct visual radius factor based on type
+                let factor;
+                if (this.type === 'sun') {
+                    factor = SUN_VISUAL_RADIUS_FACTOR;
+                } else if (this.type === 'terrestrial') {
+                    factor = TERRESTRIAL_VISUAL_RADIUS_FACTOR;
+                } else if (this.type === 'gas_giant') {
+                    factor = GAS_GIANT_VISUAL_RADIUS_FACTOR;
+                } else {
+                    factor = 1; // Default fallback
+                }
+                
+                return Math.max(1, this.baseRadius * KM_TO_PIXELS_SCALE * zoom * factor);
+            }
+
+            draw() {
+                const screenX = canvas.width / 2 + (this.x * KM_TO_PIXELS_SCALE - cameraX) * zoom;
+                const screenY = canvas.height / 2 + (this.y * KM_TO_PIXELS_SCALE - cameraY) * zoom;
+                const radius = this.visualRadius;
+
+                // --- Draw Orbit Trail ---
+                // Sun doesn't have an orbit trail, and we only draw trails for selected centerBody if it's a planet
+                if (this.name !== 'Sun') { // If it's a planet
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(${parseInt(this.color.slice(1,3), 16)}, ${parseInt(this.color.slice(3,5), 16)}, ${parseInt(this.color.slice(5,7), 16)}, ${ORBIT_TRAIL_ALPHA})`;
+                    ctx.lineWidth = ORBIT_TRAIL_WIDTH; 
+
+                    if (this.trail.length > 1) {
+                        for (let i = 0; i < this.trail.length; i++) {
+                            const trailPoint = this.trail[i];
+                            const trailScreenX = canvas.width / 2 + (trailPoint.x * KM_TO_PIXELS_SCALE) * zoom;
+                            const trailScreenY = canvas.height / 2 + (trailPoint.y * KM_TO_PIXELS_SCALE) * zoom;
+
+                            if (i === 0) {
+                                ctx.moveTo(trailScreenX, trailScreenY);
+                            } else {
+                                ctx.lineTo(trailScreenX, trailScreenY);
+                            }
+                        }
+                        ctx.stroke();
+                    }
+                }
+                // --- End Draw Orbit Trail ---
+
+                // Only draw the body if within canvas bounds for performance
+                const buffer = 100; // pixels
+                if (screenX + radius < -buffer || screenX - radius > canvas.width + buffer ||
+                    screenY + radius < -buffer || screenY - radius > canvas.height + buffer) {
+                    return;
+                }
+
+                // --- Draw Body ---
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                // --- End Draw Body ---
+            }
+
+            update(gravitationalBodies) {
+                let fx = 0;
+                let fy = 0;
+
+                for (const otherBody of gravitationalBodies) {
+                    if (otherBody === this) continue;
+
+                    const force = calculateGravitationalForce(this, otherBody);
+                    fx += force.fx;
+                    fy += force.fy;
+                }
+
+                const ax = fx / this.mass; // Acceleration in m/s^2
+                const ay = fy / this.mass; // Acceleration in m/s^2
+
+                this.vx += ax * TIME_STEP;
+                this.vy += ay * TIME_STEP;
+
+                this.x += (this.vx * TIME_STEP) / 1000; // Convert m/s to km/s for position update
+                this.y += (this.vy * TIME_STEP) / 1000; // Convert m/s to km/s for position update
+
+                // Add current position to trail and keep it limited
+                // Only add to trail if it's not the Sun, and centerBody is set
+                if (centerBody && this.name !== 'Sun') {
+                    this.trail.push({ x: this.x - centerBody.x, y: this.y - centerBody.y });
+                }
+                
+                if (this.trail.length > ORBIT_TRAIL_LENGTH) {
+                    this.trail.shift(); // Remove the oldest position
+                }
+            }
+
+            isPointInBody(pointX, pointY) {
+                const screenX = canvas.width / 2 + (this.x * KM_TO_PIXELS_SCALE - cameraX) * zoom;
+                const screenY = canvas.height / 2 + (this.y * KM_TO_PIXELS_SCALE - cameraY) * zoom;
+                const distance = Math.sqrt(Math.pow(pointX - screenX, 2) + Math.pow(pointY - screenY, 2));
+                return distance < this.visualRadius;
+            }
+        }
+
+        // --- Gravitational Force Calculation ---
+        function calculateGravitationalForce(body1, body2) {
+            // Positions are in kilometers, convert to meters for force calculation
+            const dx = (body2.x - body1.x) * 1000; // in meters
+            const dy = (body2.y - body1.y) * 1000; // in meters
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Avoid division by zero if bodies perfectly overlap (unlikely in realistic sim)
+            if (distance === 0) return { fx: 0, fy: 0 };
+
+            const forceMagnitude = G * body1.mass * body2.mass / (distance * distance);
+
+            const fx = forceMagnitude * (dx / distance);
+            const fy = forceMagnitude * (dy / distance);
+
+            return { fx, fy };
+        }
+
+        // --- Celestial Bodies Data ---
+        const celestialBodies = [
+            new CelestialBody('Sun', 696340, SUN_MASS, '#FFD700', 0, 0, 0, 'sun'),
+            new CelestialBody('Mercury', 2439.7, 3.301e23, '#A9A9A9', 0.39, 88, Math.random() * Math.PI * 2, 'terrestrial'),
+            new CelestialBody('Venus', 6051.8, 4.867e24, '#FFBF00', 0.72, 225, Math.random() * Math.PI * 2, 'terrestrial'),
+            new CelestialBody('Earth', 6371, 5.972e24, '#0000FF', 1.0, 365, Math.random() * Math.PI * 2, 'terrestrial'),
+            new CelestialBody('Mars', 3389.5, 6.417e23, '#FF4500', 1.52, 687, Math.random() * Math.PI * 2, 'terrestrial'),
+            new CelestialBody('Jupiter', 69911, 1.898e27, '#CD853F', 5.2, 4333, Math.random() * Math.PI * 2, 'gas_giant'),
+            new CelestialBody('Saturn', 58232, 5.683e26, '#DAA520', 9.58, 10759, Math.random() * Math.PI * 2, 'gas_giant'),
+            new CelestialBody('Uranus', 25362, 8.681e25, '#ADD8E6', 19.22, 30687, Math.random() * Math.PI * 2, 'gas_giant'),
+            new CelestialBody('Neptune', 24622, 1.024e26, '#4169E1', 30.1, 60190, Math.random() * Math.PI * 2, 'gas_giant')
+        ];
+
+        // Function to clear all trails
+        function clearAllTrails() {
+            celestialBodies.forEach(body => {
+                body.trail = [];
+            });
+        }
+
+        // Set the Sun as the initial center body
+        centerBody = celestialBodies[0];
+        clearAllTrails(); // Clear trails on initial load to start fresh
+
+        // --- Event Listeners ---
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Handle mouse wheel for zoom (still keep for desktop)
+        canvas.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            const zoomAmount = 1.1;
+            if (event.deltaY < 0) { // Zoom in
+                zoom *= zoomAmount;
+            } else { // Zoom out
+                zoom /= zoomAmount;
+            }
+            zoom = Math.max(0.01, Math.min(MAX_ZOOM, zoom)); // Clamp zoom level with MAX_ZOOM
+        });
+
+        // Handle mouse click for centering (on canvas) (still keep for desktop)
+        canvas.addEventListener('click', (event) => {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+
+            for (const body of celestialBodies) {
+                if (body.isPointInBody(mouseX, mouseY)) {
+                    // Only change center body if it's different
+                    if (body !== centerBody) {
+                        centerBody = body;
+                        clearAllTrails(); // Clear trails when a new center body is selected
+                    }
+                    break;
+                }
+            }
+        });
+
+        // Handle mouse movement for tooltips (still keep for desktop)
+        canvas.addEventListener('mousemove', (event) => {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            let hoveredBody = null;
+
+            for (const body of celestialBodies) {
+                if (body.isPointInBody(mouseX, mouseY)) {
+                    hoveredBody = body;
+                    break;
+                }
+            }
+
+            if (hoveredBody) {
+                infoDisplay.style.display = 'block';
+                infoDisplay.style.left = `${mouseX + 15}px`;
+                infoDisplay.style.top = `${mouseY + 15}px`;
+                infoDisplay.innerHTML = `
+                    <strong>${hoveredBody.name}</strong><br>
+                    Radius: ${hoveredBody.baseRadius.toLocaleString()} km<br>
+                    Mass: ${hoveredBody.mass.toExponential(2)} kg<br>
+                    Orbital Radius: ${hoveredBody.orbitalRadius > 0 ? (hoveredBody.orbitalRadius / AU_TO_KM).toFixed(2) + ' AU' : 'N/A'}
+                `;
+            } else {
+                infoDisplay.style.display = 'none';
+            }
+        });
+
+        // --- Touch Event Handlers ---
+        canvas.addEventListener('touchstart', (event) => {
+            event.preventDefault(); // Prevent default touch behavior (e.g., scrolling, double-tap zoom)
+            infoDisplay.style.display = 'none'; // Hide info display on touch start
+
+            if (event.touches.length === 1) { // Single touch for panning and tap-to-center
+                isDragging = true;
+                lastTouchX = event.touches[0].clientX;
+                lastTouchY = event.touches[0].clientY;
+
+                // Double tap to center
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTapTime;
+                if (tapLength < DOUBLE_TAP_TIME && tapLength > 0) {
+                    const touchX = event.touches[0].clientX;
+                    const touchY = event.touches[0].clientY;
+                    for (const body of celestialBodies) {
+                        if (body.isPointInBody(touchX, touchY)) {
+                            if (body !== centerBody) {
+                                centerBody = body;
+                                clearAllTrails();
+                            }
+                            break;
+                        }
+                    }
+                }
+                lastTapTime = currentTime;
+
+            } else if (event.touches.length === 2) { // Two touches for pinch-to-zoom
+                isDragging = false; // Disable single-finger drag when two fingers are down
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+            }
+        }, { passive: false }); // Use passive: false to allow preventDefault
+
+        canvas.addEventListener('touchmove', (event) => {
+            event.preventDefault(); // Prevent default touch behavior (e.g., scrolling)
+
+            if (event.touches.length === 1 && isDragging) { // Single touch for panning
+                const touchX = event.touches[0].clientX;
+                const touchY = event.touches[0].clientY;
+
+                const dx = touchX - lastTouchX;
+                const dy = touchY - lastTouchY;
+
+                // Adjust camera based on drag (inverse of mouse for intuitive pan)
+                cameraX -= dx / zoom / KM_TO_PIXELS_SCALE;
+                cameraY -= dy / zoom / KM_TO_PIXELS_SCALE;
+
+                lastTouchX = touchX;
+                lastTouchY = touchY;
+
+            } else if (event.touches.length === 2) { // Two touches for pinch-to-zoom
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+
+                if (initialPinchDistance === 0) { // Set initial distance if not set (e.g., touches start simultaneously)
+                    initialPinchDistance = currentPinchDistance;
+                }
+
+                const zoomFactor = currentPinchDistance / initialPinchDistance;
+                zoom *= zoomFactor;
+                zoom = Math.max(0.01, Math.min(MAX_ZOOM, zoom)); // Clamp zoom level
+
+                // Reset initial pinch distance for continuous zooming
+                initialPinchDistance = currentPinchDistance;
+            }
+        }, { passive: false }); // Use passive: false to allow preventDefault
+
+        canvas.addEventListener('touchend', (event) => {
+            // Check if it was a tap (not a drag) and not a double-tap
+            if (isDragging && event.changedTouches.length === 1) {
+                const touchX = event.changedTouches[0].clientX;
+                const touchY = event.changedTouches[0].clientY;
+                const dx = Math.abs(touchX - lastTouchX);
+                const dy = Math.abs(touchY - lastTouchY);
+
+                // If it was a light tap (not a drag beyond threshold)
+                if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) {
+                    let tappedBody = null;
+                    for (const body of celestialBodies) {
+                        if (body.isPointInBody(touchX, touchY)) {
+                            tappedBody = body;
+                            break;
+                        }
+                    }
+                    if (tappedBody) {
+                        infoDisplay.style.display = 'block';
+                        // Position info display slightly above the tapped body
+                        infoDisplay.style.left = `${touchX + 15}px`;
+                        infoDisplay.style.top = `${touchY + 15}px`;
+                        infoDisplay.innerHTML = `
+                            <strong>${tappedBody.name}</strong><br>
+                            Radius: ${tappedBody.baseRadius.toLocaleString()} km<br>
+                            Mass: ${tappedBody.mass.toExponential(2)} kg<br>
+                            Orbital Radius: ${tappedBody.orbitalRadius > 0 ? (tappedBody.orbitalRadius / AU_TO_KM).toFixed(2) + ' AU' : 'N/A'}
+                        `;
+                    } else {
+                        infoDisplay.style.display = 'none';
+                    }
+                }
+            }
+
+            isDragging = false;
+            initialPinchDistance = 0; // Reset pinch distance
+        });
+
+
+        // --- Control Buttons Logic ---
+
+        // Helper function to create a planet button
+        function createPlanetButton(body, container) {
+            const button = document.createElement('button');
+            button.textContent = body.name;
+            button.style.backgroundColor = body.color; // Set button color
+            button.onclick = () => {
+                if (body !== centerBody) {
+                    centerBody = body;
+                    clearAllTrails();
+                }
+            };
+            container.appendChild(button);
+        }
+
+        // Populate ALL planet selection buttons into a single container
+        celestialBodies.forEach(body => {
+            createPlanetButton(body, planetSelectionButtonsContainer);
+        });
+
+        // Speed control
+        const speedFactors = [0.25, 0.5, 1, 2, 4, 8];
+        let currentSpeedIndex = speedFactors.indexOf(1);
+
+        function updateSpeedDisplay() {
+            currentSpeedDisplay.textContent = `Speed: ${speedFactors[currentSpeedIndex]}x`;
+        }
+
+        slowDownBtn.onclick = () => {
+            if (currentSpeedIndex > 0) {
+                currentSpeedIndex--;
+                TIME_STEP = 3600 * 24 * speedFactors[currentSpeedIndex];
+                updateSpeedDisplay();
+            }
+        };
+
+        speedUpBtn.onclick = () => {
+            if (currentSpeedIndex < speedFactors.length - 1) {
+                currentSpeedIndex++;
+                TIME_STEP = 3600 * 24 * speedFactors[currentSpeedIndex];
+                updateSpeedDisplay();
+            }
+        };
+
+        // Initial speed display
+        updateSpeedDisplay();
+
+        // Visual Radius Control factors (can be shared or separate)
+        const radiusScaleFactors = [0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 75, 100, 200, 500, 1000,
+		   2000, 3000, 5000];
+
+        // Sun Visual Radius Control
+        let currentSunVisualRadiusIndex = radiusScaleFactors.indexOf(1);
+
+        function updateSunVisualRadiusDisplay() {
+            currentSunVisualRadiusScale.textContent = `Scale: ${radiusScaleFactors[currentSunVisualRadiusIndex]}x`;
+        }
+
+        decreaseSunRadiusBtn.onclick = () => {
+            if (currentSunVisualRadiusIndex > 0) {
+                currentSunVisualRadiusIndex--;
+                SUN_VISUAL_RADIUS_FACTOR = radiusScaleFactors[currentSunVisualRadiusIndex];
+                updateSunVisualRadiusDisplay();
+            }
+        };
+
+        increaseSunRadiusBtn.onclick = () => {
+            if (currentSunVisualRadiusIndex < radiusScaleFactors.length - 1) {
+                currentSunVisualRadiusIndex++;
+                SUN_VISUAL_RADIUS_FACTOR = radiusScaleFactors[currentSunVisualRadiusIndex];
+                updateSunVisualRadiusDisplay();
+            }
+        };
+        updateSunVisualRadiusDisplay();
+
+
+        // Terrestrial Planet Visual Radius Control
+        let currentTerrestrialVisualRadiusIndex = radiusScaleFactors.indexOf(1);
+
+        function updateTerrestrialVisualRadiusDisplay() {
+            currentTerrestrialVisualRadiusScale.textContent = `Scale: ${radiusScaleFactors[currentTerrestrialVisualRadiusIndex]}x`;
+        }
+
+        decreaseTerrestrialRadiusBtn.onclick = () => {
+            if (currentTerrestrialVisualRadiusIndex > 0) {
+                currentTerrestrialVisualRadiusIndex--;
+                TERRESTRIAL_VISUAL_RADIUS_FACTOR = radiusScaleFactors[currentTerrestrialVisualRadiusIndex];
+                updateTerrestrialVisualRadiusDisplay();
+            }
+        };
+
+        increaseTerrestrialRadiusBtn.onclick = () => {
+            if (currentTerrestrialVisualRadiusIndex < radiusScaleFactors.length - 1) {
+                currentTerrestrialVisualRadiusIndex++;
+                TERRESTRIAL_VISUAL_RADIUS_FACTOR = radiusScaleFactors[currentTerrestrialVisualRadiusIndex];
+                updateTerrestrialVisualRadiusDisplay();
+            }
+        };
+        updateTerrestrialVisualRadiusDisplay();
+
+        // Gas Giant Visual Radius Control
+        let currentGasGiantVisualRadiusIndex = radiusScaleFactors.indexOf(1);
+
+        function updateGasGiantVisualRadiusDisplay() {
+            currentGasGiantVisualRadiusScale.textContent = `Scale: ${radiusScaleFactors[currentGasGiantVisualRadiusIndex]}x`;
+        }
+
+        decreaseGasGiantRadiusBtn.onclick = () => {
+            if (currentGasGiantVisualRadiusIndex > 0) {
+                currentGasGiantVisualRadiusIndex--;
+                GAS_GIANT_VISUAL_RADIUS_FACTOR = radiusScaleFactors[currentGasGiantVisualRadiusIndex];
+                updateGasGiantVisualRadiusDisplay();
+            }
+        };
+
+        increaseGasGiantRadiusBtn.onclick = () => {
+            if (currentGasGiantVisualRadiusIndex < radiusScaleFactors.length - 1) {
+                currentGasGiantVisualRadiusIndex++;
+                GAS_GIANT_VISUAL_RADIUS_FACTOR = radiusScaleFactors[currentGasGiantVisualRadiusIndex];
+                updateGasGiantVisualRadiusDisplay();
+            }
+        };
+        updateGasGiantVisualRadiusDisplay();
+
+
+        // --- Game Loop ---
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (centerBody) {
+                cameraX = centerBody.x * KM_TO_PIXELS_SCALE;
+                cameraY = centerBody.y * KM_TO_PIXELS_SCALE;
+            } else {
+                cameraX = 0;
+                cameraY = 0;
+            }
+
+            for (const body of celestialBodies) {
+                body.update(celestialBodies);
+            }
+
+            for (const body of celestialBodies) {
+                body.draw();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the simulation
+        gameLoop();
+    </script>
+</body>
+</html>
