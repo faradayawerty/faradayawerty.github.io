@@ -862,39 +862,91 @@
             }
         }, { passive: false });
 
-        canvas.addEventListener('touchend', (event) => {
-            if (isDragging && event.changedTouches.length === 1) {
+canvas.addEventListener('touchend', (event) => {
+            if (event.changedTouches.length === 1) {
                 const touchX = event.changedTouches[0].clientX;
                 const touchY = event.changedTouches[0].clientY;
                 const dx = Math.abs(touchX - lastTouchX);
                 const dy = Math.abs(touchY - lastTouchY);
 
+                // Check if it was a tap (not a drag or pinch)
                 if (dx < DRAG_THRESHOLD && dy < DRAG_THRESHOLD) {
-                    let tappedBody = null;
-                    for (const body of celestialBodies) {
-                        if (body.isPointInBody(touchX, touchY)) {
-                            tappedBody = body;
-                            break;
-                        }
-                    }
-                    if (tappedBody) {
-                        infoDisplay.style.display = 'block';
-                        infoDisplay.style.left = `${touchX + 15}px`;
-                        infoDisplay.style.top = `${touchY + 15}px`;
-                        infoDisplay.innerHTML = `
-                            <strong>${tappedBody.name}</strong><br>
-                            Radius: ${tappedBody.baseRadius.toLocaleString()} km<br>
-                            Mass: ${tappedBody.mass.toExponential(2)} kg<br>
-                            Orbital Radius: ${tappedBody.orbitalRadius > 0 ? (tappedBody.orbitalRadius / AU_TO_KM).toFixed(2) + ' AU' : 'N/A'}
-                        `;
-                    } else {
+                    if (isCreatingNewPlanet && newPlanetData) {
+                        // Logic to place the new planet
+                        const worldX = ((touchX - canvas.width / 2) / zoom + cameraX) / KM_TO_PIXELS_SCALE;
+                        const worldY = ((touchY - canvas.height / 2) / zoom + cameraY) / KM_TO_PIXELS_SCALE;
+
+                        newPlanetData.x = worldX;
+                        newPlanetData.y = worldY;
+
+                        const velocityMagnitude = parseFloat(initialVelocityMagnitudeInput.value) * 1000;
+                        const velocityAngleDegrees = parseFloat(initialVelocityAngleInput.value);
+                        const velocityAngleRadians = velocityAngleDegrees * Math.PI / 180;
+
+                        newPlanetData.vx = velocityMagnitude * Math.cos(velocityAngleRadians);
+                        newPlanetData.vy = velocityMagnitude * Math.sin(velocityAngleRadians);
+
+                        const newPlanet = new CelestialBody(
+                            newPlanetData.name,
+                            newPlanetData.baseRadius,
+                            newPlanetData.mass,
+                            newPlanetData.color,
+                            0,
+                            0,
+                            0,
+                            newPlanetData.type
+                        );
+                        newPlanet.x = newPlanetData.x;
+                        newPlanet.y = newPlanetData.y;
+                        newPlanet.vx = newPlanetData.vx;
+                        newPlanet.vy = newPlanetData.vy;
+
+                        celestialBodies.push(newPlanet);
+                        updatePlanetSelectionButtons();
+                        clearAllTrails();
+
+                        isCreatingNewPlanet = false;
+                        newPlanetData = null;
+                        canvas.style.cursor = 'default';
+                        // Hide info display if it was shown from a previous hover
                         infoDisplay.style.display = 'none';
+                    } else {
+                        // Original logic for selecting a body on tap
+                        let tappedBody = null;
+                        for (const body of celestialBodies) {
+                            if (body.isPointInBody(touchX, touchY)) {
+                                tappedBody = body;
+                                break;
+                            }
+                        }
+                        if (tappedBody) {
+                            // If a body was tapped, center on it
+                            if (tappedBody !== centerBody) {
+                                centerBody = tappedBody;
+                                clearAllTrails();
+                            }
+                            // Display info for the tapped body
+                            infoDisplay.style.display = 'block';
+                            infoDisplay.style.left = `${touchX + 15}px`;
+                            infoDisplay.style.top = `${touchY + 15}px`;
+                            infoDisplay.innerHTML = `
+                                <strong>${tappedBody.name}</strong><br>
+                                Radius: ${tappedBody.baseRadius.toLocaleString()} km<br>
+                                Mass: ${tappedBody.mass.toExponential(2)} kg<br>
+                                Orbital Radius: ${tappedBody.orbitalRadius > 0 ? (tappedBody.orbitalRadius / AU_TO_KM).toFixed(2) + ' AU' : 'N/A'}
+                            `;
+                        } else {
+                            // If no body was tapped, hide info display
+                            infoDisplay.style.display = 'none';
+                        }
                     }
                 }
             }
 
             isDragging = false;
             initialPinchDistance = 0;
+            // Reset lastTapTime to prevent unintended double taps from single taps after a drag/pinch
+            lastTapTime = 0;
         });
 
 
