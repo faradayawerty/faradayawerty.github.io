@@ -71,6 +71,7 @@ function menu_create() {
 			"respawn on current level",
 			"indicators",
 			"auto pickup",
+			"volume",
 			"main menu"
 		],
 		player_color_selection_menu: [
@@ -140,6 +141,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_auto_pickup[m.buttons[i]]);
 		else if(m.buttons[i] == "language")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_language);
+		else if(m.buttons[i] == "volume")
+			text = menu_translate(m.want_language, text) + ": " + GLOBAL_VOLUME + "%";
 		else
 			text = menu_translate(m.want_language, text);
 		if(text.length > 0 && text[0] == "~")
@@ -202,6 +205,10 @@ function menu_update(m, dt, input) {
 			m.want_save = true;
 		} else if(m.buttons[m.iselected] == "load game") {
 			m.want_load = true;
+		} else if(m.buttons[m.iselected] == "volume") {
+			GLOBAL_VOLUME = GLOBAL_VOLUME + 10;
+			if(GLOBAL_VOLUME > 100)
+				GLOBAL_VOLUME = 0;
 		} else if(m.buttons[m.iselected] == "indicators") {
 			m.buttons = m.indicators_settings;
 			m.iselected = 0;
@@ -293,6 +300,8 @@ function menu_translate(lang, str) {
 			str = "сделать игрока жёлтым";
 		else if(str == "indicators")
 			str = "индикаторы";
+		else if(str == "volume")
+			str = "громкость";
 		else if(str == "back to settings")
 			str = "назад к настройкам";
 		else if(str == "enemies spawn")

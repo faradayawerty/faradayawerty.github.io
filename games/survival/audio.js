@@ -1,4 +1,6 @@
 
+var GLOBAL_VOLUME = 80;
+
 function audios_get() {
 	let as = {
 		deer_dies_1: audio_create("data/sfx/deer_dies_1.mp3"),
@@ -29,7 +31,7 @@ function audio_create(path, volume=0.75) {
 
 function audio_play(path, volume=0.75) {
 	let a = new Audio(path);
-	a.volume = volume;
+	a.volume = volume * GLOBAL_VOLUME * 0.01;
 	a.preload = 'auto';
 	a.play();
 }
