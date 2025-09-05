@@ -68,6 +68,12 @@ function isMouseWheelDown(input) {
 	return val;
 }
 
+function isMouseRightButtonPressed(input) {
+	let val = input.mouse.rightButtonPressed;
+	input.mouse.rightButtonPressed = false;
+	return val;
+}
+
 function isMouseLeftButtonPressed(input) {
 	let val = input.mouse.leftButtonPressed;
 	input.mouse.leftButtonPressed = false;

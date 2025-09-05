@@ -173,6 +173,10 @@ function menu_update(m, dt, input) {
 		m.iselected += 1;
 	} else if((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp', true)) && m.iselected > 0) {
 		m.iselected -= 1;
+	} else if(isMouseRightButtonPressed(input) && m.buttons[m.iselected] == "volume") {
+		GLOBAL_VOLUME = GLOBAL_VOLUME - 10;
+		if(GLOBAL_VOLUME < 0)
+			GLOBAL_VOLUME = 100;
 	} else if((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter', true) || isMouseLeftButtonPressed(input))) {
 		if(m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
