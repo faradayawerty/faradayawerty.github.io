@@ -133,18 +133,24 @@
         div.style.gridColumnStart = col + 1;
         div.style.cursor = 'pointer';
 
-        div.addEventListener('click', e => {
-          e.preventDefault();
-          toggleFlip(div, 'vertical');
-          checkSolved();
-        });
-
         div.addEventListener('contextmenu', e => {
           e.preventDefault();
           toggleFlip(div, 'horizontal');
           checkSolved();
         });
       }
+
+	div.addEventListener('dblclick', e => {
+	  e.preventDefault();
+	  toggleFlip(div, 'horizontal');
+	  checkSolved();
+	});
+
+	div.addEventListener('click', e => {
+	  e.preventDefault();
+	  toggleFlip(div, 'vertical');
+	  checkSolved();
+	});
 
       puzzle.appendChild(div);
       pieces.push(div);
