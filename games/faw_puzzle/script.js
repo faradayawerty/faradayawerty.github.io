@@ -230,16 +230,13 @@
         return array;
     }
 
-    // НОВАЯ УСОВЕРШЕНСТВОВАННАЯ ФУНКЦИЯ: перемешивание для "Пятнашек"
     function shuffleFifteen() {
-        // Создаем временную сетку-массив для вычисления ходов
         const grid = Array.from({
             length: size
         }, () => Array.from({
             length: size
         }, () => null));
 
-        // Заполняем сетку
         pieces.forEach(p => {
             const row = parseInt(p.dataset.correctRow);
             const col = parseInt(p.dataset.correctCol);
@@ -250,7 +247,6 @@
         let emptyRow = parseInt(emptySpot.dataset.row);
         let emptyCol = parseInt(emptySpot.dataset.col);
 
-        // Количество ходов для перемешивания. Достаточно 100-200.
         const moves = size * size * 10;
         let lastMove = null;
 
@@ -280,7 +276,6 @@
                     break;
             }
 
-            // Перемещаем фишку и пустую ячейку в массиве
             const pieceToMoveRow = parseInt(pieceToMove.dataset.row);
             const pieceToMoveCol = parseInt(pieceToMove.dataset.col);
 
@@ -292,12 +287,11 @@
             emptySpot.dataset.col = pieceToMoveCol;
             pieceToMove.dataset.row = emptyRow;
             pieceToMove.dataset.col = emptyCol;
-            
+
             emptyRow = parseInt(emptySpot.dataset.row);
             emptyCol = parseInt(emptySpot.dataset.col);
         }
 
-        // Применяем финальное состояние к DOM
         pieces.forEach(p => {
             p.style.gridRowStart = parseInt(p.dataset.row) + 1;
             p.style.gridColumnStart = parseInt(p.dataset.col) + 1;
@@ -305,7 +299,6 @@
 
         checkSolved();
     }
-    //------------------------------------------
 
     function toggleFlip(div, axis) {
         if (axis === 'horizontal') {
@@ -456,27 +449,42 @@
     fileInput.addEventListener('change', e => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = ev => {
-                cropModal.classList.add('active');
-                cropperImage.src = ev.target.result;
-
-                if (cropper) {
-                    cropper.destroy();
-                }
-                cropper = new Cropper(cropperImage, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    autoCropArea: 1,
-                    responsive: true,
-                    background: false,
-                    zoomable: true,
-                    movable: true,
-                });
-            };
-            reader.readAsDataURL(file);
+            handleImageUpload(file);
         }
     });
+
+    document.body.addEventListener('paste', e => {
+        const items = e.clipboardData.items;
+        for (const item of items) {
+            if (item.type.indexOf('image') !== -1) {
+                const blob = item.getAsFile();
+                handleImageUpload(blob);
+                break;
+            }
+        }
+    });
+
+    function handleImageUpload(file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            cropModal.classList.add('active');
+            cropperImage.src = ev.target.result;
+
+            if (cropper) {
+                cropper.destroy();
+            }
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 1,
+                responsive: true,
+                background: false,
+                zoomable: true,
+                movable: true,
+            });
+        };
+        reader.readAsDataURL(file);
+    }
 
     applyCropBtn.addEventListener('click', () => {
         if (cropper) {
