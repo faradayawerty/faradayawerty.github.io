@@ -190,11 +190,6 @@
                 div.addEventListener('dragover', dragOver);
                 div.addEventListener('drop', drop);
                 div.addEventListener('dragend', dragEnd);
-                div.addEventListener('contextmenu', e => {
-                    e.preventDefault();
-                    toggleFlip(div, 'horizontal');
-                    checkSolved();
-                });
                 div.addEventListener('dblclick', e => {
                     e.preventDefault();
                     toggleFlip(div, 'horizontal');
