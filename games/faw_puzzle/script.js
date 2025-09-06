@@ -12,7 +12,7 @@
     const cropModal = document.getElementById('cropModal');
     const closeCropModalBtn = document.getElementById('closeCropModal');
     const cropperImage = document.getElementById('cropperImage');
-    const applyCropBtn = document = document.getElementById('applyCropBtn');
+    const applyCropBtn = document.getElementById('applyCropBtn');
     const cancelCropBtn = document.getElementById('cancelCropBtn');
 
     let imgSrc = 'img.jpg';
@@ -230,72 +230,81 @@
         return array;
     }
 
-    // НОВАЯ ФУНКЦИЯ: Проверка на решаемость
-    function isSolvable(board, size) {
-        let inversions = 0;
-        const flatBoard = board.filter(val => val !== 0);
-
-        for (let i = 0; i < flatBoard.length - 1; i++) {
-            for (let j = i + 1; j < flatBoard.length; j++) {
-                if (flatBoard[i] > flatBoard[j]) {
-                    inversions++;
-                }
-            }
-        }
-
-        if (size % 2 !== 0) {
-            // Нечетная сетка
-            return inversions % 2 === 0;
-        } else {
-            // Четная сетка
-            const emptyRow = Math.floor(board.indexOf(0) / size);
-            const emptyRowFromBottom = size - emptyRow;
-            return (inversions + emptyRowFromBottom) % 2 === 0;
-        }
-    }
-
-    // НОВАЯ УСКОРЕННАЯ ФУНКЦИЯ: Перемешивание для режима "Пятнашки"
+    // НОВАЯ УСОВЕРШЕНСТВОВАННАЯ ФУНКЦИЯ: перемешивание для "Пятнашек"
     function shuffleFifteen() {
-        let board;
-        let solvable = false;
-        const totalPieces = size * size;
+        // Создаем временную сетку-массив для вычисления ходов
+        const grid = Array.from({
+            length: size
+        }, () => Array.from({
+            length: size
+        }, () => null));
 
-        do {
-            board = Array.from({ length: totalPieces }, (_, i) => i + 1);
-            board[totalPieces - 1] = 0; // 0 - пустая ячейка
-            board = shuffleArray(board);
-            solvable = isSolvable(board, size);
-        } while (!solvable);
-    
-        // Обновление DOM один раз на основе сгенерированной доски
-        let tiles = pieces.filter(p => !p.classList.contains('empty-spot'));
+        // Заполняем сетку
+        pieces.forEach(p => {
+            const row = parseInt(p.dataset.correctRow);
+            const col = parseInt(p.dataset.correctCol);
+            grid[row][col] = p;
+        });
+
         let emptySpot = pieces.find(p => p.classList.contains('empty-spot'));
-        
-        for (let i = 0; i < totalPieces; i++) {
-            const value = board[i];
-            const newRow = Math.floor(i / size);
-            const newCol = i % size;
+        let emptyRow = parseInt(emptySpot.dataset.row);
+        let emptyCol = parseInt(emptySpot.dataset.col);
 
-            if (value === 0) {
-                emptySpot.dataset.row = newRow;
-                emptySpot.dataset.col = newCol;
-                emptySpot.style.gridRowStart = newRow + 1;
-                emptySpot.style.gridColumnStart = newCol + 1;
-            } else {
-                const piece = tiles.find(p => {
-                    const correctRow = parseInt(p.dataset.correctRow);
-                    const correctCol = parseInt(p.dataset.correctCol);
-                    return correctRow * size + correctCol + 1 === value;
-                });
-                piece.dataset.row = newRow;
-                piece.dataset.col = newCol;
-                piece.style.gridRowStart = newRow + 1;
-                piece.style.gridColumnStart = newCol + 1;
+        // Количество ходов для перемешивания. Достаточно 100-200.
+        const moves = size * size * 10;
+        let lastMove = null;
+
+        for (let i = 0; i < moves; i++) {
+            const possibleMoves = [];
+            if (emptyRow > 0 && lastMove !== 'down') possibleMoves.push('up');
+            if (emptyRow < size - 1 && lastMove !== 'up') possibleMoves.push('down');
+            if (emptyCol > 0 && lastMove !== 'right') possibleMoves.push('left');
+            if (emptyCol < size - 1 && lastMove !== 'left') possibleMoves.push('right');
+
+            const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            lastMove = move;
+
+            let pieceToMove;
+            switch (move) {
+                case 'up':
+                    pieceToMove = grid[emptyRow - 1][emptyCol];
+                    break;
+                case 'down':
+                    pieceToMove = grid[emptyRow + 1][emptyCol];
+                    break;
+                case 'left':
+                    pieceToMove = grid[emptyRow][emptyCol - 1];
+                    break;
+                case 'right':
+                    pieceToMove = grid[emptyRow][emptyCol + 1];
+                    break;
             }
+
+            // Перемещаем фишку и пустую ячейку в массиве
+            const pieceToMoveRow = parseInt(pieceToMove.dataset.row);
+            const pieceToMoveCol = parseInt(pieceToMove.dataset.col);
+
+            const tempPiece = grid[emptyRow][emptyCol];
+            grid[emptyRow][emptyCol] = grid[pieceToMoveRow][pieceToMoveCol];
+            grid[pieceToMoveRow][pieceToMoveCol] = tempPiece;
+
+            emptySpot.dataset.row = pieceToMoveRow;
+            emptySpot.dataset.col = pieceToMoveCol;
+            pieceToMove.dataset.row = emptyRow;
+            pieceToMove.dataset.col = emptyCol;
+            
+            emptyRow = parseInt(emptySpot.dataset.row);
+            emptyCol = parseInt(emptySpot.dataset.col);
         }
+
+        // Применяем финальное состояние к DOM
+        pieces.forEach(p => {
+            p.style.gridRowStart = parseInt(p.dataset.row) + 1;
+            p.style.gridColumnStart = parseInt(p.dataset.col) + 1;
+        });
+
         checkSolved();
     }
-    
     //------------------------------------------
 
     function toggleFlip(div, axis) {
@@ -540,7 +549,7 @@
         if (!selectedPiece) return;
         const target = e.target;
         if (!target.classList.contains('piece') || target === selectedPiece) return;
-        
+
         swapPieces(selectedPiece, target);
         selectedPiece.style.outline = '';
         selectedPiece = null;
