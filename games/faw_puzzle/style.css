@@ -258,3 +258,31 @@ button:focus {
 .cropper-face {
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); /* Dimming effect */
 }
+.hint-number {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: red; /* Цвет по умолчанию, если тайл не на месте */
+    z-index: 10;
+    transition: color 0.3s ease;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    pointer-events: none; /* чтобы не мешать событиям клика */
+}
+
+.hint-number-correct {
+    color: green;
+}
+
+.hints-on .hint-number {
+    display: block;
+}
+
+.hints-on.flips-mode .hint-number {
+    display: none;
+}
+
+.hints-on .empty-spot .hint-number {
+    display: none;
+}

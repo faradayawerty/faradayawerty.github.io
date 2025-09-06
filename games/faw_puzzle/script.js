@@ -34,7 +34,7 @@
     hintsBtn.textContent = 'Подсказки: ВЫКЛ';
     controls.appendChild(hintsBtn);
 
-    const modes = ['flips', 'drag', 'fifteen', 'mixed'];
+    const modes = ['flips', 'drag', 'mixed', 'fifteen'];
     let currentModeIndex = 0;
     let currentMode = modes[currentModeIndex];
     let selectedPiece = null;
@@ -154,6 +154,13 @@
 
             div.style.gridRowStart = row + 1;
             div.style.gridColumnStart = col + 1;
+
+            if (currentMode !== 'flips') {
+                const hintNumber = document.createElement('span');
+                hintNumber.classList.add('hint-number');
+                hintNumber.textContent = i + 1;
+                div.appendChild(hintNumber);
+            }
 
             if (currentMode === 'fifteen') {
                 div.style.cursor = 'pointer';
@@ -384,23 +391,37 @@
         checkSolved();
     }
 
-    function applyHints() {
+function applyHints() {
         puzzle.classList.toggle('hints-on', hintsOn);
 
         pieces.forEach(div => {
+            // Удаляем все классы подсказок для чистоты
             div.classList.remove('hint-correct', 'hint-wrong');
-            if (!hintsOn || div.classList.contains('empty-spot')) return;
+            const hintNumberEl = div.querySelector('.hint-number');
+            if (hintNumberEl) {
+                hintNumberEl.classList.remove('hint-number-correct', 'hint-number-wrong');
+                // Скрываем номер, если подсказки выключены или режим - "flips"
+                hintNumberEl.style.display = (hintsOn && currentMode !== 'flips') ? 'block' : 'none';
+            }
 
+            if (!hintsOn || div.classList.contains('empty-spot')) {
+                return;
+            }
+
+            let correct = false;
             if (currentMode === 'fifteen' || currentMode === 'drag') {
-                const correct = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
-                div.classList.add(correct ? 'hint-correct' : 'hint-wrong');
+                correct = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
             } else if (currentMode === 'flips') {
-                const correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
-                div.classList.add(correct ? 'hint-correct' : 'hint-wrong');
+                correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
             } else if (currentMode === 'mixed') {
                 const correctPosition = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
                 const correctFlip = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
-                div.classList.add(correctPosition && correctFlip ? 'hint-correct' : 'hint-wrong');
+                correct = correctPosition && correctFlip;
+            }
+            div.classList.add(correct ? 'hint-correct' : 'hint-wrong');
+
+            if (hintNumberEl) {
+                hintNumberEl.classList.add(correct ? 'hint-number-correct' : 'hint-number-wrong');
             }
         });
     }
@@ -555,8 +576,8 @@
     function drop(e) {
         e.preventDefault();
         if (!selectedPiece) return;
-        const target = e.target;
-        if (!target.classList.contains('piece') || target === selectedPiece) return;
+        const target = e.target.closest('.piece');
+        if (!target || target === selectedPiece) return;
 
         swapPieces(selectedPiece, target);
         selectedPiece.style.outline = '';
