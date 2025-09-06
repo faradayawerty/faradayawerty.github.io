@@ -1,0 +1,161 @@
+--- a/index.html
++++ b/index.html
+@@ -107,6 +107,16 @@
+     puzzle.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+ 
+     const maxWidth = window.innerWidth * 0.95;
++    const maxHeight = window.innerHeight * 0.7;
++    const tileW = Math.floor(maxWidth / size);
++    const tileH = Math.floor(maxHeight / size);
++    pieceSizePx = Math.min(tileW, tileH);
++
++    puzzle.style.width = pieceSizePx * size + 'px';
++    puzzle.style.height = pieceSizePx * size + 'px';
++  }
++
++  function createPieces() {
+   const maxHeight = window.innerHeight * 0.7;
+     const tileW = Math.floor(maxWidth / size);
+     const tileH = Math.floor(maxHeight / size);
+@@ -155,6 +165,11 @@
+ 
+     div.style.gridRowStart = row + 1;
+     div.style.gridColumnStart = col + 1;
++
++    if (dragMode) {
++      div.style.cursor = 'grab';
++      div.draggable = true;
++
+     div.addEventListener('dragstart', dragStart);
+     div.addEventListener('dragover', dragOver);
+     div.addEventListener('drop', drop);
+@@ -194,6 +209,10 @@
+         div.addEventListener('click', e => {
+           e.preventDefault();
+           toggleFlip(div, 'vertical');
++          checkSolved();
++        });
++
++      } else if (mode === 'mixed') {
+           checkSolved();
+         });
+ 
+@@ -213,6 +232,19 @@
+         div.addEventListener('click', dragModeClickHandler);
+ 
+       } else {
++        div.style.cursor = 'grab';
++        div.draggable = true;
++        div.addEventListener('dragstart', dragStart);
++        div.addEventListener('dragover', dragOver);
++        div.addEventListener('drop', drop);
++        div.addEventListener('dragend', dragEnd);
++        div.addEventListener('click', dragModeClickHandler);
++
++        div.addEventListener('contextmenu', e => {
++          e.preventDefault();
++          toggleFlip(div, 'horizontal');
++          checkSolved();
++        });
+         div.style.backgroundPosition = `-${col * pieceSizePx}px -${row * pieceSizePx}px`;
+         div.dataset.row = row;
+         div.dataset.col = col;
+@@ -237,6 +269,11 @@
+           e.preventDefault();
+           toggleFlip(div, 'vertical');
+           checkSolved();
++        });
++      } else {
++        div.style.cursor = 'pointer';
++      }
++
++      if (mode === 'flips' || mode === 'mixed') {
+         });
+       }
+ 
+@@ -282,6 +319,25 @@
+         div.dataset.flipV = Math.random() < 0.5 ? 'true' : 'false';
+         updateTransform(div);
+       });
++      checkSolved();
++    } else if (mode === 'drag') {
++      let positions = pieces.map(p => ({ row: p.dataset.row, col: p.dataset.col }));
++      positions = shuffleArray(positions);
++      pieces.forEach((p, i) => {
++        p.dataset.row = positions[i].row;
++        p.dataset.col = positions[i].col;
++        p.style.gridRowStart = parseInt(positions[i].row) + 1;
++        p.style.gridColumnStart = parseInt(positions[i].col) + 1;
++      });
++      checkSolved();
++    } else if (mode === 'mixed') {
++      let positions = pieces.map(p => ({ row: p.dataset.row, col: p.dataset.col }));
++      positions = shuffleArray(positions);
++      pieces.forEach((p, i) => {
++        p.dataset.row = positions[i].row;
++        p.dataset.col = positions[i].col;
++        p.style.gridRowStart = parseInt(positions[i].row) + 1;
++        p.style.gridColumnStart = parseInt(positions[i].col) + 1;
+         checkSolved();
+       });
+     }
+@@ -299,6 +355,18 @@
+         div.dataset.flipV = 'false';
+         updateTransform(div);
+       });
++      checkSolved();
++    } else {
++      pieces.forEach(div => {
++        div.dataset.row = div.dataset.correctRow;
++        div.dataset.col = div.dataset.correctCol;
++        div.style.gridRowStart = parseInt(div.dataset.correctRow) + 1;
++        div.style.gridColumnStart = parseInt(div.dataset.correctCol) + 1;
++        div.dataset.flipH = 'false';
++        div.dataset.flipV = 'false';
++        updateTransform(div);
++      });
++      checkSolved();
+       checkSolved();
+     }
+   }
+@@ -326,6 +394,22 @@
+           wrongCount++;
+         }
+       }
++    } else if (mode === 'drag') {
++      for (const div of pieces) {
++        if (div.dataset.row != div.dataset.correctRow || div.dataset.col != div.dataset.correctCol) {
++          wrongCount++;
++        }
++      }
++    } else { // Mixed mode
++      for (const div of pieces) {
++        if (div.dataset.flipH !== 'false' || div.dataset.flipV !== 'false') {
++          wrongCount++;
++        }
++        if (div.dataset.row != div.dataset.correctRow || div.dataset.col != div.dataset.correctCol) {
++          wrongCount++;
++        }
++      }
++    }
+     }
+ 
+     errorCount.textContent = `Не на своём месте: ${wrongCount}`;
+@@ -404,8 +488,8 @@
+     fileInput.value = ''; // Clear file input
+   });
+   // --- End Cropping functionality integration ---
+-
+-
++ 
++  
+   shuffleBtn.addEventListener('click', shuffleFlips);
+   resetBtn.addEventListener('click', resetFlips);
+ 
+@@ -469,5 +553,5 @@
+     p2.style.gridColumnStart = parseInt(c1) + 1;
+   }
+ 
+-  createPieces();
++  createPieces(true);
+ })();
