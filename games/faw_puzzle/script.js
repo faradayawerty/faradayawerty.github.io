@@ -235,50 +235,73 @@
         return array;
     }
 
+    // НОВАЯ ФУНКЦИЯ: Проверка на решаемость
+    function isSolvable(board, size) {
+        let inversions = 0;
+        const flatBoard = board.filter(val => val !== 0);
+
+        for (let i = 0; i < flatBoard.length - 1; i++) {
+            for (let j = i + 1; j < flatBoard.length; j++) {
+                if (flatBoard[i] > flatBoard[j]) {
+                    inversions++;
+                }
+            }
+        }
+
+        if (size % 2 !== 0) {
+            // Нечетная сетка
+            return inversions % 2 === 0;
+        } else {
+            // Четная сетка
+            const emptyRow = Math.floor(board.indexOf(0) / size);
+            const emptyRowFromBottom = size - emptyRow;
+            return (inversions + emptyRowFromBottom) % 2 === 0;
+        }
+    }
+
+    // НОВАЯ УСКОРЕННАЯ ФУНКЦИЯ: Перемешивание для режима "Пятнашки"
     function shuffleFifteen() {
-        resetPuzzle();
+        let board;
+        let solvable = false;
+        const totalPieces = size * size;
+
+        do {
+            board = Array.from({ length: totalPieces }, (_, i) => i + 1);
+            board[totalPieces - 1] = 0; // 0 - пустая ячейка
+            board = shuffleArray(board);
+            solvable = isSolvable(board, size);
+        } while (!solvable);
+    
+        // Обновление DOM один раз на основе сгенерированной доски
         let tiles = pieces.filter(p => !p.classList.contains('empty-spot'));
         let emptySpot = pieces.find(p => p.classList.contains('empty-spot'));
+        
+        for (let i = 0; i < totalPieces; i++) {
+            const value = board[i];
+            const newRow = Math.floor(i / size);
+            const newCol = i % size;
 
-        const emptyInitialPos = {
-            row: parseInt(emptySpot.dataset.row),
-            col: parseInt(emptySpot.dataset.col)
-        };
-
-        const moves = size * size * 100;
-        let prevMove = null;
-
-        for (let i = 0; i < moves; i++) {
-            const emptyRow = parseInt(emptySpot.dataset.row);
-            const emptyCol = parseInt(emptySpot.dataset.col);
-
-            const neighbors = [];
-            if (emptyRow > 0) neighbors.push({
-                row: emptyRow - 1,
-                col: emptyCol
-            });
-            if (emptyRow < size - 1) neighbors.push({
-                row: emptyRow + 1,
-                col: emptyCol
-            });
-            if (emptyCol > 0) neighbors.push({
-                row: emptyRow,
-                col: emptyCol - 1
-            });
-            if (emptyCol < size - 1) neighbors.push({
-                row: emptyRow,
-                col: emptyCol + 1
-            });
-
-            const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
-            const neighborPiece = pieces.find(p => parseInt(p.dataset.row) === randomNeighbor.row && parseInt(p.dataset.col) === randomNeighbor.col);
-
-            if (neighborPiece) {
-                swapPieces(neighborPiece, emptySpot);
+            if (value === 0) {
+                emptySpot.dataset.row = newRow;
+                emptySpot.dataset.col = newCol;
+                emptySpot.style.gridRowStart = newRow + 1;
+                emptySpot.style.gridColumnStart = newCol + 1;
+            } else {
+                const piece = tiles.find(p => {
+                    const correctRow = parseInt(p.dataset.correctRow);
+                    const correctCol = parseInt(p.dataset.correctCol);
+                    return correctRow * size + correctCol + 1 === value;
+                });
+                piece.dataset.row = newRow;
+                piece.dataset.col = newCol;
+                piece.style.gridRowStart = newRow + 1;
+                piece.style.gridColumnStart = newCol + 1;
             }
         }
         checkSolved();
     }
+    
+    //------------------------------------------
 
     function toggleFlip(div, axis) {
         if (axis === 'horizontal') {
@@ -378,9 +401,9 @@
                 const correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
                 div.classList.add(correct ? 'hint-correct' : 'hint-wrong');
             } else if (currentMode === 'mixed') {
-                 const correctPosition = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
-                 const correctFlip = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
-                 div.classList.add(correctPosition && correctFlip ? 'hint-correct' : 'hint-wrong');
+                const correctPosition = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
+                const correctFlip = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
+                div.classList.add(correctPosition && correctFlip ? 'hint-correct' : 'hint-wrong');
             }
         });
     }
