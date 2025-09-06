@@ -138,19 +138,19 @@
           toggleFlip(div, 'horizontal');
           checkSolved();
         });
+
+		div.addEventListener('dblclick', e => {
+		  e.preventDefault();
+		  toggleFlip(div, 'horizontal');
+		  checkSolved();
+		});
+
+		div.addEventListener('click', e => {
+		  e.preventDefault();
+		  toggleFlip(div, 'vertical');
+		  checkSolved();
+		});
       }
-
-	div.addEventListener('dblclick', e => {
-	  e.preventDefault();
-	  toggleFlip(div, 'horizontal');
-	  checkSolved();
-	});
-
-	div.addEventListener('click', e => {
-	  e.preventDefault();
-	  toggleFlip(div, 'vertical');
-	  checkSolved();
-	});
 
       puzzle.appendChild(div);
       pieces.push(div);
