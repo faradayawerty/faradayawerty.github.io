@@ -131,7 +131,7 @@
     langSelect.addEventListener('change', (e) => {
         currentLanguage = e.target.value;
         applyTranslations();
-        createPieces();
+        //createPieces();
     });
 
     function updatePuzzleGrid() {

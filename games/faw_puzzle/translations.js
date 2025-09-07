@@ -1120,6 +1120,26 @@ const translations = {
         cancel_crop_btn: 'ยกเลิก',
         multiplayer: 'ผู้เล่นหลายคน (WIP)',
     },
+ko: {
+    mode_flips: '모드: 뒤집기',
+    mode_drag: '모드: 드래그',
+    mode_fifteen: '모드: 열다섯',
+    mode_mixed: '모드: 혼합',
+    hints_on: '힌트: 켜기',
+    hints_off: '힌트: 끄기',
+    shuffle_btn: '섞기',
+    reset_btn: '재설정',
+    reset_timer_btn: '타이머 재설정',
+    error_count: '틀린 개수: ',
+    language_btn: '언어',
+    ru_lang: '러시아어',
+    en_lang: '영어',
+    file_label: '이미지 선택',
+    crop_modal_title: '이미지 자르기',
+    apply_crop_btn: '적용',
+    cancel_crop_btn: '취소',
+    multiplayer: '멀티플레이어 (개발 중)',
+},
     fil: {
         mode_flips: 'Mode: Baliktad',
         mode_drag: 'Mode: Kaladkad',
@@ -1203,49 +1223,17 @@ elv: {
 };
 
 const languages = {
-    ru: {
-        name: 'Русский',
-        flag: '🇷🇺'
+    al: {
+        name: 'Shqip',
+        flag: '🇦🇱'
     },
-    en: {
-        name: 'English',
-        flag: '🇬🇧'
+    az: {
+        name: 'Azərbaycan',
+        flag: '🇦🇿'
     },
-    es: {
-        name: 'Español',
-        flag: '🇪🇸'
-    },
-    de: {
-        name: 'Deutsch',
-        flag: '🇩🇪'
-    },
-    fr: {
-        name: 'Français',
-        flag: '🇫🇷'
-    },
-    ja: {
-        name: '日本語',
-        flag: '🇯🇵'
-    },
-    zh: {
-        name: '中文',
-        flag: '🇨🇳'
-    },
-    uk: {
-        name: 'Українська',
-        flag: '🇺🇦'
-    },
-    pl: {
-        name: 'Polski',
-        flag: '🇵🇱'
-    },
-    kk: {
-        name: 'Қазақ',
-        flag: '🇰🇿'
-    },
-    uz: {
-        name: 'Oʻzbek',
-        flag: '🇺🇿'
+    ba: {
+        name: 'Башҡорт',
+        flag: '🇧🇦'
     },
     be: {
         name: 'Беларуская',
@@ -1255,21 +1243,121 @@ const languages = {
         name: 'Български',
         flag: '🇧🇬'
     },
-    ba: {
-        name: 'Башҡорт',
+    bn: {
+        name: 'বাংলা',
+        flag: '🇧🇩'
+    },
+    br: {
+        name: 'Brezhoneg',
+        flag: '🇫🇷'
+    },
+    bs: {
+        name: 'Bosanski',
         flag: '🇧🇦'
     },
-    az: {
-        name: 'Azərbaycan',
-        flag: '🇦🇿'
+    ca: {
+        name: 'Català',
+        flag: '🇪🇸'
+    },
+    cs: {
+        name: 'Čeština',
+        flag: '🇨🇿'
+    },
+    cy: {
+        name: 'Cymraeg',
+        flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿'
+    },
+    da: {
+        name: 'Dansk',
+        flag: '🇩🇰'
+    },
+    de: {
+        name: 'Deutsch',
+        flag: '🇩🇪'
+    },
+    el: {
+        name: 'Ελληνικά',
+        flag: '🇬🇷'
+    },
+    en: {
+        name: 'English',
+        flag: '🇬🇧'
+    },
+    es: {
+        name: 'Español',
+        flag: '🇪🇸'
+    },
+    et: {
+        name: 'Eesti',
+        flag: '🇪🇪'
+    },
+    eu: {
+        name: 'Euskara',
+        flag: '🇪🇸'
+    },
+    fi: {
+        name: 'Suomi',
+        flag: '🇫🇮'
+    },
+    fil: {
+        name: 'Filipino',
+        flag: '🇵🇭'
+    },
+    fr: {
+        name: 'Français',
+        flag: '🇫🇷'
+    },
+    ga: {
+        name: 'Gaeilge',
+        flag: '🇮🇪'
+    },
+    gd: {
+        name: 'Gàidhlig',
+        flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿'
+    },
+    hr: {
+        name: 'Hrvatski',
+        flag: '🇭🇷'
+    },
+    hu: {
+        name: 'Magyar',
+        flag: '🇭🇺'
     },
     hy: {
         name: 'Հայերեն',
         flag: '🇦🇲'
     },
+    id: {
+        name: 'Bahasa Indonesia',
+        flag: '🇮🇩'
+    },
+    it: {
+        name: 'Italiano',
+        flag: '🇮🇹'
+    },
+    ja: {
+        name: '日本語',
+        flag: '🇯🇵'
+    },
     ka: {
         name: 'ქართული',
         flag: '🇬🇪'
+    },
+    kg: {
+        name: 'Кыргызча',
+        flag: '🇰🇬'
+    },
+    kk: {
+        name: 'Қазақ',
+        flag: '🇰🇿'
+    },
+    ko: {
+        name: '한국어',
+        flag: '🇰🇷'
+    },
+    lo: {
+        name: 'ລາວ',
+        flag: '🇱🇦'
     },
     lt: {
         name: 'Lietuvių',
@@ -1279,168 +1367,100 @@ const languages = {
         name: 'Latviešu',
         flag: '🇱🇻'
     },
-    et: {
-        name: 'Eesti',
-        flag: '🇪🇪'
-    },
-    sk: {
-        name: 'Slovenčina',
-        flag: '🇸🇰'
-    },
-    cs: {
-        name: 'Čeština',
-        flag: '🇨🇿'
-    },
-    hu: {
-        name: 'Magyar',
-        flag: '🇭🇺'
-    },
-    sr: {
-        name: 'Српски',
-        flag: '🇷🇸'
-    },
-    ro: {
-        name: 'Română',
-        flag: '🇷🇴'
-    },
-    hr: {
-        name: 'Hrvatski',
-        flag: '🇭🇷'
-    },
     mk: {
         name: 'Македонски',
         flag: '🇲🇰'
-    },
-    bs: {
-        name: 'Bosanski',
-        flag: '🇧🇦'
-    },
-    sl: {
-        name: 'Slovenščina',
-        flag: '🇸🇮'
-    },
-    al: {
-        name: 'Shqip',
-        flag: '🇦🇱'
     },
     mn: {
         name: 'Монгол',
         flag: '🇲🇳'
     },
-    kg: {
-        name: 'Кыргызча',
-        flag: '🇰🇬'
-    },
-    tg: {
-        name: 'Тоҷикӣ',
-        flag: '🇹🇯'
-    },
-    tm: {
-        name: 'Türkmençe',
-        flag: '🇹🇲'
-    },
-    it: {
-        name: 'Italiano',
-        flag: '🇮🇹'
-    },
-    da: {
-        name: 'Dansk',
-        flag: '🇩🇰'
-    },
-    nl: {
-        name: 'Nederlands',
-        flag: '🇳🇱'
-    },
-    fi: {
-        name: 'Suomi',
-        flag: '🇫🇮'
-    },
-    el: {
-        name: 'Ελληνικά',
-        flag: '🇬🇷'
-    },
-    ga: {
-        name: 'Gaeilge',
-        flag: '🇮🇪'
+    ms: {
+        name: 'Bahasa Melayu',
+        flag: '🇲🇾'
     },
     mt: {
         name: 'Malti',
         flag: '🇲🇹'
     },
+    ne: {
+        name: 'नेपाली',
+        flag: '🇳🇵'
+    },
+    nl: {
+        name: 'Nederlands',
+        flag: '🇳🇱'
+    },
+    pl: {
+        name: 'Polski',
+        flag: '🇵🇱'
+    },
     pt: {
         name: 'Português',
         flag: '🇵🇹'
     },
-    sv: {
-        name: 'Svenska',
-        flag: '🇸🇪'
+    ro: {
+        name: 'Română',
+        flag: '🇷🇴'
     },
-    br: {
-        name: 'Brezhoneg',
-        flag: '🇫🇷'
-    },
-    eu: {
-        name: 'Euskara',
-        flag: '🇪🇸'
-    },
-tr: {
-    name: 'Türkçe',
-    flag: '🇹🇷'
-},
-    ca: {
-        name: 'Català',
-        flag: '🇪🇸'
-    },
-    gd: {
-        name: 'Gàidhlig',
-        flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿'
-    },
-    cy: {
-        name: 'Cymraeg',
-        flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿'
-    },
-    ko: {
-        name: '한국어',
-        flag: '🇰🇷'
-    },
-    bn: {
-        name: 'বাংলা',
-        flag: '🇧🇩'
-    },
-    ne: {
-        name: 'नेपाली',
-        flag: '🇳🇵'
+    ru: {
+        name: 'Русский',
+        flag: '🇷🇺'
     },
     si: {
         name: 'සිංහල',
         flag: '🇱🇰'
     },
-    id: {
-        name: 'Bahasa Indonesia',
-        flag: '🇮🇩'
+    sk: {
+        name: 'Slovenčina',
+        flag: '🇸🇰'
     },
-    ms: {
-        name: 'Bahasa Melayu',
-        flag: '🇲🇾'
+    sl: {
+        name: 'Slovenščina',
+        flag: '🇸🇮'
     },
-    vi: {
-        name: 'Tiếng Việt',
-        flag: '🇻🇳'
+    sr: {
+        name: 'Српски',
+        flag: '🇷🇸'
+    },
+    sv: {
+        name: 'Svenska',
+        flag: '🇸🇪'
+    },
+    tg: {
+        name: 'Тоҷикӣ',
+        flag: '🇹🇯'
     },
     th: {
         name: 'ไทย',
         flag: '🇹🇭'
     },
-    fil: {
-        name: 'Filipino',
-        flag: '🇵🇭'
+    tm: {
+        name: 'Türkmençe',
+        flag: '🇹🇲'
     },
-    lo: {
-        name: 'ລາວ',
-        flag: '🇱🇦'
+    tr: {
+        name: 'Türkçe',
+        flag: '🇹🇷'
     },
-elv: {
-    name: 'Sindarin',
-    flag: '⭐'
-},
+    uk: {
+        name: 'Українська',
+        flag: '🇺🇦'
+    },
+    uz: {
+        name: 'Oʻzbek',
+        flag: '🇺🇿'
+    },
+    vi: {
+        name: 'Tiếng Việt',
+        flag: '🇻🇳'
+    },
+    zh: {
+        name: '中文',
+        flag: '🇨🇳'
+    },
+    elv: {
+        name: 'Sindarin',
+        flag: '⭐'
+    },
 };
