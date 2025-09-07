@@ -1,3 +1,8 @@
+/*
+ * Поддерживаемые языки
+ * Shqip, Azərbaycan, Башҡорт, Беларуская, Български, বাংলা, Brezhoneg, Bosanski, Català, Čeština, Cymraeg, Dansk, Deutsch, Ελληνικά, English, Español, Eesti, Euskara, Suomi, Filipino, Français, Gaeilge, Gàidhlig, Hrvatski, Magyar, Հայերեն, Bahasa Indonesia, Italiano, 日本語, ქართული, Кыргызча, Қазақ, 한국어, ລາວ, Lietuvių, Latviešu, Македонски, Монгол, Bahasa Melayu, Malti, नेपाली, Nederlands, Polski, Português, Română, Русский, සිංහල, Slovenčina, Slovenščina, Српски, Svenska, Тоҷикӣ, ไทย, Türkmençe, Türkçe, Українська, Oʻzbek, Tiếng Việt, 中文, Sindarin
+ *
+ */
 
 const translations = {
     ru: {
@@ -8,7 +13,7 @@ const translations = {
         hints_on: 'Подсказки: ВКЛ',
         hints_off: 'Подсказки: ВЫКЛ',
         shuffle_btn: 'Перемешать',
-        reset_btn: 'Сбросить',
+        reset_btn: 'Собрать',
         reset_timer_btn: 'Сбросить таймер',
         error_count: 'Не на своём месте: ',
         language_btn: 'Язык',
@@ -28,7 +33,7 @@ const translations = {
         hints_on: 'Hints: ON',
         hints_off: 'Hints: OFF',
         shuffle_btn: 'Shuffle',
-        reset_btn: 'Reset',
+        reset_btn: 'Reset Image',
         reset_timer_btn: 'Reset timer',
         error_count: 'Out of place: ',
         language_btn: 'Language',
