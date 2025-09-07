@@ -125,6 +125,8 @@
         currentModeIndex = (currentModeIndex + 1) % modes.length;
         currentMode = modes[currentModeIndex];
         modeBtn.textContent = translations[currentLanguage]['mode_' + currentMode];
+        timer = 0;
+        timerDisplay.textContent = formatTime(timer);
         createPieces();
     });
 
