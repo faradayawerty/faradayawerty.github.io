@@ -8,6 +8,7 @@
     const errorCount = document.getElementById('errorCount');
     const timerDisplay = document.getElementById('timerDisplay');
     const resetTimerBtn = document.getElementById('resetTimerBtn');
+    const multiplayerBtn = document.getElementById('multiplayer');
 
     const cropModal = document.getElementById('cropModal');
     const closeCropModalBtn = document.getElementById('closeCropModal');
@@ -26,13 +27,17 @@
 
     const modeBtn = document.createElement('button');
     modeBtn.id = 'modeBtn';
-    modeBtn.textContent = 'Режим: Перевороты';
     controls.appendChild(modeBtn);
 
     const hintsBtn = document.createElement('button');
     hintsBtn.id = 'hintsBtn';
-    hintsBtn.textContent = 'Подсказки: ВЫКЛ';
     controls.appendChild(hintsBtn);
+
+    const langSelect = document.createElement('select');
+    langSelect.id = 'langSelect';
+    controls.insertBefore(langSelect, multiplayerBtn);
+
+    let currentLanguage = 'ru';
 
     const modes = ['flips', 'drag', 'mixed', 'fifteen'];
     let currentModeIndex = 0;
@@ -50,6 +55,49 @@
         sizeSelect.appendChild(opt);
     }
     sizeSelect.value = size;
+    
+    // Заполняем dropdown для выбора языка
+    for (const langCode in languages) {
+        const opt = document.createElement('option');
+        opt.value = langCode;
+        opt.textContent = languages[langCode].flag + ' ' + languages[langCode].name;
+        langSelect.appendChild(opt);
+    }
+    langSelect.value = currentLanguage;
+
+    function applyTranslations() {
+        modeBtn.textContent = translations[currentLanguage]['mode_' + currentMode];
+        hintsBtn.textContent = hintsOn ? translations[currentLanguage].hints_on : translations[currentLanguage].hints_off;
+        shuffleBtn.textContent = translations[currentLanguage].shuffle_btn;
+        resetBtn.textContent = translations[currentLanguage].reset_btn;
+        resetTimerBtn.textContent = translations[currentLanguage].reset_timer_btn;
+        errorCount.textContent = translations[currentLanguage].error_count + getWrongCount();
+
+        const fileLabel = document.querySelector('.file-label span');
+        if (fileLabel) {
+            fileLabel.textContent = translations[currentLanguage].file_label;
+        }
+
+        const multiplayerBtn = document.getElementById('multiplayer');
+        if (multiplayerBtn) {
+            multiplayerBtn.textContent = translations[currentLanguage].multiplayer;
+        }
+
+        const modalTitle = document.querySelector('#cropModal h2');
+        if (modalTitle) {
+            modalTitle.textContent = translations[currentLanguage].crop_modal_title;
+        }
+
+        const applyBtn = document.getElementById('applyCropBtn');
+        if (applyBtn) {
+            applyBtn.textContent = translations[currentLanguage].apply_crop_btn;
+        }
+
+        const cancelBtn = document.getElementById('cancelCropBtn');
+        if (cancelBtn) {
+            cancelBtn.textContent = translations[currentLanguage].cancel_crop_btn;
+        }
+    }
 
     function formatTime(seconds) {
         const min = Math.floor(seconds / 60);
@@ -69,29 +117,20 @@
 
     hintsBtn.addEventListener('click', () => {
         hintsOn = !hintsOn;
-        hintsBtn.textContent = hintsOn ? 'Подсказки: ВКЛ' : 'Подсказки: ВЫКЛ';
+        hintsBtn.textContent = hintsOn ? translations[currentLanguage].hints_on : translations[currentLanguage].hints_off;
         applyHints();
     });
 
     modeBtn.addEventListener('click', () => {
         currentModeIndex = (currentModeIndex + 1) % modes.length;
         currentMode = modes[currentModeIndex];
+        modeBtn.textContent = translations[currentLanguage]['mode_' + currentMode];
+        createPieces();
+    });
 
-        switch (currentMode) {
-            case 'flips':
-                modeBtn.textContent = 'Режим: Перевороты';
-                break;
-            case 'drag':
-                modeBtn.textContent = 'Режим: Перетаскивание';
-                break;
-            case 'fifteen':
-                modeBtn.textContent = 'Режим: Пятнашки';
-                break;
-            case 'mixed':
-                modeBtn.textContent = 'Режим: Смешанный';
-                break;
-        }
-
+    langSelect.addEventListener('change', (e) => {
+        currentLanguage = e.target.value;
+        applyTranslations();
         createPieces();
     });
 
@@ -388,19 +427,19 @@
                 updateTransform(div);
             });
         }
+        timer = 0;
+        timerDisplay.textContent = formatTime(timer);
         checkSolved();
     }
 
-function applyHints() {
+    function applyHints() {
         puzzle.classList.toggle('hints-on', hintsOn);
 
         pieces.forEach(div => {
-            // Удаляем все классы подсказок для чистоты
             div.classList.remove('hint-correct', 'hint-wrong');
             const hintNumberEl = div.querySelector('.hint-number');
             if (hintNumberEl) {
                 hintNumberEl.classList.remove('hint-number-correct', 'hint-number-wrong');
-                // Скрываем номер, если подсказки выключены или режим - "flips"
                 hintNumberEl.style.display = (hintsOn && currentMode !== 'flips') ? 'block' : 'none';
             }
 
@@ -426,22 +465,18 @@ function applyHints() {
         });
     }
 
-    function checkSolved() {
+    function getWrongCount() {
         let wrongCount = 0;
-        let allCorrect = true;
-
         if (currentMode === 'fifteen' || currentMode === 'drag') {
             for (const div of pieces.filter(p => !p.classList.contains('empty-spot'))) {
                 if (div.dataset.row != div.dataset.correctRow || div.dataset.col != div.dataset.correctCol) {
                     wrongCount++;
-                    allCorrect = false;
                 }
             }
         } else if (currentMode === 'flips') {
             for (const div of pieces) {
                 if (div.dataset.flipH !== 'false' || div.dataset.flipV !== 'false') {
                     wrongCount++;
-                    allCorrect = false;
                 }
             }
         } else if (currentMode === 'mixed') {
@@ -450,12 +485,17 @@ function applyHints() {
                 const correctFlip = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
                 if (!correctPosition || !correctFlip) {
                     wrongCount++;
-                    allCorrect = false;
                 }
             }
         }
+        return wrongCount;
+    }
 
-        errorCount.textContent = `Не на своём месте: ${wrongCount}`;
+    function checkSolved() {
+        const wrongCount = getWrongCount();
+        const allCorrect = wrongCount === 0;
+
+        errorCount.textContent = translations[currentLanguage].error_count + wrongCount;
         puzzle.style.borderColor = allCorrect ? 'green' : 'red';
 
         applyHints();
@@ -464,6 +504,9 @@ function applyHints() {
 
     sizeSelect.addEventListener('change', () => {
         size = +sizeSelect.value;
+        // Сбрасываем таймер
+        timer = 0;
+        timerDisplay.textContent = formatTime(timer);
         createPieces();
     });
 
@@ -654,4 +697,5 @@ function applyHints() {
 
     createPieces();
     startTimerLoop();
+    applyTranslations();
 })();
