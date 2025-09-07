@@ -563,6 +563,8 @@
             cropModal.classList.remove('active');
             cropper.destroy();
             createPieces();
+        timer = 0;
+        timerDisplay.textContent = formatTime(timer);
         }
     });
 
