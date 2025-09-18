@@ -200,12 +200,10 @@
             div.style.gridRowStart = row + 1;
             div.style.gridColumnStart = col + 1;
 
-            if (currentMode !== 'flips') {
-                const hintNumber = document.createElement('span');
-                hintNumber.classList.add('hint-number');
-                hintNumber.textContent = i + 1;
-                div.appendChild(hintNumber);
-            }
+            const hintNumber = document.createElement('span');
+            hintNumber.classList.add('hint-number');
+            hintNumber.textContent = i + 1;
+            div.appendChild(hintNumber);
 
             if (currentMode === 'fifteen') {
                 div.style.cursor = 'pointer';
@@ -647,15 +645,8 @@
     function checkSolved() {
         const wrongCount = getWrongCount();
         const allCorrect = wrongCount === 0;
-
         errorCount.textContent = getTranslation('error_count') + wrongCount;
-
-        //if (hintsOn) {
-            puzzle.style.borderColor = allCorrect ? 'green' : 'red';
-        //} else {
-        //    puzzle.style.borderColor = 'green';
-        //}
-
+        puzzle.style.borderColor = allCorrect ? 'green' : 'red';
         applyHints();
         return allCorrect;
     }
