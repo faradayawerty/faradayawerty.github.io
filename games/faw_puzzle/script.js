@@ -13,7 +13,7 @@
     const cropModal = document.getElementById('cropModal');
     const closeCropModalBtn = document.getElementById('closeCropModal');
     const cropperImage = document.getElementById('cropperImage');
-    const applyCropBtn = document.getElementById('applyCropBtn');
+    const applyCropBtn = document = document.getElementById('applyCropBtn');
     const cancelCropBtn = document.getElementById('cancelCropBtn');
 
     let imgSrc = 'img.jpg';
@@ -39,7 +39,7 @@
 
     let currentLanguage = 'ru';
 
-    const modes = ['flips', 'drag', 'mixed', 'fifteen'];
+    const modes = ['flips', 'drag', 'mixed', 'fifteen', 'rotate', 'complex_flips', 'complex_rotate'];
     let currentModeIndex = 0;
     let currentMode = modes[currentModeIndex];
     let selectedPiece = null;
@@ -55,7 +55,7 @@
         sizeSelect.appendChild(opt);
     }
     sizeSelect.value = size;
-    
+
     // Заполняем dropdown для выбора языка
     for (const langCode in languages) {
         const opt = document.createElement('option');
@@ -65,37 +65,41 @@
     }
     langSelect.value = currentLanguage;
 
+    function getTranslation(key) {
+        return translations[currentLanguage][key] || translations['en'][key] || key;
+    }
+
     function applyTranslations() {
-        modeBtn.textContent = translations[currentLanguage]['mode_' + currentMode];
-        hintsBtn.textContent = hintsOn ? translations[currentLanguage].hints_on : translations[currentLanguage].hints_off;
-        shuffleBtn.textContent = translations[currentLanguage].shuffle_btn;
-        resetBtn.textContent = translations[currentLanguage].reset_btn;
-        resetTimerBtn.textContent = translations[currentLanguage].reset_timer_btn;
-        errorCount.textContent = translations[currentLanguage].error_count + getWrongCount();
+        modeBtn.textContent = getTranslation('mode_' + currentMode);
+        hintsBtn.textContent = hintsOn ? getTranslation('hints_on') : getTranslation('hints_off');
+        shuffleBtn.textContent = getTranslation('shuffle_btn');
+        resetBtn.textContent = getTranslation('reset_btn');
+        resetTimerBtn.textContent = getTranslation('reset_timer_btn');
+        errorCount.textContent = getTranslation('error_count') + getWrongCount();
 
         const fileLabel = document.querySelector('.file-label span');
         if (fileLabel) {
-            fileLabel.textContent = translations[currentLanguage].file_label;
+            fileLabel.textContent = getTranslation('file_label');
         }
 
         const multiplayerBtn = document.getElementById('multiplayer');
         if (multiplayerBtn) {
-            multiplayerBtn.textContent = translations[currentLanguage].multiplayer;
+            multiplayerBtn.textContent = getTranslation('multiplayer');
         }
 
         const modalTitle = document.querySelector('#cropModal h2');
         if (modalTitle) {
-            modalTitle.textContent = translations[currentLanguage].crop_modal_title;
+            modalTitle.textContent = getTranslation('crop_modal_title');
         }
 
         const applyBtn = document.getElementById('applyCropBtn');
         if (applyBtn) {
-            applyBtn.textContent = translations[currentLanguage].apply_crop_btn;
+            applyBtn.textContent = getTranslation('apply_crop_btn');
         }
 
         const cancelBtn = document.getElementById('cancelCropBtn');
         if (cancelBtn) {
-            cancelBtn.textContent = translations[currentLanguage].cancel_crop_btn;
+            cancelBtn.textContent = getTranslation('cancel_crop_btn');
         }
     }
 
@@ -117,14 +121,14 @@
 
     hintsBtn.addEventListener('click', () => {
         hintsOn = !hintsOn;
-        hintsBtn.textContent = hintsOn ? translations[currentLanguage].hints_on : translations[currentLanguage].hints_off;
-        applyHints();
+        hintsBtn.textContent = hintsOn ? getTranslation('hints_on') : getTranslation('hints_off');
+        checkSolved();
     });
 
     modeBtn.addEventListener('click', () => {
         currentModeIndex = (currentModeIndex + 1) % modes.length;
         currentMode = modes[currentModeIndex];
-        modeBtn.textContent = translations[currentLanguage]['mode_' + currentMode];
+        modeBtn.textContent = getTranslation('mode_' + currentMode);
         timer = 0;
         timerDisplay.textContent = formatTime(timer);
         createPieces();
@@ -133,7 +137,6 @@
     langSelect.addEventListener('change', (e) => {
         currentLanguage = e.target.value;
         applyTranslations();
-        //createPieces();
     });
 
     function updatePuzzleGrid() {
@@ -192,6 +195,7 @@
             div.dataset.col = col;
             div.dataset.flipH = 'false';
             div.dataset.flipV = 'false';
+            div.dataset.rotate = '0';
 
             div.style.gridRowStart = row + 1;
             div.style.gridColumnStart = col + 1;
@@ -246,6 +250,37 @@
                 div.addEventListener('click', e => {
                     toggleFlip(div, 'vertical');
                     checkSolved();
+                });
+            } else if (currentMode === 'rotate') {
+                const hintArrow = document.createElement('span');
+                hintArrow.classList.add('hint-arrow');
+                div.appendChild(hintArrow);
+                div.addEventListener('click', () => {
+                    rotatePiece(div);
+                    checkSolved();
+                });
+            } else if (currentMode === 'complex_flips') {
+                div.style.cursor = 'pointer';
+                div.addEventListener('click', e => {
+                    e.preventDefault();
+                    complexFlipClickHandler(div, 'vertical');
+                });
+                div.addEventListener('contextmenu', e => {
+                    e.preventDefault();
+                    complexFlipClickHandler(div, 'horizontal');
+                });
+                div.addEventListener('dblclick', e => {
+                    e.preventDefault();
+                    complexFlipClickHandler(div, 'horizontal');
+                });
+            } else if (currentMode === 'complex_rotate') {
+                const hintArrow = document.createElement('span');
+                hintArrow.classList.add('hint-arrow');
+                div.appendChild(hintArrow);
+                div.style.cursor = 'pointer';
+                div.addEventListener('click', e => {
+                    e.preventDefault();
+                    complexRotateClickHandler(div);
                 });
             }
 
@@ -357,16 +392,73 @@
         updateTransform(div);
     }
 
+    function rotatePiece(div) {
+        let currentRotation = parseInt(div.dataset.rotate);
+        currentRotation += 90;
+        div.dataset.rotate = currentRotation;
+
+        // Явно сбрасываем атрибуты переворотов для этого режима
+        div.dataset.flipH = 'false';
+        div.dataset.flipV = 'false';
+
+        updateTransform(div);
+    }
+
     function updateTransform(div) {
-        const flipH = div.dataset.flipH === 'true';
-        const flipV = div.dataset.flipV === 'true';
-        const scaleX = flipH ? -1 : 1;
-        const scaleY = flipV ? -1 : 1;
-        div.style.transform = `scale(${scaleX}, ${scaleY})`;
+        let transformString = '';
+        if (currentMode === 'flips' || currentMode === 'mixed' || currentMode === 'complex_flips') {
+            const flipH = div.dataset.flipH === 'true';
+            const flipV = div.dataset.flipV === 'true';
+            const scaleX = flipH ? -1 : 1;
+            const scaleY = flipV ? -1 : 1;
+            transformString += `scale(${scaleX}, ${scaleY}) `;
+        }
+        if (currentMode === 'rotate' || currentMode === 'mixed' || currentMode === 'complex_rotate') {
+            const rotation = parseInt(div.dataset.rotate);
+            transformString += `rotate(${rotation}deg)`;
+        }
+        div.style.transform = transformString.trim();
+    }
+
+    // НОВЫЕ ФУНКЦИИ-ОБРАБОТЧИКИ
+    function getNeighbors(div) {
+        const row = parseInt(div.dataset.row);
+        const col = parseInt(div.dataset.col);
+        const neighbors = [];
+
+        // Соседи по горизонтали и вертикали
+        const neighborCoords = [
+            [row - 1, col],
+            [row + 1, col],
+            [row, col - 1],
+            [row, col + 1]
+        ];
+
+        neighborCoords.forEach(([nRow, nCol]) => {
+            const neighbor = pieces.find(p => parseInt(p.dataset.row) === nRow && parseInt(p.dataset.col) === nCol);
+            if (neighbor && !neighbor.classList.contains('empty-spot')) {
+                neighbors.push(neighbor);
+            }
+        });
+
+        return neighbors;
+    }
+
+    function complexFlipClickHandler(div, axis) {
+        const tilesToFlip = [div, ...getNeighbors(div)];
+        tilesToFlip.forEach(tile => toggleFlip(tile, axis));
+        checkSolved();
+    }
+
+    function complexRotateClickHandler(div) {
+        const tilesToRotate = [div, ...getNeighbors(div)];
+        tilesToRotate.forEach(tile => rotatePiece(tile));
+        checkSolved();
     }
 
     function shufflePuzzle() {
         if (currentMode === 'fifteen') {
+            resetPuzzle();
             shuffleFifteen();
         } else if (currentMode === 'drag' || currentMode === 'mixed') {
             let positions = pieces.map(p => ({
@@ -390,79 +482,132 @@
             }
 
             checkSolved();
-        } else {
+        } else if (currentMode === 'flips') {
             pieces.forEach(div => {
                 div.dataset.flipH = Math.random() < 0.5 ? 'true' : 'false';
                 div.dataset.flipV = Math.random() < 0.5 ? 'true' : 'false';
                 updateTransform(div);
             });
             checkSolved();
+        } else if (currentMode === 'rotate') {
+            pieces.forEach(div => {
+                const randomRotation = Math.floor(Math.random() * 4) * 90;
+                div.dataset.rotate = randomRotation;
+                // Убеждаемся, что при перемешивании в режиме поворотов, переворотов нет
+                div.dataset.flipH = 'false';
+                div.dataset.flipV = 'false';
+                updateTransform(div);
+            });
+            checkSolved();
+        }
+        // УЛУЧШЕННОЕ ПЕРЕМЕШИВАНИЕ ДЛЯ LIGHTS OUT
+        else if (currentMode === 'complex_flips' || currentMode === 'complex_rotate') {
+            // 1. Сброс головоломки в собранное состояние
+            resetPuzzle();
+            
+            // 2. Генерация решаемого состояния
+            const puzzlePieces = pieces.filter(p => !p.classList.contains('empty-spot'));
+            puzzlePieces.forEach(piece => {
+                if (Math.random() < 0.5) { // 50% шанс "нажать" на тайл
+                    if (currentMode === 'complex_flips') {
+                        // Случайный выбор оси для переворота
+                        const axis = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+                        complexFlipClickHandler(piece, axis);
+                    } else if (currentMode === 'complex_rotate') {
+                        complexRotateClickHandler(piece);
+                    }
+                }
+            });
         }
         timer = 0;
         timerDisplay.textContent = formatTime(timer);
     }
 
     function resetPuzzle() {
-        if (currentMode === 'fifteen') {
-            pieces.forEach(div => {
-                const correctRow = div.dataset.correctRow;
-                const correctCol = div.dataset.correctCol;
+        pieces.forEach(div => {
+            // Сбрасываем все трансформации
+            div.dataset.flipH = 'false';
+            div.dataset.flipV = 'false';
+            div.dataset.rotate = '0';
+            updateTransform(div);
 
-                div.dataset.row = correctRow;
-                div.dataset.col = correctCol;
-                div.style.gridRowStart = parseInt(correctRow) + 1;
-                div.style.gridColumnStart = parseInt(correctCol) + 1;
-            });
-        } else if (currentMode === 'drag' || currentMode === 'mixed') {
-            pieces.forEach(div => {
-                div.dataset.row = div.dataset.correctRow;
-                div.dataset.col = div.dataset.correctCol;
-                div.style.gridRowStart = parseInt(div.dataset.correctRow) + 1;
-                div.style.gridColumnStart = parseInt(div.dataset.correctCol) + 1;
-            });
+            // Возвращаем на правильные позиции
+            div.dataset.row = div.dataset.correctRow;
+            div.dataset.col = div.dataset.correctCol;
+            div.style.gridRowStart = parseInt(div.dataset.correctRow) + 1;
+            div.style.gridColumnStart = parseInt(div.dataset.correctCol) + 1;
+        });
+
+        // Отдельно обрабатываем пустое место для режима "Пятнашки"
+        const emptySpot = pieces.find(p => p.classList.contains('empty-spot'));
+        if (emptySpot) {
+            emptySpot.dataset.row = emptySpot.dataset.correctRow;
+            emptySpot.dataset.col = emptySpot.dataset.correctCol;
+            emptySpot.style.gridRowStart = parseInt(emptySpot.dataset.correctRow) + 1;
+            emptySpot.style.gridColumnStart = parseInt(emptySpot.dataset.correctCol) + 1;
         }
 
-        if (currentMode === 'flips' || currentMode === 'mixed') {
-            pieces.forEach(div => {
-                div.dataset.flipH = 'false';
-                div.dataset.flipV = 'false';
-                updateTransform(div);
-            });
-        }
         timer = 0;
         timerDisplay.textContent = formatTime(timer);
         checkSolved();
     }
 
     function applyHints() {
-        puzzle.classList.toggle('hints-on', hintsOn);
-
+        // Убираем все классы, связанные с подсветкой, независимо от состояния подсказок.
         pieces.forEach(div => {
-            div.classList.remove('hint-correct', 'hint-wrong');
             const hintNumberEl = div.querySelector('.hint-number');
+            const hintArrowEl = div.querySelector('.hint-arrow');
+            div.classList.remove('hint-correct', 'hint-wrong');
             if (hintNumberEl) {
+                hintNumberEl.style.display = 'none';
                 hintNumberEl.classList.remove('hint-number-correct', 'hint-number-wrong');
-                hintNumberEl.style.display = (hintsOn && currentMode !== 'flips') ? 'block' : 'none';
             }
+            if (hintArrowEl) {
+                hintArrowEl.style.display = 'none';
+                hintArrowEl.classList.remove('hint-arrow-correct', 'hint-arrow-wrong');
+            }
+        });
 
-            if (!hintsOn || div.classList.contains('empty-spot')) {
+        // Если подсказки выключены, просто выходим из функции.
+        if (!hintsOn) {
+            return;
+        }
+
+        // Если подсказки включены, показываем их и применяем стили
+        pieces.forEach(div => {
+            const hintNumberEl = div.querySelector('.hint-number');
+            const hintArrowEl = div.querySelector('.hint-arrow');
+
+            if (div.classList.contains('empty-spot')) {
                 return;
             }
+
+            if (hintNumberEl) hintNumberEl.style.display = 'block';
+            if (hintArrowEl) hintArrowEl.style.display = 'block';
 
             let correct = false;
             if (currentMode === 'fifteen' || currentMode === 'drag') {
                 correct = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
-            } else if (currentMode === 'flips') {
+            } else if (currentMode === 'flips' || currentMode === 'complex_flips') {
                 correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
             } else if (currentMode === 'mixed') {
                 const correctPosition = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
                 const correctFlip = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
                 correct = correctPosition && correctFlip;
+            } else if (currentMode === 'rotate' || currentMode === 'complex_rotate') {
+                correct = parseInt(div.dataset.rotate) % 360 === 0;
+                if (hintArrowEl) {
+                    hintArrowEl.textContent = '↑';
+                    hintArrowEl.classList.add(correct ? 'hint-arrow-correct' : 'hint-arrow-wrong');
+                }
             }
-            div.classList.add(correct ? 'hint-correct' : 'hint-wrong');
+
+            div.classList.toggle('hint-correct', correct);
+            div.classList.toggle('hint-wrong', !correct);
 
             if (hintNumberEl) {
-                hintNumberEl.classList.add(correct ? 'hint-number-correct' : 'hint-number-wrong');
+                hintNumberEl.classList.toggle('hint-number-correct', correct);
+                hintNumberEl.classList.toggle('hint-number-wrong', !correct);
             }
         });
     }
@@ -475,7 +620,7 @@
                     wrongCount++;
                 }
             }
-        } else if (currentMode === 'flips') {
+        } else if (currentMode === 'flips' || currentMode === 'complex_flips') {
             for (const div of pieces) {
                 if (div.dataset.flipH !== 'false' || div.dataset.flipV !== 'false') {
                     wrongCount++;
@@ -489,6 +634,12 @@
                     wrongCount++;
                 }
             }
+        } else if (currentMode === 'rotate' || currentMode === 'complex_rotate') {
+            for (const div of pieces) {
+                if (parseInt(div.dataset.rotate) % 360 !== 0) {
+                    wrongCount++;
+                }
+            }
         }
         return wrongCount;
     }
@@ -497,8 +648,13 @@
         const wrongCount = getWrongCount();
         const allCorrect = wrongCount === 0;
 
-        errorCount.textContent = translations[currentLanguage].error_count + wrongCount;
-        puzzle.style.borderColor = allCorrect ? 'green' : 'red';
+        errorCount.textContent = getTranslation('error_count') + wrongCount;
+
+        if (hintsOn) {
+            puzzle.style.borderColor = allCorrect ? 'green' : 'red';
+        } else {
+            puzzle.style.borderColor = 'green';
+        }
 
         applyHints();
         return allCorrect;
@@ -506,7 +662,6 @@
 
     sizeSelect.addEventListener('change', () => {
         size = +sizeSelect.value;
-        // Сбрасываем таймер
         timer = 0;
         timerDisplay.textContent = formatTime(timer);
         createPieces();
@@ -563,8 +718,8 @@
             cropModal.classList.remove('active');
             cropper.destroy();
             createPieces();
-        timer = 0;
-        timerDisplay.textContent = formatTime(timer);
+            timer = 0;
+            timerDisplay.textContent = formatTime(timer);
         }
     });
 
