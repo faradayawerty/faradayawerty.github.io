@@ -13,7 +13,7 @@
     const cropModal = document.getElementById('cropModal');
     const closeCropModalBtn = document.getElementById('closeCropModal');
     const cropperImage = document.getElementById('cropperImage');
-    const applyCropBtn = document = document.getElementById('applyCropBtn');
+    const applyCropBtn = document.getElementById('applyCropBtn');
     const cancelCropBtn = document.getElementById('cancelCropBtn');
 
     let imgSrc = 'img.jpg';
@@ -56,7 +56,6 @@
     }
     sizeSelect.value = size;
 
-    // Заполняем dropdown для выбора языка
     for (const langCode in languages) {
         const opt = document.createElement('option');
         opt.value = langCode;
@@ -181,13 +180,18 @@
             } = positions[i];
             const div = document.createElement('div');
             div.classList.add('piece');
-            div.style.backgroundImage = `url(${imgSrc})`;
-            div.style.backgroundSize = `${fullSizePx}px ${fullSizePx}px`;
+            div.style.fontSize = `${pieceSizePx * 0.3}px`; // Размер шрифта для адаптивных подсказок
+
+            const imageInner = document.createElement('div');
+            imageInner.classList.add('piece-image-inner');
+            imageInner.style.backgroundImage = `url(${imgSrc})`;
+            imageInner.style.backgroundSize = `${fullSizePx}px ${fullSizePx}px`;
 
             const correctRow = Math.floor(i / size);
             const correctCol = i % size;
 
-            div.style.backgroundPosition = `-${correctCol * pieceSizePx}px -${correctRow * pieceSizePx}px`;
+            imageInner.style.backgroundPosition = `-${correctCol * pieceSizePx}px -${correctRow * pieceSizePx}px`;
+
             div.dataset.correctRow = correctRow;
             div.dataset.correctCol = correctCol;
 
@@ -199,6 +203,8 @@
 
             div.style.gridRowStart = row + 1;
             div.style.gridColumnStart = col + 1;
+
+            div.appendChild(imageInner);
 
             const hintNumber = document.createElement('span');
             hintNumber.classList.add('hint-number');
@@ -271,6 +277,15 @@
                     e.preventDefault();
                     complexFlipClickHandler(div, 'horizontal');
                 });
+
+                const flipIndicatorH = document.createElement('span');
+                flipIndicatorH.classList.add('flip-indicator', 'flip-indicator-h');
+                div.appendChild(flipIndicatorH);
+
+                const flipIndicatorV = document.createElement('span');
+                flipIndicatorV.classList.add('flip-indicator', 'flip-indicator-v');
+                div.appendChild(flipIndicatorV);
+
             } else if (currentMode === 'complex_rotate') {
                 const hintArrow = document.createElement('span');
                 hintArrow.classList.add('hint-arrow');
@@ -382,6 +397,10 @@
     }
 
     function toggleFlip(div, axis) {
+        if (!div.classList.contains('piece')) return;
+        const imageInner = div.querySelector('.piece-image-inner');
+        if (!imageInner) return;
+
         if (axis === 'horizontal') {
             div.dataset.flipH = div.dataset.flipH === 'true' ? 'false' : 'true';
         } else if (axis === 'vertical') {
@@ -391,11 +410,11 @@
     }
 
     function rotatePiece(div) {
+        if (!div.classList.contains('piece')) return;
         let currentRotation = parseInt(div.dataset.rotate);
         currentRotation += 90;
         div.dataset.rotate = currentRotation;
 
-        // Явно сбрасываем атрибуты переворотов для этого режима
         div.dataset.flipH = 'false';
         div.dataset.flipV = 'false';
 
@@ -403,28 +422,34 @@
     }
 
     function updateTransform(div) {
-        let transformString = '';
+        const imageInner = div.querySelector('.piece-image-inner');
+        if (!imageInner) return;
+
+        let pieceTransformString = '';
+        let imageTransformString = '';
+
         if (currentMode === 'flips' || currentMode === 'mixed' || currentMode === 'complex_flips') {
             const flipH = div.dataset.flipH === 'true';
             const flipV = div.dataset.flipV === 'true';
             const scaleX = flipH ? -1 : 1;
             const scaleY = flipV ? -1 : 1;
-            transformString += `scale(${scaleX}, ${scaleY}) `;
+            imageTransformString += `scale(${scaleX}, ${scaleY}) `;
         }
-        if (currentMode === 'rotate' || currentMode === 'mixed' || currentMode === 'complex_rotate') {
+
+        if (currentMode === 'rotate' || currentMode === 'complex_rotate') {
             const rotation = parseInt(div.dataset.rotate);
-            transformString += `rotate(${rotation}deg)`;
+            pieceTransformString += `rotate(${rotation}deg)`;
         }
-        div.style.transform = transformString.trim();
+
+        div.style.transform = pieceTransformString.trim();
+        imageInner.style.transform = imageTransformString.trim();
     }
 
-    // НОВЫЕ ФУНКЦИИ-ОБРАБОТЧИКИ
     function getNeighbors(div) {
         const row = parseInt(div.dataset.row);
         const col = parseInt(div.dataset.col);
         const neighbors = [];
 
-        // Соседи по горизонтали и вертикали
         const neighborCoords = [
             [row - 1, col],
             [row + 1, col],
@@ -491,24 +516,18 @@
             pieces.forEach(div => {
                 const randomRotation = Math.floor(Math.random() * 4) * 90;
                 div.dataset.rotate = randomRotation;
-                // Убеждаемся, что при перемешивании в режиме поворотов, переворотов нет
                 div.dataset.flipH = 'false';
                 div.dataset.flipV = 'false';
                 updateTransform(div);
             });
             checkSolved();
-        }
-        // УЛУЧШЕННОЕ ПЕРЕМЕШИВАНИЕ ДЛЯ LIGHTS OUT
-        else if (currentMode === 'complex_flips' || currentMode === 'complex_rotate') {
-            // 1. Сброс головоломки в собранное состояние
+        } else if (currentMode === 'complex_flips' || currentMode === 'complex_rotate') {
             resetPuzzle();
-            
-            // 2. Генерация решаемого состояния
+
             const puzzlePieces = pieces.filter(p => !p.classList.contains('empty-spot'));
             puzzlePieces.forEach(piece => {
-                if (Math.random() < 0.5) { // 50% шанс "нажать" на тайл
+                if (Math.random() < 0.5) {
                     if (currentMode === 'complex_flips') {
-                        // Случайный выбор оси для переворота
                         const axis = Math.random() < 0.5 ? 'horizontal' : 'vertical';
                         complexFlipClickHandler(piece, axis);
                     } else if (currentMode === 'complex_rotate') {
@@ -523,20 +542,17 @@
 
     function resetPuzzle() {
         pieces.forEach(div => {
-            // Сбрасываем все трансформации
             div.dataset.flipH = 'false';
             div.dataset.flipV = 'false';
             div.dataset.rotate = '0';
             updateTransform(div);
 
-            // Возвращаем на правильные позиции
             div.dataset.row = div.dataset.correctRow;
             div.dataset.col = div.dataset.correctCol;
             div.style.gridRowStart = parseInt(div.dataset.correctRow) + 1;
             div.style.gridColumnStart = parseInt(div.dataset.correctCol) + 1;
         });
 
-        // Отдельно обрабатываем пустое место для режима "Пятнашки"
         const emptySpot = pieces.find(p => p.classList.contains('empty-spot'));
         if (emptySpot) {
             emptySpot.dataset.row = emptySpot.dataset.correctRow;
@@ -551,10 +567,12 @@
     }
 
     function applyHints() {
-        // Убираем все классы, связанные с подсветкой, независимо от состояния подсказок.
         pieces.forEach(div => {
             const hintNumberEl = div.querySelector('.hint-number');
             const hintArrowEl = div.querySelector('.hint-arrow');
+            const flipIndicatorHEl = div.querySelector('.flip-indicator-h');
+            const flipIndicatorVEl = div.querySelector('.flip-indicator-v');
+
             div.classList.remove('hint-correct', 'hint-wrong');
             if (hintNumberEl) {
                 hintNumberEl.style.display = 'none';
@@ -564,41 +582,69 @@
                 hintArrowEl.style.display = 'none';
                 hintArrowEl.classList.remove('hint-arrow-correct', 'hint-arrow-wrong');
             }
+            if (flipIndicatorHEl) {
+                flipIndicatorHEl.style.display = 'none';
+                flipIndicatorHEl.classList.remove('flip-indicator-correct', 'flip-indicator-wrong');
+            }
+            if (flipIndicatorVEl) {
+                flipIndicatorVEl.style.display = 'none';
+                flipIndicatorVEl.classList.remove('flip-indicator-correct', 'flip-indicator-wrong');
+            }
         });
 
-        // Если подсказки выключены, просто выходим из функции.
         if (!hintsOn) {
             return;
         }
 
-        // Если подсказки включены, показываем их и применяем стили
         pieces.forEach(div => {
             const hintNumberEl = div.querySelector('.hint-number');
             const hintArrowEl = div.querySelector('.hint-arrow');
+            const flipIndicatorHEl = div.querySelector('.flip-indicator-h');
+            const flipIndicatorVEl = div.querySelector('.flip-indicator-v');
 
             if (div.classList.contains('empty-spot')) {
                 return;
             }
 
-            if (hintNumberEl) hintNumberEl.style.display = 'block';
-            if (hintArrowEl) hintArrowEl.style.display = 'block';
-
             let correct = false;
+
             if (currentMode === 'fifteen' || currentMode === 'drag') {
                 correct = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
-            } else if (currentMode === 'flips' || currentMode === 'complex_flips') {
+                if (hintNumberEl) hintNumberEl.style.display = 'block';
+            } else if (currentMode === 'flips') {
                 correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
             } else if (currentMode === 'mixed') {
                 const correctPosition = div.dataset.row == div.dataset.correctRow && div.dataset.col == div.dataset.correctCol;
                 const correctFlip = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
                 correct = correctPosition && correctFlip;
+                if (hintNumberEl) hintNumberEl.style.display = 'block';
             } else if (currentMode === 'rotate' || currentMode === 'complex_rotate') {
                 correct = parseInt(div.dataset.rotate) % 360 === 0;
                 if (hintArrowEl) {
                     hintArrowEl.textContent = '↑';
                     hintArrowEl.classList.add(correct ? 'hint-arrow-correct' : 'hint-arrow-wrong');
+                    hintArrowEl.style.display = 'block';
+                }
+            } else if (currentMode === 'complex_flips') {
+                if (flipIndicatorHEl) {
+                    const isHCorrect = div.dataset.flipH === 'false';
+                    flipIndicatorHEl.textContent = isHCorrect ? '✓' : '✗';
+                    flipIndicatorHEl.classList.toggle('flip-indicator-correct', isHCorrect);
+                    flipIndicatorHEl.classList.toggle('flip-indicator-wrong', !isHCorrect);
+                }
+                if (flipIndicatorVEl) {
+                    const isVCorrect = div.dataset.flipV === 'false';
+                    flipIndicatorVEl.textContent = isVCorrect ? '✓' : '✗';
+                    flipIndicatorVEl.classList.toggle('flip-indicator-correct', isVCorrect);
+                    flipIndicatorVEl.classList.toggle('flip-indicator-wrong', !isVCorrect);
+                }
+                correct = div.dataset.flipH === 'false' && div.dataset.flipV === 'false';
+                if (flipIndicatorHEl && flipIndicatorVEl) {
+                    flipIndicatorHEl.style.display = 'block';
+                    flipIndicatorVEl.style.display = 'block';
                 }
             }
+
 
             div.classList.toggle('hint-correct', correct);
             div.classList.toggle('hint-wrong', !correct);
@@ -740,19 +786,16 @@
     window.addEventListener('resize', () => {
         updatePuzzleGrid();
         pieces.forEach(div => {
-            if (div.classList.contains('empty-spot')) return;
-            div.style.backgroundSize = `${pieceSizePx * size}px ${pieceSizePx * size}px`;
-            if (currentMode === 'fifteen' || currentMode === 'drag' || currentMode === 'mixed') {
-                const correctRow = parseInt(div.dataset.correctRow);
-                const correctCol = parseInt(div.dataset.correctCol);
-                div.style.backgroundPosition = `-${correctCol * pieceSizePx}px -${correctRow * pieceSizePx}px`;
-            } else {
-                const row = parseInt(div.dataset.row);
-                const col = parseInt(div.dataset.col);
-                div.style.backgroundPosition = `-${col * pieceSizePx}px -${row * pieceSizePx}px`;
-            }
-            div.style.width = pieceSizePx + 'px';
-            div.style.height = pieceSizePx + 'px';
+            const imageInner = div.querySelector('.piece-image-inner');
+            if (div.classList.contains('empty-spot') || !imageInner) return;
+            
+            div.style.fontSize = `${pieceSizePx * 0.3}px`;
+            
+            imageInner.style.backgroundSize = `${pieceSizePx * size}px ${pieceSizePx * size}px`;
+            
+            const correctRow = parseInt(div.dataset.correctRow);
+            const correctCol = parseInt(div.dataset.correctCol);
+            imageInner.style.backgroundPosition = `-${correctCol * pieceSizePx}px -${correctRow * pieceSizePx}px`;
         });
     });
 

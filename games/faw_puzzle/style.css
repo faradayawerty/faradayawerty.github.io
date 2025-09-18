@@ -46,11 +46,19 @@ body {
   cursor: pointer;
   user-select: none;
   border-radius: 3px;
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
-  background-size: cover;
+  border: 0px solid rgba(255, 255, 255, 0.1);
   box-sizing: border-box;
-  transition: transform 0.3s ease;
   will-change: transform;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.piece-image-inner {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    transition: transform 0.3s ease;
+    will-change: transform;
 }
 
 #puzzle:not(.hints-on) .piece:hover {
@@ -69,7 +77,7 @@ body {
 
 #controls {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 столбца */
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 10px;
   width: fit-content;
@@ -165,7 +173,7 @@ button:focus {
 }
 
 #puzzle {
-  position: relative; /* для абсолютных элементов */
+  position: relative;
   display: grid;
   gap: 1px;
   background: #222;
@@ -176,37 +184,36 @@ button:focus {
   user-select: none;
   overflow: hidden;
   transition: border-color 0.3s ease;
-  /* grid-template по-прежнему для flip, в drag мы позиционируем абсолютом */
 }
 
 /* Modal styles for Cropper.js integration */
 .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1000; /* Sit on top */
+  display: none;
+  position: fixed;
+  z-index: 1000;
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
   justify-content: center;
   align-items: center;
-  padding: 15px; /* Add padding for mobile */
+  padding: 15px;
   box-sizing: border-box;
 }
 
 .modal.active {
-  display: flex; /* Show when active */
+  display: flex;
 }
 
 .modal-content {
   background-color: #222;
-  margin: auto; /* Centered */
+  margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 95%; /* Make it more responsive */
-  max-width: 700px; /* Limit max width for desktop */
+  width: 95%;
+  max-width: 700px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -232,18 +239,18 @@ button:focus {
 }
 
 .img-container {
-  max-height: 60vh; /* Limit height for mobile screens */
+  max-height: 60vh;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #333; /* Background for image container */
+  background: #333;
 }
 
 .img-container img {
   display: block;
   max-width: 100%;
-  height: auto; /* Important for Cropper.js */
+  height: auto;
 }
 
 #cropButtons {
@@ -256,7 +263,7 @@ button:focus {
 /* Ensure Cropper.js elements are responsive */
 .cropper-view-box,
 .cropper-face {
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); /* Dimming effect */
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
 }
 
 .hint-number {
@@ -265,11 +272,11 @@ button:focus {
     left: 5px;
     font-size: 0.8em;
     font-weight: bold;
-    color: red; /* Цвет по умолчанию, если тайл не на месте */
+    color: red;
     z-index: 10;
     transition: color 0.3s ease;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    pointer-events: none; /* чтобы не мешать событиям клика */
+    pointer-events: none;
 }
 
 .hint-number-correct {
@@ -309,5 +316,37 @@ button:focus {
 }
 
 .hint-arrow-wrong {
+  color: red;
+}
+
+.flip-indicator {
+  position: absolute;
+  font-size: 1.5em; /* Размер зависит от font-size родительского .piece */
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  display: none;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.hints-on .flip-indicator {
+  display: block;
+}
+
+.flip-indicator-h {
+  right: 20%;
+}
+
+.flip-indicator-v {
+  left: 20%;
+}
+
+.flip-indicator-correct {
+  color: green;
+}
+
+.flip-indicator-wrong {
   color: red;
 }
