@@ -650,11 +650,11 @@
 
         errorCount.textContent = getTranslation('error_count') + wrongCount;
 
-        if (hintsOn) {
+        //if (hintsOn) {
             puzzle.style.borderColor = allCorrect ? 'green' : 'red';
-        } else {
-            puzzle.style.borderColor = 'green';
-        }
+        //} else {
+        //    puzzle.style.borderColor = 'green';
+        //}
 
         applyHints();
         return allCorrect;
