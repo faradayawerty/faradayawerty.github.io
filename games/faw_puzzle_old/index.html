@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>faw_puzzle</title>
+  <link rel="icon" href="img.jpg">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+</head>
+<body>
+  <div id="container">
+    <span id="errorCount">Не на своём месте: 0</span>
+    <div id="timerDisplay">00:00</div>
+    <div id="puzzle"></div>
+    <div id="controls">
+      <select id="sizeSelect"></select>
+      <label class="file-label">
+        <span>Выбрать картинку</span>
+        <input type="file" id="fileInput" hidden>
+      </label>
+      <button id="shuffleBtn">Перемешать</button>
+      <button id="resetBtn">Сбросить</button>
+      <button id="resetTimerBtn">Обнулить секундомер</button>
+	 <!--<button id="multiplayer">Мультиплеер (WIP)</button>-->
+    </div>
+  </div>
+
+  <div id="cropModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="closeCropModal">&times;</span>
+      <h2>Кадрировать изображение</h2>
+      <div class="img-container">
+        <img id="cropperImage" src="" alt="Изображение для кадрирования">
+      </div>
+      <div id="cropButtons">
+        <button id="cancelCropBtn">Отмена</button>
+        <button id="applyCropBtn">Применить</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+<script src="translations.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
