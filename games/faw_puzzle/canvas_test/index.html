@@ -4,956 +4,944 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игра Пазл</title>
+    <title>Puzzle Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-
         body {
             font-family: 'Inter', sans-serif;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
             background-color: #1a202c;
             color: #e2e8f0;
-            transition: background-color 0.5s, color 0.5s;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            overflow: hidden;
         }
 
-        /* Светлая тема */
-        body.light-theme {
-            background-color: #f7fafc;
-            color: #2d3748;
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
-        .light-theme .bg-gray-800 {
-            background-color: #e2e8f0;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .light-theme .bg-gray-700, .light-theme button {
-            background-color: #cbd5e0;
-            color: #2d3748;
-            border-color: #a0aec0;
-        }
-
-        .light-theme .text-gray-400 {
-            color: #4a5568;
-        }
-        
-        .light-theme .bg-gray-600 {
-            background-color: #a0aec0;
-            color: #2d3748;
-        }
-
-        /* Исправляем цвет текста статистики для светлой темы */
-        .light-theme .stat-panel .text-white {
-            color: #2d3748;
-        }
-
-        .light-theme canvas {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Устанавливаем размер холста, чтобы он был большим, квадратным и оставался в пределах экрана */
-        #puzzleCanvas {
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-            transition: border-color 0.5s ease-in-out;
-            touch-action: none;
-            border: 4px solid #ef4444;
-            /* Размеры в CSS для адаптивности */
-            width: min(85vw, 85vh);
-            height: min(85vw, 85vh);
-        }
-
-        .control-panel {
+        #game-container {
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            width: 100%;
-            margin-bottom: 1rem;
-            align-items: center; /* Центрируем элементы внутри панели управления */
+            align-items: center;
+            padding: 1rem;
         }
-        
-        @media (min-width: 768px) {
-            .control-panel {
-                width: auto;
-                margin-right: 1.5rem;
+
+        @media (min-width: 1024px) {
+            #game-container {
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+
+        #controls {
+            background-color: #2d3748;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 1024px) {
+            #controls {
+                margin-right: 2rem;
                 margin-bottom: 0;
             }
         }
         
-        /* Выравниваем статистику по левому краю */
-        .stat-panel {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start; /* Выравнивание по левому краю */
-            margin-bottom: 0.5rem;
-            text-align: left;
+        .control-group {
+            margin-bottom: 1rem;
         }
 
-        /* Стили для модального окна кадрирования */
-        .modal {
-            display: none; /* Скрыто по умолчанию */
+        .control-label {
+            font-size: 0.875rem;
+            color: #a0aec0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .control-button {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .control-button:hover:not(:disabled) {
+            background-color: #636b77;
+        }
+        
+        .control-button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .control-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .mode-button-nav {
+            background-color: #4a5568;
+            color: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .mode-button-nav:hover:not(:disabled) {
+            background-color: #636b77;
+        }
+
+        .mode-button-nav:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        #game-canvas {
+            border-radius: 1rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.5s ease;
+            touch-action: none; /* Prevent browser touch actions */
+        }
+
+        .status-border-unsolved {
+            border: 5px solid #e53e3e; /* Red */
+        }
+        .status-border-solved {
+            border: 5px solid #48bb78; /* Green */
+        }
+
+        #info-panel {
+            background-color: #2d3748;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        #cropper-modal {
             position: fixed;
-            z-index: 20;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 1000;
         }
 
-        .modal-content {
-            background-color: #2d3748;
-            padding: 1.5rem;
-            border-radius: 1rem;
+        .cropper-container {
             max-width: 90%;
             max-height: 90%;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            flex-shrink: 0; /* Добавлено для предотвращения переполнения */
-        }
-        
-        /* Контейнер для изображения в модальном окне */
-        #cropper-container {
-            max-width: min(80vw, 80vh); /* Уменьшаем максимальный размер */
-            max-height: min(80vw, 80vh); /* Уменьшаем максимальный размер */
+            background-color: #1a202c;
+            border-radius: 1rem;
+            padding: 1rem;
         }
 
+        #cropper-image {
+            max-width: 100%;
+            max-height: 80vh;
+        }
+
+        .cropper-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
     </style>
 </head>
-<body class="bg-gray-900 flex items-center justify-center min-h-screen relative">
+<body class="bg-gray-900 text-white font-inter">
+    <div id="game-container">
 
-    <button id="themeSwitcher" class="fixed top-4 right-4 p-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 z-10">
-        <svg id="moonIcon" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-        </svg>
-        <svg id="sunIcon" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-    </button>
-    
-    <div class="bg-gray-800 shadow-xl rounded-2xl p-6 md:p-8 text-center max-w-full flex flex-col md:flex-row items-center justify-center">
+        <!-- Панель управления -->
+        <div id="controls" class="no-select">
+            <h2 class="text-xl font-bold mb-4">Управление</h2>
 
-        <div class="control-panel">
-            <div class="stat-panel text-gray-400 font-bold text-sm sm:text-lg">
-                <p>Не на своём месте: <span id="outOfPlaceCount" class="text-white">0</span></p>
-                <p>Ходы: <span id="movesCount" class="text-white">0</span></p>
-                <p>Время: <span id="timer" class="text-white">00:00</span></p>
+            <!-- Загрузка изображения -->
+            <div class="control-group">
+                <label for="image-upload" class="control-label">Загрузить изображение</label>
+                <button onclick="document.getElementById('image-upload').click()" class="control-button w-full">Выбрать файл</button>
+                <input type="file" id="image-upload" class="hidden" accept="image/*">
             </div>
-            
-            <div class="flex flex-col gap-2 w-full items-center">
-                <select id="sizeSelector" class="p-2 text-sm rounded-full bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300 w-full">
-                    </select>
-                <button id="shuffleButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 shadow-lg w-full">
-                    Перемешать
-                </button>
-                <button id="selectImageButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 shadow-lg w-full">
-                    Выбрать изображение
-                </button>
-                <input type="file" id="imageInput" accept="image/*" class="hidden">
-                 <button id="solveButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 shadow-lg w-full">
-                    Собрать
-                </button>
-                
-                <div class="flex items-center gap-2 w-full">
-                    <button id="modePrevButton" class="px-3 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 shadow-lg flex-grow-0">&lt;</button>
-                    <span id="modeName" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-700 flex-grow text-center">Режим: Пятнашки</span>
-                    <button id="modeNextButton" class="px-3 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 shadow-lg flex-grow-0">&gt;</button>
+
+            <!-- Переключение режима -->
+            <div class="control-group">
+                <div class="control-label">Режим игры</div>
+                <div class="flex items-center justify-between mt-2">
+                    <button id="prev-mode-btn" class="mode-button-nav" disabled>&lt;</button>
+                    <span id="current-mode-display" class="font-bold text-center mx-2">Перевороты</span>
+                    <button id="next-mode-btn" class="mode-button-nav" disabled>&gt;</button>
                 </div>
+            </div>
 
-                <button id="hintsButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 shadow-lg w-full">
-                    Подсказки: Выкл.
-                </button>
+            <!-- Выбор размера поля -->
+            <div class="control-group">
+                <div class="control-label">Размер поля</div>
+                <select id="grid-size-select" class="w-full mt-2 bg-gray-700 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 transition-colors">
+                    <option value="2">2x2</option>
+                    <option value="3" selected>3x3</option>
+                    <option value="4">4x4</option>
+                    <option value="5">5x5</option>
+                    <option value="6">6x6</option>
+                    <option value="7">7x7</option>
+                    <option value="8">8x8</option>
+                    <option value="9">9x9</option>
+                    <option value="10">10x10</option>
+                    <option value="11">11x11</option>
+                    <option value="12">12x12</option>
+                    <option value="13">13x13</option>
+                    <option value="14">14x14</option>
+                    <option value="15">15x15</option>
+                    <option value="16">16x16</option>
+                </select>
+            </div>
 
-                <button id="animationsButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 shadow-lg w-full">
-                    Анимации: Вкл.
-                </button>
+            <!-- Переключатели -->
+            <div class="control-group flex items-center justify-between">
+                <div class="control-label mb-0">Анимации</div>
+                <input type="checkbox" id="animation-toggle" class="form-checkbox h-5 w-5 text-blue-600 rounded" checked>
+            </div>
+            <div class="control-group flex items-center justify-between">
+                <div class="control-label mb-0">Подсказки</div>
+                <input type="checkbox" id="hints-toggle" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+            </div>
 
-                 <button id="resetStatsButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-600 hover:bg-gray-500 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 shadow-lg w-full">
-                    Сбросить статистику
-                </button>
+            <!-- Кнопки действий -->
+            <div class="control-group flex justify-between gap-2 mt-4">
+                <button id="shuffle-btn" class="control-button flex-1">Перемешать</button>
+                <button id="solve-btn" class="control-button flex-1">Собрать</button>
             </div>
         </div>
 
-        <div class="flex-grow flex items-center justify-center">
-            <canvas id="puzzleCanvas" class="max-w-full max-h-full"></canvas>
+        <!-- Информация о игре -->
+        <div id="info-panel" class="no-select">
+            <h3 class="text-lg font-bold mb-2">Статистика</h3>
+            <div class="info-item">
+                <span class="text-sm">Не на своём месте:</span>
+                <span id="tiles-out-of-place-count" class="font-bold text-xl">0</span>
+            </div>
+            <div class="info-item">
+                <span class="text-sm">Ходов:</span>
+                <span id="moves-count" class="font-bold text-xl">0</span>
+            </div>
+            <div class="info-item">
+                <span class="text-sm">Время:</span>
+                <span id="timer-display" class="font-bold text-xl">00:00</span>
+            </div>
         </div>
         
+        <!-- Canvas -->
+        <canvas id="game-canvas" class="lg:h-screen lg:w-auto w-full h-auto max-w-full max-h-full aspect-square bg-gray-800 rounded-2xl status-border-unsolved transition-all duration-500"></canvas>
     </div>
 
-    <div id="croppingModal" class="modal">
-        <div class="modal-content">
-            <div id="cropper-container">
-                <img id="cropper-image" src="" alt="Image to crop" class="max-w-full max-h-full">
+    <!-- Модальное окно для кадрирования -->
+    <div id="cropper-modal" class="hidden">
+        <div class="cropper-container">
+            <h2 class="text-xl font-bold mb-4">Кадрировать изображение</h2>
+            <div class="cropper-box flex-1 w-full flex items-center justify-center">
+                <img id="cropper-image" src="#" alt="Image to crop">
             </div>
-            <div class="flex gap-4 mt-2">
-                <button id="cropButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-700 hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-ring-offset-2 shadow-lg">
-                    Кадрировать
-                </button>
-                <button id="closeModalButton" class="px-4 py-2 text-sm text-white font-bold rounded-full bg-gray-600 hover:bg-gray-500 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 shadow-lg">
-                    Закрыть
-                </button>
+            <div class="cropper-buttons">
+                <button id="crop-cancel-btn" class="control-button mr-2">Отмена</button>
+                <button id="crop-confirm-btn" class="control-button">Готово</button>
             </div>
         </div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('puzzleCanvas');
-            const ctx = canvas.getContext('2d');
-            const sizeSelector = document.getElementById('sizeSelector');
-            const shuffleButton = document.getElementById('shuffleButton');
-            const selectImageButton = document.getElementById('selectImageButton');
-            const imageInput = document.getElementById('imageInput');
-            const solveButton = document.getElementById('solveButton');
-            const hintsButton = document.getElementById('hintsButton');
-            const resetStatsButton = document.getElementById('resetStatsButton');
-            const themeSwitcher = document.getElementById('themeSwitcher');
-            const moonIcon = document.getElementById('moonIcon');
-            const sunIcon = document.getElementById('sunIcon');
-            
-            // Новые элементы для переключения режимов
-            const modePrevButton = document.getElementById('modePrevButton');
-            const modeNextButton = document.getElementById('modeNextButton');
-            const modeNameElement = document.getElementById('modeName');
-            
-            // NEW ELEMENT: Animations toggle button
-            const animationsButton = document.getElementById('animationsButton');
 
-            // Элементы модального окна Cropper.js
-            const croppingModal = document.getElementById('croppingModal');
-            const cropperImage = document.getElementById('cropper-image');
-            const cropButton = document.getElementById('cropButton');
-            const closeModalButton = document.getElementById('closeModalButton');
-            let cropper;
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-            // --- Элементы статистики ---
-            const outOfPlaceCountElement = document.getElementById('outOfPlaceCount');
-            const movesCountElement = document.getElementById('movesCount');
-            const timerElement = document.getElementById('timer');
+        // --- Глобальные переменные и состояние игры ---
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const imageUpload = document.getElementById('image-upload');
+        const cropperModal = document.getElementById('cropper-modal');
+        const cropperImage = document.getElementById('cropper-image');
+        const cropConfirmBtn = document.getElementById('crop-confirm-btn');
+        const cropCancelBtn = document.getElementById('crop-cancel-btn');
+        const modes = ['Перевороты', 'Перевороты+', 'Повороты', 'Повороты+', 'Пятнашки', 'Перетаскивание'];
+        let cropper;
 
-            // --- КОНФИГУРАЦИЯ ---
-            let IMAGE_SRC = 'img.jpg'; 
-            const ANIMATION_DURATION = 300; 
+        let gameState = {
+            modeIndex: 0,
+            gridSize: 3,
+            isAnimationEnabled: true,
+            isHintsEnabled: false,
+            isSolved: false,
+            moves: 0,
+            timer: 0,
+            timerId: null,
+            image: new Image(),
+            tiles: [],
+            isDragging: false,
+            draggedTile: null,
+            dragStartX: 0,
+            dragStartY: 0,
+            dragOffsetX: 0,
+            dragOffsetY: 0,
+            emptyTileIndex: 0,
+            animationQueue: [],
+            isAnimating: false,
+            animationStart: 0,
+        };
 
-            // --- СОСТОЯНИЕ ИГРЫ ---
-            let image = new Image();
-            let gridSize = 3;
-            let tileWidth, tileHeight;
-            let tiles = [];
-            let emptyTile = {};
-            let isSolved = true;
-            let showHints = false;
-            let isAnimationsEnabled = true; // NEW STATE VARIABLE
-            let gameMode = 'classic';
-            const modes = ['classic', 'flips', 'flips+', 'rotations', 'rotations+'];
-            const modeNames = {
-                'classic': 'Пятнашки',
-                'flips': 'Перевороты',
-                'flips+': 'Перевороты+',
-                'rotations': 'Повороты',
-                'rotations+': 'Повороты+'
-            };
+        const uiElements = {
+            modeDisplay: document.getElementById('current-mode-display'),
+            prevModeBtn: document.getElementById('prev-mode-btn'),
+            nextModeBtn: document.getElementById('next-mode-btn'),
+            gridSizeSelect: document.getElementById('grid-size-select'),
+            animationToggle: document.getElementById('animation-toggle'),
+            hintsToggle: document.getElementById('hints-toggle'),
+            shuffleBtn: document.getElementById('shuffle-btn'),
+            solveBtn: document.getElementById('solve-btn'),
+            tilesOutOfPlaceCount: document.getElementById('tiles-out-of-place-count'),
+            movesCount: document.getElementById('moves-count'),
+            timerDisplay: document.getElementById('timer-display'),
+        };
 
-            // Флаг для контроля основного цикла анимации
-            let isAnimating = false;
+        const defaultImageUrl = "https://placehold.co/1024x1024/2d3748/e2e8f0?text=Загрузите+изображение";
 
-            // --- Состояние статистики ---
-            let movesCount = 0;
-            let timerSeconds = 0;
-            let timerInterval = null;
+        // --- Управление UI и события ---
 
-            // --- ИНИЦИАЛИЗАЦИЯ ---
-            function setupGame() {
-                for (let i = 2; i <= 16; i++) {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.text = `${i}x${i}`;
-                    sizeSelector.appendChild(option);
-                }
-                sizeSelector.value = gridSize;
-                
-                image.onload = () => {
-                    initPuzzle();
-                    requestAnimationFrame(animateLoop);
+        uiElements.prevModeBtn.addEventListener('click', () => {
+            gameState.modeIndex = (gameState.modeIndex - 1 + modes.length) % modes.length;
+            updateMode();
+        });
+
+        uiElements.nextModeBtn.addEventListener('click', () => {
+            gameState.modeIndex = (gameState.modeIndex + 1) % modes.length;
+            updateMode();
+        });
+
+        uiElements.gridSizeSelect.addEventListener('change', (e) => {
+            gameState.gridSize = parseInt(e.target.value);
+            resetGame();
+        });
+
+        uiElements.animationToggle.addEventListener('change', (e) => {
+            gameState.isAnimationEnabled = e.target.checked;
+        });
+
+        uiElements.hintsToggle.addEventListener('change', (e) => {
+            gameState.isHintsEnabled = e.target.checked;
+            draw();
+        });
+
+        uiElements.shuffleBtn.addEventListener('click', shuffleTiles);
+
+        uiElements.solveBtn.addEventListener('click', () => {
+            resetTiles();
+            checkWin();
+            draw();
+        });
+
+        imageUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    cropperImage.src = event.target.result;
+                    cropperModal.classList.remove('hidden');
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(cropperImage, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        background: false,
+                    });
                 };
-                image.src = IMAGE_SRC;
+                reader.readAsDataURL(file);
+            }
+        });
 
-                window.addEventListener('resize', initPuzzle);
-                applySavedTheme();
+        cropConfirmBtn.addEventListener('click', () => {
+            const croppedCanvas = cropper.getCroppedCanvas();
+            gameState.image.onload = () => {
+                cropperModal.classList.add('hidden');
+                resetGame();
+            };
+            gameState.image.src = croppedCanvas.toDataURL();
+        });
+
+        cropCancelBtn.addEventListener('click', () => {
+            cropperModal.classList.add('hidden');
+        });
+
+        // --- Инициализация игры ---
+
+        function init() {
+            gameState.image.src = defaultImageUrl;
+            gameState.image.onload = () => {
+                resizeCanvas();
+                resetGame();
+            };
+            window.addEventListener('resize', resizeCanvas);
+            updateMode();
+            setupInputListeners();
+            animate();
+        }
+
+        // --- Игровая логика ---
+
+        function resizeCanvas() {
+            const container = document.getElementById('game-container');
+            const containerRect = container.getBoundingClientRect();
+            const controlWidth = document.getElementById('controls').offsetWidth + 32; // 32 = 2rem margin
+            let size = Math.min(window.innerWidth - controlWidth - 64, window.innerHeight - 64);
+            if (window.innerWidth < 1024) { // Mobile layout
+                size = Math.min(window.innerWidth - 32, window.innerHeight - 32 - document.getElementById('controls').offsetHeight - document.getElementById('info-panel').offsetHeight);
             }
 
-            function initPuzzle() {
-                movesCount = 0;
-                timerSeconds = 0;
-                stopTimer();
-                isSolved = true;
-                
-                const minDim = Math.min(image.naturalWidth, image.naturalHeight);
-                canvas.width = minDim;
-                canvas.height = minDim;
-                
-                ctx.imageSmoothingEnabled = false;
+            canvas.width = size;
+            canvas.height = size;
+            draw();
+        }
 
-                tileWidth = canvas.width / gridSize;
-                tileHeight = canvas.height / gridSize;
-                
-                tiles = [];
-                const tileCount = gridSize * gridSize;
-                
-                for (let row = 0; row < gridSize; row++) {
-                    for (let col = 0; col < gridSize; col++) {
-                        const tileIndex = row * gridSize + col;
-                        if (gameMode === 'classic' && tileIndex >= tileCount - 1) {
-                            emptyTile = { currentPos: { row: row, col: col } };
-                        } else {
-                            tiles.push({
-                                originalIndex: tileIndex,
-                                currentPos: { row: row, col: col },
-                                isFlippedHorizontal: false,
-                                isFlippedVertical: false,
-                                rotation: 0,
-                                isAnimating: false,
-                                animationStartTime: 0,
-                                startState: {},
-                                endState: {},
-                            });
-                        }
-                    }
-                }
-                
-                updateStats();
-                drawPuzzle();
-                updateCanvasBorder();
+        function resetGame() {
+            resetStats();
+            createTiles();
+            draw();
+        }
+
+        function resetStats() {
+            gameState.moves = 0;
+            gameState.timer = 0;
+            gameState.isSolved = false;
+            if (gameState.timerId) clearInterval(gameState.timerId);
+            updateUI();
+        }
+
+        function createTiles() {
+            const n = gameState.gridSize;
+            gameState.tiles = [];
+            for (let i = 0; i < n * n; i++) {
+                gameState.tiles.push({
+                    id: i,
+                    position: i,
+                    initialPosition: i,
+                    rotation: 0,
+                    flippedX: false,
+                    flippedY: false,
+                    animating: false,
+                    animProgress: 0,
+                    startTransform: {},
+                    endTransform: {},
+                    targetPosition: i,
+                    isCorrect: i === i, // For initial state
+                });
             }
+            gameState.emptyTileIndex = n * n - 1;
+            gameState.tiles[gameState.emptyTileIndex].position = -1; // Special position for the empty tile
+        }
 
-            // Функция для отрисовки стрелки
-            function drawArrow(x, y, size, color) {
-                ctx.fillStyle = color;
-                ctx.font = `bold ${size}px Inter, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('↑', x, y);
-            }
+        function shuffleTiles() {
+            resetStats();
+            const n = gameState.gridSize;
+            let flatTiles = gameState.tiles.slice();
+            const emptyTile = flatTiles.pop();
+            flatTiles = shuffleArray(flatTiles);
 
-            function easeInOutCubic(t) {
-                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-            }
-
-            function animateLoop(timestamp) {
-                if (!isAnimationsEnabled) {
-                     drawPuzzle();
-                     return;
-                }
-                
-                let isAnyAnimating = false;
-                tiles.forEach(tile => {
-                    if (tile.isAnimating) {
-                        isAnyAnimating = true;
-                        const elapsed = timestamp - tile.animationStartTime;
-                        let progress = Math.min(elapsed / ANIMATION_DURATION, 1);
-                        const easedProgress = easeInOutCubic(progress);
-
-                        if (tile.animationType === 'slide') {
-                            tile.currentPos.col = tile.startState.col + (tile.endState.col - tile.startState.col) * easedProgress;
-                            tile.currentPos.row = tile.startState.row + (tile.endState.row - tile.startState.row) * easedProgress;
-                        } else if (tile.animationType === 'rotate') {
-                            tile.currentRotation = tile.startState.rotation + (tile.endState.rotation - tile.startState.rotation) * easedProgress;
-                        } else if (tile.animationType === 'flip') {
-                            const startScaleX = tile.startState.isFlippedHorizontal ? -1 : 1;
-                            const endScaleX = tile.endState.isFlippedHorizontal ? -1 : 1;
-                            const startScaleY = tile.startState.isFlippedVertical ? -1 : 1;
-                            const endScaleY = tile.endState.isFlippedVertical ? -1 : 1;
-                            
-                            tile.currentScaleX = startScaleX + (endScaleX - startScaleX) * easedProgress;
-                            tile.currentScaleY = startScaleY + (endScaleY - startScaleY) * easedProgress;
-                        }
-
-                        if (progress >= 1) {
-                            if (tile.animationType === 'slide') {
-                                tile.currentPos = { ...tile.endState };
-                                const startPos = { ...tile.startState };
-                                emptyTile.currentPos = { row: startPos.row, col: startPos.col };
-                            } else if (tile.animationType === 'rotate') {
-                                tile.rotation = (tile.endState.rotation % 360 + 360) % 360;
-                            } else if (tile.animationType === 'flip') {
-                                tile.isFlippedHorizontal = tile.endState.isFlippedHorizontal;
-                                tile.isFlippedVertical = tile.endState.isFlippedVertical;
+            if (modes[gameState.modeIndex].includes('Пятнашки')) {
+                // Пятнашки: Ensure solvability
+                let isSolvable = false;
+                while (!isSolvable) {
+                    let inversions = 0;
+                    for (let i = 0; i < flatTiles.length; i++) {
+                        for (let j = i + 1; j < flatTiles.length; j++) {
+                            if (flatTiles[i].id > flatTiles[j].id) {
+                                inversions++;
                             }
-                            
-                            tile.isAnimating = false;
-                            checkWin();
-                            updateStats();
                         }
                     }
-                });
-
-                drawPuzzle();
-                requestAnimationFrame(animateLoop);
+                    if (n % 2 !== 0) { // Odd grid size
+                        isSolvable = inversions % 2 === 0;
+                    } else { // Even grid size
+                        const emptyRow = Math.floor(n * n / 2 / n); // Simplified for a solvable config
+                        isSolvable = (inversions + emptyRow) % 2 === 0;
+                    }
+                    if (!isSolvable) {
+                        flatTiles = shuffleArray(flatTiles);
+                    }
+                }
             }
 
-            function drawPuzzle() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                const minDim = Math.min(image.naturalWidth, image.naturalHeight);
-                const sourceX = (image.naturalWidth - minDim) / 2;
-                const sourceY = (image.naturalHeight - minDim) / 2;
-                
-                const sourceTileWidth = minDim / gridSize;
-                const sourceTileHeight = minDim / gridSize;
+            // Assign new positions
+            flatTiles.push(emptyTile);
+            gameState.tiles = flatTiles.map((tile, index) => {
+                tile.position = index;
+                tile.isCorrect = checkTileCorrect(tile);
+                tile.rotation = 0;
+                tile.flippedX = false;
+                tile.flippedY = false;
+                return tile;
+            });
 
-                tiles.forEach(tile => {
-                    drawSingleTile(tile, sourceX, sourceY, sourceTileWidth, sourceTileHeight);
-                });
+            // Set the empty tile position correctly
+            const emptyTileObj = gameState.tiles.find(t => t.id === gameState.emptyTileIndex);
+            if (emptyTileObj) emptyTileObj.position = gameState.emptyTileIndex;
+
+            // Start timer
+            if (!gameState.timerId) {
+                gameState.timerId = setInterval(() => {
+                    gameState.timer++;
+                    updateUI();
+                }, 1000);
+            }
+            checkWin();
+            draw();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function checkWin() {
+            gameState.isSolved = gameState.tiles.every(tile => checkTileCorrect(tile));
+            updateUI();
+        }
+
+        function checkTileCorrect(tile) {
+            const mode = modes[gameState.modeIndex];
+            if (tile.id === -1) return true; // Empty tile is always correct
+
+            let isPositionCorrect = tile.position === tile.id;
+            let isOrientationCorrect = true;
+
+            if (mode.includes('Повороты')) {
+                isOrientationCorrect = tile.rotation === 0;
+            } else if (mode.includes('Перевороты')) {
+                isOrientationCorrect = !tile.flippedX && !tile.flippedY;
             }
 
-            function drawSingleTile(tile, sourceX, sourceY, sourceTileWidth, sourceTileHeight) {
-                const currentX = (tile.isAnimating ? tile.currentPos.col : tile.currentPos.col) * tileWidth;
-                const currentY = (tile.isAnimating ? tile.currentPos.row : tile.currentPos.row) * tileHeight;
-                
-                let tileRotation = tile.isAnimating ? tile.currentRotation : tile.rotation;
-                let tileScaleX = tile.isAnimating ? tile.currentScaleX : (tile.isFlippedHorizontal ? -1 : 1);
-                let tileScaleY = tile.isAnimating ? tile.currentScaleY : (tile.isFlippedVertical ? -1 : 1);
+            if (mode === 'Пятнашки' || mode === 'Перетаскивание') {
+                isOrientationCorrect = true;
+            }
 
-                const originalRow = Math.floor(tile.originalIndex / gridSize);
-                const originalCol = tile.originalIndex % gridSize;
+            return isPositionCorrect && isOrientationCorrect;
+        }
+
+        // --- Логика рендеринга ---
+
+        function draw() {
+            if (!canvas || !ctx || !gameState.image) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const n = gameState.gridSize;
+            const tileSize = canvas.width / n;
+
+            const mode = modes[gameState.modeIndex];
+
+            gameState.tiles.forEach(tile => {
+                if (tile.position === -1) return; // Skip empty tile
+
+                const currentPosition = tile.position;
+                const row = Math.floor(currentPosition / n);
+                const col = currentPosition % n;
+                let x = col * tileSize;
+                let y = row * tileSize;
+
+                const originalRow = Math.floor(tile.id / n);
+                const originalCol = tile.id % n;
 
                 ctx.save();
-                
-                ctx.translate(currentX + tileWidth / 2, currentY + tileHeight / 2);
-                ctx.rotate(tileRotation * Math.PI / 180);
-                ctx.scale(tileScaleX, tileScaleY);
+
+                if (tile.animating && gameState.isAnimationEnabled) {
+                    const animTime = Date.now() - gameState.animationStart;
+                    let progress = Math.min(animTime / 300, 1);
+                    tile.animProgress = progress;
+
+                    const animType = tile.animType;
+                    const start = tile.startTransform;
+                    const end = tile.endTransform;
+
+                    if (animType === 'slide') {
+                        x = start.x + (end.x - start.x) * progress;
+                        y = start.y + (end.y - start.y) * progress;
+                    } else if (animType === 'rotate') {
+                        const currentRotation = start.rotation + (end.rotation - start.rotation) * progress;
+                        ctx.translate(x + tileSize / 2, y + tileSize / 2);
+                        ctx.rotate(currentRotation * Math.PI / 180);
+                        ctx.translate(-(x + tileSize / 2), -(y + tileSize / 2));
+                    } else if (animType === 'flip') {
+                        let scaleX = start.scaleX + (end.scaleX - start.scaleX) * progress;
+                        let scaleY = start.scaleY + (end.scaleY - start.scaleY) * progress;
+                        ctx.translate(x + tileSize / 2, y + tileSize / 2);
+                        ctx.scale(scaleX, scaleY);
+                        ctx.translate(-(x + tileSize / 2), -(y + tileSize / 2));
+                    }
+                    
+                    if (progress === 1) {
+                        tile.animating = false;
+                        if (gameState.animationQueue.length > 0) {
+                            const nextAnim = gameState.animationQueue.shift();
+                            startAnimation(nextAnim.tile, nextAnim.type, nextAnim.from, nextAnim.to);
+                        } else {
+                            gameState.isAnimating = false;
+                        }
+                    }
+                }
+
+                if (gameState.isDragging && tile === gameState.draggedTile) {
+                    x = gameState.draggedTile.dragX;
+                    y = gameState.draggedTile.dragY;
+                }
 
                 ctx.drawImage(
-                    image,
-                    sourceX + originalCol * sourceTileWidth,
-                    sourceY + originalRow * sourceTileHeight,
-                    sourceTileWidth,
-                    sourceTileHeight,
-                    -tileWidth / 2,
-                    -tileHeight / 2,
-                    tileWidth,
-                    tileHeight
+                    gameState.image,
+                    originalCol * (gameState.image.width / n),
+                    originalRow * (gameState.image.height / n),
+                    gameState.image.width / n,
+                    gameState.image.height / n,
+                    x, y,
+                    tileSize, tileSize
                 );
 
                 ctx.restore();
 
-                // Рисуем стрелки только в режимах поворота И только если включены подсказки
-                if ((gameMode === 'rotations' || gameMode === 'rotations+') && showHints) {
-                     ctx.save();
-                     ctx.translate(currentX + tileWidth / 2, currentY + tileHeight / 2);
-                     ctx.rotate(tileRotation * Math.PI / 180);
-                     if (tile.isFlippedHorizontal) ctx.scale(-1, 1);
-                     if (tile.isFlippedVertical) ctx.scale(1, -1);
-                     drawArrow(0, 0, Math.max(12, Math.min(tileWidth, tileHeight) * 0.4), '#e0e0e0');
-                     ctx.restore();
-                }
+                // Рисование подсказок и рамок
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#374151'; // Gray border
+                ctx.strokeRect(x, y, tileSize, tileSize);
 
-                // Рисуем подсказки
-                if (showHints) {
-                    const solvedRow = Math.floor(tile.originalIndex / gridSize);
-                    const solvedCol = tile.originalIndex % gridSize;
-                    
-                    const isCorrect = (tile.currentPos.row === solvedRow) && 
-                                      (tile.currentPos.col === solvedCol) &&
-                                      !tile.isFlippedHorizontal && !tile.isFlippedVertical &&
-                                      tile.rotation === 0;
+                if (gameState.isHintsEnabled) {
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = checkTileCorrect(tile) ? '#48bb78' : '#e53e3e';
+                    ctx.strokeRect(x, y, tileSize, tileSize);
 
-                    ctx.fillStyle = isCorrect ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)';
-                    ctx.fillRect(currentX, currentY, tileWidth, tileHeight);
-
-                    const hintColor = isCorrect ? '#22c55e' : '#ef4444';
-                    
-                    if (gameMode === 'classic') {
-                        ctx.fillStyle = hintColor;
-                        const fontSize = Math.max(12, Math.min(tileWidth, tileHeight) * 0.4);
-                        ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+                    if (mode.includes('Пятнашки') || mode === 'Перетаскивание') {
+                        ctx.font = `${tileSize * 0.25}px Inter`;
+                        ctx.fillStyle = checkTileCorrect(tile) ? '#48bb78' : '#e53e3e';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
-                        ctx.fillText(tile.originalIndex + 1, currentX + tileWidth / 2, currentY + tileHeight / 2);
-                    } else if ((gameMode === 'rotations' || gameMode === 'rotations+') && showHints) {
+                        ctx.fillText(tile.id + 1, x + tileSize / 2, y + tileSize / 2);
+                    } else if (mode.includes('Повороты')) {
+                        const arrowSize = tileSize * 0.2;
+                        const arrowX = x + tileSize / 2;
+                        const arrowY = y + tileSize / 2;
+                        
                         ctx.save();
-                        ctx.translate(currentX + tileWidth / 2, currentY + tileHeight / 2);
-                        ctx.rotate(tileRotation * Math.PI / 180);
-                        if (tile.isFlippedHorizontal) ctx.scale(-1, 1);
-                        if (tile.isFlippedVertical) ctx.scale(1, -1);
-                        drawArrow(0, 0, Math.max(12, Math.min(tileWidth, tileHeight) * 0.4), hintColor);
+                        ctx.translate(arrowX, arrowY);
+                        ctx.rotate(tile.rotation * Math.PI / 180);
+                        
+                        ctx.fillStyle = checkTileCorrect(tile) ? '#48bb78' : '#e53e3e';
+                        ctx.beginPath();
+                        ctx.moveTo(0, -arrowSize);
+                        ctx.lineTo(arrowSize * 0.4, 0);
+                        ctx.lineTo(-arrowSize * 0.4, 0);
+                        ctx.closePath();
+                        ctx.fill();
+
                         ctx.restore();
                     }
                 }
-                
-                ctx.strokeStyle = '#334155';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(currentX, currentY, tileWidth, tileHeight);
+            });
+        }
+
+        function animate() {
+            if (gameState.isAnimating) {
+                draw();
             }
+            requestAnimationFrame(animate);
+        }
 
-            // Улучшенная функция перемешивания, которая гарантирует решаемость
-            function shufflePuzzle() {
-                initPuzzle();
-                const movesToShuffle = gridSize * gridSize * 300; // Увеличиваем количество ходов
-                
-                for (let i = 0; i < movesToShuffle; i++) {
-                    const randomRow = Math.floor(Math.random() * gridSize);
-                    const randomCol = Math.floor(Math.random() * gridSize);
-                    const randomTile = getTileByPosition(randomRow, randomCol);
+        // --- Управление анимацией ---
 
-                    if (!randomTile) continue;
-                    
-                    if (gameMode === 'classic') {
-                         const movableTiles = getMovableTiles();
-                         const randomMove = movableTiles[Math.floor(Math.random() * movableTiles.length)];
-                         if (randomMove) {
-                             swapTiles(randomMove.tile, randomMove.emptyPos);
-                         }
-                    } else if (gameMode === 'rotations') {
-                        randomTile.rotation = (randomTile.rotation + 90) % 360;
-                    } else if (gameMode === 'rotations+') {
-                         applyToNeighbors(randomRow, randomCol, (neighbor) => {
-                             neighbor.rotation = (neighbor.rotation + 90) % 360;
-                         });
-                    } else if (gameMode === 'flips') {
-                        if (Math.random() > 0.5) {
-                            randomTile.isFlippedHorizontal = !randomTile.isFlippedHorizontal;
-                        } else {
-                            randomTile.isFlippedVertical = !randomTile.isFlippedVertical;
-                        }
-                    } else if (gameMode === 'flips+') {
-                         applyToNeighbors(randomRow, randomCol, (neighbor) => {
-                             neighbor.isFlippedHorizontal = !neighbor.isFlippedHorizontal;
-                         });
-                    }
+        function startAnimation(tile, type, from, to) {
+            if (!gameState.isAnimationEnabled) {
+                tile.animating = false;
+                if (type === 'slide') tile.position = to.position;
+                else if (type === 'rotate') tile.rotation = to.rotation;
+                else if (type === 'flip') {
+                    tile.flippedX = to.flippedX;
+                    tile.flippedY = to.flippedY;
                 }
-                
-                isSolved = false;
-                movesCount = 0;
-                timerSeconds = 0;
-                startTimer();
-                updateStats();
-                drawPuzzle();
-                updateCanvasBorder();
-            }
-
-            function getMovableTiles() {
-                if (gameMode !== 'classic') return [];
-                const movable = [];
-                const emptyRow = emptyTile.currentPos.row;
-                const emptyCol = emptyTile.currentPos.col;
-
-                const possibleMoves = [
-                    { row: emptyRow, col: emptyCol + 1 }, 
-                    { row: emptyRow, col: emptyCol - 1 }, 
-                    { row: emptyRow + 1, col: emptyCol }, 
-                    { row: emptyRow - 1, col: emptyCol }, 
-                ];
-
-                possibleMoves.forEach(pos => {
-                    if (pos.row >= 0 && pos.row < gridSize && pos.col >= 0 && pos.col < gridSize) {
-                        const tileToMove = tiles.find(t => t.currentPos.row === pos.row && t.currentPos.col === pos.col);
-                        if (tileToMove) {
-                            movable.push({ tile: tileToMove, emptyPos: { row: emptyRow, col: emptyCol } });
-                        }
-                    }
-                });
-                return movable;
-            }
-
-            function swapTiles(tile, emptyPos) {
-                const tempPos = { ...tile.currentPos };
-                tile.currentPos = { ...emptyPos };
-                emptyTile.currentPos = tempPos;
-            }
-
-            function checkWin() {
-                let solved = true;
-                
-                for (let i = 0; i < tiles.length; i++) {
-                    const tile = tiles[i];
-                    const solvedRow = Math.floor(tile.originalIndex / gridSize);
-                    const solvedCol = tile.originalIndex % gridSize;
-                    
-                    if (tile.currentPos.row !== solvedRow || 
-                        tile.currentPos.col !== solvedCol ||
-                        tile.isFlippedHorizontal ||
-                        tile.isFlippedVertical ||
-                        tile.rotation !== 0) {
-                        solved = false;
-                        break;
-                    }
-                }
-                
-                if (gameMode === 'classic') {
-                    const emptySolvedRow = gridSize - 1;
-                    const emptySolvedCol = gridSize - 1;
-                    if (emptyTile.currentPos.row !== emptySolvedRow || emptyTile.currentPos.col !== emptySolvedCol) {
-                        solved = false;
-                    }
-                }
-
-                if (solved && !isSolved) {
-                    stopTimer();
-                }
-
-                isSolved = solved;
-                updateCanvasBorder();
-            }
-
-            function updateCanvasBorder() {
-                if (isSolved) {
-                    canvas.style.borderColor = '#22c55e'; // Зеленый
-                } else {
-                    canvas.style.borderColor = '#ef4444'; // Красный
-                }
-            }
-
-            // --- ФУНКЦИИ СТАТИСТИКИ ---
-            function checkOutOfPlaceTiles() {
-                let count = 0;
-                tiles.forEach(tile => {
-                    const originalRow = Math.floor(tile.originalIndex / gridSize);
-                    const originalCol = tile.originalIndex % gridSize;
-                    
-                    const isCorrect = (tile.currentPos.row === originalRow &&
-                                       tile.currentPos.col === originalCol &&
-                                       !tile.isFlippedHorizontal &&
-                                       !tile.isFlippedVertical &&
-                                       tile.rotation === 0);
-
-                    if (!isCorrect) {
-                        count++;
-                    }
-                });
-                outOfPlaceCountElement.textContent = count;
-            }
-
-            function updateStats() {
-                movesCountElement.textContent = movesCount;
-                const minutes = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
-                const seconds = (timerSeconds % 60).toString().padStart(2, '0');
-                timerElement.textContent = `${minutes}:${seconds}`;
-                checkOutOfPlaceTiles();
-            }
-
-            function startTimer() {
-                if (timerInterval) clearInterval(timerInterval);
-                timerInterval = setInterval(() => {
-                    timerSeconds++;
-                    updateStats();
-                }, 1000);
-            }
-
-            function stopTimer() {
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                }
-            }
-
-            function resetStats() {
-                movesCount = 0;
-                timerSeconds = 0;
-                updateStats();
-            }
-
-            // --- ФУНКЦИИ ТЕМЫ ---
-            function toggleTheme() {
-                document.body.classList.toggle('light-theme');
-                const isLight = document.body.classList.contains('light-theme');
-                moonIcon.classList.toggle('hidden', isLight);
-                sunIcon.classList.toggle('hidden', !isLight);
-            }
-
-            function applySavedTheme() {
-                // Логика для сохранения темы
+                draw();
+                return;
             }
             
-            // --- ОБРАБОТЧИКИ СОБЫТИЙ ---
-            sizeSelector.addEventListener('change', () => {
-                gridSize = parseInt(sizeSelector.value);
-                initPuzzle();
-            });
+            tile.animating = true;
+            tile.animType = type;
+            gameState.animationStart = Date.now();
+            gameState.isAnimating = true;
 
-            shuffleButton.addEventListener('click', () => {
-                shufflePuzzle();
-            });
-            
-            selectImageButton.addEventListener('click', () => {
-                imageInput.click();
-            });
+            const n = gameState.gridSize;
+            const tileSize = canvas.width / n;
 
-            imageInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        cropperImage.src = event.target.result;
-                        croppingModal.style.display = 'flex';
+            if (type === 'slide') {
+                const fromRow = Math.floor(from.position / n);
+                const fromCol = from.position % n;
+                const toRow = Math.floor(to.position / n);
+                const toCol = to.position % n;
 
-                        if (cropper) {
-                            cropper.destroy();
-                        }
-
-                        cropper = new Cropper(cropperImage, {
-                            aspectRatio: 1,
-                            viewMode: 1,
-                            dragMode: 'move',
-                            minCropBoxWidth: 100,
-                            minCropBoxHeight: 100,
-                            autoCropArea: 0.8,
-                            cropBoxMovable: true,
-                            cropBoxResizable: true,
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                }
-                e.target.value = '';
-            });
-
-            cropButton.addEventListener('click', () => {
-                if (cropper) {
-                    const croppedCanvas = cropper.getCroppedCanvas({
-                        width: 1000,
-                        height: 1000,
-                        imageSmoothingEnabled: false,
-                        imageSmoothingQuality: 'high',
-                    });
-
-                    image.onload = () => {
-                        IMAGE_SRC = croppedCanvas.toDataURL('image/jpeg');
-                        initPuzzle();
-                    };
-                    image.src = croppedCanvas.toDataURL('image/jpeg');
-                }
-                
-                croppingModal.style.display = 'none';
-                if (cropper) {
-                    cropper.destroy();
-                }
-            });
-
-            closeModalButton.addEventListener('click', () => {
-                croppingModal.style.display = 'none';
-                if (cropper) {
-                    cropper.destroy();
-                }
-            });
-
-            function getTileByPosition(row, col) {
-                return tiles.find(t => t.currentPos.row === row && t.currentPos.col === col);
+                tile.startTransform = { x: fromCol * tileSize, y: fromRow * tileSize };
+                tile.endTransform = { x: toCol * tileSize, y: toRow * tileSize };
+            } else if (type === 'rotate') {
+                tile.startTransform = { rotation: from.rotation };
+                tile.endTransform = { rotation: to.rotation };
+            } else if (type === 'flip') {
+                tile.startTransform = { scaleX: from.flippedX ? -1 : 1, scaleY: from.flippedY ? -1 : 1 };
+                tile.endTransform = { scaleX: to.flippedX ? -1 : 1, scaleY: to.flippedY ? -1 : 1 };
             }
+        }
+
+        // --- Управление вводом (мышь и тач) ---
+
+        function getTileIndexFromCoords(x, y) {
+            const n = gameState.gridSize;
+            const tileSize = canvas.width / n;
+            const col = Math.floor((x - canvas.offsetLeft) / tileSize);
+            const row = Math.floor((y - canvas.offsetTop) / tileSize);
             
-            function applyToNeighbors(row, col, action) {
-                const neighbors = [
-                    { r: row, c: col },
-                    { r: row - 1, c: col },
-                    { r: row + 1, c: col },
-                    { r: row, c: col - 1 },
-                    { r: row, c: col + 1 }
-                ];
-                neighbors.forEach(pos => {
-                    if (pos.r >= 0 && pos.r < gridSize && pos.c >= 0 && pos.c < gridSize) {
-                        const tile = getTileByPosition(pos.r, pos.c);
-                        if (tile) {
-                            action(tile);
-                        }
-                    }
-                });
-            }
-            
-            function updateMode(direction) {
-                const currentIndex = modes.indexOf(gameMode);
-                let nextIndex = (currentIndex + direction + modes.length) % modes.length;
-                gameMode = modes[nextIndex];
-                modeNameElement.textContent = `Режим: ${modeNames[gameMode]}`;
-                initPuzzle();
+            // Find the tile at the clicked position
+            return gameState.tiles.findIndex(tile => {
+                const tileRow = Math.floor(tile.position / n);
+                const tileCol = tile.position % n;
+                return tileRow === row && tileCol === col && tile.position !== -1;
+            });
+        }
+
+        function setupInputListeners() {
+            canvas.addEventListener('contextmenu', e => e.preventDefault());
+            canvas.addEventListener('mousedown', handleInput);
+            canvas.addEventListener('touchstart', handleInput);
+            canvas.addEventListener('mousemove', handleDrag);
+            canvas.addEventListener('touchmove', handleDrag);
+            canvas.addEventListener('mouseup', handleDragEnd);
+            canvas.addEventListener('touchend', handleDragEnd);
+        }
+
+        function handleInput(e) {
+            const mode = modes[gameState.modeIndex];
+            const isTouch = e.type.startsWith('touch');
+            const touch = isTouch ? e.touches[0] : null;
+            const x = isTouch ? touch.clientX : e.clientX;
+            const y = isTouch ? touch.clientY : e.clientY;
+
+            const tileIndex = getTileIndexFromCoords(x, y);
+            if (tileIndex === -1) return;
+            const tile = gameState.tiles[tileIndex];
+
+            // Interrupt any ongoing animation
+            if (tile.animating) {
+                // Instantly complete the animation
+                tile.animating = false;
+                if (tile.animType === 'slide') tile.position = tile.targetPosition;
+                draw();
             }
 
-            modePrevButton.addEventListener('click', () => updateMode(-1));
-            modeNextButton.addEventListener('click', () => updateMode(1));
-            
-            canvas.addEventListener('click', (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-                
-                const x = (e.clientX - rect.left) * scaleX;
-                const y = (e.clientY - rect.top) * scaleY;
-                
-                const clickedCol = Math.floor(x / tileWidth);
-                const clickedRow = Math.floor(y / tileHeight);
-                
-                const clickedTile = tiles.find(t => t.currentPos.row === clickedRow && t.currentPos.col === clickedCol);
-                
-                if (!clickedTile || clickedTile.isAnimating) {
-                    return;
-                }
-                
-                if (isSolved && !timerInterval) {
-                    isSolved = false;
-                    startTimer();
-                }
-
-                if (gameMode === 'classic') {
-                    const emptyRow = emptyTile.currentPos.row;
-                    const emptyCol = emptyTile.currentPos.col;
-                    const isAdjacent = (Math.abs(clickedRow - emptyRow) + Math.abs(clickedCol - emptyCol)) === 1;
-                    if (isAdjacent) {
-                        movesCount++;
-                        startAnimation(clickedTile, 'slide', { 
-                            col: emptyCol, 
-                            row: emptyRow 
-                        });
-                    }
-                } else if (gameMode === 'flips') {
-                    movesCount++;
-                    startAnimation(clickedTile, 'flip', { isFlippedVertical: !clickedTile.isFlippedVertical });
-                } else if (gameMode === 'rotations') {
-                    movesCount++;
-                    startAnimation(clickedTile, 'rotate', { rotation: clickedTile.rotation + 90 });
-                } else if (gameMode === 'flips+') {
-                    movesCount++;
-                    applyToNeighbors(clickedRow, clickedCol, (tile) => {
-                        startAnimation(tile, 'flip', { isFlippedHorizontal: !tile.isFlippedHorizontal });
-                    });
-                } else if (gameMode === 'rotations+') {
-                     movesCount++;
-                     applyToNeighbors(clickedRow, clickedCol, (tile) => {
-                        startAnimation(tile, 'rotate', { rotation: tile.rotation + 90 });
-                     });
-                }
-            });
-
-            // Обработчик для правого клика (контекстное меню)
-            canvas.addEventListener('contextmenu', (e) => {
+            // Game logic based on mode
+            if (mode.includes('Перетаскивание')) {
+                gameState.isDragging = true;
+                gameState.draggedTile = tile;
+                gameState.dragStartX = x;
+                gameState.dragStartY = y;
                 e.preventDefault();
+            } else if (mode.includes('Пятнашки')) {
+                const n = gameState.gridSize;
+                const tilePos = tile.position;
+                const emptyTilePos = gameState.tiles.find(t => t.id === gameState.emptyTileIndex).position;
 
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-                
-                const x = (e.clientX - rect.left) * scaleX;
-                const y = (e.clientY - rect.top) * scaleY;
-                
-                const clickedCol = Math.floor(x / tileWidth);
-                const clickedRow = Math.floor(y / tileHeight);
-                
-                const clickedTile = getTileByPosition(clickedRow, clickedCol);
-                
-                if (!clickedTile || clickedTile.isAnimating) {
-                    return;
-                }
-                
-                if (isSolved && !timerInterval) {
-                    isSolved = false;
-                    startTimer();
-                }
+                const dx = Math.abs((tilePos % n) - (emptyTilePos % n));
+                const dy = Math.abs(Math.floor(tilePos / n) - Math.floor(emptyTilePos / n));
 
-                if (gameMode === 'flips') {
-                    movesCount++;
-                    startAnimation(clickedTile, 'flip', { isFlippedHorizontal: !clickedTile.isFlippedHorizontal });
-                } else if (gameMode === 'rotations') {
-                    movesCount++;
-                    startAnimation(clickedTile, 'rotate', { rotation: clickedTile.rotation - 90 });
-                } else if (gameMode === 'flips+') {
-                    movesCount++;
-                    // Исправлено: ПКМ переворачивает по вертикали
-                    applyToNeighbors(clickedRow, clickedCol, (tile) => {
-                        startAnimation(tile, 'flip', { isFlippedVertical: !tile.isFlippedVertical });
-                    });
-                } else if (gameMode === 'rotations+') {
-                    movesCount++;
-                    applyToNeighbors(clickedRow, clickedCol, (tile) => {
-                       startAnimation(tile, 'rotate', { rotation: tile.rotation - 90 });
-                    });
-                } else { 
-                   return;
+                if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                    swapTiles(tile, gameState.tiles.find(t => t.id === gameState.emptyTileIndex));
                 }
-            });
-
-            // Функция запускает анимацию для конкретного тайла
-            function startAnimation(tile, animationType, endState) {
-                if (tile.isAnimating) return;
-
-                if (!isAnimationsEnabled) {
-                     // If animations are disabled, immediately apply the end state
-                     if (animationType === 'slide') {
-                         const startPos = { ...tile.currentPos };
-                         tile.currentPos = { ...endState };
-                         emptyTile.currentPos = startPos;
-                     } else if (animationType === 'rotate') {
-                         tile.rotation = (endState.rotation % 360 + 360) % 360;
-                     } else if (animationType === 'flip') {
-                         tile.isFlippedHorizontal = endState.isFlippedHorizontal !== undefined ? endState.isFlippedHorizontal : tile.isFlippedHorizontal;
-                         tile.isFlippedVertical = endState.isFlippedVertical !== undefined ? endState.isFlippedVertical : tile.isFlippedVertical;
-                     }
-                     checkWin();
-                     updateStats();
-                     drawPuzzle();
-                     return;
-                }
-                
-                tile.isAnimating = true;
-                tile.animationStartTime = performance.now();
-                tile.animationType = animationType;
-
-                if (animationType === 'slide') {
-                    tile.startState = { ...tile.currentPos };
-                    tile.endState = { ...endState };
-                } else if (animationType === 'rotate') {
-                    tile.startState = { rotation: tile.rotation };
-                    tile.endState = { rotation: endState.rotation };
-                    if (tile.endState.rotation === 0 && tile.startState.rotation === 270) {
-                         tile.startState.rotation = -90; // Для плавности
-                    }
-                } else if (animationType === 'flip') {
-                    tile.startState = { 
-                        isFlippedHorizontal: tile.isFlippedHorizontal, 
-                        isFlippedVertical: tile.isFlippedVertical 
-                    };
-                    tile.endState = { 
-                        isFlippedHorizontal: endState.isFlippedHorizontal !== undefined ? endState.isFlippedHorizontal : tile.isFlippedHorizontal,
-                        isFlippedVertical: endState.isFlippedVertical !== undefined ? endState.isFlippedVertical : tile.isFlippedVertical
-                    };
-                }
+            } else if (mode.includes('Повороты')) {
+                const rotation = e.button === 2 ? -90 : 90; // Right click for -90, left for 90
+                rotateTiles(tile, rotation, mode.includes('+'));
+                e.preventDefault(); // Prevent context menu on right click
+            } else if (mode.includes('Перевороты')) {
+                const flipX = e.button === 2; // Right click for horizontal flip
+                const flipY = e.button !== 2; // Left click for vertical flip
+                flipTiles(tile, flipX, flipY, mode.includes('+'));
+                e.preventDefault(); // Prevent context menu
             }
 
-            solveButton.addEventListener('click', () => {
-                initPuzzle();
-            });
+            gameState.moves++;
+            checkWin();
+            updateUI();
+        }
+
+        function handleDrag(e) {
+            if (!gameState.isDragging || modes[gameState.modeIndex] !== 'Перетаскивание') return;
+            const isTouch = e.type.startsWith('touch');
+            const touch = isTouch ? e.touches[0] : null;
+            const x = isTouch ? touch.clientX : e.clientX;
+            const y = isTouch ? touch.clientY : e.clientY;
+
+            const dx = x - gameState.dragStartX;
+            const dy = y - gameState.dragStartY;
+
+            const tile = gameState.draggedTile;
+            const n = gameState.gridSize;
+            const tileSize = canvas.width / n;
+            const row = Math.floor(tile.position / n);
+            const col = tile.position % n;
+
+            tile.dragX = col * tileSize + dx;
+            tile.dragY = row * tileSize + dy;
+            draw();
+            e.preventDefault();
+        }
+
+        function handleDragEnd(e) {
+            if (!gameState.isDragging) return;
+
+            const isTouch = e.type.startsWith('touch');
+            const touch = isTouch ? e.changedTouches[0] : null;
+            const x = isTouch ? touch.clientX : e.clientX;
+            const y = isTouch ? touch.clientY : e.clientY;
+
+            const n = gameState.gridSize;
+            const tileSize = canvas.width / n;
+
+            const newTileCol = Math.floor((x - canvas.offsetLeft + tileSize / 2) / tileSize);
+            const newTileRow = Math.floor((y - canvas.offsetTop + tileSize / 2) / tileSize);
+            const newPosition = newTileRow * n + newTileCol;
+
+            const draggedTile = gameState.draggedTile;
+            const targetTile = gameState.tiles.find(t => t.position === newPosition);
+
+            if (targetTile && draggedTile.position !== newPosition) {
+                // Swap tiles
+                startAnimation(draggedTile, 'slide', { position: draggedTile.position }, { position: newPosition });
+                startAnimation(targetTile, 'slide', { position: newPosition }, { position: draggedTile.position });
+                
+                const tempPos = draggedTile.position;
+                draggedTile.position = targetTile.position;
+                targetTile.position = tempPos;
+            } else {
+                // Snap back to original position with animation
+                startAnimation(draggedTile, 'slide', { position: draggedTile.position }, { position: draggedTile.position });
+            }
+
+            gameState.isDragging = false;
+            gameState.draggedTile = null;
+            checkWin();
+            updateUI();
+        }
+
+        function swapTiles(tileA, tileB) {
+            const tempPos = tileA.position;
             
-            hintsButton.addEventListener('click', () => {
-                showHints = !showHints;
-                hintsButton.textContent = `Подсказки: ${showHints ? 'Вкл.' : 'Выкл.'}`;
-                drawPuzzle();
-            });
+            startAnimation(tileA, 'slide', { position: tileA.position }, { position: tileB.position });
+            startAnimation(tileB, 'slide', { position: tileB.position }, { position: tempPos });
 
-            resetStatsButton.addEventListener('click', () => {
-                resetStats();
-            });
+            tileA.position = tileB.position;
+            tileB.position = tempPos;
+        }
 
-            themeSwitcher.addEventListener('click', toggleTheme);
+        function rotateTiles(tile, rotation, rotateNeighbors) {
+            const tilesToRotate = [tile];
+            if (rotateNeighbors) {
+                const n = gameState.gridSize;
+                const row = Math.floor(tile.position / n);
+                const col = tile.position % n;
+                const neighbors = [
+                    { r: row - 1, c: col }, { r: row + 1, c: col },
+                    { r: row, c: col - 1 }, { r: row, c: col + 1 }
+                ];
+                neighbors.forEach(nPos => {
+                    const neighborTile = gameState.tiles.find(t => Math.floor(t.position / n) === nPos.r && (t.position % n) === nPos.c);
+                    if (neighborTile) tilesToRotate.push(neighborTile);
+                });
+            }
 
-            // NEW: Animations toggle handler
-            animationsButton.addEventListener('click', () => {
-                isAnimationsEnabled = !isAnimationsEnabled;
-                animationsButton.textContent = `Анимации: ${isAnimationsEnabled ? 'Вкл.' : 'Выкл.'}`;
-                // This will force the next frame to be drawn without animation if disabled
-                drawPuzzle(); 
+            tilesToRotate.forEach(t => {
+                const newRotation = (t.rotation + rotation) % 360;
+                startAnimation(t, 'rotate', { rotation: t.rotation }, { rotation: newRotation });
+                t.rotation = newRotation;
+                t.isCorrect = checkTileCorrect(t);
             });
-            
-            setupGame();
-        });
-    </script>
+            draw();
+        }
+
+        function flipTiles(tile, flipX, flipY, flipNeighbors) {
+            const tilesToFlip = [tile];
+            if (flipNeighbors) {
+                const n = gameState.gridSize;
+                const row = Math.floor(tile.position / n);
+                const col = tile.position % n;
+                const neighbors = [
+                    { r: row - 1, c: col }, { r: row + 1, c: col },
+                    { r: row, c: col - 1 }, { r: row, c: col + 1 }
+                ];
+                neighbors.forEach(nPos => {
+                    const neighborTile = gameState.tiles.find(t => Math.floor(t.position / n) === nPos.r && (t.position % n) === nPos.c);
+                    if (neighborTile) tilesToFlip.push(neighborTile);
+                });
+            }
+
+            tilesToFlip.forEach(t => {
+                if (flipX) t.flippedX = !t.flippedX;
+                if (flipY) t.flippedY = !t.flippedY;
+                startAnimation(t, 'flip', { flippedX: !flipX, flippedY: !flipY }, { flippedX, flippedY });
+                t.isCorrect = checkTileCorrect(t);
+            });
+            draw();
+        }
+
+        // --- Обновление UI ---
+
+        function updateMode() {
+            uiElements.modeDisplay.textContent = modes[gameState.modeIndex];
+            const isPuzzleMode = modes[gameState.modeIndex].includes('Пятнашки') || modes[gameState.modeIndex].includes('Перетаскивание');
+            uiElements.shuffleBtn.disabled = !isPuzzleMode;
+            uiElements.solveBtn.disabled = !isPuzzleMode;
+        }
+
+        function updateUI() {
+            const tilesOutOfPlace = gameState.tiles.filter(t => !checkTileCorrect(t)).length;
+            uiElements.tilesOutOfPlaceCount.textContent = tilesOutOfPlace;
+            uiElements.movesCount.textContent = gameState.moves;
+
+            const minutes = Math.floor(gameState.timer / 60).toString().padStart(2, '0');
+            const seconds = (gameState.timer % 60).toString().padStart(2, '0');
+            uiElements.timerDisplay.textContent = `${minutes}:${seconds}`;
+
+            if (gameState.isSolved) {
+                canvas.classList.remove('status-border-unsolved');
+                canvas.classList.add('status-border-solved');
+            } else {
+                canvas.classList.remove('status-border-solved');
+                canvas.classList.add('status-border-unsolved');
+            }
+        }
+
+        init();
+    });
+</script>
 </body>
 </html>
