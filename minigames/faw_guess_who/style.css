@@ -1,0 +1,38 @@
+
+body {
+    margin: 0;
+    background-color: #aabbcc;
+}
+
+.picture-container {
+    width: calc(50% - 10px);
+    height: calc(100vh - 10px);
+    margin: 5px;
+    padding: 5px;
+    background-color: #ffffff;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); /* минимум 125px, максимум равномерно по строке */
+    gap: 10px;             /* промежуток между картинками */
+    justify-items: stretch; /* растягивание кнопок по ширине ячейки */
+    align-items: stretch;   /* растягивание по высоте ячейки */
+    overflow-x: auto;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.image-button {
+    width: 100%;
+    aspect-ratio: 1 / 1;   /* квадрат */
+    border-radius: 4px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.image-button:hover {
+    transform: scale(1.05);
+}
+
