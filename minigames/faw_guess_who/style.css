@@ -1,4 +1,5 @@
 
+/* ===== БАЗОВЫЙ СТИЛЬ ===== */
 body {
     margin: 0;
     background-color: #aabbcc;
@@ -79,12 +80,15 @@ body {
 
     .picture-container {
         width: calc(60% - 10px);
+        /* Fallback + поддержка современных браузеров */
         height: calc(100vh - 10px);
+        height: calc(100dvh - 10px);
     }
 
     .chat-container {
         width: calc(40% - 10px);
         height: calc(100vh - 10px);
+        height: calc(100dvh - 10px);
     }
 }
 
@@ -99,11 +103,13 @@ body {
     .picture-container {
         width: calc(100vw - 10px);
         height: calc(50vh - 10px);
+        height: calc(50dvh - 10px);
     }
 
     .chat-container {
         width: calc(100vw - 10px);
         height: calc(50vh - 10px);
+        height: calc(50dvh - 10px);
     }
 }
 
