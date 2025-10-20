@@ -1,5 +1,6 @@
 
-class CommandHandler {
+class ChatContainer {
+
 	constructor() {
 	}
 }

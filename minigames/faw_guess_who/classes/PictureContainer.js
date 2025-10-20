@@ -1,0 +1,7 @@
+
+class PictureContainer {
+
+	constructor() {
+	}
+}
+
