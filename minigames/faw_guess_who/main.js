@@ -21,11 +21,25 @@ function main() {
 	document.head.appendChild(Object.assign(
 		document.createElement('link'), {rel:'icon', href:'icon.png'}));
 
+	let existingMeta = document.querySelector('meta[name="viewport"]');
+	if (!existingMeta) {
+	    let meta = document.createElement('meta');
+	    meta.name = 'viewport';
+	    meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+	    document.head.appendChild(meta);
+	} else {
+	    existingMeta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+	}
+
 	let pc = new PictureContainer();
 	let cc = new ChatContainer();
 
 	updateLayout([pc, cc]);
 	window.addEventListener('resize', function() { updateLayout([pc, cc]); });
+
+	pc.addButton("connect", null);
+	pc.addButton("host", null);
+	pc.addButton("set pictures", null);
 }
 
 window.addEventListener("DOMContentLoaded", main);

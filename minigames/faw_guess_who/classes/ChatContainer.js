@@ -16,12 +16,11 @@ class ChatContainer {
 		document.body.appendChild(this.htmlContainer);
 
 		this.htmlContainer.style.display = 'grid';
-		this.htmlContainer.style.gridTemplateRows = '9fr 1fr';
+		this.htmlContainer.style.gridTemplateRows = '19fr 1fr';
 		this.htmlContainer.style.gap = '1%';
 
 		this.htmlHistory = document.createElement('div');
-		this.htmlHistory.innerText = 'This is where the chat history will be!';
-		this.htmlHistory.style.fontSize= '200%';
+		this.htmlHistory.style.fontSize= '100%';
 		this.htmlHistory.id = 'chat-history';
 		this.htmlHistory.style.background= '#11aaaa';
 		this.htmlHistory.style.width = '100%';
@@ -33,7 +32,7 @@ class ChatContainer {
 		this.htmlInputBox = document.createElement('input');
 		this.htmlInputBox.type = 'text';
 		this.htmlInputBox.id = 'chat-input';
-		this.htmlInputBox.style.fontSize= '200%';
+		this.htmlInputBox.style.fontSize= '100%';
 		this.htmlInputBox.style.background= '#aa11aa';
 		this.htmlInputBox.style.width = '100%';
 		this.htmlInputBox.style.height = '100%';
@@ -43,12 +42,22 @@ class ChatContainer {
 			if(event.key == 'Enter') {
 				let messageText = this.htmlInputBox.value;
 				if(messageText != '') {
-					this.htmlHistory.innerHTML += `<div>${messageText}</div>`;
+					if(messageText[0] == '/')
+						this.handleCommand(messageText);
+					else
+						this.htmlHistory.innerHTML += `<div>${messageText}</div>`;
 					this.htmlInputBox.value = '';
 					this.htmlHistory.scrollTop = this.htmlHistory.scrollHeight;
 				}
 			}
 		});
+	}
+
+	handleCommand(command) {
+		if(command == '/clear')
+			this.htmlHistory.innerHTML = ``;
+		else
+			this.htmlHistory.innerHTML += `<div>${"command not found: " + command}</div>`;
 	}
 
 	updateLayout(container) {
