@@ -15,7 +15,8 @@ class ChatContainer {
 		'/clear': (args) => { this.htmlHistory.innerHTML = ''; },
 		'/test1': function(args) { alert('TEST'); },
 		'/test2': function(args) { alert(args); },
-		'/name': (args) => { this.name = args; }
+		'/name': (args) => { this.name = args; },
+		'/id': (args) => { this.htmlHistory.innerHTML += '<div>' + this.peerJSId + '</div>'; },
 	};
 
 	constructor() {
@@ -35,7 +36,7 @@ class ChatContainer {
 
 		this.htmlInfoBox = document.createElement('div');
 		this.htmlInfoBox.id = 'chat-info';
-		this.htmlInfoBox.style.fontSize= '80%';
+		this.htmlInfoBox.style.fontSize= '75%';
 		this.htmlInfoBox.style.background= '#aa4444';
 		this.htmlInfoBox.style.width = '100%';
 		this.htmlInfoBox.style.height = '100%';
@@ -51,7 +52,8 @@ class ChatContainer {
 		infoBoxCopy.style.background = '#11aa11';
 		infoBoxCopy.onclick = () => {
 			navigator.clipboard.writeText(this.connectionURL).then(() => {
-				console.log('copied url to clipboard');
+				if(this.connectionURL != '')
+					alert('The URL is copied to clipboard');
 			}).catch(err => {
 				console.error("Не удалось скопировать текст: ", err);
 		    });
