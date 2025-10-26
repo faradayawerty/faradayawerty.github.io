@@ -50,7 +50,17 @@ function main() {
 	pc.addButton("dummy", null);
 	pc.addButton("dummy", null);
 
-	let peer = new Peer();
+	let peer = new Peer(undefined, {
+		host: '0.peerjs.com',
+		port: 443,
+		path: '/',
+		secure: true,
+		config: {
+			iceServers: [
+				{ urls: 'stun:stun.l.google.com:19302' },
+			]
+		}
+	});
 
 	peer.on('open', (id) => {
 		cc.htmlInfoBox.innerHTML = '<div>' + id + '</div>';
