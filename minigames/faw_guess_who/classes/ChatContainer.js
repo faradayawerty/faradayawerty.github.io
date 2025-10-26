@@ -5,7 +5,7 @@ class ChatContainer {
 	htmlInputBox = null;
 	htmlInfoBox = null;
 
-	name = '';
+	name = 'NoName';
 	connectionURL = '';
 	
 	peerJSConnection = null;
@@ -15,7 +15,10 @@ class ChatContainer {
 		'/clear': (args) => { this.htmlHistory.innerHTML = ''; },
 		'/test1': function(args) { alert('TEST'); },
 		'/test2': function(args) { alert(args); },
-		'/name': (args) => { this.name = args; },
+		'/name': (args) => {
+			this.name = args;
+			this.htmlHistory.innerHTML += '<div> your name is set to ' + this.name + '</div>';
+		},
 		'/id': (args) => { this.htmlHistory.innerHTML += '<div>' + this.peerJSId + '</div>'; },
 	};
 
@@ -87,13 +90,13 @@ class ChatContainer {
 						this.handleCommand(messageText.split(' ')[0],
 							messageText.split(' ').slice(1).join(' '));
 					} else {
-						let name = this.peerJSId;
-						if(this.name != '')
-							name = this.name;
+						let name = this.name;
+						if(this.peerJSId != '')
+							name = this.peerJSId;
 						this.htmlHistory.innerHTML
-							+= `<div>${name}: ${messageText}</div>`;
+							+= `<div>[${name}] ${messageText}</div>`;
 						if(this.peerJSConnection != null)
-							this.peerJSConnection.send(name + ': ' + messageText);
+							this.peerJSConnection.send('[' + name + '] ' + messageText);
 					}
 					this.htmlInputBox.value = '';
 					this.htmlHistory.scrollTop
