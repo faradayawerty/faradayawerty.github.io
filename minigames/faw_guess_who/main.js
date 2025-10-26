@@ -63,7 +63,7 @@ function main() {
 	});
 
 	peer.on('open', (id) => {
-		cc.htmlInfoBox.innerHTML = '<div>' + id + '</div>';
+		cc.htmlInfoBox.innerHTML = '<div>' + 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id + '</div>';
 		cc.peerJSId = id;
 	});
 
@@ -74,6 +74,10 @@ function main() {
 	cc.commands['/connect'] = (args) => {
 		setupConnection(cc, peer.connect(args));
 	};
+
+	let urlParams = new URLSearchParams(window.location.search);
+	let connectionFromURL = urlParams.get('connection');
+	setupConnection(cc, connectionFromURL);
 }
 
 
