@@ -1,4 +1,16 @@
 
+function setupConnection(connection) {
+    cc.peerJSConnection = connection;
+
+    connection.on('data', (data) => {
+        cc.htmlHistory.innerHTML += `<div>${data}</div>`;
+    });
+
+    connection.on('open', () => {
+        connection.send('Привет от меня!');
+    });
+}
+
 function updateLayout(layoutElements) {
 	if(window.innerWidth > window.innerHeight)
 		document.body.style.flexDirection = "row";
@@ -16,37 +28,41 @@ function main() {
 	document.body.style.padding = "0";
 	document.body.style.display = 'flex';
 
-	// somehow setting an icon without html is that difficult in js
-	// hate the language but have no other options
-	document.head.appendChild(Object.assign(
-		document.createElement('link'), {rel:'icon', href:'icon.png'}));
-
-	// I guess this is the only way to make the webpage on mobile
-	// not update on swipe down
-	// so that the code doesn't exceed 80 characters a line
-	let metaContent = 'width=device-width, '
-		+ 'initial-scale=1, '
-		+ 'maximum-scale=1, '
-		+ 'user-scalable=no';
-	let existingMeta = document.querySelector('meta[name="viewport"]');
-	if (!existingMeta) {
-	    document.head.appendChild(Object.assign(
-		    document.createElement('meta'),
-		    { name: 'viewport', content: metaContent }));
-	} else {
-	    existingMeta.content = metaContent;
-	}
-
 	let pc = new PictureContainer();
 	let cc = new ChatContainer();
 
 	updateLayout([pc, cc]);
 	window.addEventListener('resize', function() { updateLayout([pc, cc]); });
 
-	pc.addButton("connect", null);
-	pc.addButton("host", null);
-	pc.addButton("set pictures", null);
+	cc.commands['/picset'] = (args) => {
+		if(args == 'flags') {
+			pc.clearPictures();
+			for(let i = 0; i < Config.defaultPictureSets.countryFlags.length; i++)
+				pc.addPicture('data/picture_sets/default_countries/' + Config.defaultPictureSets.countryFlags[i]);
+		} else if(args == 'clear') {
+			pc.clearPictures();
+		} else {
+			cc.htmlHistory.innerHTML += `<div> picture set ${args} doesn't exist </div>`;
+		}
+	};
+
+	pc.addButton("dummy", null);
+	pc.addButton("dummy", null);
+	pc.addButton("dummy", null);
+	pc.addButton("dummy", null);
+
+	let peer = new Peer();
+
+	peer.on('open', id => {
+		cc.htmlInfoBox.innerHTML = '<div>' + id + '</div>';
+	});
+
+	peer.on('connection', setupConnection);
+	cc.commands['/connect'] = (args) => {
+		setupConnection(peer.connect(args));
+	};
 }
+
 
 window.addEventListener("DOMContentLoaded", main);
 

@@ -3,6 +3,15 @@ class ChatContainer {
 	htmlContainer = null;
 	htmlHistory = null;
 	htmlInputBox = null;
+	htmlInfoBox = null;
+	
+	peerJSConnection = null;
+
+	commands = {
+		'/clear': (args) => { this.htmlHistory.innerHTML = ''; },
+		'/test1': function(args) { alert('TEST'); },
+		'/test2': function(args) { alert(args); }
+	};
 
 	constructor() {
 		this.htmlContainer = document.createElement('div');
@@ -16,8 +25,21 @@ class ChatContainer {
 		document.body.appendChild(this.htmlContainer);
 
 		this.htmlContainer.style.display = 'grid';
-		this.htmlContainer.style.gridTemplateRows = '19fr 1fr';
+		this.htmlContainer.style.gridTemplateRows = '1fr 18fr 1fr';
 		this.htmlContainer.style.gap = '1%';
+
+		this.htmlInfoBox = document.createElement('div');
+		this.htmlInfoBox.id = 'chat-info';
+		this.htmlInfoBox.style.fontSize= '100%';
+		this.htmlInfoBox.style.background= '#aa4444';
+		this.htmlInfoBox.style.width = '100%';
+		this.htmlInfoBox.style.height = '100%';
+		this.htmlInfoBox.style.display = 'flex';
+		this.htmlInfoBox.style.alignItems = 'center';
+		this.htmlInfoBox.style.justifyContent = 'center';
+		this.htmlInfoBox.style.textAlign = 'center';
+		this.htmlInfoBox.innerHTML = '<div>loading your id...</div>';
+		this.htmlContainer.appendChild(this.htmlInfoBox);
 
 		this.htmlHistory = document.createElement('div');
 		this.htmlHistory.style.fontSize= '100%';
@@ -42,11 +64,15 @@ class ChatContainer {
 			if(event.key == 'Enter') {
 				let messageText = this.htmlInputBox.value;
 				if(messageText != '') {
-					if(messageText[0] == '/')
-						this.handleCommand(messageText);
-					else
+					if(messageText[0] == '/') {
+						this.handleCommand(messageText.split(' ')[0],
+							messageText.split(' ').slice(1).join(' '));
+					} else {
 						this.htmlHistory.innerHTML
 							+= `<div>${messageText}</div>`;
+						if(this.peerJSConnection != null)
+							this.peerJSConnection.send(messageText);
+					}
 					this.htmlInputBox.value = '';
 					this.htmlHistory.scrollTop
 						= this.htmlHistory.scrollHeight;
@@ -55,12 +81,13 @@ class ChatContainer {
 		});
 	}
 
-	handleCommand(command) {
-		if(command == '/clear')
-			this.htmlHistory.innerHTML = ``;
-		else
+	handleCommand(command, args) {
+		try {
+			this.commands[command](args);
+		} catch(e) {
 			this.htmlHistory.innerHTML
-				+= `<div>${"command not found: " + command}</div>`;
+				+= `<div>${"failed to execute the command: " + command}</div>`;
+		}
 	}
 
 	updateLayout(container) {
