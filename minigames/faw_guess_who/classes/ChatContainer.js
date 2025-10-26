@@ -45,9 +45,11 @@ class ChatContainer {
 					if(messageText[0] == '/')
 						this.handleCommand(messageText);
 					else
-						this.htmlHistory.innerHTML += `<div>${messageText}</div>`;
+						this.htmlHistory.innerHTML
+							+= `<div>${messageText}</div>`;
 					this.htmlInputBox.value = '';
-					this.htmlHistory.scrollTop = this.htmlHistory.scrollHeight;
+					this.htmlHistory.scrollTop
+						= this.htmlHistory.scrollHeight;
 				}
 			}
 		});
@@ -57,7 +59,8 @@ class ChatContainer {
 		if(command == '/clear')
 			this.htmlHistory.innerHTML = ``;
 		else
-			this.htmlHistory.innerHTML += `<div>${"command not found: " + command}</div>`;
+			this.htmlHistory.innerHTML
+				+= `<div>${"command not found: " + command}</div>`;
 	}
 
 	updateLayout(container) {

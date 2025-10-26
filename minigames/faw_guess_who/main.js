@@ -21,14 +21,20 @@ function main() {
 	document.head.appendChild(Object.assign(
 		document.createElement('link'), {rel:'icon', href:'icon.png'}));
 
+	// I guess this is the only way to make the webpage on mobile
+	// not update on swipe down
+	// so that the code doesn't exceed 80 characters a line
+	let metaContent = 'width=device-width, '
+		+ 'initial-scale=1, '
+		+ 'maximum-scale=1, '
+		+ 'user-scalable=no';
 	let existingMeta = document.querySelector('meta[name="viewport"]');
 	if (!existingMeta) {
-	    let meta = document.createElement('meta');
-	    meta.name = 'viewport';
-	    meta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
-	    document.head.appendChild(meta);
+	    document.head.appendChild(Object.assign(
+		    document.createElement('meta'),
+		    { name: 'viewport', content: metaContent }));
 	} else {
-	    existingMeta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+	    existingMeta.content = metaContent;
 	}
 
 	let pc = new PictureContainer();
