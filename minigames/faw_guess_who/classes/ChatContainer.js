@@ -6,6 +6,7 @@ class ChatContainer {
 	htmlInfoBox = null;
 
 	name = '';
+	connectionURL = '';
 	
 	peerJSConnection = null;
 	peerJSId = '';
@@ -34,15 +35,27 @@ class ChatContainer {
 
 		this.htmlInfoBox = document.createElement('div');
 		this.htmlInfoBox.id = 'chat-info';
-		this.htmlInfoBox.style.fontSize= '100%';
+		this.htmlInfoBox.style.fontSize= '75%';
 		this.htmlInfoBox.style.background= '#aa4444';
 		this.htmlInfoBox.style.width = '100%';
 		this.htmlInfoBox.style.height = '100%';
 		this.htmlInfoBox.style.display = 'flex';
 		this.htmlInfoBox.style.alignItems = 'center';
-		this.htmlInfoBox.style.justifyContent = 'center';
+		this.htmlInfoBox.style.justifyContent = 'flex-start';
 		this.htmlInfoBox.style.textAlign = 'center';
 		this.htmlContainer.appendChild(this.htmlInfoBox);
+
+		let infoBoxCopy = document.createElement('button');
+		infoBoxCopy.textContent = '📋️';
+		infoBoxCopy.style.margin = '1%';
+		infoBoxCopy.onclick = () => {
+			navigator.clipboard.writeText(this.connectionURL).then(() => {
+				console.log('copied url to clipboard');
+			}).catch(err => {
+				console.error("Не удалось скопировать текст: ", err);
+		    });
+		};
+		this.htmlInfoBox.appendChild(infoBoxCopy);
 
 		this.htmlHistory = document.createElement('div');
 		this.htmlHistory.style.fontSize= '100%';

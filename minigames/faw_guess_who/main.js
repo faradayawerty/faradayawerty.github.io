@@ -63,8 +63,11 @@ function main() {
 	});
 
 	peer.on('open', (id) => {
-		cc.htmlInfoBox.innerHTML = '<div>' + 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id + '</div>';
 		cc.peerJSId = id;
+		cc.connectionURL = 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id;
+		let div = document.createElement('div');
+		div.textContent = cc.connectionURL;
+		cc.htmlInfoBox.appendChild(div);
 	});
 
 	peer.on('connection', (connection) => {
@@ -77,7 +80,7 @@ function main() {
 
 	let urlParams = new URLSearchParams(window.location.search);
 	let connectionFromURL = urlParams.get('connection');
-	setupConnection(cc, connectionFromURL);
+	setupConnection(cc, peer.connect(connectionFromURL));
 }
 
 
