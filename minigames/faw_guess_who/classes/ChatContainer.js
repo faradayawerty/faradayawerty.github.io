@@ -35,7 +35,7 @@ class ChatContainer {
 
 		this.htmlInfoBox = document.createElement('div');
 		this.htmlInfoBox.id = 'chat-info';
-		this.htmlInfoBox.style.fontSize= '75%';
+		this.htmlInfoBox.style.fontSize= '80%';
 		this.htmlInfoBox.style.background= '#aa4444';
 		this.htmlInfoBox.style.width = '100%';
 		this.htmlInfoBox.style.height = '100%';
@@ -48,6 +48,7 @@ class ChatContainer {
 		let infoBoxCopy = document.createElement('button');
 		infoBoxCopy.textContent = '📋️';
 		infoBoxCopy.style.margin = '1%';
+		infoBoxCopy.style.background = '#11aa11';
 		infoBoxCopy.onclick = () => {
 			navigator.clipboard.writeText(this.connectionURL).then(() => {
 				console.log('copied url to clipboard');
