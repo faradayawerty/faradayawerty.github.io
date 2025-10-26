@@ -1,13 +1,12 @@
 
-function setupConnection(connection) {
-    cc.peerJSConnection = connection;
+function setupConnection(chatContainer, connection) {
+    chatContainer.peerJSConnection = connection;
 
     connection.on('data', (data) => {
-        cc.htmlHistory.innerHTML += `<div>${data}</div>`;
+        chatContainer.htmlHistory.innerHTML += `<div> ${data} </div>`;
     });
 
     connection.on('open', () => {
-        connection.send('Привет от меня!');
     });
 }
 
@@ -53,13 +52,17 @@ function main() {
 
 	let peer = new Peer();
 
-	peer.on('open', id => {
+	peer.on('open', (id) => {
 		cc.htmlInfoBox.innerHTML = '<div>' + id + '</div>';
+		cc.peerJSId = id;
 	});
 
-	peer.on('connection', setupConnection);
+	peer.on('connection', (connection) => {
+		setupConnection(cc, connection);
+	});
+
 	cc.commands['/connect'] = (args) => {
-		setupConnection(peer.connect(args));
+		setupConnection(cc, peer.connect(args));
 	};
 }
 

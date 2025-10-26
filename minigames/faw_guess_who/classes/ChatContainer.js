@@ -4,13 +4,17 @@ class ChatContainer {
 	htmlHistory = null;
 	htmlInputBox = null;
 	htmlInfoBox = null;
+
+	name = '';
 	
 	peerJSConnection = null;
+	peerJSId = '';
 
 	commands = {
 		'/clear': (args) => { this.htmlHistory.innerHTML = ''; },
 		'/test1': function(args) { alert('TEST'); },
-		'/test2': function(args) { alert(args); }
+		'/test2': function(args) { alert(args); },
+		'/name': (args) => { this.name = args; }
 	};
 
 	constructor() {
@@ -38,7 +42,6 @@ class ChatContainer {
 		this.htmlInfoBox.style.alignItems = 'center';
 		this.htmlInfoBox.style.justifyContent = 'center';
 		this.htmlInfoBox.style.textAlign = 'center';
-		this.htmlInfoBox.innerHTML = '<div>loading your id...</div>';
 		this.htmlContainer.appendChild(this.htmlInfoBox);
 
 		this.htmlHistory = document.createElement('div');
@@ -68,10 +71,13 @@ class ChatContainer {
 						this.handleCommand(messageText.split(' ')[0],
 							messageText.split(' ').slice(1).join(' '));
 					} else {
+						let name = this.peerJSId;
+						if(this.name != '')
+							name = this.name;
 						this.htmlHistory.innerHTML
-							+= `<div>${messageText}</div>`;
+							+= `<div>${name}: ${messageText}</div>`;
 						if(this.peerJSConnection != null)
-							this.peerJSConnection.send(messageText);
+							this.peerJSConnection.send(name + ': ' + messageText);
 					}
 					this.htmlInputBox.value = '';
 					this.htmlHistory.scrollTop
