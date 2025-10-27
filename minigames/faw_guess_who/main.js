@@ -68,13 +68,13 @@ function main() {
 		cc.connectionURL = 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id;
 
 		let div = document.createElement('div');
-		//div.textContent = cc.connectionURL;
 		div.textContent = 'Copy URL for connecting to ' + id;
 		cc.htmlInfoBox.appendChild(div);
 
 		let urlParams = new URLSearchParams(window.location.search);
 		let connectionFromURL = urlParams.get('connection');
-		setupConnection(cc, peer.connect(connectionFromURL));
+		if(connectionFromURL)
+			setupConnection(cc, peer.connect(connectionFromURL));
 	});
 
 	peer.on('connection', (connection) => {
