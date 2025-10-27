@@ -73,8 +73,8 @@ function main() {
 
 		let urlParams = new URLSearchParams(window.location.search);
 		let connectionFromURL = urlParams.get('connection');
-		if(connectionFromURL != null && connectionFromURL != undefined)
-			setupConnection(cc, peer.connect(connectionFromURL));
+		//if(connectionFromURL != null && connectionFromURL != undefined)
+		setupConnection(cc, peer.connect(connectionFromURL));
 	});
 
 	peer.on('connection', (connection) => {
