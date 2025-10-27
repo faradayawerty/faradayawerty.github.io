@@ -91,7 +91,7 @@ class ChatContainer {
 							messageText.split(' ').slice(1).join(' '));
 					} else {
 						let name = this.name;
-						if(this.peerJSId != '')
+						if(this.peerJSId != '' && this.name == 'NoName')
 							name = this.peerJSId;
 						this.htmlHistory.innerHTML
 							+= '<div> [' + name + '] ' + messageText + '</div>';
