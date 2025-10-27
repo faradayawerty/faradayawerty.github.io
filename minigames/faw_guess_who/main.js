@@ -1,10 +1,10 @@
 
-function setupConnection(chatContainer, connection) {
+function setupConnection(chatContainer, pictureContainer, connection) {
 	chatContainer.peerJSConnection = connection;
 
 	connection.on('data', (data) => {
 		if(data.type === 'image') {
-			pc.addPicture(data.data);
+			pictureContainer, c.addPicture(data.data);
 		} else {
 			chatContainer.htmlHistory.innerHTML += `<div> ${data} </div>`;
 		}
@@ -14,7 +14,7 @@ function setupConnection(chatContainer, connection) {
 		chatContainer.htmlHistory.innerHTML += `<div> connection with ${chatContainer.peerJSId} established </div>`;
 		if(chatContainer.peerJSId === undefined)
 			return;
-		let allImages = pc.getAllImagesData();
+		let allImages = pictureContainer, c.getAllImagesData();
 		allImages.forEach(dataURL => {
 			connection.send({ type: 'image', data: dataURL });
 		});
@@ -114,15 +114,15 @@ function main() {
 		let urlParams = new URLSearchParams(window.location.search);
 		let connectionFromURL = urlParams.get('connection');
 		if(connectionFromURL != null && connectionFromURL != undefined)
-			setupConnection(cc, peer.connect(connectionFromURL));
+			setupConnection(cc, pc, peer.connect(connectionFromURL));
 	});
 
 	peer.on('connection', (connection) => {
-		setupConnection(cc, connection);
+		setupConnection(cc, pc, connection);
 	});
 
 	cc.commands['/connect'] = (args) => {
-		setupConnection(cc, peer.connect(args));
+		setupConnection(cc, pc, peer.connect(args));
 	};
 }
 
