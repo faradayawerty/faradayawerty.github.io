@@ -4,7 +4,7 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 
 	connection.on('data', (data) => {
 		if(data.type === 'image') {
-			pictureContainer, c.addPicture(data.data);
+			pictureContainer.addPicture(data.data);
 		} else {
 			chatContainer.htmlHistory.innerHTML += `<div> ${data} </div>`;
 		}
@@ -14,7 +14,7 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 		chatContainer.htmlHistory.innerHTML += `<div> connection with ${chatContainer.peerJSId} established </div>`;
 		if(chatContainer.peerJSId === undefined)
 			return;
-		let allImages = pictureContainer, c.getAllImagesData();
+		let allImages = pictureContainer.getAllImagesData();
 		allImages.forEach(dataURL => {
 			connection.send({ type: 'image', data: dataURL });
 		});

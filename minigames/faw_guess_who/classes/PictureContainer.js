@@ -4,6 +4,8 @@ class PictureContainer {
 	htmlButtonsContainer = null;
 	htmlPicturesContainer = null;
 
+	current_default_opacity = '0.1';
+
 	constructor() {
 		this.htmlContainer = document.createElement('div');
 		this.htmlContainer.id = 'picture-container';
@@ -51,13 +53,20 @@ class PictureContainer {
 	}
 
 	updateLayout(container) {
+		let defaultOpacity = '0.1';
 		if(window.innerWidth > window.innerHeight) {
 			container.style.width = '49%';
 			container.style.height = '98%';
 		} else {
 			container.style.width = '98%';
 			container.style.height = '49%';
+			defaultOpacity = '0.75';
 		}
+		this.current_default_opacity = defaultOpacity;
+		let elements = document.querySelectorAll('[id="delete-cross"]');
+		elements.forEach(el => {
+			el.style.opacity = defaultOpacity;
+		});
 	}
 
 	addButton(text, action, fontSize='1.5vh') {
@@ -187,6 +196,7 @@ class PictureContainer {
 		picture.style.objectPosition = 'center'; // Центрируем картинку внутри wrapper
 
 		let deleteBtn = document.createElement('button');
+		deleteBtn.id = 'delete-cross';
 		deleteBtn.textContent = 'X';
 		deleteBtn.style.position = 'absolute';
 		deleteBtn.style.top = '3%';
@@ -197,18 +207,19 @@ class PictureContainer {
 		deleteBtn.style.cursor = 'pointer';
 		deleteBtn.style.padding = '1%';
 		deleteBtn.style.fontSize = '2vh';
-		deleteBtn.style.opacity = '0.1';
+		deleteBtn.style.opacity = this.current_default_opacity;
 		deleteBtn.style.transition = 'opacity 0.3s ease';
 		deleteBtn.addEventListener('click', () => pictureWrapper.remove());
 		pictureWrapper.appendChild(deleteBtn);
 
 		pictureWrapper.addEventListener('mouseenter', () => {
 			pictureWrapper.style.transform = 'scale(1.025)';
+			this.current_default_opacity = deleteBtn.style.opacity;
 			deleteBtn.style.opacity = '1';
 		});
 		pictureWrapper.addEventListener('mouseleave', () => {
 			pictureWrapper.style.transform = 'scale(1)';
-			deleteBtn.style.opacity = '0.1';
+			deleteBtn.style.opacity = this.current_default_opacity;
 		});
 		pictureWrapper.addEventListener('click', () => this.excludePicture(pictureWrapper));
 	}
