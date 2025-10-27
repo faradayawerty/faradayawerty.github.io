@@ -94,7 +94,7 @@ class ChatContainer {
 						if(this.peerJSId != '')
 							name = this.peerJSId;
 						this.htmlHistory.innerHTML
-							+= `<div>[${name}] ${messageText}</div>`;
+							+= '<div> [' + name + '] ' + messageText + '</div>';
 						if(this.peerJSConnection != null)
 							this.peerJSConnection.send('[' + name + '] ' + messageText);
 					}
