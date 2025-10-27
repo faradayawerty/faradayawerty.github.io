@@ -19,7 +19,7 @@ class ChatContainer {
 			this.name = args;
 			this.htmlHistory.innerHTML += '<div> your name is set to ' + this.name + '</div>';
 		},
-		'/id': (args) => { this.htmlHistory.innerHTML += '<div>' + this.peerJSId + '</div>'; },
+		'/id': (args) => { this.htmlHistory.innerHTML += '<div> your id is ' + this.peerJSId + '</div>'; },
 	};
 
 	constructor() {
@@ -39,7 +39,7 @@ class ChatContainer {
 
 		this.htmlInfoBox = document.createElement('div');
 		this.htmlInfoBox.id = 'chat-info';
-		this.htmlInfoBox.style.fontSize= '75%';
+		this.htmlInfoBox.style.fontSize= '100%';
 		this.htmlInfoBox.style.background= '#aa4444';
 		this.htmlInfoBox.style.width = '100%';
 		this.htmlInfoBox.style.height = '100%';
@@ -48,20 +48,6 @@ class ChatContainer {
 		this.htmlInfoBox.style.justifyContent = 'flex-start';
 		this.htmlInfoBox.style.textAlign = 'center';
 		this.htmlContainer.appendChild(this.htmlInfoBox);
-
-		let infoBoxCopy = document.createElement('button');
-		infoBoxCopy.textContent = '📋️';
-		infoBoxCopy.style.margin = '1%';
-		infoBoxCopy.style.background = '#11aa11';
-		infoBoxCopy.onclick = () => {
-			navigator.clipboard.writeText(this.connectionURL).then(() => {
-				if(this.connectionURL != '')
-					alert('The URL is copied to clipboard');
-			}).catch(err => {
-				console.error("Не удалось скопировать текст: ", err);
-		    });
-		};
-		this.htmlInfoBox.appendChild(infoBoxCopy);
 
 		this.htmlHistory = document.createElement('div');
 		this.htmlHistory.style.fontSize= '100%';
@@ -117,12 +103,15 @@ class ChatContainer {
 
 	updateLayout(container) {
 		if(window.innerWidth > window.innerHeight) {
+			this.htmlInfoBox.style.fontSize= '100%';
 			container.style.width = '49%';
 			container.style.height = '98%';
 		} else {
+			this.htmlInfoBox.style.fontSize= '50%';
 			container.style.width = '98%';
 			container.style.height = '49%';
 		}
+
 	}
 }
 

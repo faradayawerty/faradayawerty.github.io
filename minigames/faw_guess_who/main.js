@@ -1,14 +1,24 @@
 
 function setupConnection(chatContainer, connection) {
-    chatContainer.peerJSConnection = connection;
+	chatContainer.peerJSConnection = connection;
 
-    connection.on('data', (data) => {
-        chatContainer.htmlHistory.innerHTML += `<div> ${data} </div>`;
-    });
+	connection.on('data', (data) => {
+		if(data.type === 'image') {
+			pc.addPicture(data.data);
+		} else {
+			chatContainer.htmlHistory.innerHTML += `<div> ${data} </div>`;
+		}
+	});
 
-    connection.on('open', () => {
-        chatContainer.htmlHistory.innerHTML += `<div> connection with ${chatContainer.peerJSId} established </div>`;
-    });
+	connection.on('open', () => {
+		chatContainer.htmlHistory.innerHTML += `<div> connection with ${chatContainer.peerJSId} established </div>`;
+		if(chatContainer.peerJSId === undefined)
+			return;
+		let allImages = pc.getAllImagesData();
+		allImages.forEach(dataURL => {
+			connection.send({ type: 'image', data: dataURL });
+		});
+	});
 }
 
 function updateLayout(layoutElements) {
@@ -34,11 +44,25 @@ function main() {
 	updateLayout([pc, cc]);
 	window.addEventListener('resize', function() { updateLayout([pc, cc]); });
 
+	document.addEventListener('paste', (event) => {
+		let items = event.clipboardData.items;
+		for (let item of items) {
+			if (item.type.startsWith('image/')) {
+				let file = item.getAsFile();
+				pc.addPicture(file);
+			}
+		}
+	});
+
 	cc.commands['/picset'] = (args) => {
 		if(args == 'flags') {
 			pc.clearPictures();
 			for(let i = 0; i < Config.defaultPictureSets.countryFlags.length; i++)
 				pc.addPicture('data/picture_sets/default_countries/' + Config.defaultPictureSets.countryFlags[i]);
+		} else if(args == 'es') {
+			pc.clearPictures();
+			for(let i = 0; i < Config.defaultPictureSets.everlastingSummerCharacters.length; i++)
+				pc.addPicture('data/picture_sets/default_everlasting_summer/' + Config.defaultPictureSets.everlastingSummerCharacters[i]);
 		} else if(args == 'clear') {
 			pc.clearPictures();
 		} else {
@@ -46,10 +70,11 @@ function main() {
 		}
 	};
 
-	pc.addButton("dummy", null);
-	pc.addButton("dummy", null);
-	pc.addButton("dummy", null);
-	pc.addButton("dummy", null);
+	pc.addImagesInput();
+	pc.addButton("remove all images", function() {
+		pc.clearPictures();
+	});
+	pc.addButton("image set", null);
 
 	let peer = new Peer(undefined, {
 		host: '0.peerjs.com',
@@ -67,14 +92,29 @@ function main() {
 		cc.peerJSId = id;
 		cc.connectionURL = 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id;
 
+		let infoBoxCopy = document.createElement('button');
+		infoBoxCopy.textContent = '📋️ Copy URL ';
+		infoBoxCopy.style.fontSize = '1.5vh';
+		infoBoxCopy.style.margin = '1%';
+		infoBoxCopy.style.padding = '1%';
+		infoBoxCopy.style.background = '#11aa11';
+		infoBoxCopy.onclick = () => {
+			navigator.clipboard.writeText(cc.connectionURL).then(() => {
+				alert('The URL is copied to clipboard');
+			}).catch(err => {
+				console.error("Не удалось скопировать текст: ", err);
+		    });
+		};
+		cc.htmlInfoBox.appendChild(infoBoxCopy);
+
 		let div = document.createElement('div');
-		div.textContent = 'Copy URL for connecting to ' + id;
+		div.textContent = id;
 		cc.htmlInfoBox.appendChild(div);
 
 		let urlParams = new URLSearchParams(window.location.search);
 		let connectionFromURL = urlParams.get('connection');
-		//if(connectionFromURL != null && connectionFromURL != undefined)
-		setupConnection(cc, peer.connect(connectionFromURL));
+		if(connectionFromURL != null && connectionFromURL != undefined)
+			setupConnection(cc, peer.connect(connectionFromURL));
 	});
 
 	peer.on('connection', (connection) => {
