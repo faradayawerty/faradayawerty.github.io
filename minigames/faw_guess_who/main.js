@@ -12,8 +12,6 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 
 	connection.on('open', () => {
 		chatContainer.htmlHistory.innerHTML += `<div> connection with ${chatContainer.peerJSId} established </div>`;
-		if(chatContainer.peerJSId === undefined)
-			return;
 		let allImages = pictureContainer.getAllImagesData();
 		allImages.forEach(dataURL => {
 			connection.send({ type: 'image', data: dataURL });
@@ -82,9 +80,7 @@ function main() {
 		path: '/',
 		secure: true,
 		config: {
-			iceServers: [
-				{ urls: 'stun:stun.l.google.com:19302' },
-			]
+			iceServers: Config.iceServers
 		}
 	});
 
