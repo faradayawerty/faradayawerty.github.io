@@ -129,10 +129,8 @@ let Config = {
 		{ urls: 'stun:stun.moonlight-stream.org:3478' },
 
 		// tested, working with vpn
-		{ urls: 'stun:stun.12connect.com:3478' },
 		{ urls: 'stun:stun.1und1.de:3478' },
 		{ urls: 'stun:stun.3deluxe.de:3478' },
-		{ urls: 'stun:stun.3wayint.com:3478' },
 		{ urls: 'stun:stun.callromania.ro:3478' },
 		{ urls: 'stun:stun.comfi.com:3478' },
 		{ urls: 'stun:stun.cope.es:3478' },
