@@ -126,7 +126,7 @@ function main() {
 	});
 
 	peer.on('disconnected', () => {
-		chatContainer.htmlHistory.innerHTML += '<div>Peer disconnected. Reconnecting...</div>';
+		cc.htmlHistory.innerHTML += '<div>Peer disconnected. Reconnecting...</div>';
 		peer.reconnect();
 	});
 
