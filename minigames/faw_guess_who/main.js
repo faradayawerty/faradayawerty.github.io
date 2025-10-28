@@ -21,11 +21,11 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 	});
 
 	connection.on('close', () => {
-		chatContainer.htmlHistory.innerHTML += '<div>Connection closed</div>';
-		//setTimeout(() => {
-		//	let newConnection = peer.connect(connection.peer);
-		//	setupConnection(chatContainer, pictureContainer, newConnection);
-		//}, 300000);
+		chatContainer.htmlHistory.innerHTML += '<div>Connection closed. Attempting to reconnect...</div>';
+		setTimeout(() => {
+			let newConnection = peer.connect(connection.peer);
+			setupConnection(chatContainer, pictureContainer, newConnection);
+		}, 60000);
 	});
 }
 
