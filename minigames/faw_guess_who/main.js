@@ -17,6 +17,19 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 			connection.send({ type: 'image', data: dataURL });
 		});
 	});
+
+	connection.on('close', () => {
+		chatContainer.htmlHistory.innerHTML += '<div>Connection closed. Trying to reconnect...</div>';
+		setTimeout(() => {
+			let newConnection = peer.connect(connection.peer);
+			setupConnection(chatContainer, pictureContainer, newConnection);
+		}, 60000);
+	});
+
+	peer.on('disconnected', () => {
+		chatContainer.htmlHistory.innerHTML += '<div>Peer disconnected. Reconnecting...</div>';
+		peer.reconnect();
+	});
 }
 
 function updateLayout(layoutElements) {
