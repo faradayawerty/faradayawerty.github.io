@@ -1,4 +1,6 @@
 
+let peer = null;
+
 function setupConnection(chatContainer, pictureContainer, connection) {
 	chatContainer.peerJSConnection = connection;
 
@@ -82,7 +84,7 @@ function main() {
 	});
 	pc.addButton("image set", null);
 
-	let peer = new Peer(undefined, {
+	peer = new Peer(undefined, {
 		host: '0.peerjs.com',
 		port: 443,
 		path: '/',
