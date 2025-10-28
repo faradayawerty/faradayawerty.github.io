@@ -1,21 +1,4 @@
 
-function sanitizeIceServers(servers) {
-	if (!Array.isArray(servers))
-		return [];
-	return servers
-		.filter(s => !!s)
-		.map(s => {
-			if (typeof s === 'string')
-				return { urls: s };
-			if (s.url)
-				return { urls: s.url };
-			if (s.urls)
-				return s;
-			return null;
-		})
-		.filter(s => !!s);
-}
-
 function setupConnection(chatContainer, pictureContainer, connection) {
 	chatContainer.peerJSConnection = connection;
 
@@ -105,7 +88,7 @@ function main() {
 		path: '/',
 		secure: true,
 		config: {
-			iceServers: sanitizeIceServers(Config.iceServers)
+			iceServers: Config.iceServers
 		}
 	});
 
