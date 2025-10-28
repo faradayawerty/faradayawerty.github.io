@@ -1,4 +1,21 @@
 
+function sanitizeIceServers(servers) {
+	if (!Array.isArray(servers))
+		return [];
+	return servers
+		.filter(s => !!s)
+		.map(s => {
+			if (typeof s === 'string')
+				return { urls: s };
+			if (s.url)
+				return { urls: s.url };
+			if (s.urls)
+				return s;
+			return null;
+		})
+		.filter(s => !!s);
+}
+
 function setupConnection(chatContainer, pictureContainer, connection) {
 	chatContainer.peerJSConnection = connection;
 
@@ -23,12 +40,7 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 		setTimeout(() => {
 			let newConnection = peer.connect(connection.peer);
 			setupConnection(chatContainer, pictureContainer, newConnection);
-		}, 60000);
-	});
-
-	peer.on('disconnected', () => {
-		chatContainer.htmlHistory.innerHTML += '<div>Peer disconnected. Reconnecting...</div>';
-		peer.reconnect();
+		}, 300000);
 	});
 }
 
@@ -93,7 +105,7 @@ function main() {
 		path: '/',
 		secure: true,
 		config: {
-			iceServers: Config.iceServers
+			iceServers: sanitizeIceServers(Config.iceServers)
 		}
 	});
 
@@ -128,6 +140,11 @@ function main() {
 
 	peer.on('connection', (connection) => {
 		setupConnection(cc, pc, connection);
+	});
+
+	peer.on('disconnected', () => {
+		chatContainer.htmlHistory.innerHTML += '<div>Peer disconnected. Reconnecting...</div>';
+		peer.reconnect();
 	});
 
 	cc.commands['/connect'] = (args) => {
