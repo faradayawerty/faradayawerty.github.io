@@ -121,6 +121,10 @@ function main() {
 			setupConnection(cc, pc, peer.connect(connectionFromURL));
 	});
 
+	peer.on('error', (err) => {
+		console.error("Peer error:", err)
+	});
+
 	peer.on('connection', (connection) => {
 		setupConnection(cc, pc, connection);
 	});

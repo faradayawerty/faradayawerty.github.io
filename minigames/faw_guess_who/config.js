@@ -126,7 +126,7 @@ let Config = {
 		{ urls: 'stun:stun.bethesda.net:3478' },
 		{ urls: 'stun:stun.bitburger.de:3478' },
 		{ urls: 'stun:stun.dus.net:3478' },
-		{ urls: 'stun:stun.moonlight-stream.org:3478' },
+		//{ urls: 'stun:stun.moonlight-stream.org:3478' },
 
 		// tested, working with vpn
 		{ urls: 'stun:stun.12connect.com:3478' },
