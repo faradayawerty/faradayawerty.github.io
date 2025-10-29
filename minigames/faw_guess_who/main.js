@@ -1,8 +1,13 @@
 let peer = null;
 
-async function benchmarkStunServers(servers, limit = 10) {
+async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
 	console.log("[ICE Benchmark] testing STUN servers...");
-	let shuffled = servers .sort(() => Math.random() - 0.5);
+
+	// перемешаем список, чтобы не тестировать всегда в одном порядке
+	let shuffled = servers
+		.sort(() => Math.random() - 0.5)
+		.slice(0, testCount);
+
 	async function testServer(server) {
 		const start = performance.now();
 		return new Promise(resolve => {
@@ -24,10 +29,12 @@ async function benchmarkStunServers(servers, limit = 10) {
 				.catch(() => resolve({ server, time: Infinity }));
 		});
 	}
+
 	const results = await Promise.all(shuffled.map(testServer));
 	const valid = results.filter(r => r.time < Infinity);
 	const sorted = valid.sort((a, b) => a.time - b.time);
 	const top = sorted.slice(0, limit).map(r => r.server);
+
 	console.log("[ICE Benchmark] fastest servers:", top.map(s => s.urls));
 	return top.length ? top : servers.slice(0, limit);
 }
@@ -215,7 +222,7 @@ function main() {
 	pc.addButton("[wip] угадать", () => {});
 
 	(async () => {
-		let fastestServers = await benchmarkStunServers(Config.iceServers, 15, 30);
+		let fastestServers = await benchmarkStunServers(Config.iceServers, 10, 50);
 		console.log("[Peer] Creating peer with", fastestServers.length, "fast servers");
 		peer = new Peer(undefined, {
 			host: '0.peerjs.com',
@@ -260,7 +267,7 @@ function main() {
 				div.setAttribute('data-peer-id', 'true');
 				cc.htmlInfoBox.appendChild(div);
 			}
-			printHelp();
+			cc.printHelp();
 			let urlParams = new URLSearchParams(window.location.search);
 			let connectionFromURL = urlParams.get('connection');
 			if (connectionFromURL != null && connectionFromURL != undefined)
