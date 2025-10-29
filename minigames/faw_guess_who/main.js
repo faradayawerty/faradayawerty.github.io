@@ -1,12 +1,8 @@
 let peer = null;
 
-async function benchmarkStunServers(servers, limit = 15) {
+async function benchmarkStunServers(servers, limit = 10) {
 	console.log("[ICE Benchmark] testing STUN servers...");
-
-	// перемешаем список, чтобы не тестировать всегда в одном порядке
-	let shuffled = servers
-		.sort(() => Math.random() - 0.5);
-
+	let shuffled = servers .sort(() => Math.random() - 0.5);
 	async function testServer(server) {
 		const start = performance.now();
 		return new Promise(resolve => {
@@ -28,12 +24,10 @@ async function benchmarkStunServers(servers, limit = 15) {
 				.catch(() => resolve({ server, time: Infinity }));
 		});
 	}
-
 	const results = await Promise.all(shuffled.map(testServer));
 	const valid = results.filter(r => r.time < Infinity);
 	const sorted = valid.sort((a, b) => a.time - b.time);
 	const top = sorted.slice(0, limit).map(r => r.server);
-
 	console.log("[ICE Benchmark] fastest servers:", top.map(s => s.urls));
 	return top.length ? top : servers.slice(0, limit);
 }
@@ -81,7 +75,7 @@ function updateLayout(layoutElements) {
 }
 
 function main() {
-	document.title = "ALPHA Guess Who!";
+	document.title = "Guess Who!";
 	document.body.style.backgroundColor = Config.colors.page.background;
 	document.body.style.fontFamily = "Arial, sans-serif";
 	document.body.style.margin = "0";
@@ -277,6 +271,7 @@ function main() {
 				Например, чтобы выбрать себе имя, нужно использовать команду /name Имя в чате.<br>
 				Вот список некоторых других команд: /sync - синхронизировать изображения друга со своими.
 				Команда очистит его картинки и заменит их твоими. /clear - очистить чат.<br>
+				Если понадобится снова вывести это сообщение, напиши /help.<br>
 				Игра находится в ранней-ранней alpha, поэтому некоторые функции ещё не реализованы,
 				а подключение между игроками может сильно барахлить (хотя что-то мне подсказывает,
 				что корень проблемы в текущих реалиях РФ).<br> Так или иначе, в игру уже можно играть
