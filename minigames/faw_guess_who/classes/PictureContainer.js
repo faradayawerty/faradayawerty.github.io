@@ -140,32 +140,57 @@ class PictureContainer {
 		this.htmlButtonsContainer.appendChild(button);
 	}
 
-	excludePicture(pictureWrapper) {
-		const img = pictureWrapper.querySelector('img');
-		if (!img) return;
 
-		let cross = pictureWrapper.querySelector('.excluded-cross');
 
-		if (cross) {
-			img.style.filter = '';
-			cross.remove();
-		} else {
-			img.style.filter = 'grayscale(100%)';
-			cross = document.createElement('div');
-			cross.classList.add('excluded-cross');
-			//cross.textContent = '×';
-			cross.textContent = 'No';
-			cross.style.position = 'absolute';
-			cross.style.top = '50%';
-			cross.style.left = '50%';
-			cross.style.transform = 'translate(-50%, -50%)';
-			cross.style.fontSize = '5vw';
-			cross.style.color = Config.colors.pictureContainer.noColor;
-			cross.style.fontWeight = 'bold';
-			cross.style.pointerEvents = 'none';
-			pictureWrapper.appendChild(cross);
-		}
-	}
+	
+excludePicture(pictureWrapper) {
+    const img = pictureWrapper.querySelector('img');
+    if (!img) return;
+
+    let cross = pictureWrapper.querySelector('.excluded-cross');
+
+    if (cross) {
+        // Снимаем исключение
+        img.style.filter = '';
+        cross.remove();
+    } else {
+        // Добавляем исключение
+        img.style.filter = 'grayscale(100%)';
+        cross = document.createElement('div');
+        cross.classList.add('excluded-cross');
+        cross.textContent = 'No';
+        cross.style.position = 'absolute';
+        cross.style.top = '50%';
+        cross.style.left = '50%';
+        cross.style.transform = 'translate(-50%, -50%)';
+        cross.style.fontSize = '24px'; // фиксированный размер
+        cross.style.color = Config.colors.pictureContainer.noColor;
+        cross.style.fontWeight = 'bold';
+        cross.style.pointerEvents = 'none';
+        cross.style.whiteSpace = 'nowrap';
+        pictureWrapper.appendChild(cross);
+    }
+
+    // Перемещаем картинку сразу после последнего No
+    const pictures = Array.from(this.htmlPicturesContainer.children);
+    const lastExcluded = [...pictures].reverse().find(p => p.querySelector('.excluded-cross') && p !== pictureWrapper);
+    
+    if (lastExcluded) {
+        if (lastExcluded.nextSibling) {
+            this.htmlPicturesContainer.insertBefore(pictureWrapper, lastExcluded.nextSibling);
+        } else {
+            this.htmlPicturesContainer.appendChild(pictureWrapper);
+        }
+    } else {
+        // Если исключённых нет, вставляем в начало
+        this.htmlPicturesContainer.insertBefore(pictureWrapper, this.htmlPicturesContainer.firstChild);
+    }
+}
+
+
+
+
+
 
 	addPicture(source) {
 		let pictureWrapper = document.createElement('div');
