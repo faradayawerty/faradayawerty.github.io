@@ -1,12 +1,11 @@
 let peer = null;
 
-async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
+async function benchmarkStunServers(servers, limit = 15) {
 	console.log("[ICE Benchmark] testing STUN servers...");
 
 	// перемешаем список, чтобы не тестировать всегда в одном порядке
 	let shuffled = servers
-		.sort(() => Math.random() - 0.5)
-		.slice(0, testCount);
+		.sort(() => Math.random() - 0.5);
 
 	async function testServer(server) {
 		const start = performance.now();
