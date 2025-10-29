@@ -97,7 +97,7 @@ function main() {
 	});
 
 	pc.addButton("default sets", () => {
-		const selectorColors = Config.colors.pictureContainer.pictureSetSelector;
+		let selectorColors = Config.colors.pictureContainer.pictureSetSelector;
 
 		let overlay = document.createElement('div');
 		overlay.style.position = 'fixed';
@@ -127,7 +127,7 @@ function main() {
 		title.style.margin = '0 0 10px 0';
 		modal.appendChild(title);
 
-		const sets = ['Country flags', 'Everlasting Summer', 'Zoomers'];
+		let sets = ['Country flags', 'Everlasting Summer', 'Zoomers'];
 
 		for (let setName of sets) {
 			let btn = document.createElement('button');
