@@ -78,7 +78,6 @@ class ChatContainer {
 		this.htmlInputBox = document.createElement('input');
 		this.htmlInputBox.type = 'text';
 		this.htmlInputBox.id = 'chat-input';
-		this.htmlInputBox.style.color = Config.colors.chatContainer.textColor;
 		this.htmlInputBox.style.fontSize= '100%';
 		this.htmlInputBox.style.background= Config.colors.chatContainer.input;
 		this.htmlInputBox.style.width = '100%';
@@ -88,7 +87,6 @@ class ChatContainer {
 		let zoomOut = document.createElement('button');
 		zoomOut.textContent = '-';
 		zoomOut.style.fontSize = '1.5vh';
-		zoomOut.style.width = '6%';
 		zoomOut.style.margin = '1%';
 		zoomOut.style.padding = '1%';
 		zoomOut.style.background = Config.colors.pictureContainer.buttonColor;
@@ -102,7 +100,6 @@ class ChatContainer {
 		let zoomIn = document.createElement('button');
 		zoomIn.textContent = '+';
 		zoomIn.style.fontSize = '1.5vh';
-		zoomIn.style.width = '6%';
 		zoomIn.style.margin = '1%';
 		zoomIn.style.padding = '1%';
 		zoomIn.style.background = Config.colors.pictureContainer.buttonColor;
@@ -126,9 +123,8 @@ class ChatContainer {
 							name = this.peerJSId;
 						this.htmlHistory.innerHTML
 							+= '<div> [' + name + '] ' + messageText + '</div>';
-						if(this.peerJSConnection != null) {
+						if(this.peerJSConnection != null)
 							this.peerJSConnection.send('[' + name + '] ' + messageText);
-						}
 					}
 					this.htmlInputBox.value = '';
 					this.htmlHistory.scrollTop

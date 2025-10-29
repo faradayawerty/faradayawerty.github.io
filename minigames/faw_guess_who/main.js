@@ -9,6 +9,7 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 			pictureContainer.addPicture(data.data);
 		} else {
 			chatContainer.htmlHistory.innerHTML += `<div> ${data} </div>`;
+			this.htmlHistory.scrollTop = this.htmlHistory.scrollHeight;
 		}
 	});
 
@@ -40,7 +41,7 @@ function updateLayout(layoutElements) {
 
 function main() {
 	document.title = "Guess Who!";
-	document.body.style.backgroundColor = "#aabbcc";
+	document.body.style.backgroundColor = Config.colors.page.background;
 	document.body.style.fontFamily = "Arial, sans-serif";
 	document.body.style.margin = "0";
 	document.body.style.padding = "0";
@@ -48,6 +49,8 @@ function main() {
 
 	let pc = new PictureContainer();
 	let cc = new ChatContainer();
+
+	cc.pictureContainer = pc;
 
 	updateLayout([pc, cc]);
 	window.addEventListener('resize', function() { updateLayout([pc, cc]); });
@@ -79,9 +82,7 @@ function main() {
 	};
 
 	pc.addImagesInput();
-	pc.addButton("remove all images", function() {
-		pc.clearPictures();
-	});
+	pc.addButton("remove all images", function() { pc.clearPictures(); });
 	pc.addButton("image set", null);
 
 	peer = new Peer(undefined, {
@@ -103,7 +104,8 @@ function main() {
 		infoBoxCopy.style.fontSize = '1.5vh';
 		infoBoxCopy.style.margin = '1%';
 		infoBoxCopy.style.padding = '1%';
-		infoBoxCopy.style.background = '#11aa11';
+		infoBoxCopy.style.background = Config.colors.pictureContainer.buttonColor;
+		infoBoxCopy.style.color = Config.colors.chatContainer.textColorDark;
 		infoBoxCopy.onclick = () => {
 			navigator.clipboard.writeText(cc.connectionURL).then(() => {
 				alert('The URL is copied to clipboard');

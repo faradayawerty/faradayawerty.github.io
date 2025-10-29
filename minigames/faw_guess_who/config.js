@@ -137,6 +137,36 @@ let Config = {
 		{ urls: 'stun:stun.bridesbay.com:3478' },
 		{ urls: 'stun:stun.business-isp.nl:3478' },
 		{ urls: 'stun:stun.diallog.com:3478' },
-	]
+	],
+
+
+colors: {
+	page: {
+		background: "#2e3440",
+	},
+	pictureContainer: {
+		background: "#3b4252",
+		pictureContainerBackground: "#434c5e",
+		buttonContainerBackground: "#4c566a",
+		buttonColor: "#88c0d0",
+		buttonColorHover: "#8fbcbb",
+		pictureWrapper: "#5e81ac",
+		noColor: '#bf616a',
+		deleteButton: '#bf616aaa',
+	},
+	chatContainer: {
+		textColor: "#eceff4",
+		textColorDark: "#2e3440",
+		background: "#3b4252",
+		infoBox: "#4c566a",
+		history: "#434c5e",
+		input: "#4c566a",
+	},
+}
+
+
+
+
+
 }
 

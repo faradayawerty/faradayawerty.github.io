@@ -11,7 +11,7 @@ class PictureContainer {
 		this.htmlContainer.id = 'picture-container';
 		this.htmlContainer.style.width = '49%';
 		this.htmlContainer.style.height = '98%';
-		this.htmlContainer.style.background= '#aa1111';
+		this.htmlContainer.style.background = Config.colors.pictureContainer.background;
 		this.htmlContainer.style.margin = '0.5%'
 		this.htmlContainer.style.padding = '0.5%'
 		this.htmlContainer.style.boxSizing = 'border-box';
@@ -23,7 +23,7 @@ class PictureContainer {
 
 		this.htmlPicturesContainer = document.createElement('div');
 		this.htmlPicturesContainer.id = 'buttons-container';
-		this.htmlPicturesContainer.style.background= '#aa4411';
+		this.htmlPicturesContainer.style.background = Config.colors.pictureContainer.pictureContainerBackground ;
 		this.htmlPicturesContainer.style.width = '100%';
 		this.htmlPicturesContainer.style.height = '100%';
 		this.htmlPicturesContainer.style.overflowY = 'auto';
@@ -36,7 +36,7 @@ class PictureContainer {
 
 		this.htmlButtonsContainer = document.createElement('div');
 		this.htmlButtonsContainer.id = 'buttons-container';
-		this.htmlButtonsContainer.style.background= '#aaaa11';
+		this.htmlButtonsContainer.style.background = Config.colors.pictureContainer.buttonContainerBackground;
 		this.htmlButtonsContainer.style.width = '100%';
 		this.htmlButtonsContainer.style.height = '100%';
 		this.htmlButtonsContainer.style.display = 'flex';
@@ -75,16 +75,17 @@ class PictureContainer {
 		button.onclick = action;
 		button.style.flex = '1';
 		button.style.margin = '1% 1%';
-		button.style.background = '#11aa11';
+		button.style.background = Config.colors.pictureContainer.buttonColor;
+		button.style.color = Config.colors.chatContainer.textColorDark;
 		button.style.fontSize = fontSize;
 		button.style.border = '1px solid #000';
 
 		button.addEventListener('mouseenter', () => {
-			button.style.background = '#0a8a0a';
+			button.style.background = Config.colors.pictureContainer.buttonColorHover;
 		});
 
 		button.addEventListener('mouseleave', () => {
-			button.style.background = '#11aa11';
+			button.style.background = Config.colors.pictureContainer.buttonColor;
 		});
 
 		this.htmlButtonsContainer.appendChild(button);
@@ -101,7 +102,7 @@ class PictureContainer {
 		button.textContent = "add images";
 		button.style.flex = '1';
 		button.style.margin = '1% 1%';
-		button.style.background = '#11aa11';
+		button.style.background = Config.colors.pictureContainer.buttonColor;
 		button.style.fontSize = '1.5vh';
 		button.style.cursor = 'pointer';
 		button.style.color = '#fff';
@@ -111,11 +112,11 @@ class PictureContainer {
 		button.style.border = '1px solid #000';
 
 		button.addEventListener('mouseenter', () => {
-			button.style.background = '#0a8a0a';
+			button.style.background = Config.colors.pictureContainer.buttonColorHover;
 		});
 
 		button.addEventListener('mouseleave', () => {
-			button.style.background = '#11aa11';
+			button.style.background = Config.colors.pictureContainer.buttonColor;
 		});
 
 		button.addEventListener('click', () => {
@@ -159,7 +160,7 @@ class PictureContainer {
 			cross.style.left = '50%';
 			cross.style.transform = 'translate(-50%, -50%)';
 			cross.style.fontSize = '5vw';
-			cross.style.color = 'red';
+			cross.style.color = Config.colors.pictureContainer.noColor;
 			cross.style.fontWeight = 'bold';
 			cross.style.pointerEvents = 'none';
 			pictureWrapper.appendChild(cross);
@@ -168,7 +169,7 @@ class PictureContainer {
 
 	addPicture(source) {
 		let pictureWrapper = document.createElement('div');
-		pictureWrapper.style.background = '#aaaa11';
+		pictureWrapper.style.background = Config.colors.pictureContainer.pictureWrapper;
 		pictureWrapper.style.width = '22%';
 		pictureWrapper.style.height = '25%';
 		pictureWrapper.style.margin = '1%';
@@ -192,8 +193,8 @@ class PictureContainer {
 
 		picture.style.width = '100%';
 		picture.style.height = '100%';
-		picture.style.objectFit = 'contain'; // Важный момент: сохраняет пропорции и масштабирует картинку
-		picture.style.objectPosition = 'center'; // Центрируем картинку внутри wrapper
+		picture.style.objectFit = 'contain';
+		picture.style.objectPosition = 'center';
 
 		let deleteBtn = document.createElement('button');
 		deleteBtn.id = 'delete-cross';
@@ -201,7 +202,7 @@ class PictureContainer {
 		deleteBtn.style.position = 'absolute';
 		deleteBtn.style.top = '3%';
 		deleteBtn.style.right = '3%';
-		deleteBtn.style.background = '#ff7777aa';
+		deleteBtn.style.background = Config.colors.pictureContainer.deleteButton;
 		deleteBtn.style.border = 'none';
 		deleteBtn.style.color = '#000';
 		deleteBtn.style.cursor = 'pointer';
@@ -237,6 +238,30 @@ class PictureContainer {
 			dataURLs.push(canvas.toDataURL());
 		});
 		return dataURLs;
-	};
+	}
+
+
+	biggerPics(step = 5) {
+		let wrappers = this.htmlPicturesContainer.querySelectorAll('div');
+		wrappers.forEach(wrapper => {
+			let width = parseFloat(wrapper.style.width);
+			let height = parseFloat(wrapper.style.height);
+			wrapper.style.width = (width + step) + '%';
+			wrapper.style.height = (height + step) + '%';
+		});
+	}
+
+	smallerPics(step = 5) {
+		let wrappers = this.htmlPicturesContainer.querySelectorAll('div');
+		wrappers.forEach(wrapper => {
+			let width = parseFloat(wrapper.style.width);
+			let height = parseFloat(wrapper.style.height);
+			wrapper.style.width = Math.max(5, width - step) + '%';  // минимальный размер 5%
+			wrapper.style.height = Math.max(5, height - step) + '%';
+		});
+	}
+
+
+
 }
 
