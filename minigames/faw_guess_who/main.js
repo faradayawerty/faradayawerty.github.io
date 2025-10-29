@@ -92,11 +92,11 @@ function main() {
 	};
 
 	pc.addImagesInput();
-	pc.addButton("remove all", function() {
+	pc.addButton("удалить всё", function() {
 		pc.clearPictures();
 	});
 
-	pc.addButton("default sets", () => {
+	pc.addButton("выбрать набор", () => {
 		let selectorColors = Config.colors.pictureContainer.pictureSetSelector;
 
 		let overlay = document.createElement('div');
@@ -122,12 +122,12 @@ function main() {
 		overlay.appendChild(modal);
 
 		let title = document.createElement('h3');
-		title.textContent = 'Select a picture set';
+		title.textContent = 'Выберите набор картинок';
 		title.style.color = selectorColors.titleColor;
 		title.style.margin = '0 0 10px 0';
 		modal.appendChild(title);
 
-		let sets = ['Country flags', 'Everlasting Summer', 'Zoomers'];
+		let sets = ['Флаги стран', 'Бесконечное лето', 'Зумеры'];
 
 		for (let setName of sets) {
 			let btn = document.createElement('button');
@@ -146,13 +146,13 @@ function main() {
 				let folder = '';
 				let images = [];
 
-				if (setName === 'Country flags') {
+				if (setName === 'Флаги стран') {
 					folder = 'default_countries';
 					images = Config.defaultPictureSets.countryFlags;
-				} else if (setName === 'Everlasting Summer') {
+				} else if (setName === 'Бесконечное лето') {
 					folder = 'default_everlasting_summer';
 					images = Config.defaultPictureSets.everlastingSummerCharacters;
-				} else if (setName === 'Zoomers') {
+				} else if (setName === 'Зумеры') {
 					folder = 'default_zoomers';
 					images = Config.defaultPictureSets.zoomers;
 				}
@@ -167,7 +167,7 @@ function main() {
 		}
 
 		let closeBtn = document.createElement('button');
-		closeBtn.textContent = 'Cancel';
+		closeBtn.textContent = 'Назад';
 		closeBtn.style.padding = '5px 10px';
 		closeBtn.style.marginTop = '10px';
 		closeBtn.style.backgroundColor = selectorColors.cancelButtonBackground;
@@ -183,11 +183,11 @@ function main() {
 		document.body.appendChild(overlay);
 	});
 
-	pc.addButton("choose", () => {
+	pc.addButton("[wip] загадать", () => {
 
 	});
 
-	pc.addButton("guess", () => {
+	pc.addButton("[wip] угадать", () => {
 
 	});
 
@@ -208,7 +208,7 @@ function main() {
 
 		if (!cc.htmlInfoBox.querySelector('button[data-copy-url]')) {
 			let infoBoxCopy = document.createElement('button');
-			infoBoxCopy.textContent = '📋️ Copy URL ';
+			infoBoxCopy.textContent = '📋️ URL ';
 			infoBoxCopy.style.fontSize = '1.5vh';
 			infoBoxCopy.style.margin = '1%';
 			infoBoxCopy.style.padding = '1%';
@@ -234,12 +234,13 @@ function main() {
 
 		cc.htmlHistory.innerHTML += `<div>
 			Привет!<br>
-			Это моя версия популярной настолки, Guess Who!<br>
+			Перед тобой моя версия популярной настолки, Guess Who!<br>
 			Это игра для двоих игроков, так что тебе придётся позвать друга.
-			Чтобы он мог подключиться, воспользуйся кнопкой [📋️ Copy URL]<br>
+			Чтобы он мог подключиться, воспользуйся кнопкой [📋️URL].
+			Она скопирует ссылку для подключения, которую нужно отправить твоему другу
+			каким-либо из способов.<br>
 			Пока что не все функции реализованы как элементы графического интерфейса.
-			Например, чтобы поставить себе имя, нужно использовать команду /name Имя
-			в чате.<br>
+			Например, чтобы выбрать себе имя, нужно использовать команду /name Имя в чате.<br>
 			Вот список некоторых других команд: /sync - синхронизировать изображения друга со своими.
 			Команда очистит его картинки и заменит их твоими. /clear - очистить чат.<br>
 			Игра находится в ранней-ранней alpha, поэтому некоторые функции ещё не реализованы,

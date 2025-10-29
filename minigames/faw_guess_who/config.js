@@ -218,7 +218,7 @@ let Config = {
 				buttonHover: "#81a1c1",
 				buttonText: "#eceff4",
 				cancelButtonBackground: "#bf616a",
-				cancelButtonHover: "#d08770"
+				cancelButtonHover: "#cf6f6f"
 			}
 		},
 		chatContainer: {

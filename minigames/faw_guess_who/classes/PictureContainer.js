@@ -101,7 +101,7 @@ class PictureContainer {
 		input.style.display = 'none';
 
 		let button = document.createElement("button");
-		button.textContent = "add images";
+		button.textContent = "добавить";
 		button.style.flex = '1';
 		button.style.margin = '1% 1%';
 		button.style.background = Config.colors.pictureContainer.buttonColor;
