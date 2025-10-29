@@ -166,13 +166,6 @@ function main() {
 			modal.appendChild(btn);
 		}
 
-		pc.addButton("choose", () => {
-
-		});
-		pc.addButton("guess", () => {
-
-		});
-
 		let closeBtn = document.createElement('button');
 		closeBtn.textContent = 'Cancel';
 		closeBtn.style.padding = '5px 10px';
@@ -190,7 +183,13 @@ function main() {
 		document.body.appendChild(overlay);
 	});
 
+	pc.addButton("choose", () => {
 
+	});
+
+	pc.addButton("guess", () => {
+
+	});
 
 
 	peer = new Peer(undefined, {
