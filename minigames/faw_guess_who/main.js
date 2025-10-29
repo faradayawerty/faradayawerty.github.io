@@ -98,33 +98,41 @@ function main() {
 	});
 
 	peer.on('open', (id) => {
-		cc.peerJSId = id;
-		cc.connectionURL = 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id;
+	    cc.peerJSId = id;
+	    cc.connectionURL = 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id;
 
-		let infoBoxCopy = document.createElement('button');
-		infoBoxCopy.textContent = '📋️ Copy URL ';
-		infoBoxCopy.style.fontSize = '1.5vh';
-		infoBoxCopy.style.margin = '1%';
-		infoBoxCopy.style.padding = '1%';
-		infoBoxCopy.style.background = Config.colors.pictureContainer.buttonColor;
-		infoBoxCopy.style.color = Config.colors.chatContainer.textColorDark;
-		infoBoxCopy.onclick = () => {
+	    // Проверяем, есть ли уже кнопка copy
+	    if (!cc.htmlInfoBox.querySelector('button[data-copy-url]')) {
+		  let infoBoxCopy = document.createElement('button');
+		  infoBoxCopy.textContent = '📋️ Copy URL ';
+		  infoBoxCopy.style.fontSize = '1.5vh';
+		  infoBoxCopy.style.margin = '1%';
+		  infoBoxCopy.style.padding = '1%';
+		  infoBoxCopy.style.background = Config.colors.pictureContainer.buttonColor;
+		  infoBoxCopy.style.color = Config.colors.chatContainer.textColorDark;
+		  infoBoxCopy.setAttribute('data-copy-url', 'true'); // помечаем как созданную
+		  infoBoxCopy.onclick = () => {
 			navigator.clipboard.writeText(cc.connectionURL).then(() => {
-				alert('The URL is copied to clipboard');
+			    alert('The URL is copied to clipboard');
 			}).catch(err => {
-				console.error("Не удалось скопировать текст: ", err);
-		    });
-		};
-		cc.htmlInfoBox.appendChild(infoBoxCopy);
+			    console.error("Не удалось скопировать текст: ", err);
+			});
+		  };
+		  cc.htmlInfoBox.appendChild(infoBoxCopy);
+	    }
 
-		let div = document.createElement('div');
-		div.textContent = id;
-		cc.htmlInfoBox.appendChild(div);
+	    // Проверяем, есть ли уже div с id
+	    if (!cc.htmlInfoBox.querySelector('div[data-peer-id]')) {
+		  let div = document.createElement('div');
+		  div.textContent = id;
+		  div.setAttribute('data-peer-id', 'true'); // помечаем как созданный
+		  cc.htmlInfoBox.appendChild(div);
+	    }
 
-		let urlParams = new URLSearchParams(window.location.search);
-		let connectionFromURL = urlParams.get('connection');
-		if(connectionFromURL != null && connectionFromURL != undefined)
-			setupConnection(cc, pc, peer.connect(connectionFromURL));
+	    let urlParams = new URLSearchParams(window.location.search);
+	    let connectionFromURL = urlParams.get('connection');
+	    if(connectionFromURL != null && connectionFromURL != undefined)
+		  setupConnection(cc, pc, peer.connect(connectionFromURL));
 	});
 
 	peer.on('error', (err) => {
