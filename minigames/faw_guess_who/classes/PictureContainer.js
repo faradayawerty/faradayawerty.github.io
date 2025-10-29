@@ -6,6 +6,8 @@ class PictureContainer {
 
 	current_default_opacity = '0.1';
 
+	chosenPicture = null;
+
 	constructor() {
 		this.htmlContainer = document.createElement('div');
 		this.htmlContainer.id = 'picture-container';

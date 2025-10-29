@@ -17,8 +17,20 @@ class ChatContainer {
 
 	commands = {
 		'/clear': (args) => { this.htmlHistory.innerHTML = ''; },
-		'/test1': function(args) { alert('TEST'); },
-		'/test2': function(args) { alert(args); },
+		'/sync': (args) => {
+			if (this.peerJSConnection != null) {
+				// Получаем все изображения текущего игрока
+				let allImages = this.pictureContainer.getAllImagesData();
+				
+				// Отправляем их другому игроку
+				this.peerJSConnection.send({ type: 'sync-images', data: allImages });
+
+				// Выводим в чат уведомление
+				this.htmlHistory.innerHTML += '<div>Images synced to the other player</div>';
+			} else {
+				this.htmlHistory.innerHTML += '<div>No connection to sync images</div>';
+			}
+		},
 		'/name': (args) => {
 			this.name = args;
 			this.htmlHistory.innerHTML += '<div> your name is set to ' + this.name + '</div>';

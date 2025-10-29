@@ -5,11 +5,19 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 	chatContainer.peerJSConnection = connection;
 
 	connection.on('data', (data) => {
-		if(data.type === 'image') {
+		if (data.type === 'image') {
+			// Одиночное изображение
 			pictureContainer.addPicture(data.data);
+		} else if (data.type === 'sync-images') {
+			// Синхронизация картинок
+			pictureContainer.clearPictures(); // очищаем старые
+			data.data.forEach(imgData => {
+				pictureContainer.addPicture(imgData); // добавляем новые
+			});
+			chatContainer.htmlHistory.innerHTML += '<div>Images synced from other player</div>';
 		} else {
-			chatContainer.htmlHistory.innerHTML += `<div> ${data} </div>`;
-			this.htmlHistory.scrollTop = this.htmlHistory.scrollHeight;
+			chatContainer.htmlHistory.innerHTML += `<div>${data}</div>`;
+			chatContainer.htmlHistory.scrollTop = chatContainer.htmlHistory.scrollHeight;
 		}
 	});
 
