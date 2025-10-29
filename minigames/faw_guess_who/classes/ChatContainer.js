@@ -13,7 +13,7 @@ class ChatContainer {
 			this.htmlHistory.innerHTML = '';
 		},
 		'/help': (args) => {
-			printHelp();
+			this.printHelp();
 		},
 		'/sync': (args) => {
 			if (this.peerJSConnection != null) {
