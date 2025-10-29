@@ -8,10 +8,15 @@ async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
 		.sort(() => Math.random() - 0.5)
 		.slice(0, testCount);
 
+	shuffled.push({ "urls": "stun:stun.l.google.com:19302" });
+	shuffled.push({ "urls": "stun:stun.nextcloud.com:443" });
+	shuffled.push({ "urls": "stun:stun.ru-brides.com:3478" });
+	shuffled.push({ "urls": "stun:stun.fitauto.ru:3478" });
+
 	async function testServer(server) {
-		const start = performance.now();
+		let start = performance.now();
 		return new Promise(resolve => {
-			const pc = new RTCPeerConnection({ iceServers: [server] });
+			let pc = new RTCPeerConnection({ iceServers: [server] });
 			pc.createDataChannel("t");
 			let timeout = setTimeout(() => {
 				pc.close();
@@ -30,10 +35,10 @@ async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
 		});
 	}
 
-	const results = await Promise.all(shuffled.map(testServer));
-	const valid = results.filter(r => r.time < Infinity);
-	const sorted = valid.sort((a, b) => a.time - b.time);
-	const top = sorted.slice(0, limit).map(r => r.server);
+	let results = await Promise.all(shuffled.map(testServer));
+	let valid = results.filter(r => r.time < Infinity);
+	let sorted = valid.sort((a, b) => a.time - b.time);
+	let top = sorted.slice(0, limit).map(r => r.server);
 
 	console.log("[ICE Benchmark] fastest servers:", top.map(s => s.urls));
 	return top.length ? top : servers.slice(0, limit);
@@ -222,7 +227,7 @@ function main() {
 	pc.addButton("[wip] угадать", () => {});
 
 	(async () => {
-		let fastestServers = await benchmarkStunServers(Config.iceServers, 10, 50);
+		let fastestServers = await benchmarkStunServers(Config.iceServers, 10, 150);
 		console.log("[Peer] Creating peer with", fastestServers.length, "fast servers");
 		peer = new Peer(undefined, {
 			host: '0.peerjs.com',

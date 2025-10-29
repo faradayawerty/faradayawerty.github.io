@@ -180,7 +180,7 @@ class ChatContainer {
 		}
 	}
 	printHelp() {
-		cc.htmlHistory.innerHTML += `<div>
+		this.htmlHistory.innerHTML += `<div>
 			Привет!<br>
 			Перед тобой моя версия популярной настолки, Guess Who!<br>
 			Это игра для двоих игроков, так что тебе придётся позвать друга.
