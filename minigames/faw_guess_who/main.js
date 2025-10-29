@@ -1,5 +1,43 @@
 let peer = null;
 
+async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
+	console.log("[ICE Benchmark] testing STUN servers...");
+
+	// перемешаем список, чтобы не тестировать всегда в одном порядке
+	let shuffled = servers
+		.sort(() => Math.random() - 0.5)
+		.slice(0, testCount);
+
+	async function testServer(server) {
+		const start = performance.now();
+		return new Promise(resolve => {
+			const pc = new RTCPeerConnection({ iceServers: [server] });
+			pc.createDataChannel("t");
+			let timeout = setTimeout(() => {
+				pc.close();
+				resolve({ server, time: Infinity });
+			}, 2000);
+			pc.onicecandidate = e => {
+				if (e.candidate) {
+					clearTimeout(timeout);
+					pc.close();
+					resolve({ server, time: performance.now() - start });
+				}
+			};
+			pc.createOffer()
+				.then(o => pc.setLocalDescription(o))
+				.catch(() => resolve({ server, time: Infinity }));
+		});
+	}
+
+	const results = await Promise.all(shuffled.map(testServer));
+	const valid = results.filter(r => r.time < Infinity);
+	const sorted = valid.sort((a, b) => a.time - b.time);
+	const top = sorted.slice(0, limit).map(r => r.server);
+
+	console.log("[ICE Benchmark] fastest servers:", top.map(s => s.urls));
+	return top.length ? top : servers.slice(0, limit);
+}
 function setupConnection(chatContainer, pictureContainer, connection) {
 	chatContainer.peerJSConnection = connection;
 	connection.on('data', (data) => {
@@ -182,81 +220,86 @@ function main() {
 	});
 	pc.addButton("[wip] загадать", () => {});
 	pc.addButton("[wip] угадать", () => {});
-	peer = new Peer(undefined, {
-		host: '0.peerjs.com',
-		port: 443,
-		path: '/',
-		secure: true,
-		config: {
-			iceServers: Config.iceServers
-		}
-	});
-	peer.on('open', (id) => {
-		cc.peerJSId = id;
-		cc.connectionURL =
-			'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' +
-			id;
-		if (!cc.htmlInfoBox.querySelector('button[data-copy-url]')) {
-			let infoBoxCopy = document.createElement('button');
-			infoBoxCopy.textContent = '📋️ URL ';
-			infoBoxCopy.style.fontSize = '1.5vh';
-			infoBoxCopy.style.margin = '1%';
-			infoBoxCopy.style.padding = '1%';
-			infoBoxCopy.style.background = Config.colors
-				.pictureContainer.buttonColor;
-			infoBoxCopy.style.color = Config.colors.chatContainer
-				.textColorDark;
-			infoBoxCopy.setAttribute('data-copy-url', 'true');
-			infoBoxCopy.onclick = () => {
-				navigator.clipboard.writeText(cc.connectionURL)
-					.then(() => {
-						alert('The URL is copied to clipboard');
-					}).catch(err => {
-						console.error(
-							"Не удалось скопировать текст: ",
-							err);
-					});
-			};
-			cc.htmlInfoBox.appendChild(infoBoxCopy);
-		}
-		if (!cc.htmlInfoBox.querySelector('div[data-peer-id]')) {
-			let div = document.createElement('div');
-			div.textContent = id;
-			div.setAttribute('data-peer-id', 'true');
-			cc.htmlInfoBox.appendChild(div);
-		}
-		cc.htmlHistory.innerHTML += `<div>
-			Привет!<br>
-			Перед тобой моя версия популярной настолки, Guess Who!<br>
-			Это игра для двоих игроков, так что тебе придётся позвать друга.
-			Чтобы он мог подключиться, воспользуйся кнопкой [📋️URL].
-			Она скопирует ссылку для подключения, которую нужно отправить твоему другу
-			каким-либо из способов.<br>
-			Пока что не все функции реализованы как элементы графического интерфейса.
-			Например, чтобы выбрать себе имя, нужно использовать команду /name Имя в чате.<br>
-			Вот список некоторых других команд: /sync - синхронизировать изображения друга со своими.
-			Команда очистит его картинки и заменит их твоими. /clear - очистить чат.<br>
-			Игра находится в ранней-ранней alpha, поэтому некоторые функции ещё не реализованы,
-			а подключение между игроками может сильно барахлить (хотя что-то мне подсказывает,
-			что корень проблемы в текущих реалиях РФ).<br> Так или иначе, в игру уже можно играть
-			и получать удовольствие. Надеюсь, тебе и твоему другу она понравится!
-		</div>`;
-		let urlParams = new URLSearchParams(window.location.search);
-		let connectionFromURL = urlParams.get('connection');
-		if (connectionFromURL != null && connectionFromURL != undefined)
-			setupConnection(cc, pc, peer.connect(connectionFromURL));
-	});
-	peer.on('error', (err) => {
-		console.error("Peer error:", err)
-	});
-	peer.on('connection', (connection) => {
-		setupConnection(cc, pc, connection);
-	});
-	peer.on('disconnected', () => {
-		cc.htmlHistory.innerHTML +=
-			'<div>Peer disconnected. Reconnecting...</div>';
-		peer.reconnect();
-	});
+
+	(async () => {
+		let fastestServers = await benchmarkStunServers(Config.iceServers, 15, 30);
+		console.log("[Peer] Creating peer with", fastestServers.length, "fast servers");
+		peer = new Peer(undefined, {
+			host: '0.peerjs.com',
+			port: 443,
+			path: '/',
+			secure: true,
+			config: {
+				iceServers: fastestServers
+			}
+		});
+		peer.on('open', (id) => {
+			cc.peerJSId = id;
+			cc.connectionURL =
+				'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' +
+				id;
+			if (!cc.htmlInfoBox.querySelector('button[data-copy-url]')) {
+				let infoBoxCopy = document.createElement('button');
+				infoBoxCopy.textContent = '📋️ URL ';
+				infoBoxCopy.style.fontSize = '1.5vh';
+				infoBoxCopy.style.margin = '1%';
+				infoBoxCopy.style.padding = '1%';
+				infoBoxCopy.style.background = Config.colors
+					.pictureContainer.buttonColor;
+				infoBoxCopy.style.color = Config.colors.chatContainer
+					.textColorDark;
+				infoBoxCopy.setAttribute('data-copy-url', 'true');
+				infoBoxCopy.onclick = () => {
+					navigator.clipboard.writeText(cc.connectionURL)
+						.then(() => {
+							alert('The URL is copied to clipboard');
+						}).catch(err => {
+							console.error(
+								"Не удалось скопировать текст: ",
+								err);
+						});
+				};
+				cc.htmlInfoBox.appendChild(infoBoxCopy);
+			}
+			if (!cc.htmlInfoBox.querySelector('div[data-peer-id]')) {
+				let div = document.createElement('div');
+				div.textContent = id;
+				div.setAttribute('data-peer-id', 'true');
+				cc.htmlInfoBox.appendChild(div);
+			}
+			cc.htmlHistory.innerHTML += `<div>
+				Привет!<br>
+				Перед тобой моя версия популярной настолки, Guess Who!<br>
+				Это игра для двоих игроков, так что тебе придётся позвать друга.
+				Чтобы он мог подключиться, воспользуйся кнопкой [📋️URL].
+				Она скопирует ссылку для подключения, которую нужно отправить твоему другу
+				каким-либо из способов.<br>
+				Пока что не все функции реализованы как элементы графического интерфейса.
+				Например, чтобы выбрать себе имя, нужно использовать команду /name Имя в чате.<br>
+				Вот список некоторых других команд: /sync - синхронизировать изображения друга со своими.
+				Команда очистит его картинки и заменит их твоими. /clear - очистить чат.<br>
+				Игра находится в ранней-ранней alpha, поэтому некоторые функции ещё не реализованы,
+				а подключение между игроками может сильно барахлить (хотя что-то мне подсказывает,
+				что корень проблемы в текущих реалиях РФ).<br> Так или иначе, в игру уже можно играть
+				и получать удовольствие. Надеюсь, тебе и твоему другу она понравится!
+			</div>`;
+			let urlParams = new URLSearchParams(window.location.search);
+			let connectionFromURL = urlParams.get('connection');
+			if (connectionFromURL != null && connectionFromURL != undefined)
+				setupConnection(cc, pc, peer.connect(connectionFromURL));
+		});
+		peer.on('error', (err) => {
+			console.error("Peer error:", err)
+		});
+		peer.on('connection', (connection) => {
+			setupConnection(cc, pc, connection);
+		});
+		peer.on('disconnected', () => {
+			cc.htmlHistory.innerHTML +=
+				'<div>Peer disconnected. Reconnecting...</div>';
+			peer.reconnect();
+		});
+	})();
 	cc.commands['/connect'] = (args) => {
 		setupConnection(cc, pc, peer.connect(args));
 	};
