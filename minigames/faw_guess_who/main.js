@@ -1,4 +1,3 @@
-
 let peer = null;
 
 function setupConnection(chatContainer, pictureContainer, connection) {
@@ -81,6 +80,10 @@ function main() {
 			pc.clearPictures();
 			for (let i = 0; i < Config.defaultPictureSets.everlastingSummerCharacters.length; i++)
 				pc.addPicture('data/picture_sets/default_everlasting_summer/' + Config.defaultPictureSets.everlastingSummerCharacters[i]);
+		} else if (args == 'zoomers') {
+			pc.clearPictures();
+			for (let i = 0; i < Config.defaultPictureSets.zoomers.length; i++)
+				pc.addPicture('data/picture_sets/default_zoomers/' + Config.defaultPictureSets.zoomers[i]);
 		} else if (args == 'clear') {
 			pc.clearPictures();
 		} else {
@@ -89,15 +92,106 @@ function main() {
 	};
 
 	pc.addImagesInput();
-	pc.addButton("remove all images", function() {
+	pc.addButton("remove all", function() {
 		pc.clearPictures();
 	});
-	pc.addButton("choose", () => {
 
-	});
-	pc.addButton("guess", () => {
+	pc.addButton("default sets", () => {
+		const selectorColors = Config.colors.pictureContainer.pictureSetSelector;
 
+		let overlay = document.createElement('div');
+		overlay.style.position = 'fixed';
+		overlay.style.top = '0';
+		overlay.style.left = '0';
+		overlay.style.width = '100%';
+		overlay.style.height = '100%';
+		overlay.style.backgroundColor = selectorColors.overlayBackground;
+		overlay.style.display = 'flex';
+		overlay.style.alignItems = 'center';
+		overlay.style.justifyContent = 'center';
+		overlay.style.zIndex = '1000';
+
+		let modal = document.createElement('div');
+		modal.style.backgroundColor = selectorColors.modalBackground;
+		modal.style.padding = '20px';
+		modal.style.borderRadius = '10px';
+		modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+		modal.style.display = 'flex';
+		modal.style.flexDirection = 'column';
+		modal.style.gap = '10px';
+		overlay.appendChild(modal);
+
+		let title = document.createElement('h3');
+		title.textContent = 'Select a picture set';
+		title.style.color = selectorColors.titleColor;
+		title.style.margin = '0 0 10px 0';
+		modal.appendChild(title);
+
+		const sets = ['Country flags', 'Everlasting Summer', 'Zoomers'];
+
+		for (let setName of sets) {
+			let btn = document.createElement('button');
+			btn.textContent = setName;
+			btn.style.padding = '5px 10px';
+			btn.style.backgroundColor = selectorColors.buttonBackground;
+			btn.style.color = selectorColors.buttonText;
+			btn.style.border = 'none';
+			btn.style.borderRadius = '5px';
+			btn.style.cursor = 'pointer';
+			btn.onmouseenter = () => btn.style.backgroundColor = selectorColors.buttonHover;
+			btn.onmouseleave = () => btn.style.backgroundColor = selectorColors.buttonBackground;
+
+			btn.onclick = () => {
+				pc.clearPictures();
+				let folder = '';
+				let images = [];
+
+				if (setName === 'Country flags') {
+					folder = 'default_countries';
+					images = Config.defaultPictureSets.countryFlags;
+				} else if (setName === 'Everlasting Summer') {
+					folder = 'default_everlasting_summer';
+					images = Config.defaultPictureSets.everlastingSummerCharacters;
+				} else if (setName === 'Zoomers') {
+					folder = 'default_zoomers';
+					images = Config.defaultPictureSets.zoomers;
+				}
+
+				for (let img of images) {
+					pc.addPicture('data/picture_sets/' + folder + '/' + img);
+				}
+
+				document.body.removeChild(overlay);
+			};
+			modal.appendChild(btn);
+		}
+
+		pc.addButton("choose", () => {
+
+		});
+		pc.addButton("guess", () => {
+
+		});
+
+		let closeBtn = document.createElement('button');
+		closeBtn.textContent = 'Cancel';
+		closeBtn.style.padding = '5px 10px';
+		closeBtn.style.marginTop = '10px';
+		closeBtn.style.backgroundColor = selectorColors.cancelButtonBackground;
+		closeBtn.style.color = selectorColors.buttonText;
+		closeBtn.style.border = 'none';
+		closeBtn.style.borderRadius = '5px';
+		closeBtn.style.cursor = 'pointer';
+		closeBtn.onmouseenter = () => closeBtn.style.backgroundColor = selectorColors.cancelButtonHover;
+		closeBtn.onmouseleave = () => closeBtn.style.backgroundColor = selectorColors.cancelButtonBackground;
+		closeBtn.onclick = () => document.body.removeChild(overlay);
+		modal.appendChild(closeBtn);
+
+		document.body.appendChild(overlay);
 	});
+
+
+
 
 	peer = new Peer(undefined, {
 		host: '0.peerjs.com',
@@ -165,4 +259,3 @@ function main() {
 
 
 window.addEventListener("DOMContentLoaded", main);
-

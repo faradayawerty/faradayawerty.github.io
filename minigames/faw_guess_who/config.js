@@ -1,4 +1,3 @@
-
 let Config = {
 	defaultPictureSets: {
 		countryFlags: [
@@ -93,80 +92,143 @@ let Config = {
 			"ulyana.webp",
 			"viola.webp",
 			"yulya.webp",
+		],
+		zoomers: [
+			"photo_2025-10-28_22-07-52.jpg",
+			"photo_2025-10-28_22-07-58.jpg",
+			"photo_2025-10-28_22-08-01.jpg",
+			"photo_2025-10-28_22-08-03.jpg",
+			"photo_2025-10-28_22-08-05.jpg",
+			"photo_2025-10-28_22-08-08.jpg",
+			"photo_2025-10-28_22-08-10.jpg",
+			"photo_2025-10-28_22-08-15.jpg",
+			"photo_2025-10-28_22-08-17.jpg",
+			"photo_2025-10-28_22-08-23.jpg",
+			"photo_2025-10-28_22-08-45.jpg",
+			"photo_2025-10-28_22-08-48.jpg",
+			"photo_2025-10-28_22-08-51.jpg",
+			"photo_2025-10-28_22-08-53.jpg",
+			"photo_2025-10-28_22-08-55.jpg",
+			"photo_2025-10-28_22-08-59.jpg",
+			"photo_2025-10-28_22-09-02.jpg",
+			"photo_2025-10-28_22-09-15.jpg",
 		]
 	},
 	iceServers: [
 
 		// google
-		{ urls: "stun:stun.l.google.com:19302" },
-		{ urls: "stun:stun1.l.google.com:19302" },
-		{ urls: "stun:stun2.l.google.com:19302" },
-		{ urls: "stun:stun3.l.google.com:19302" },
-		{ urls: "stun:stun4.l.google.com:19302" },
+		{
+			urls: "stun:stun.l.google.com:19302"
+		}, {
+			urls: "stun:stun1.l.google.com:19302"
+		}, {
+			urls: "stun:stun2.l.google.com:19302"
+		}, {
+			urls: "stun:stun3.l.google.com:19302"
+		}, {
+			urls: "stun:stun4.l.google.com:19302"
+		},
 
 		// tested, working without vpn in moscow
-		{ urls: 'stun:stun.fitauto.ru:3478' },
-		{ urls: 'stun:stun.ru-brides.com:3478' },
-		{ urls: 'stun:stun.siptrunk.com:3478' },
-		{ urls: 'stun:stun.nextcloud.com:3478' },
-		{ urls: 'stun:stun.12connect.com:3478' },
-		{ urls: 'stun:stun.12voip.com:3478' },
-		{ urls: 'stun:stun.1und1.de:3478' },
-		{ urls: 'stun:stun.3deluxe.de:3478' },
-		{ urls: 'stun:stun.3wayint.com:3478' },
-		{ urls: 'stun:stun.aa.net.uk:3478' },
-		{ urls: 'stun:stun.acrobits.cz:3478' },
-		{ urls: 'stun:stun.acronis.com:3478' },
-		{ urls: 'stun:stun.actionvoip.com:3478' },
-		{ urls: 'stun:stun.annatel.net:3478' },
-		{ urls: 'stun:stun.antisip.com:3478' },
-		{ urls: 'stun:stun.atagverwarming.nl:3478' },
-		{ urls: 'stun:stun.axialys.net:3478' },
-		{ urls: 'stun:stun.baltmannsweiler.de:3478' },
-		{ urls: 'stun:stun.bethesda.net:3478' },
-		{ urls: 'stun:stun.bitburger.de:3478' },
-		{ urls: 'stun:stun.dus.net:3478' },
-		{ urls: 'stun:stun.moonlight-stream.org:3478' },
+		{
+			urls: 'stun:stun.fitauto.ru:3478'
+		}, {
+			urls: 'stun:stun.ru-brides.com:3478'
+		}, {
+			urls: 'stun:stun.siptrunk.com:3478'
+		}, {
+			urls: 'stun:stun.nextcloud.com:3478'
+		}, {
+			urls: 'stun:stun.12connect.com:3478'
+		}, {
+			urls: 'stun:stun.12voip.com:3478'
+		}, {
+			urls: 'stun:stun.1und1.de:3478'
+		}, {
+			urls: 'stun:stun.3deluxe.de:3478'
+		}, {
+			urls: 'stun:stun.3wayint.com:3478'
+		}, {
+			urls: 'stun:stun.aa.net.uk:3478'
+		}, {
+			urls: 'stun:stun.acrobits.cz:3478'
+		}, {
+			urls: 'stun:stun.acronis.com:3478'
+		}, {
+			urls: 'stun:stun.actionvoip.com:3478'
+		}, {
+			urls: 'stun:stun.annatel.net:3478'
+		}, {
+			urls: 'stun:stun.antisip.com:3478'
+		}, {
+			urls: 'stun:stun.atagverwarming.nl:3478'
+		}, {
+			urls: 'stun:stun.axialys.net:3478'
+		}, {
+			urls: 'stun:stun.baltmannsweiler.de:3478'
+		}, {
+			urls: 'stun:stun.bethesda.net:3478'
+		}, {
+			urls: 'stun:stun.bitburger.de:3478'
+		}, {
+			urls: 'stun:stun.dus.net:3478'
+		}, {
+			urls: 'stun:stun.moonlight-stream.org:3478'
+		},
 
 		// tested, working with vpn
-		{ urls: 'stun:stun.1und1.de:3478' },
-		{ urls: 'stun:stun.3deluxe.de:3478' },
-		{ urls: 'stun:stun.callromania.ro:3478' },
-		{ urls: 'stun:stun.comfi.com:3478' },
-		{ urls: 'stun:stun.cope.es:3478' },
-		{ urls: 'stun:stun.bridesbay.com:3478' },
-		{ urls: 'stun:stun.business-isp.nl:3478' },
-		{ urls: 'stun:stun.diallog.com:3478' },
+		{
+			urls: 'stun:stun.1und1.de:3478'
+		}, {
+			urls: 'stun:stun.3deluxe.de:3478'
+		}, {
+			urls: 'stun:stun.callromania.ro:3478'
+		}, {
+			urls: 'stun:stun.comfi.com:3478'
+		}, {
+			urls: 'stun:stun.cope.es:3478'
+		}, {
+			urls: 'stun:stun.bridesbay.com:3478'
+		}, {
+			urls: 'stun:stun.business-isp.nl:3478'
+		}, {
+			urls: 'stun:stun.diallog.com:3478'
+		},
 	],
 
+	colors: {
+		page: {
+			background: "#2e3440",
+		},
+		pictureContainer: {
+			background: "#3b4252",
+			pictureContainerBackground: "#434c5e",
+			buttonContainerBackground: "#4c566a",
+			buttonColor: "#88c0d0",
+			buttonColorHover: "#8fbcbb",
+			pictureWrapper: "#5e81ac",
+			noColor: '#bf616a',
+			deleteButton: '#bf616aaa',
 
-colors: {
-	page: {
-		background: "#2e3440",
-	},
-	pictureContainer: {
-		background: "#3b4252",
-		pictureContainerBackground: "#434c5e",
-		buttonContainerBackground: "#4c566a",
-		buttonColor: "#88c0d0",
-		buttonColorHover: "#8fbcbb",
-		pictureWrapper: "#5e81ac",
-		noColor: '#bf616a',
-		deleteButton: '#bf616aaa',
-	},
-	chatContainer: {
-		textColor: "#eceff4",
-		textColorDark: "#2e3440",
-		background: "#3b4252",
-		infoBox: "#4c566a",
-		history: "#434c5e",
-		input: "#4c566a",
-	},
+			pictureSetSelector: {
+				overlayBackground: "rgba(46, 52, 64, 0.9)",
+				modalBackground: "#3b4252",
+				titleColor: "#88c0d0",
+				buttonBackground: "#4c566a",
+				buttonHover: "#81a1c1",
+				buttonText: "#eceff4",
+				cancelButtonBackground: "#bf616a",
+				cancelButtonHover: "#d08770"
+			}
+		},
+		chatContainer: {
+			textColor: "#eceff4",
+			textColorDark: "#2e3440",
+			background: "#3b4252",
+			infoBox: "#4c566a",
+			history: "#434c5e",
+			input: "#4c566a",
+		},
+	}
+
 }
-
-
-
-
-
-}
-
