@@ -25,7 +25,7 @@ class PictureContainer {
 
 		this.htmlPicturesContainer = document.createElement('div');
 		this.htmlPicturesContainer.id = 'buttons-container';
-		this.htmlPicturesContainer.style.background = Config.colors.pictureContainer.pictureContainerBackground ;
+		this.htmlPicturesContainer.style.background = Config.colors.pictureContainer.pictureContainerBackground;
 		this.htmlPicturesContainer.style.width = '100%';
 		this.htmlPicturesContainer.style.height = '100%';
 		this.htmlPicturesContainer.style.overflowY = 'auto';
@@ -56,7 +56,7 @@ class PictureContainer {
 
 	updateLayout(container) {
 		let defaultOpacity = '0.1';
-		if(window.innerWidth > window.innerHeight) {
+		if (window.innerWidth > window.innerHeight) {
 			container.style.width = '49%';
 			container.style.height = '98%';
 		} else {
@@ -71,7 +71,7 @@ class PictureContainer {
 		});
 	}
 
-	addButton(text, action, fontSize='1.5vh') {
+	addButton(text, action, fontSize = '1.5vh') {
 		let button = document.createElement("button");
 		button.textContent = text;
 		button.onclick = action;
@@ -144,50 +144,46 @@ class PictureContainer {
 
 
 
-	
-excludePicture(pictureWrapper) {
-    const img = pictureWrapper.querySelector('img');
-    if (!img) return;
 
-    let cross = pictureWrapper.querySelector('.excluded-cross');
+	excludePicture(pictureWrapper) {
+		const img = pictureWrapper.querySelector('img');
+		if (!img) return;
 
-    if (cross) {
-        // Снимаем исключение
-        img.style.filter = '';
-        cross.remove();
-    } else {
-        // Добавляем исключение
-        img.style.filter = 'grayscale(100%)';
-        cross = document.createElement('div');
-        cross.classList.add('excluded-cross');
-        cross.textContent = 'No';
-        cross.style.position = 'absolute';
-        cross.style.top = '50%';
-        cross.style.left = '50%';
-        cross.style.transform = 'translate(-50%, -50%)';
-        cross.style.fontSize = '24px'; // фиксированный размер
-        cross.style.color = Config.colors.pictureContainer.noColor;
-        cross.style.fontWeight = 'bold';
-        cross.style.pointerEvents = 'none';
-        cross.style.whiteSpace = 'nowrap';
-        pictureWrapper.appendChild(cross);
-    }
+		let cross = pictureWrapper.querySelector('.excluded-cross');
 
-    // Перемещаем картинку сразу после последнего No
-    const pictures = Array.from(this.htmlPicturesContainer.children);
-    const lastExcluded = [...pictures].reverse().find(p => p.querySelector('.excluded-cross') && p !== pictureWrapper);
-    
-    if (lastExcluded) {
-        if (lastExcluded.nextSibling) {
-            this.htmlPicturesContainer.insertBefore(pictureWrapper, lastExcluded.nextSibling);
-        } else {
-            this.htmlPicturesContainer.appendChild(pictureWrapper);
-        }
-    } else {
-        // Если исключённых нет, вставляем в начало
-        this.htmlPicturesContainer.insertBefore(pictureWrapper, this.htmlPicturesContainer.firstChild);
-    }
-}
+		if (cross) {
+			img.style.filter = '';
+			cross.remove();
+		} else {
+			img.style.filter = 'grayscale(100%)';
+			cross = document.createElement('div');
+			cross.classList.add('excluded-cross');
+			cross.textContent = 'No';
+			cross.style.position = 'absolute';
+			cross.style.top = '50%';
+			cross.style.left = '50%';
+			cross.style.transform = 'translate(-50%, -50%)';
+			cross.style.fontSize = '24px';
+			cross.style.color = Config.colors.pictureContainer.noColor;
+			cross.style.fontWeight = 'bold';
+			cross.style.pointerEvents = 'none';
+			cross.style.whiteSpace = 'nowrap';
+			pictureWrapper.appendChild(cross);
+		}
+
+		const pictures = Array.from(this.htmlPicturesContainer.children);
+		const lastExcluded = [...pictures].reverse().find(p => p.querySelector('.excluded-cross') && p !== pictureWrapper);
+
+		if (lastExcluded) {
+			if (lastExcluded.nextSibling) {
+				this.htmlPicturesContainer.insertBefore(pictureWrapper, lastExcluded.nextSibling);
+			} else {
+				this.htmlPicturesContainer.appendChild(pictureWrapper);
+			}
+		} else {
+			this.htmlPicturesContainer.insertBefore(pictureWrapper, this.htmlPicturesContainer.firstChild);
+		}
+	}
 
 
 
@@ -237,7 +233,10 @@ excludePicture(pictureWrapper) {
 		deleteBtn.style.fontSize = '2vh';
 		deleteBtn.style.opacity = this.current_default_opacity;
 		deleteBtn.style.transition = 'opacity 0.3s ease';
-		deleteBtn.addEventListener('click', () => pictureWrapper.remove());
+		deleteBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			pictureWrapper.remove();
+		});
 		pictureWrapper.appendChild(deleteBtn);
 
 		pictureWrapper.addEventListener('mouseenter', () => {
@@ -283,12 +282,10 @@ excludePicture(pictureWrapper) {
 		wrappers.forEach(wrapper => {
 			let width = parseFloat(wrapper.style.width);
 			let height = parseFloat(wrapper.style.height);
-			wrapper.style.width = Math.max(5, width - step) + '%';  // минимальный размер 5%
+			wrapper.style.width = Math.max(5, width - step) + '%';
 			wrapper.style.height = Math.max(5, height - step) + '%';
 		});
 	}
-
-
 
 }
 

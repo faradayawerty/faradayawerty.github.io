@@ -11,21 +11,28 @@ class ChatContainer {
 
 	name = 'NoName';
 	connectionURL = '';
-	
+
 	peerJSConnection = null;
 	peerJSId = '';
 
 	commands = {
-		'/clear': (args) => { this.htmlHistory.innerHTML = ''; },
+		'/clear': (args) => {
+			this.htmlHistory.innerHTML = '';
+		},
 		'/help': (args) => {
 			this.htmlHistory.innerHTML += '<div> use /clear to clear the screen </div>';
 		},
 		'/sync': (args) => {
 			if (this.peerJSConnection != null) {
 				let allImages = this.pictureContainer.getAllImagesData();
-				this.peerJSConnection.send({ type: 'start-sync' }); // сигнал начала
+				this.peerJSConnection.send({
+					type: 'start-sync'
+				});
 				allImages.forEach(dataURL => {
-				this.peerJSConnection.send({ type: 'image', data: dataURL });
+					this.peerJSConnection.send({
+						type: 'image',
+						data: dataURL
+					});
 				});
 				this.htmlHistory.innerHTML += '<div>Images synced to the other player</div>';
 			} else {
@@ -36,14 +43,16 @@ class ChatContainer {
 			this.name = args;
 			this.htmlHistory.innerHTML += '<div> your name is set to ' + this.name + '</div>';
 		},
-		'/id': (args) => { this.htmlHistory.innerHTML += '<div> your id is ' + this.peerJSId + '</div>'; },
+		'/id': (args) => {
+			this.htmlHistory.innerHTML += '<div> your id is ' + this.peerJSId + '</div>';
+		},
 		'/bigger': (args) => {
-			if(this.pictureContainer != null) {
+			if (this.pictureContainer != null) {
 				this.pictureContainer.biggerPics(1);
 			}
 		},
 		'/smaller': (args) => {
-			if(this.pictureContainer != null) {
+			if (this.pictureContainer != null) {
 				this.pictureContainer.smallerPics(1);
 			}
 		},
@@ -52,7 +61,7 @@ class ChatContainer {
 	constructor() {
 		this.htmlContainer = document.createElement('div');
 		this.htmlContainer.id = 'chat-container';
-		this.htmlContainer.style.background= Config.colors.chatContainer.background;
+		this.htmlContainer.style.background = Config.colors.chatContainer.background;
 		this.htmlContainer.style.width = '49%';
 		this.htmlContainer.style.height = '98%';
 		this.htmlContainer.style.margin = '0.5%'
@@ -78,10 +87,10 @@ class ChatContainer {
 		this.htmlContainer.appendChild(this.htmlInfoBox);
 
 		this.htmlHistory = document.createElement('div');
-		this.htmlHistory.style.fontSize= '100%';
+		this.htmlHistory.style.fontSize = '100%';
 		this.htmlHistory.style.color = Config.colors.chatContainer.textColor;
 		this.htmlHistory.id = 'chat-history';
-		this.htmlHistory.style.background= Config.colors.chatContainer.history;
+		this.htmlHistory.style.background = Config.colors.chatContainer.history;
 		this.htmlHistory.style.width = '100%';
 		this.htmlHistory.style.height = '100%';
 		this.htmlHistory.style.overflowX = 'auto';
@@ -92,8 +101,8 @@ class ChatContainer {
 		this.htmlInputBox.type = 'text';
 		this.htmlInputBox.id = 'chat-input';
 		this.htmlInputBox.style.color = Config.colors.chatContainer.textColor;
-		this.htmlInputBox.style.fontSize= '100%';
-		this.htmlInputBox.style.background= Config.colors.chatContainer.input;
+		this.htmlInputBox.style.fontSize = '100%';
+		this.htmlInputBox.style.background = Config.colors.chatContainer.input;
 		this.htmlInputBox.style.width = '100%';
 		this.htmlInputBox.style.height = '100%';
 		this.htmlContainer.appendChild(this.htmlInputBox);
@@ -107,7 +116,7 @@ class ChatContainer {
 		zoomOut.style.background = Config.colors.pictureContainer.buttonColor;
 		zoomOut.style.color = Config.colors.chatContainer.textColorDark;
 		zoomOut.onclick = () => {
-			if(this.pictureContainer != null)
+			if (this.pictureContainer != null)
 				this.pictureContainer.smallerPics();
 		};
 		this.htmlInfoBox.appendChild(zoomOut);
@@ -121,31 +130,29 @@ class ChatContainer {
 		zoomIn.style.background = Config.colors.pictureContainer.buttonColor;
 		zoomIn.style.color = Config.colors.chatContainer.textColorDark;
 		zoomIn.onclick = () => {
-			if(this.pictureContainer != null)
+			if (this.pictureContainer != null)
 				this.pictureContainer.biggerPics();
 		};
 		this.htmlInfoBox.appendChild(zoomIn);
 
 		this.htmlInputBox.addEventListener('keydown', (event) => {
-			if(event.key == 'Enter') {
+			if (event.key == 'Enter') {
 				let messageText = this.htmlInputBox.value;
-				if(messageText != '') {
-					if(messageText[0] == '/') {
+				if (messageText != '') {
+					if (messageText[0] == '/') {
 						this.handleCommand(messageText.split(' ')[0],
 							messageText.split(' ').slice(1).join(' '));
 					} else {
 						let name = this.name;
-						if(this.peerJSId != '' && this.name == 'NoName')
+						if (this.peerJSId != '' && this.name == 'NoName')
 							name = this.peerJSId;
-						this.htmlHistory.innerHTML
-							+= '<div> [' + name + '] ' + messageText + '</div>';
-						if(this.peerJSConnection != null) {
+						this.htmlHistory.innerHTML += '<div> [' + name + '] ' + messageText + '</div>';
+						if (this.peerJSConnection != null) {
 							this.peerJSConnection.send('[' + name + '] ' + messageText);
 						}
 					}
 					this.htmlInputBox.value = '';
-					this.htmlHistory.scrollTop
-						= this.htmlHistory.scrollHeight;
+					this.htmlHistory.scrollTop = this.htmlHistory.scrollHeight;
 				}
 			}
 		});
@@ -154,19 +161,18 @@ class ChatContainer {
 	handleCommand(command, args) {
 		try {
 			this.commands[command](args);
-		} catch(e) {
-			this.htmlHistory.innerHTML
-				+= `<div>${"failed to execute the command: " + command}</div>`;
+		} catch (e) {
+			this.htmlHistory.innerHTML += `<div>${"failed to execute the command: " + command}</div>`;
 		}
 	}
 
 	updateLayout(container) {
-		if(window.innerWidth > window.innerHeight) {
-			this.htmlInfoBox.style.fontSize= '100%';
+		if (window.innerWidth > window.innerHeight) {
+			this.htmlInfoBox.style.fontSize = '100%';
 			container.style.width = '49%';
 			container.style.height = '98%';
 		} else {
-			this.htmlInfoBox.style.fontSize= '50%';
+			this.htmlInfoBox.style.fontSize = '50%';
 			container.style.width = '98%';
 			container.style.height = '49%';
 		}

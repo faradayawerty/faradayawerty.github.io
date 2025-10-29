@@ -19,7 +19,10 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 		chatContainer.htmlHistory.innerHTML += `<div> connection with ${chatContainer.peerJSId} established </div>`;
 		let allImages = pictureContainer.getAllImagesData();
 		allImages.forEach(dataURL => {
-			connection.send({ type: 'image', data: dataURL });
+			connection.send({
+				type: 'image',
+				data: dataURL
+			});
 		});
 	});
 
@@ -33,11 +36,11 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 }
 
 function updateLayout(layoutElements) {
-	if(window.innerWidth > window.innerHeight)
+	if (window.innerWidth > window.innerHeight)
 		document.body.style.flexDirection = "row";
 	else
 		document.body.style.flexDirection = "column";
-	for(let i = 0; i < layoutElements.length; i++)
+	for (let i = 0; i < layoutElements.length; i++)
 		layoutElements[i].updateLayout(layoutElements[i].htmlContainer);
 }
 
@@ -55,7 +58,9 @@ function main() {
 	cc.pictureContainer = pc;
 
 	updateLayout([pc, cc]);
-	window.addEventListener('resize', function() { updateLayout([pc, cc]); });
+	window.addEventListener('resize', function() {
+		updateLayout([pc, cc]);
+	});
 
 	document.addEventListener('paste', (event) => {
 		let items = event.clipboardData.items;
@@ -68,15 +73,15 @@ function main() {
 	});
 
 	cc.commands['/picset'] = (args) => {
-		if(args == 'flags') {
+		if (args == 'flags') {
 			pc.clearPictures();
-			for(let i = 0; i < Config.defaultPictureSets.countryFlags.length; i++)
+			for (let i = 0; i < Config.defaultPictureSets.countryFlags.length; i++)
 				pc.addPicture('data/picture_sets/default_countries/' + Config.defaultPictureSets.countryFlags[i]);
-		} else if(args == 'es') {
+		} else if (args == 'es') {
 			pc.clearPictures();
-			for(let i = 0; i < Config.defaultPictureSets.everlastingSummerCharacters.length; i++)
+			for (let i = 0; i < Config.defaultPictureSets.everlastingSummerCharacters.length; i++)
 				pc.addPicture('data/picture_sets/default_everlasting_summer/' + Config.defaultPictureSets.everlastingSummerCharacters[i]);
-		} else if(args == 'clear') {
+		} else if (args == 'clear') {
 			pc.clearPictures();
 		} else {
 			cc.htmlHistory.innerHTML += `<div> picture set ${args} doesn't exist </div>`;
@@ -84,8 +89,15 @@ function main() {
 	};
 
 	pc.addImagesInput();
-	pc.addButton("remove all images", function() { pc.clearPictures(); });
-	pc.addButton("image set", null);
+	pc.addButton("remove all images", function() {
+		pc.clearPictures();
+	});
+	pc.addButton("choose", () => {
+
+	});
+	pc.addButton("guess", () => {
+
+	});
 
 	peer = new Peer(undefined, {
 		host: '0.peerjs.com',
@@ -98,41 +110,39 @@ function main() {
 	});
 
 	peer.on('open', (id) => {
-	    cc.peerJSId = id;
-	    cc.connectionURL = 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id;
+		cc.peerJSId = id;
+		cc.connectionURL = 'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' + id;
 
-	    // Проверяем, есть ли уже кнопка copy
-	    if (!cc.htmlInfoBox.querySelector('button[data-copy-url]')) {
-		  let infoBoxCopy = document.createElement('button');
-		  infoBoxCopy.textContent = '📋️ Copy URL ';
-		  infoBoxCopy.style.fontSize = '1.5vh';
-		  infoBoxCopy.style.margin = '1%';
-		  infoBoxCopy.style.padding = '1%';
-		  infoBoxCopy.style.background = Config.colors.pictureContainer.buttonColor;
-		  infoBoxCopy.style.color = Config.colors.chatContainer.textColorDark;
-		  infoBoxCopy.setAttribute('data-copy-url', 'true'); // помечаем как созданную
-		  infoBoxCopy.onclick = () => {
-			navigator.clipboard.writeText(cc.connectionURL).then(() => {
-			    alert('The URL is copied to clipboard');
-			}).catch(err => {
-			    console.error("Не удалось скопировать текст: ", err);
-			});
-		  };
-		  cc.htmlInfoBox.appendChild(infoBoxCopy);
-	    }
+		if (!cc.htmlInfoBox.querySelector('button[data-copy-url]')) {
+			let infoBoxCopy = document.createElement('button');
+			infoBoxCopy.textContent = '📋️ Copy URL ';
+			infoBoxCopy.style.fontSize = '1.5vh';
+			infoBoxCopy.style.margin = '1%';
+			infoBoxCopy.style.padding = '1%';
+			infoBoxCopy.style.background = Config.colors.pictureContainer.buttonColor;
+			infoBoxCopy.style.color = Config.colors.chatContainer.textColorDark;
+			infoBoxCopy.setAttribute('data-copy-url', 'true');
+			infoBoxCopy.onclick = () => {
+				navigator.clipboard.writeText(cc.connectionURL).then(() => {
+					alert('The URL is copied to clipboard');
+				}).catch(err => {
+					console.error("Не удалось скопировать текст: ", err);
+				});
+			};
+			cc.htmlInfoBox.appendChild(infoBoxCopy);
+		}
 
-	    // Проверяем, есть ли уже div с id
-	    if (!cc.htmlInfoBox.querySelector('div[data-peer-id]')) {
-		  let div = document.createElement('div');
-		  div.textContent = id;
-		  div.setAttribute('data-peer-id', 'true'); // помечаем как созданный
-		  cc.htmlInfoBox.appendChild(div);
-	    }
+		if (!cc.htmlInfoBox.querySelector('div[data-peer-id]')) {
+			let div = document.createElement('div');
+			div.textContent = id;
+			div.setAttribute('data-peer-id', 'true');
+			cc.htmlInfoBox.appendChild(div);
+		}
 
-	    let urlParams = new URLSearchParams(window.location.search);
-	    let connectionFromURL = urlParams.get('connection');
-	    if(connectionFromURL != null && connectionFromURL != undefined)
-		  setupConnection(cc, pc, peer.connect(connectionFromURL));
+		let urlParams = new URLSearchParams(window.location.search);
+		let connectionFromURL = urlParams.get('connection');
+		if (connectionFromURL != null && connectionFromURL != undefined)
+			setupConnection(cc, pc, peer.connect(connectionFromURL));
 	});
 
 	peer.on('error', (err) => {
