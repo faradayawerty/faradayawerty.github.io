@@ -1,4 +1,6 @@
+
 let peer = null;
+
 async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
 	console.log("[ICE Benchmark] testing STUN servers...");
 	let solidServers = [];
@@ -231,7 +233,7 @@ function main() {
 	pc.addButton("[wip] угадать", () => {});
 	(async () => {
 		let fastestServers = await benchmarkStunServers(Config
-			.iceServers, 10, 30);
+			.iceServers, 15, 30);
 		console.log("[Peer] Creating peer with", fastestServers.length,
 			"fast servers");
 		peer = new Peer(undefined, {
@@ -306,4 +308,6 @@ function main() {
 		setupConnection(cc, pc, peer.connect(args));
 	};
 }
+
 window.addEventListener("DOMContentLoaded", main);
+
