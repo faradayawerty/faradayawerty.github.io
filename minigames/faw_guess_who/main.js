@@ -9,9 +9,9 @@ async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
 		.slice(0, testCount);
 
 	shuffled.push({ "urls": "stun:stun.l.google.com:19302" });
-	shuffled.push({ "urls": "stun:stun.nextcloud.com:443" });
-	shuffled.push({ "urls": "stun:stun.ru-brides.com:3478" });
-	shuffled.push({ "urls": "stun:stun.fitauto.ru:3478" });
+//	shuffled.push({ "urls": "stun:stun.nextcloud.com:443" });
+//	shuffled.push({ "urls": "stun:stun.ru-brides.com:3478" });
+//	shuffled.push({ "urls": "stun:stun.fitauto.ru:3478" });
 
 	async function testServer(server) {
 		let start = performance.now();
@@ -227,7 +227,7 @@ function main() {
 	pc.addButton("[wip] угадать", () => {});
 
 	(async () => {
-		let fastestServers = await benchmarkStunServers(Config.iceServers, 10, 150);
+		let fastestServers = await benchmarkStunServers(Config.iceServers, 10, 30);
 		console.log("[Peer] Creating peer with", fastestServers.length, "fast servers");
 		peer = new Peer(undefined, {
 			host: '0.peerjs.com',
