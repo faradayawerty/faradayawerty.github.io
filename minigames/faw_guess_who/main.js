@@ -1,48 +1,52 @@
 let peer = null;
-
 async function benchmarkStunServers(servers, limit = 15, testCount = 25) {
 	console.log("[ICE Benchmark] testing STUN servers...");
-
-	// перемешаем список, чтобы не тестировать всегда в одном порядке
-	let shuffled = servers
-		.sort(() => Math.random() - 0.5)
-		.slice(0, testCount);
-
-	shuffled.push({ "urls": "stun:stun.l.google.com:19302" });
-//	shuffled.push({ "urls": "stun:stun.nextcloud.com:443" });
-//	shuffled.push({ "urls": "stun:stun.ru-brides.com:3478" });
-//	shuffled.push({ "urls": "stun:stun.fitauto.ru:3478" });
-
+	let solidServers = [];
+	for (let i = 0; i < Math.min(4, servers.length); i++) solidServers.push(
+		servers[i]);
+	let shuffled1 = servers.sort(() => Math.random() - 0.5).slice(0,
+		testCount);
+	let shuffled = solidServers.concat(shuffled1);
 	async function testServer(server) {
 		let start = performance.now();
 		return new Promise(resolve => {
-			let pc = new RTCPeerConnection({ iceServers: [server] });
+			let pc = new RTCPeerConnection({
+				iceServers: [server]
+			});
 			pc.createDataChannel("t");
 			let timeout = setTimeout(() => {
 				pc.close();
-				resolve({ server, time: Infinity });
+				resolve({
+					server,
+					time: Infinity
+				});
 			}, 2000);
 			pc.onicecandidate = e => {
 				if (e.candidate) {
 					clearTimeout(timeout);
 					pc.close();
-					resolve({ server, time: performance.now() - start });
+					resolve({
+						server,
+						time: performance.now() -
+							start
+					});
 				}
 			};
-			pc.createOffer()
-				.then(o => pc.setLocalDescription(o))
-				.catch(() => resolve({ server, time: Infinity }));
+			pc.createOffer().then(o => pc.setLocalDescription(
+				o)).catch(() => resolve({
+				server,
+				time: Infinity
+			}));
 		});
 	}
-
 	let results = await Promise.all(shuffled.map(testServer));
 	let valid = results.filter(r => r.time < Infinity);
 	let sorted = valid.sort((a, b) => a.time - b.time);
 	let top = sorted.slice(0, limit).map(r => r.server);
-
 	console.log("[ICE Benchmark] fastest servers:", top.map(s => s.urls));
 	return top.length ? top : servers.slice(0, limit);
 }
+
 function setupConnection(chatContainer, pictureContainer, connection) {
 	chatContainer.peerJSConnection = connection;
 	connection.on('data', (data) => {
@@ -225,10 +229,11 @@ function main() {
 	});
 	pc.addButton("[wip] загадать", () => {});
 	pc.addButton("[wip] угадать", () => {});
-
 	(async () => {
-		let fastestServers = await benchmarkStunServers(Config.iceServers, 10, 30);
-		console.log("[Peer] Creating peer with", fastestServers.length, "fast servers");
+		let fastestServers = await benchmarkStunServers(Config
+			.iceServers, 10, 30);
+		console.log("[Peer] Creating peer with", fastestServers.length,
+			"fast servers");
 		peer = new Peer(undefined, {
 			host: '0.peerjs.com',
 			port: 443,
@@ -243,40 +248,47 @@ function main() {
 			cc.connectionURL =
 				'https://faradayawerty.github.io/minigames/faw_guess_who?connection=' +
 				id;
-			if (!cc.htmlInfoBox.querySelector('button[data-copy-url]')) {
-				let infoBoxCopy = document.createElement('button');
+			if (!cc.htmlInfoBox.querySelector(
+					'button[data-copy-url]')) {
+				let infoBoxCopy = document.createElement(
+					'button');
 				infoBoxCopy.textContent = '📋️ URL ';
 				infoBoxCopy.style.fontSize = '1.5vh';
 				infoBoxCopy.style.margin = '1%';
 				infoBoxCopy.style.padding = '1%';
 				infoBoxCopy.style.background = Config.colors
 					.pictureContainer.buttonColor;
-				infoBoxCopy.style.color = Config.colors.chatContainer
-					.textColorDark;
-				infoBoxCopy.setAttribute('data-copy-url', 'true');
+				infoBoxCopy.style.color = Config.colors
+					.chatContainer.textColorDark;
+				infoBoxCopy.setAttribute('data-copy-url',
+					'true');
 				infoBoxCopy.onclick = () => {
-					navigator.clipboard.writeText(cc.connectionURL)
-						.then(() => {
-							alert('The URL is copied to clipboard');
-						}).catch(err => {
-							console.error(
-								"Не удалось скопировать текст: ",
-								err);
-						});
+					navigator.clipboard.writeText(cc
+						.connectionURL).then(() => {
+						alert(
+							'The URL is copied to clipboard');
+					}).catch(err => {
+						console.error(
+							"Не удалось скопировать текст: ",
+							err);
+					});
 				};
 				cc.htmlInfoBox.appendChild(infoBoxCopy);
 			}
-			if (!cc.htmlInfoBox.querySelector('div[data-peer-id]')) {
+			if (!cc.htmlInfoBox.querySelector(
+					'div[data-peer-id]')) {
 				let div = document.createElement('div');
 				div.textContent = id;
 				div.setAttribute('data-peer-id', 'true');
 				cc.htmlInfoBox.appendChild(div);
 			}
 			cc.printHelp();
-			let urlParams = new URLSearchParams(window.location.search);
+			let urlParams = new URLSearchParams(window.location
+				.search);
 			let connectionFromURL = urlParams.get('connection');
-			if (connectionFromURL != null && connectionFromURL != undefined)
-				setupConnection(cc, pc, peer.connect(connectionFromURL));
+			if (connectionFromURL != null &&
+				connectionFromURL != undefined) setupConnection(
+				cc, pc, peer.connect(connectionFromURL));
 		});
 		peer.on('error', (err) => {
 			console.error("Peer error:", err)
