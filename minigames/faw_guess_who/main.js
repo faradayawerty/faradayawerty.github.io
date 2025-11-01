@@ -17,13 +17,6 @@ function setupConnection(chatContainer, pictureContainer, connection) {
 	connection.on('open', () => {
 		chatContainer.htmlHistory.innerHTML +=
 			`<div> connection with ${chatContainer.peerJSId} established </div>`;
-		let allImages = pictureContainer.getAllImagesData();
-		allImages.forEach(dataURL => {
-			connection.send({
-				type: 'image',
-				data: dataURL
-			});
-		});
 	});
 	connection.on('close', () => {
 		chatContainer.htmlHistory.innerHTML +=
