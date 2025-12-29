@@ -1,67 +1,118 @@
 
 class InputHandler {
 
-	keys = {};
-	pointer = {
-		x: 0,
-		y: 0,
-		down: false
-	};
+	constructor(target) {
+		if (!target)
+			target = window;
 
-	constructor() {
-		window.addEventListener("keydown", (e) => {
+		this.keys = {};
+		this.mouseButtons = {};
+		this.mousePos = { x: 0, y: 0 };
+		this.touches = [];
+		this.lastTouch = null;
+
+		target.addEventListener("keydown", (e) => {
 			this.keys[e.key] = true;
 		});
-		window.addEventListener("keyup", (e) => {
+
+		target.addEventListener("keyup", (e) => {
 			this.keys[e.key] = false;
 		});
-		window.addEventListener("mousedown", (e) => {
-			this.pointer.down = true;
-			this.pointer.x = e.clientX;
-			this.pointer.y = e.clientY;
+
+		target.addEventListener("mousedown", (e) => {
+			this.mouseButtons[e.button] = true;
 		});
-		window.addEventListener("mouseup", (e) => {
-			this.pointer.down = false;
-			this.pointer.x = e.clientX;
-			this.pointer.y = e.clientY;
+
+		target.addEventListener("mouseup", (e) => {
+			this.mouseButtons[e.button] = false;
 		});
-		window.addEventListener("mousemove", (e) => {
-			this.pointer.x = e.clientX;
-			this.pointer.y = e.clientY;
+
+		target.addEventListener("mousemove", (e) => {
+			this.mousePos.x = e.clientX;
+			this.mousePos.y = e.clientY;
 		});
-		window.addEventListener("touchstart", (e) => {
-			this.pointer.down = true;
-			this.pointer.x = e.touches[0].clientX;
-			this.pointer.y = e.touches[0].clientY;
-		});
-		window.addEventListener("touchend", (e) => {
-			this.pointer.down = false;
+
+		target.addEventListener("touchstart", (e) => {
+			this.touches.length = 0;
+
+			for (let i = 0; i < e.touches.length; i++) {
+				let t = e.touches[i];
+				this.touches.push({
+					x: t.clientX,
+					y: t.clientY,
+					id: t.identifier
+				});
+			}
+
 			if (e.changedTouches.length > 0) {
-				this.pointer.x = e.changedTouches[0].clientX;
-				this.pointer.y = e.changedTouches[0].clientY;
+				let t = e.changedTouches[e.changedTouches.length - 1];
+				this.lastTouch = {
+					x: t.clientX,
+					y: t.clientY,
+					id: t.identifier
+				};
 			}
 		});
-		window.addEventListener("touchmove", (e) => {
-			this.pointer.x = e.touches[0].clientX;
-			this.pointer.y = e.touches[0].clientY;
-			e.preventDefault();
-		}, { passive: false });
+
+		target.addEventListener("touchmove", (e) => {
+			this.touches.length = 0;
+
+			for (let i = 0; i < e.touches.length; i++) {
+				let t = e.touches[i];
+				this.touches.push({
+					x: t.clientX,
+					y: t.clientY,
+					id: t.identifier
+				});
+			}
+		});
+
+		target.addEventListener("touchend", (e) => {
+			this.touches.length = 0;
+
+			for (let i = 0; i < e.touches.length; i++) {
+				let t = e.touches[i];
+				this.touches.push({
+					x: t.clientX,
+					y: t.clientY,
+					id: t.identifier
+				});
+			}
+
+			if (e.changedTouches.length > 0) {
+				let t = e.changedTouches[e.changedTouches.length - 1];
+				this.lastTouch = {
+					x: t.clientX,
+					y: t.clientY,
+					id: t.identifier
+				};
+			}
+		});
 	}
 
-	isKeyDown(key) {
-		return this.keys[key] === true;
+	isKeyDown(code) {
+		return !!this.keys[code];
 	}
 
-	isPointerDown() {
-		return this.pointer.down;
+	isMouseKeyDown(button) {
+		if (button === undefined)
+			button = 0;
+		return !!this.mouseButtons[button];
 	}
 
-	getPointerX() {
-		return this.pointer.x;
+	getMousePos() {
+		return {
+			x: this.mousePos.x,
+			y: this.mousePos.y
+		};
 	}
 
-	getPointerY() {
-		return this.pointer.y;
+	getTouches() {
+		return this.touches;
+	}
+
+	getLastTouch() {
+		return this.lastTouch;
 	}
 }
 

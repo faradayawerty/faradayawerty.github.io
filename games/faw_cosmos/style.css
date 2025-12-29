@@ -1,11 +1,13 @@
 
 body {
-	margin: 0;
-	background-color: black;
+	background: #111111;
+	color: #eeeeee;
+	display: grid;
+	place-items: center;
 }
 
-#canvas__FAW_COSMOS {
-	position: absolute;
-	background: black;
+canvas {
+	width: 95vw;
+	height: 90vh;
 }
 
