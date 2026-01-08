@@ -3,6 +3,9 @@ class UserInterface {
 
 	constructor(input) {
 		this.input = input;
+		this.position = "bottom";
+		this.width = 1.0; // 100% of screen width
+		this.height = 15.0 / 16.0;
 	}
 
 	update() {

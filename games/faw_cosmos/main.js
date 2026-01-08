@@ -3,7 +3,7 @@ function prepareContext(ctx) {
 	if(ctx.canvas !== undefined) {
 		ctx.canvas.width = ctx.canvas.clientWidth;
 		ctx.canvas.height = ctx.canvas.clientHeight;
-		ctx.fillStyle = "#222222";
+		ctx.fillStyle = "#ff00ff";
 		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	}
 }
@@ -25,6 +25,8 @@ function animate(ctx, game, ui, lastFrameTime)
 		let scale = Math.min(1/2000.0 * ctx.canvas.width, 1/2000.0 * ctx.canvas.height);
 		ctx.scale(scale, -scale);
 
+		ctx.fillStyle = "#111111";
+		ctx.fillRect(-1000, -1000, 2000, 2000);
 		game.draw(ctx);
 	}
 	ctx.restore();
