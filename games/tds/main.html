@@ -1,31 +1,40 @@
-<html>
+
+<!DOCTYPE html>
+<html lang="ru">
 
 <head>
-	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=0.3, maximum-scale=0.3, user-scalable=0"/>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
 	<title>faw_tds</title>
 	<link rel="icon" href="icon.png">
 	<style>
+		/* Убираем все отступы, чтобы игра занимала всё пространство без скролла */
 		body {
 			background-color: gray;
+			margin: 0;
+			padding: 0;
+			height: 100vh;
+			width: 100vw;
+			display: flex;
+			justify-content: center; /* Центрирование по горизонтали */
+			align-items: center;     /* Центрирование по вертикали (для ПК) */
+			overflow: hidden;
+			touch-action: none;      /* Запрещает браузеру обрабатывать жесты (важно для игры) */
 		}
 
 		#canvas {
-			position: center;
-			left: 0%;
-			top: 0%;
-			width: 1000;
-			height: 1000;
-			border: 1px solid;
-			margin-left: auto;
-			margin-right: auto;
+			background-color: #dddddd;
+			border: 1px solid #aaaaaa;
+			image-rendering: pixelated; /* Четкие пиксели */
 			display: block;
-			image-rendering: pixelated;
+			box-sizing: border-box;
 		}
 	</style>
 </head>
 
 <body>
-	<canvas id="canvas" width=1000 height=1000 style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
+	<canvas id="canvas" width="1000" height="1000"></canvas>
+
 	<script type="text/javascript" src="player.js"></script>
 	<script type="text/javascript" src="enemies.js"></script>
 	<script type="text/javascript" src="bullets.js"></script>
@@ -39,26 +48,45 @@
 	<script type="text/javascript" src="ammoboxZones.js"></script>
 	<script type="text/javascript" src="healthkit.js"></script>
 	<script type="text/javascript" src="healthkitZones.js"></script>
-	<script>
-		// this game is...
-		// a top down shooter
-		// with a map and enemies
-		// with a player that shoots
 
+	<script>
 		var bestScore = 0;
 		var imgBackground = null;
 
+		// Функция динамического изменения размера под экран
+		function resizeCanvas() {
+			const cvs = document.getElementById("canvas");
+			const w = window.innerWidth;
+			const h = window.innerHeight;
+
+			// Вычисляем размер квадратной стороны
+			const size = Math.min(w, h);
+
+			// Устанавливаем размер CSS
+			cvs.style.width = size + "px";
+			cvs.style.height = size + "px";
+
+			// Если экран вертикальный (телефон), прижимаем канвас к верху
+			if (w < h) {
+				document.body.style.alignItems = "flex-start";
+			} else {
+				document.body.style.alignItems = "center";
+			}
+		}
+
+		window.addEventListener('resize', resizeCanvas);
+
 		function setBackground(bg) {
-			if (bg == 'city') {
-				imgBackground = new Image;
+			if (bg === 'city') {
+				imgBackground = new Image();
 				imgBackground.src = 'bg_city.png';
 			}
 		}
 
 		function drawBackground(ctx) {
-			if (imgBackground == null)
-				return;
-			ctx.drawImage(imgBackground, 0, 0);
+			if (imgBackground == null) return;
+			// Рисуем на весь размер внутреннего разрешения
+			ctx.drawImage(imgBackground, 0, 0, 1000, 1000);
 		}
 
 		function drawText(ctx, x, y, text) {
@@ -70,16 +98,29 @@
 		}
 
 		function animate(g, ctx, input, lastUpdateTime) {
-			updateGame(Date.now() - lastUpdateTime, g, input);
+			// Вычисляем разницу во времени для плавности
+			let dt = Date.now() - lastUpdateTime;
+			updateGame(dt, g, input);
 			lastUpdateTime = Date.now();
-			if (g.player == null)
+			
+			if (g.player == null) {
 				gameSetLevel(g, 1);
-			bestScore = Math.max(g.player.survivalTime, bestScore);
+			} else {
+				bestScore = Math.max(g.player.survivalTime, bestScore);
+			}
+			
+			// Отрисовка
 			ctx.clearRect(0, 0, 1000, 1000);
 			drawBackground(ctx);
 			drawGame(ctx, g, input);
-			drawJoysticks(ctx, input.joystick);
+			
+			// Рисуем интерфейс и джойстики
+			if (input.joystick) {
+				drawJoysticks(ctx, input.joystick);
+			}
+			
 			drawText(ctx, 15, 60, 'best survival time: ' + Math.round(bestScore / 1000.0));
+			
 			window.requestAnimationFrame(function() {
 				animate(g, ctx, input, lastUpdateTime);
 			});
@@ -87,27 +128,28 @@
 
 		function main() {
 			let cvs = document.getElementById("canvas");
-			let ctx = canvas.getContext("2d");
+			let ctx = cvs.getContext("2d");
+
+			// Настраиваем размер сразу
+			resizeCanvas();
+
 			let game1 = newGame(false);
 			let input1 = getInput();
+			
 			gameSetLevel(game1, 1);
 			setBackground('city');
+			
+			// Инициализация ввода с передачей чистого элемента canvas (cvs)
 			initializeKeyboardInput(input1.keys);
-			initializeMouseInput(input1.mouse, ctx);
-			initializeTouchInput(input1.touch, input1.joystick, ctx);
+			initializeMouseInput(input1.mouse, cvs);
+			initializeTouchInput(input1.touch, input1.joystick, cvs);
+			
 			animate(game1, ctx, input1, Date.now());
 		}
 
-		main()
+		// Запуск игры
+		window.onload = main;
 
-		/*
-			USED RESOURCES
-			https://dustinpfister.github.io/2020/02/20/canvas-keyboard/
-			https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
-			https://metanit.com/web/javascript/21.13.php
-		*/
 	</script>
 </body>
-
 </html>
-
