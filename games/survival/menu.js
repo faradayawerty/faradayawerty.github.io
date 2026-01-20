@@ -99,7 +99,9 @@ function menu_create() {
 			"automatically pickup ammo",
 			"back to settings"
 		],
-		buttons: null
+		buttons: null,
+		can_touch_button: false,
+		touched_button_previus_frame: false
 	};
 	m.buttons = m.language_selection_buttons;
 	return m;
@@ -157,10 +159,18 @@ function menu_draw(ctx, m) {
 
 function menu_update(m, dt, input) {
 
+	let would_be_able_to_touch_button = false;
+
 	for(let i = 0; i < m.buttons.length; i++)
 		if(doRectsCollide(input.mouse.x / get_scale(), input.mouse.y / get_scale(), 0, 0,
-			80, 40 + 60 * i, 30 * menu_translate(m.want_language, m.buttons[i]).length, 60))
+			80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60)
+			||
+			(input.touch && input.touch.length > 0 && doRectsCollide(input.touch[0].x / get_scale(), input.touch[0].y / get_scale(), 0, 0,
+				80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60))
+		) {
 			m.iselected = i;
+			would_be_able_to_touch_button = true;
+		}
 
 	if(m.buttons == m.menu_respawn_buttons && m.want_autorespawn) {
 		m.shown = false;
@@ -177,7 +187,7 @@ function menu_update(m, dt, input) {
 		GLOBAL_VOLUME = GLOBAL_VOLUME - 10;
 		if(GLOBAL_VOLUME < 0)
 			GLOBAL_VOLUME = 100;
-	} else if((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter', true) || isMouseLeftButtonPressed(input))) {
+	} else if((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter', true) || isMouseLeftButtonPressed(input) || (isScreenTouched(input) && m.can_touch_button))) {
 		if(m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
 		} else if(m.buttons[m.iselected] == "respawn and continue game") {
@@ -192,10 +202,12 @@ function menu_update(m, dt, input) {
 			menu1.buttons = menu1.main_menu_buttons;
 		} else if(m.buttons[m.iselected] == "settings" || m.buttons[m.iselected] == "back to settings") {
 			m.buttons = m.settings_buttons;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "main menu") {
 			m.buttons = m.main_menu_buttons;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "enemies spawn") {
 			m.want_enemies_spawn = !m.want_enemies_spawn;
 		} else if(m.buttons[m.iselected] == "debug") {
@@ -204,7 +216,8 @@ function menu_update(m, dt, input) {
 			m.want_autorespawn = !m.want_autorespawn;
 		} else if(m.buttons[m.iselected] == "player color") {
 			m.buttons = m.player_color_selection_menu;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "save game") {
 			m.want_save = true;
 		} else if(m.buttons[m.iselected] == "load game") {
@@ -215,13 +228,16 @@ function menu_update(m, dt, input) {
 				GLOBAL_VOLUME = 0;
 		} else if(m.buttons[m.iselected] == "indicators") {
 			m.buttons = m.indicators_settings;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "new game") {
 			m.buttons = m.menu_new_game;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "auto pickup") {
 			m.buttons = m.auto_pickup_settings;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.indicators_settings.includes(m.buttons[m.iselected])) {
 			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m.buttons[m.iselected]];
 		} else if(m.auto_pickup_settings.includes(m.buttons[m.iselected])) {
@@ -249,11 +265,13 @@ function menu_update(m, dt, input) {
 		} else if(m.buttons[m.iselected] == "english") {
 			m.want_language = "english";
 			m.buttons = m.main_menu_buttons;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "русский") {
 			m.want_language = "русский";
 			m.buttons = m.main_menu_buttons;
-			m.iselected = 0;
+			if(!isScreenTouched(input))
+				m.iselected = 0;
 		} else if(m.buttons[m.iselected] == "language") {
 			if(m.want_language == "русский")
 				m.want_language = "english";
@@ -261,6 +279,17 @@ function menu_update(m, dt, input) {
 				m.want_language = "русский";
 		}
 	}
+
+	if(would_be_able_to_touch_button && !m.touched_button_previus_frame)
+		m.can_touch_button = true;
+	else
+		m.can_touch_button = false;
+
+	if(isScreenTouched(input))
+		m.touched_button_previus_frame = true;
+	else
+		m.touched_button_previus_frame = false;
+
 }
 
 function menu_translate(lang, str) {

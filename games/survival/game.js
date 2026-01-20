@@ -204,6 +204,9 @@ function game_update(g, dt) {
 		g.input.mouse.x = g.input.touch[0].x;
 		g.input.mouse.y = g.input.touch[0].y;
 		g.input.mouse.leftButtonPressed = g.input.touch.length > 0;
+	} else if(g.mobile) {
+		g.input.mouse.x = undefined;
+		g.input.mouse.y = undefined;
 	}
 }
 

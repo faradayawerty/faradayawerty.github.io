@@ -14,6 +14,7 @@ function achievements_create(g) {
 		clicked: false,
 		icon_size: 60,
 		animstate: 0,
+		cross_width: 0,
 		achievements: [
 
 			// game machanics achievements
@@ -250,7 +251,7 @@ function achievements_update(ae, dt) {
 
 	let as = ae.data.achievements;
 
-	if(ae.game.input.mouse.leftButtonPressed) {
+	if(ae.game.input.mouse.leftButtonPressed && !ae.game.mobile) {
 
 		let mx = ae.game.input.mouse.x / get_scale();
 		let my = ae.game.input.mouse.y / get_scale();
@@ -272,10 +273,23 @@ function achievements_update(ae, dt) {
 
 			ae.data.clicked = true;
 		}
-	} else if(ae.data.clicked) {
+	} else if(ae.data.clicked && !ae.game.mobile) {
 		ae.data.xx = ae.game.input.mouse.x / get_scale();
 		ae.data.yy = ae.game.input.mouse.y / get_scale();
 		ae.data.clicked = false;
+	}
+
+	let mx = ae.game.input.mouse.x;
+	let my = ae.game.input.mouse.y;
+	if(ae.game.mobile && ae.game.input.touch.length > 0) {
+		let mx = ae.game.input.touch[0].x;
+		let my = ae.game.input.touch[0].y;
+	}
+
+	if((ae.game.input.mouse.leftButtonPressed || isScreenTouched(ae.game.input)) &&
+		(false || doRectsCollide(mx / get_scale(), my / get_scale(), 0, 0, ae.data.offset_x + ae.data.width - ae.data.cross_width, ae.data.offset_y, ae.data.cross_width, ae.data.cross_width))) {
+		ae.shown = false;
+		ae.game.debug_console.unshift('hide achievements', mx / get_scale(), my / get_scale(), 0, 0, ae.data.offset_x + ae.data.width - ae.data.cross_width, ae.data.offset_y, ae.data.cross_width, ae.data.cross_width)
 	}
 }
 
@@ -292,6 +306,17 @@ function achievements_draw(ae, ctx) {
 	ctx.strokeRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data.height);
 
 	ctx.globalAlpha = 1.0;
+
+
+	let cross_width = ae.data.width * 0.025;
+	ae.data.cross_width = cross_width;
+
+	ctx.fillStyle = "#444444";
+	ctx.fillRect(ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y, cross_width, cross_width);
+	ctx.strokeStyle = "white";
+	ctx.strokeRect(ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y, cross_width, cross_width);
+	drawLine(ctx, ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y, ae.data.offset_x + ae.data.width, ae.data.offset_y + cross_width, "white", 0.1 * cross_width);
+	drawLine(ctx, ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y + cross_width, ae.data.offset_x + ae.data.width, ae.data.offset_y, "white", 0.1 * cross_width);
 
 	let x = ae.data.x;
 	let y = ae.data.y;

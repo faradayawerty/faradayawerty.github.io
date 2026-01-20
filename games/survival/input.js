@@ -40,7 +40,7 @@ function getShootDir(input) {
 
 function getWishDir(input) {
 	if(input.touch.length > 0)
-		return {x: input.joystick.right.dx, y: input.joystick.right.dy}
+		return {x: Math.sqrt(2) * input.joystick.right.dx, y: Math.sqrt(2) * input.joystick.right.dy}
 
 	let vel = Matter.Vector.create(0, 0);
 
@@ -77,7 +77,13 @@ function isMouseRightButtonPressed(input) {
 function isMouseLeftButtonPressed(input) {
 	let val = input.mouse.leftButtonPressed;
 	input.mouse.leftButtonPressed = false;
-	return val || input.touch.length > 0;
+	return val;
+}
+
+function isScreenTouched(input) {
+	if(input.touch.length > 0)
+		return true;
+	return false;
 }
 
 function isKeyDown(input, key, read_once=false) {
