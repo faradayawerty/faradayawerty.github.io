@@ -247,7 +247,10 @@ function game_draw(g, ctx) {
 	}
 	ctx.restore();
 	
-	drawJoysticks(ctx, g.input.joystick);
+	if(g.mobile) {
+		drawJoysticks(ctx, g.input.joystick);
+		drawMobileActionButtons(ctx, g.input);
+	}
 }
 
 function game_destroy_all_objects(g) {

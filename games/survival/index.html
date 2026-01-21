@@ -124,14 +124,21 @@
 				menu1.want_load = false;
 			}
 
+			if(game1.mobile)
+				menu1.iselected = -1;
+
 			// update game if menu is not shown, else update menu
 			if(isKeyDown(input1, 'escape', true)) {
 				menu1.shown = !menu1.shown;
 				game1.want_hide_inventory = true;
 			}
+			if(game1.want_menu) {
+				menu1.shown = true;
+			}
 			if(menu1.shown) {
 				menu_update(menu1, dt, input1);
 				game1.show_gui = false;
+				game1.want_menu = false;
 			} else if(game1.want_respawn_menu) {
 				menu1.shown = true;
 				menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf("continue game")] = "respawn and continue game";

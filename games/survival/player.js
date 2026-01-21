@@ -136,30 +136,17 @@ function player_die(player_object) {
 
 function player_update(player_object, dt) {
 
-	//player_object.game.debug_console.unshift(
-	//	"mouse " + player_object.game.input.mouse.x + ":" + player_object.game.input.mouse.y + " lmb: " + player_object.game.input.mouse.leftButtonPressed
-	//);
-
 	if(dt < 1000/120 && !player_object || player_object.destroyed || !player_object.data.body)
 		return;
 
 	let p = player_object.data;
 
+	// Инициализация и расчет задержки ввода
+	if (p.mobile_delay === undefined) p.mobile_delay = 0;
+	if (p.mobile_delay > 0) p.mobile_delay -= dt;
+
 	if(!menu1.shown)
 		achievement_do(p.achievements_element.data.achievements, "joining in", p.achievements_shower_element);
-
-	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["regular"] < 16))
-	//	achievement_do(p.achievements_element.data.achievements, "time to boss", p.achievements_shower_element);
-	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting"] < 16))
-	//	achievement_do(p.achievements_element.data.achievements, "time to boss, round II", p.achievements_shower_element);
-	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting red"] < 16))
-	//	achievement_do(p.achievements_element.data.achievements, "red boss", p.achievements_shower_element);
-	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["sword"] < 16))
-	//	achievement_do(p.achievements_element.data.achievements, "boss with a sword", p.achievements_shower_element);
-	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting rocket"] < 16))
-	//	achievement_do(p.achievements_element.data.achievements, "boss with a rocket launcher", p.achievements_shower_element);
-	//if(!(player_object.game.kills_for_boss > 0 || player_object.game.enemy_kills["shooting laser"] < 16))
-	//	achievement_do(p.achievements_element.data.achievements, "rainbow boss", p.achievements_shower_element);
 
 	let has_empty = false;
 	for(let i = 0; i < p.inventory_element.data.items.length; i++)
@@ -171,38 +158,23 @@ function player_update(player_object, dt) {
 
 	let max_levels = 600;
 
-	if(p.body.position.x < -max_levels * 2500) {
-		Matter.Body.setPosition(p.body, {x: max_levels * 2500, y: p.body.position.y}, false);
-	}
+	// Бесшовный мир (телепортация по краям)
+	if(p.body.position.x < -max_levels * 2500) Matter.Body.setPosition(p.body, {x: max_levels * 2500, y: p.body.position.y}, false);
+	if(max_levels * 2500 < p.body.position.x) Matter.Body.setPosition(p.body, {x: -max_levels * 2500, y: p.body.position.y}, false);
+	if(p.body.position.y < -max_levels * 2500) Matter.Body.setPosition(p.body, {x: p.body.position.x, y: max_levels * 2500}, false);
+	if(max_levels * 2500 < p.body.position.y) Matter.Body.setPosition(p.body, {x: p.body.position.x, y: -max_levels * 2500}, false);
 
-	if(max_levels * 2500 < p.body.position.x) {
-		Matter.Body.setPosition(p.body, {x: -max_levels * 2500, y: p.body.position.y}, false);
-	}
-
-	if(p.body.position.y < -max_levels * 2500) {
-		Matter.Body.setPosition(p.body, {x: p.body.position.x, y: max_levels * 2500}, false);
-	}
-
-	if(max_levels * 2500 < p.body.position.y) {
-		Matter.Body.setPosition(p.body, {x: p.body.position.x, y: -max_levels * 2500}, false);
-	}
-
-	if(p.shot_cooldown > 0)
-		p.shot_cooldown -= dt;
-	if(p.shotgun_cooldown > 0)
-		p.shotgun_cooldown -= dt;
-	if(p.minigun_cooldown > 0)
-		p.minigun_cooldown -= dt;
+	if(p.shot_cooldown > 0) p.shot_cooldown -= dt;
+	if(p.shotgun_cooldown > 0) p.shotgun_cooldown -= dt;
+	if(p.minigun_cooldown > 0) p.minigun_cooldown -= dt;
 
 	p.item_animstate += 0.01 * dt;
 
-	if(p.shield_blue_health > 0)
-		p.shield_blue_health -= 0.01 * dt;
-	if(p.shield_green_health > 0)
-		p.shield_green_health -= 0.01 * dt;
-	if(p.shield_rainbow_health > 0)
-		p.shield_rainbow_health -= 0.01 * dt;
+	if(p.shield_blue_health > 0) p.shield_blue_health -= 0.01 * dt;
+	if(p.shield_green_health > 0) p.shield_green_health -= 0.01 * dt;
+	if(p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.01 * dt;
 
+	// Дебаг здоровья
 	if(p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(p.health) + ", change " + Math.round(p.saved_health - p.health)
 			+ ": hunger: " + Math.round(p.hunger) + ", thirst: " + Math.round(p.thirst)
@@ -213,20 +185,7 @@ function player_update(player_object, dt) {
 	p.saved_hunger = p.hunger;
 	p.saved_thirst = p.thirst;
 
-	if(p.shield_rainbow_health < 0) {
-		p.shield_rainbow_health = 0;
-	}
-
-	if(p.shield_green_health < 0) {
-		p.shield_green_health = 0;
-	}
-
-	if(p.shield_blue_health < 0) {
-		p.shield_blue_health = 0;
-	}
-
-	if(p.immunity > 0)
-		p.immunity -= dt;
+	if(p.immunity > 0) p.immunity -= dt;
 
 	if(player_object.data.health <= 0 && !player_object.game.godmode) {
 		player_die(player_object);
@@ -234,389 +193,231 @@ function player_update(player_object, dt) {
 	}
 
 	if(player_object.game.godmode) {
-		p.health = p.max_health;
-		p.hunger = p.max_hunger;
-		p.thirst = p.max_thirst;
+		p.health = p.max_health; p.hunger = p.max_hunger; p.thirst = p.max_thirst;
 	}
 
+	// Голод и жажда
 	if(p.thirst > 0 && achievement_get(p.achievements_element.data.achievements, "first steps").done) {
-		if(p.shield_green_health > 0)
-			p.thirst = Math.max(0, p.thirst - 0.0005 * dt)
-		else if(p.shield_rainbow_health > 0)
-			p.thirst = Math.max(0, p.thirst - 0.00000025 * dt)
-		else
-			p.thirst = Math.max(0, p.thirst - 0.001 * dt)
+		if(p.shield_green_health > 0) p.thirst = Math.max(0, p.thirst - 0.0005 * dt);
+		else if(p.shield_rainbow_health > 0) p.thirst = Math.max(0, p.thirst - 0.00000025 * dt);
+		else p.thirst = Math.max(0, p.thirst - 0.001 * dt);
 	}
-
-	if(p.thirst <= 0)
-		p.health -= 0.01 * dt;
+	if(p.thirst <= 0) p.health -= 0.01 * dt;
 
 	if(p.hunger > 0 && achievement_get(p.achievements_element.data.achievements, "first steps").done) {
-		if(p.shield_green_health > 0)
-			p.hunger = Math.max(0, p.hunger - 0.0005 * dt)
-		else if(p.shield_rainbow_health > 0)
-			p.hunger = Math.max(0, p.hunger - 0.00000025 * dt)
-		else
-			p.hunger = Math.max(0, p.hunger - 0.001 * dt)
+		if(p.shield_green_health > 0) p.hunger = Math.max(0, p.hunger - 0.0005 * dt);
+		else if(p.shield_rainbow_health > 0) p.hunger = Math.max(0, p.hunger - 0.00000025 * dt);
+		else p.hunger = Math.max(0, p.hunger - 0.001 * dt);
 	}
-
-	if(p.hunger <= 0)
-		p.health -= 0.005 * dt;
+	if(p.hunger <= 0) p.health -= 0.005 * dt;
 
 	p.speed = p.max_speed;
-	if(p.thirst < 0.33 * p.max_thirst)
-		p.speed = 0.875 * p.speed;
-	if(p.hunger < 0.11 * p.max_hunger)
-		p.speed = 0.75 * p.speed;
+	if(p.thirst < 0.33 * p.max_thirst) p.speed *= 0.875;
+	if(p.hunger < 0.11 * p.max_hunger) p.speed *= 0.75;
 	if(p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
 
+	// Уровни
 	if(p.want_level == null) {
-		if(!level_visible(player_object.game, "0x0", player_object))
-			levels_set(player_object.game, "0x0");
+		if(!level_visible(player_object.game, "0x0", player_object)) levels_set(player_object.game, "0x0");
 		p.want_level = "0x0";
 	}
 
 	let old_level = p.want_level;
-
-	let pos = p.body.position;
-	let px = pos.x;
-	let py = pos.y;
-
-	// choose level based on coordinates
-	let level_x = Number(p.want_level.split("x")[0]);
-	let level_y = Number(p.want_level.split("x")[1]);
-	let Ox = 2500 * level_x;
-	let Oy = 2500 * level_y;
-
-	p.want_level = (Math.floor(px / 2500)) + "x" + (Math.floor(py / 2500));
+	p.want_level = (Math.floor(p.body.position.x / 2500)) + "x" + (Math.floor(p.body.position.y / 2500));
 
 	if(old_level != p.want_level) {
-		if(!level_visible(player_object.game, old_level, player_object))
-			game_destroy_level(player_object.game, old_level);
-		if(!level_visible(player_object.game, p.want_level, player_object))
-			levels_set(player_object.game, p.want_level, old_level);
-
+		if(!level_visible(player_object.game, old_level, player_object)) game_destroy_level(player_object.game, old_level);
+		if(!level_visible(player_object.game, p.want_level, player_object)) levels_set(player_object.game, p.want_level, old_level);
 		achievement_do(p.achievements_element.data.achievements, "outside the box", p.achievements_shower_element);
 	}
 
-	if(p.ai_controlled) {
+	if(p.ai_controlled) return;
 
-		if(p.hunger < 0.5 * p.max_hunger) {
-			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_FOODS);
-			if(id > -1) {
-				player_item_consume(player_object, id, true);
-			}
-		}
+	// --- УПРАВЛЕНИЕ ВИДИМОСТЬЮ UI ---
+	//
+	if(p.inventory_element.shown) {
+		p.achievements_element.shown = false;
+	}
 
-		if(p.thirst < 0.5 * p.max_thirst) {
- 			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_DRINKS);
-			if(id > -1) {
-				player_item_consume(player_object, id, true);
-			}
-		}
-
-		if(p.health < 0.5 * p.max_health) {
- 			let id = inventory_has_item_from_list(player_object.data.inventory_element, [ITEM_HEALTH, ITEM_HEALTH_GREEN]);
-			if(id > -1) {
-				player_item_consume(player_object, id, true);
-			}
-		}
-
-		p.car_object = null;
-		p.body.collisionFilter.mask = -1;
-
-		let vel = Matter.Vector.create(0, 0);
-
-		let closest_enemy = null;
-		let closest_item = null;
-		let closest_player = null;
-
-		let follow_range = 10000;
-
- 		if(inventory_has_item(player_object.data.inventory_element, 0))
-			closest_item = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "item", follow_range);
-
-		closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", follow_range);
-
-		let iv = -1;
-		if(closest_item) {
-			let tx = closest_item.data.body.position.x - p.body.position.x;
-			let ty = closest_item.data.body.position.y - p.body.position.y;
-			let iv = Math.sqrt(tx*tx + ty*ty);
-			let dx = p.speed * tx / iv;
-			let dy = p.speed * ty / iv;
-			if(iv < 1.5 * p.w) {
-				if(!item_pickup(player_object.data.inventory_element, closest_item))
-					item_pickup(player_object.data.inventory_element, closest_item, true);
-			}
-			vel = Matter.Vector.create(dx, dy);
-		}
-
-		if(closest_enemy) {
- 			let id = inventory_has_item_from_list(player_object.data.inventory_element, ITEMS_GUNS);
-			if(id > -1) {
-				for(let i = 0; i < player_object.data.inventory_element.data.items.length; i++)
-					for(let j = 0; j < player_object.data.inventory_element.data.items[i].length; j++)
-						if(player_object.data.inventory_element.data.items[i][j] == id) {
-							player_object.data.inventory_element.data.items[i][j]
-								= player_object.data.hotbar_element.data.row[player_object.data.hotbar_element.data.iselected];
-							player_object.data.hotbar_element.data.row[player_object.data.hotbar_element.data.iselected] = id;
-						}
-						
-			}
-			let tx = closest_enemy.data.body.position.x - p.body.position.x;
-			let ty = closest_enemy.data.body.position.y - p.body.position.y;
-			let v = Math.sqrt(tx*tx + ty*ty);
-			let dx = p.speed * tx / v;
-			let dy = p.speed * ty / v;
-			if(p.w * 7.5 < v && v < p.w * 16.5) {
-				player_shoot(player_object, dt, closest_enemy.data.body);
-				dx = 0;
-				dy = 0;
-			} else {
-				p.laser_sound_has_played = false;
-				p.sword_protection = false;
-			}
-			if(v < p.w * 7.5) {
-				dx = -dx;
-				dy = -dy;
-				if(iv > v)
-					vel = Matter.Vector.create(dx, dy);
-			}
-			if(iv < v && Matter.Vector.magnitude(Matter.Vector.add(Matter.Vector.create(dx, dy), vel)) > 5)
-				vel = Matter.Vector.add(Matter.Vector.create(dx, dy), vel);
-		}
-
-		if(!closest_enemy && !closest_item)
-			closest_player = player_object.game.objects.find((obj) => obj.name == "player" && !obj.data.ai_controlled && !obj.destroyed);
-		if(!closest_player) {
-			player_object.name = "PLAYER";
-			closest_player = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "player", follow_range);
-			player_object.name = "player";
-		}
-
-		if(closest_player && !closest_player.destroyed && closest_player.data.body) {
-			let tx = closest_player.data.body.position.x - p.body.position.x;
-			let ty = closest_player.data.body.position.y - p.body.position.y;
-			let v = Math.sqrt(tx*tx + ty*ty);
-			let dx = p.speed * tx / v;
-			let dy = p.speed * ty / v;
-			if(p.w * 4.5 > v) {
-				dx = 0;
-				dy = 0;
-			}
-			if(p.w * 7.5 < v && v < 10.5 * p.w)
-				vel = Matter.Vector.create(dx, dy);
-			else
-				closest_player = null;
-		}
-		if(!closest_player && !closest_item && !closest_enemy) {
-			if(Math.random() < 0.001 * dt)
-				p.ai_random_dir = 2 * Math.PI * Math.random();
-			vel = Matter.Vector.create(p.speed * Math.cos(p.ai_random_dir), p.speed * Math.sin(p.ai_random_dir));
-		}
-
-		Matter.Body.setVelocity(p.body, vel);
-		return;
+	if(p.inventory_element.shown || p.achievements_element.shown) {
+		p.hotbar_element.shown = false;
+		p.achievements_shower_element.shown = false;
+	} else {
+		p.achievements_shower_element.shown = true;
 	}
 
 	if(!p.inventory_element.shown && !p.hotbar_element.shown && !p.achievements_element.shown) {
-		p.inventory_element.shown = false;
 		p.hotbar_element.shown = true;
-		p.achievements_element.shown = false;
-	}
-
-	if(p.achievements_element.shown || p.inventory_element.shown)
-		p.achievements_shower_element.shown = false;
-	else
 		p.achievements_shower_element.shown = true;
-
-	//if(isKeyDown(player_object.game.input, 'm', true))
-	//	player_create(player_object.game, p.body.position.x, p.body.position.y, false, true);
-
-	if(isKeyDown(player_object.game.input, 'e', true)
-		|| isKeyDown(player_object.game.input, 'i', true)
-		|| isKeyDown(player_object.game.input, 'у', true)
-		|| isKeyDown(player_object.game.input, 'ш', true)) {
-		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
-		p.inventory_element.shown = !p.inventory_element.shown;
-		p.inventory_element.data.imove = -1;
-		p.inventory_element.data.jmove = -1;
-		p.hotbar_element.shown = !p.hotbar_element.shown;
-		if(p.achievements_element.shown)
-			p.hotbar_element.shown = false;
-		p.achievements_element.shown = false;
-	}
-
-	if(isKeyDown(p.achievements_element.game.input, 'j', true)
-		|| isKeyDown(p.achievements_element.game.input, 'r', true)
-		|| isKeyDown(p.achievements_element.game.input, 'о', true)
-		|| isKeyDown(p.achievements_element.game.input, 'к', true)) {
-		p.achievements_element.data.x = 75;
-		p.achievements_element.data.y = 75;
-		achievement_do(p.achievements_element.data.achievements, "achievements", p.achievements_shower_element);
-		p.achievements_element.shown = !p.achievements_element.shown;
-	}
-
-	if(p.achievements_element.shown) {
-		p.hotbar_element.shown = false;
-		p.inventory_element.shown = false;
 	}
 
 	if(player_object.game.want_hide_inventory) {
 		p.inventory_element.shown = false;
 		p.hotbar_element.shown = true;
-		player_object.game.want_hide_inventory = false;
 		p.achievements_element.shown = false;
+		player_object.game.want_hide_inventory = false;
 	}
 
-	if(player_object.game.input.mouse.leftButtonPressed)
-		player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
+	// --- ОБРАБОТКА НАЖАТИЙ НА КНОПКИ ХОТБАРА ---
+	if (p.mobile_delay <= 0 && player_object.game.input.mouse.leftButtonPressed && p.hotbar_element.shown) {
+		let mx = player_object.game.input.mouse.x / get_scale();
+		let my = player_object.game.input.mouse.y / get_scale();
+		let hb = p.hotbar_element.data;
+		let s = hb.slot_size;
+		let step = s * 1.05;
+		let button_y = 40;
 
-	let vel = Matter.Vector.create(0, 0);
+		if (my >= button_y && my <= button_y + s) {
+			let x_start_buttons = 60 + step * 9;
 
-	//if(!p.inventory_element.shown && !p.achievements_element.shown && !p.car_object) {
-	if(!p.car_object) {
-		player_object.game.camera_target_body = p.body;
-		p.body.collisionFilter.mask = -1;
-
-		vel = Matter.Vector.mult(getWishDir(player_object.game.input), p.speed);
-
-		//if(player_object.game.input.keys.down['d'])
-		//	vel = Matter.Vector.add(vel, Matter.Vector.create(p.speed, 0));
-		//if(player_object.game.input.keys.down['a'])
-		//	vel = Matter.Vector.add(vel, Matter.Vector.create(-p.speed, 0));
-		//if(player_object.game.input.keys.down['s'])
-		//	vel = Matter.Vector.add(vel, Matter.Vector.create(0, p.speed));
-		//if(player_object.game.input.keys.down['w'])
-		//	vel = Matter.Vector.add(vel, Matter.Vector.create(0, -p.speed));
-		//
-		//if(player_object.game.input.touch.length > 0)
-		//	vel = Matter.Vector.add(vel, Matter.Vector.create(
-		//		Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dx,
-		//		Math.sqrt(2) * p.speed * player_object.game.input.joystick.right.dy
-		//	));
-
-
-		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true)
-			|| isKeyDown(player_object.game.input, ' ', true)
-			|| player_object.game.input.joystick.left.dx*player_object.game.input.joystick.left.dx + player_object.game.input.joystick.left.dy*player_object.game.input.joystick.left.dy > 0;
-
-		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
-		if(closest_item && !closest_item.data.dropped && ITEMS_AMMOS.includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup ammo"] || f_down || player_object.game.mobile) {
-				item_pickup(p.inventory_element, closest_item);
-				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+			// Кнопка Инвентаря
+			if (mx >= x_start_buttons && mx <= x_start_buttons + s) {
+				achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
+				p.inventory_element.shown = !p.inventory_element.shown;
+				p.hotbar_element.shown = !p.inventory_element.shown;
+				p.achievements_element.shown = false;
+				p.inventory_element.data.imove = -1;
+				p.inventory_element.data.jmove = -1;
+				p.mobile_delay = 300;
 			}
-		} else if(closest_item && !closest_item.data.dropped && ITEMS_FOODS.concat(ITEMS_DRINKS).includes(closest_item.data.id)) {
-			if(player_object.game.settings.auto_pickup["automatically pickup food and drinks"] || f_down || player_object.game.mobile) {
-				item_pickup(p.inventory_element, closest_item);
-				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+			// Кнопка Достижений
+			else if (mx >= x_start_buttons + step && mx <= x_start_buttons + step + s) {
+				achievement_do(p.achievements_element.data.achievements, "achievements", p.achievements_shower_element);
+				p.achievements_element.shown = !p.achievements_element.shown;
+				p.inventory_element.shown = false;
+				p.hotbar_element.shown = !p.achievements_element.shown;
+				p.mobile_delay = 300;
 			}
-		} else if(closest_item && !closest_item.data.dropped && [ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(closest_item.data.id) || player_object.game.mobile) {
-			if(player_object.game.settings.auto_pickup["automatically pickup health"] || f_down || player_object.game.mobile) {
-				item_pickup(p.inventory_element, closest_item);
-				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+			// Кнопка Меню
+			else if (mx >= x_start_buttons + step * 2 && mx <= x_start_buttons + step * 2 + s) {
+				player_object.game.want_menu = true;
+				p.mobile_delay = 300;
 			}
-		} else if(closest_item && !closest_item.data.dropped && closest_item.data.id == ITEM_FUEL) {
-			if(player_object.game.settings.auto_pickup["automatically pickup fuel"] || f_down || player_object.game.mobile) {
-				item_pickup(p.inventory_element, closest_item);
-				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+		}
+	}
+
+	// Клавиатура: Инвентарь
+	if(true && (isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true) || isKeyDown(player_object.game.input, 'у', true) || isKeyDown(player_object.game.input, 'ш', true))) {
+		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
+		p.inventory_element.shown = !p.inventory_element.shown;
+		p.inventory_element.data.imove = -1; p.inventory_element.data.jmove = -1;
+		p.hotbar_element.shown = !p.inventory_element.shown;
+		p.achievements_element.shown = false;
+		p.mobile_delay = 300;
+	}
+
+	// Клавиатура: Достижения
+	if(true && (isKeyDown(p.achievements_element.game.input, 'j', true) || isKeyDown(p.achievements_element.game.input, 'r', true) || isKeyDown(p.achievements_element.game.input, 'о', true) || isKeyDown(p.achievements_element.game.input, 'к', true))) {
+		p.achievements_element.data.x = 75; p.achievements_element.data.y = 75;
+		achievement_do(p.achievements_element.data.achievements, "achievements", p.achievements_shower_element);
+		p.achievements_element.shown = !p.achievements_element.shown;
+		p.inventory_element.shown = false;
+		p.hotbar_element.shown = !p.achievements_element.shown;
+		p.mobile_delay = 300;
+	}
+
+	// --- ДЕЙСТВИЯ ПЕРСОНАЖА (Стрельба, использование предметов) ---
+	// Выполняются только если нет активной задержки UI
+	if (p.mobile_delay <= 0) {
+		let use_triggered = player_object.game.mobile ? isKeyDown(player_object.game.input, ' ', true) : player_object.game.input.mouse.leftButtonPressed;
+
+		if(use_triggered) {
+			// Проверка, что мы не кликаем по самому хотбару или открытому окну
+			let is_clicking_ui = (p.hotbar_element.shown && (player_object.game.input.mouse.y / get_scale() <= 40 + p.hotbar_element.data.slot_size))
+								|| p.inventory_element.shown || p.achievements_element.shown;
+			if(!is_clicking_ui) {
+				player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
+				if(player_object.game.mobile) p.mobile_delay = 200;
 			}
-		} else if(f_down || player_object.game.mobile) {
-			let did_pickup = item_pickup(p.inventory_element, closest_item);
-			if(did_pickup) {
-				achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
-				if(closest_item.data.id == ITEM_GUN)
-					achievement_do(p.achievements_element.data.achievements, "get a gun", p.achievements_shower_element);
-			}
-			if(!did_pickup && f_down) {
+		}
+
+		let vel = Matter.Vector.create(0, 0);
+
+		if(!p.car_object) {
+			player_object.game.camera_target_body = p.body;
+			p.body.collisionFilter.mask = -1;
+			vel = Matter.Vector.mult(getWishDir(player_object.game.input), p.speed);
+
+			let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, ' ', true);
+
+			let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
+
+			if(closest_item && !closest_item.data.dropped) {
+				let id = closest_item.data.id;
+				if((ITEMS_AMMOS.includes(id) && player_object.game.settings.auto_pickup["automatically pickup ammo"]) ||
+				   (ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) && player_object.game.settings.auto_pickup["automatically pickup food and drinks"]) ||
+				   ([ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(id) && player_object.game.settings.auto_pickup["automatically pickup health"]) ||
+				   (id == ITEM_FUEL && player_object.game.settings.auto_pickup["automatically pickup fuel"]) || f_down) {
+
+					if(item_pickup(p.inventory_element, closest_item)) {
+						achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+						if(id == ITEM_GUN) achievement_do(p.achievements_element.data.achievements, "get a gun", p.achievements_shower_element);
+					}
+				}
+			} else if(f_down) { // Заход в машину (пробел или F)
 				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 				if(p.car_object) {
 					audio_play("data/sfx/car_1.mp3", 0.25);
 					achievement_do(p.achievements_element.data.achievements, "get a ride", p.achievements_shower_element);
+					p.mobile_delay = 500;
 				}
 			}
-			if(!p.car_object) {
-				player_object.name = "PLAYER";
-				let player_closest = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "player", 100);
-				player_object.name = "player";
-				if(player_closest) {
-					player_closest.data.ai_controlled = false;
-					player_object.data.ai_controlled = true;
-				}
+
+			let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed) ||
+						   (player_object.game.mobile && (player_object.game.input.joystick.left.dx**2 + player_object.game.input.joystick.left.dy**2 > 0.01));
+
+			if(shooting && !p.inventory_element.shown && !p.achievements_element.shown) {
+				player_shoot(player_object, dt, null, getShootDir(player_object.game.input).x, getShootDir(player_object.game.input).y);
+				if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
+					achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
+			} else {
+				p.laser_sound_has_played = false; p.sword_protection = false;
+			}
+
+			if(p.hotbar_element.shown && (isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true)))
+				inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
+
+			if(Matter.Vector.magnitude(vel) > 0)
+				achievement_do(p.achievements_element.data.achievements, "first steps", p.achievements_shower_element);
+
+			Matter.Body.setVelocity(p.body, vel);
+		}
+
+		if(p.car_object) {
+			if(player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
+				let cl_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
+				if(cl_item && cl_item.data.id == ITEM_FUEL) item_pickup(p.inventory_element, cl_item);
+			}
+			let rotatedir = 0;
+			player_object.game.camera_target_body = p.car_object.data.body;
+			p.body.collisionFilter.mask = -3;
+			let wish = getWishDir(player_object.game.input);
+
+			if(wish.y < 0 && p.car_object.data.fuel > 0) {
+				vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
+				p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
+				rotatedir = 1;
+			}
+			if(wish.y > 0 && p.car_object.data.fuel > 0) {
+				vel = Matter.Vector.create(-0.5 * p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), -0.5 * p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
+				p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
+				rotatedir = -1;
+			}
+			if(wish.x > 0) Matter.Body.rotate(p.car_object.data.body, rotatedir * 0.0015 * dt);
+			if(wish.x < 0) Matter.Body.rotate(p.car_object.data.body, -rotatedir * 0.0015 * dt);
+
+			Matter.Body.setVelocity(p.car_object.data.body, vel);
+			Matter.Body.setPosition(p.body, p.car_object.data.body.position);
+
+			let exit_key = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, ' ', true);
+			if(exit_key && p.mobile_delay <= 0) {
+				Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
+				p.car_object = null;
+				p.mobile_delay = 500;
 			}
 		}
-
-		if(player_object.game.input.mouse.leftButtonPressed
-			&& !player_object.game.mobile
-			||
-			player_object.game.input.joystick.left.dx*player_object.game.input.joystick.left.dx + player_object.game.input.joystick.left.dy*player_object.game.input.joystick.left.dy > 0
-			&& player_object.game.mobile) {
-
-			player_shoot(player_object, dt, null, getShootDir(player_object.game.input).x, getShootDir(player_object.game.input).y);
-			if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
-				achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
-		//} else if(player_object.game.input.joystick.left.dx != 0 || player_object.game.input.joystick.left.dy != 0) {
-		//	player_shoot(player_object, dt,
-		//		game_object_find_closest(player_object.game,
-		//			player_object.data.body.position.x + 50 * player_object.game.input.joystick.left.dx,
-		//			player_object.data.body.position.y + 50 * player_object.game.input.joystick.left.dy,
-		//			"enemy", 300),
-		//		player_object.game.input.joystick.left.dx,
-		//		player_object.game.input.joystick.left.dy				
-		//	);
-		} else {
-			p.laser_sound_has_played = false;
-			p.sword_protection = false;
-		}
-
-		if(p.hotbar_element.shown && (isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true)))
-			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
-
-		if(Matter.Vector.magnitude(vel) > 0)
-			achievement_do(p.achievements_element.data.achievements, "first steps", p.achievements_shower_element);
-
-		Matter.Body.setVelocity(p.body, vel);
 	}
-
-	//if(!p.inventory_element.shown && !p.achievements_element.shown && p.car_object) {
-	if(p.car_object) {
-		if(player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
-			let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
-			if(closest_item && closest_item.data.id == ITEM_FUEL)
-				item_pickup(p.inventory_element, closest_item);
-		}
-		let rotatedir = 0;
-		player_object.game.camera_target_body = p.car_object.data.body;
-		p.body.collisionFilter.mask = -3;
-		if(getWishDir(player_object.game.input).y < 0 && p.car_object.data.fuel > 0) {
-			vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
-			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
-			rotatedir = 1;
-		}
-		if(getWishDir(player_object.game.input).y > 0 && p.car_object.data.fuel > 0) { 
-			vel = Matter.Vector.create(-0.5 * p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), -0.5 * p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
-			p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
-			rotatedir = -1;
-		}
-		if(getWishDir(player_object.game.input).x > 0)
-			Matter.Body.rotate(p.car_object.data.body, rotatedir * 0.0015 * dt);
-		if(getWishDir(player_object.game.input).x < 0)
-			Matter.Body.rotate(p.car_object.data.body, -rotatedir * 0.0015 * dt);
-
-		Matter.Body.setVelocity(p.car_object.data.body, vel);
-		Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(0, 0)));
-
-		if(isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true)
-			//|| isKeyDown(player_object.game.input, ' ', true)
-			|| player_object.game.input.joystick.left.dx*player_object.game.input.joystick.left.dx + player_object.game.input.joystick.left.dy*player_object.game.input.joystick.left.dy > 0
-			|| isKeyDown(player_object.game.input, ' ', true)) {
-			Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
-			p.car_object = null;
-		}
-	} 
 }
 
 function player_draw(player_object, ctx) {

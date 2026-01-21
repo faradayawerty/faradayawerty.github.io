@@ -1,9 +1,12 @@
 
+// --- ИНВЕНТАРЬ ---
+
 function inventory_create(g, attached_to_object=null) {
 	let inv = {
 		slot_size: 80,
-		iselected: 0,
-		jselected: 0,
+		cross_size: 40, // Размер кнопки закрытия
+		iselected: -1,
+		jselected: -1,
 		items: [
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -16,7 +19,8 @@ function inventory_create(g, attached_to_object=null) {
 		imove: -1,
 		jmove: -1,
 		attached_to_object: attached_to_object,
-		animation_state: 0
+		animation_state: 0,
+		_touch_lock: false // Вспомогательный флаг для фиксации одного клика по тачу
 	};
 	return game_gui_element_create(g, "inventory", inv, inventory_update, inventory_draw, inventory_destroy);
 }
@@ -27,111 +31,173 @@ function inventory_destroy(inventory_element) {
 }
 
 function inventory_update(inventory_element, dt) {
-
 	if(inventory_element.data.attached_to_object.data.ai_controlled)
 		inventory_element.shown = false;
 
+	if(!inventory_element.shown) return;
+
 	let inv = inventory_element.data;
+	let input = inventory_element.game.input;
+	let scale = get_scale();
+
+	// Координаты (приоритет тачу, если он есть)
+	let mx = input.mouse.x / scale;
+	let my = input.mouse.y / scale;
+	let is_clicked = isMouseLeftButtonPressed(input);
+
+	if (isScreenTouched(input)) {
+		mx = input.touch[0].x / scale;
+		my = input.touch[0].y / scale;
+		if (!inv._touch_lock) {
+			is_clicked = true;
+			inv._touch_lock = true;
+		} else {
+			is_clicked = false; 
+		}
+	} else {
+		inv._touch_lock = false;
+	}
+
+	// --- КНОПКА ЗАКРЫТИЯ ---
+	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
+	let cross_y = 40;
+
+	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
+		inventory_element.shown = false;
+		inv.imove = -1;
+		inv.jmove = -1;
+		return;
+	}
 
 	inv.animation_state += 0.02 * dt;
 
 	let slot_selected = false;
-	for(let i = 0; i < inv.items.length; i++)
-		for(let j = 0; j < inv.items[i].length; j++)
-			if(doRectsCollide(inventory_element.game.input.mouse.x / get_scale(), inventory_element.game.input.mouse.y / get_scale(), 0, 0,
-				40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size)) {
+	for(let i = 0; i < inv.items.length; i++) {
+		for(let j = 0; j < inv.items[i].length; j++) {
+			let sx = 40 + (inv.slot_size * 1.05) * j;
+			let sy = 40 + (inv.slot_size * 1.05) * i;
+			
+			if(doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
 				slot_selected = true;
 				inv.iselected = i;
 				inv.jselected = j;
-				if(isMouseLeftButtonPressed(inventory_element.game.input))
+
+				if(is_clicked) {
+					// Если в руках ничего нет — берем предмет из слота
 					if(inv.imove < 0 && inv.jmove < 0) {
 						if(inv.items[i][j] > 0) {
-							inv.imove = inv.iselected;
-							inv.jmove = inv.jselected;
+							inv.imove = i;
+							inv.jmove = j;
 						}
 					} else {
-						let temp = inv.items[inv.iselected][inv.jselected];
-						inv.items[inv.iselected][inv.jselected] = inv.items[inv.imove][inv.jmove];
+						// Если в руках уже есть предмет — меняем его местами с текущим слотом
+						let temp = inv.items[i][j];
+						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 						inv.items[inv.imove][inv.jmove] = temp;
 						inv.imove = -1;
 						inv.jmove = -1;
 					}
+				}
 			}
+		}
+	}
+	
+	// --- ФИКС "ЕРЕСИ": ЕСЛИ КЛИКНУЛИ МИМО ВСЕХ ЯЧЕЕК ---
+	if(is_clicked && !slot_selected) {
+		// Если мы несли предмет, просто отменяем перенос (предмет остается там, где был)
+		inv.imove = -1;
+		inv.jmove = -1;
+	}
+
 	if(!slot_selected) {
 		inv.iselected = -1;
 		inv.jselected = -1;
 	}
 
-	//if(isKeyDown(inventory_element.game.input, 's', true) && inv.iselected < inv.items.length - 1)
-	//	inv.iselected++;
-	//if(isKeyDown(inventory_element.game.input, 'w', true) && inv.iselected > 0)
-	//	inv.iselected--;
-	//if(isKeyDown(inventory_element.game.input, 'd', true) && inv.jselected < inv.items[inv.iselected].length - 1)
-	//	inv.jselected++;
-	//if(isKeyDown(inventory_element.game.input, 'a', true) && inv.jselected > 0)
-	//	inv.jselected--;
-	//if(isKeyDown(inventory_element.game.input, 'enter', true))
-	//	if(inv.imove < 0 && inv.jmove < 0) {
-	//		inv.imove = inv.iselected;
-	//		inv.jmove = inv.jselected;
-	//	} else {
-	//		let temp = inv.items[inv.iselected][inv.jselected];
-	//		inv.items[inv.iselected][inv.jselected] = inv.items[inv.imove][inv.jmove];
-	//		inv.items[inv.imove][inv.jmove] = temp;
-	//		inv.imove = -1;
-	//		inv.jmove = -1;
-	//	}
-	if(isKeyDown(inventory_element.game.input, 'q', true) || isKeyDown(inventory_element.game.input, 'й', true)) {
-		inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
-		if(inv.iselected == inv.imove && inv.jselected == inv.jmove) {
-			inv.imove = -1;
-			inv.jmove = -1;
+	// Выбросить предмет на Q
+	if(isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
+		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
+		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
+		
+		if (dropI !== -1 && dropJ !== -1) {
+			inventory_drop_item(inventory_element, dropI, dropJ);
+			if (dropI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
 		}
 	}
-	if(inventory_element.game.input.mouse.rightButtonPressed) {
-		inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-		inv.imove = -1;
-		inv.jmove = -1;
+	
+	// Правая кнопка мыши — тоже выброс
+	if(input.mouse.rightButtonPressed) {
+		if (inv.imove !== -1) {
+			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+			inv.imove = -1;
+			inv.jmove = -1;
+		} else if (inv.iselected !== -1) {
+			inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
+		}
 	}
 }
 
 function inventory_draw(inventory_element, ctx) {
-
-	if(inventory_element.game.want_hide_inventory)
+	if(inventory_element.game.want_hide_inventory || !inventory_element.shown)
 		return;
+
 	let inv = inventory_element.data;
+	let scale = get_scale();
+
+	// 1. Отрисовка слотов
 	for(let i = 0; i < inv.items.length; i++) {
 		for(let j = 0; j < inv.items[i].length; j++) {
 			ctx.globalAlpha = 0.9;
-			if(inv.imove == i && inv.jmove == j && inv.iselected == i && inv.jselected == j)
-				ctx.fillStyle = "yellow";
+			
+			if(inv.imove == i && inv.jmove == j)
+				ctx.fillStyle = "orange"; // Подсветка "откуда взяли"
 			else if(inv.iselected == i && inv.jselected == j)
 				ctx.fillStyle = "cyan";
-			else if(inv.imove == i && inv.jmove == j)
-				ctx.fillStyle = "orange";
-			else if(i == 0)
-				ctx.fillStyle = "blue";
 			else
 				ctx.fillStyle = "blue";
+			
 			ctx.fillRect(40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size);
 			ctx.globalAlpha = 1.0;
+
+			// Отрисовка предмета (если он не в руках)
+			if (!(inv.imove === i && inv.jmove === j)) {
+				item_icon_draw(ctx, inv.items[i][j], 40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size, inv.animation_state);
+			}
 		}
 	}
-	for(let i = 0; i < inv.items.length; i++) {
-		for(let j = 0; j < inv.items[i].length; j++) {
-			if(inv.imove == i && inv.jmove == j)
-				continue;
-			let icon_x = 40 + (inv.slot_size * 1.05) * j;
-			let icon_y = 40 + (inv.slot_size * 1.05) * i;
-			let icon_size = inv.slot_size;
-			item_icon_draw(ctx, inv.items[i][j], icon_x, icon_y, icon_size, icon_size, inv.animation_state);
-		}
+
+	// 2. Отрисовка кнопки закрытия
+	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15; 
+	let cross_y = 40; 
+	let cs = inv.cross_size;
+
+	if(inventory_element.game.mobile) {
+		ctx.fillStyle = "#444444";
+		ctx.fillRect(cross_x, cross_y, cs, cs);
+		ctx.strokeStyle = "white";
+		ctx.lineWidth = 2;
+		ctx.strokeRect(cross_x, cross_y, cs, cs);
+
+		ctx.beginPath();
+		ctx.lineWidth = 3;
+		ctx.moveTo(cross_x + cs * 0.25, cross_y + cs * 0.25);
+		ctx.lineTo(cross_x + cs * 0.75, cross_y + cs * 0.75);
+		ctx.moveTo(cross_x + cs * 0.75, cross_y + cs * 0.25);
+		ctx.lineTo(cross_x + cs * 0.25, cross_y + cs * 0.75);
+		ctx.stroke();
 	}
-	let icon_x = inventory_element.game.input.mouse.x / get_scale();
-	let icon_y = inventory_element.game.input.mouse.y / get_scale();
-	let icon_size = inv.slot_size * 0.75;
-	if(inv.imove > -1 && inv.jmove > -1)
-		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], icon_x, icon_y, icon_size, icon_size, inv.animation_state);
+
+	// 3. Предмет в руках (тянется за курсором)
+	if(inv.imove > -1 && inv.jmove > -1) {
+		let input = inventory_element.game.input;
+		let curX = (input.touch.length > 0) ? input.touch[0].x / scale : input.mouse.x / scale;
+		let curY = (input.touch.length > 0) ? input.touch[0].y / scale : input.mouse.y / scale;
+		
+		let drag_size = inv.slot_size * 0.8;
+		ctx.globalAlpha = 0.8;
+		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size/2, curY - drag_size/2, drag_size, drag_size, inv.animation_state);
+		ctx.globalAlpha = 1.0;
+	}
 }
 
 function inventory_drop_item(inventory_element, i, j, death=false) {
@@ -153,6 +219,8 @@ function inventory_drop_all_items(inventory_element) {
 			inventory_drop_item(inventory_element, i, j, true);
 }
 
+// --- ХОТБАР ---
+
 function hotbar_create(g, inv, attached_to_object=null) {
 	let hb = {
 		iselected: 0,
@@ -173,41 +241,56 @@ function hotbar_destroy(hotbar_element) {
 }
 
 function hotbar_update(hotbar_element, dt) {
-	hotbar_element.data.animation_state += 0.02 * dt;
-	if(hotbar_element.data.attached_to_object.data.ai_controlled)
-		hotbar_element.shown = false;
 	let hb = hotbar_element.data;
-	if(isKeyDown(hotbar_element.game.input, '1', true))
-		hb.iselected = 0;
-	if(isKeyDown(hotbar_element.game.input, '2', true))
-		hb.iselected = 1;
-	if(isKeyDown(hotbar_element.game.input, '3', true))
-		hb.iselected = 2;
-	if(isKeyDown(hotbar_element.game.input, '4', true))
-		hb.iselected = 3;
-	if(isKeyDown(hotbar_element.game.input, '5', true))
-		hb.iselected = 4;
-	if(isKeyDown(hotbar_element.game.input, '6', true))
-		hb.iselected = 5;
-	if(isKeyDown(hotbar_element.game.input, '7', true))
-		hb.iselected = 6;
-	if(isKeyDown(hotbar_element.game.input, '8', true))
-		hb.iselected = 7;
-	if(isKeyDown(hotbar_element.game.input, '9', true))
-		hb.iselected = 8;
-	if(isMouseWheelUp(hotbar_element.game.input))
-		hb.iselected = Math.min(8, hb.iselected + 1);
-	if(isMouseWheelDown(hotbar_element.game.input))
-		hb.iselected = Math.max(0, hb.iselected - 1);
+	let input = hotbar_element.game.input;
+	let scale = get_scale();
+	hb.animation_state += 0.02 * dt;
+
+	if(hb.attached_to_object.data.ai_controlled)
+		hotbar_element.shown = false;
+
+	// Клавиши 1-9
+	for (let i = 0; i < 9; i++) {
+		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
+	}
+
+	if(isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
+	if(isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
+
+	// Клик по слоту хотбара
 	hb.mouse_over = false;
+	let mx = input.mouse.x / scale;
+	let my = input.mouse.y / scale;
+	if (isScreenTouched(input)) {
+		mx = input.touch[0].x / scale;
+		my = input.touch[0].y / scale;
+	}
+
 	for(let i = 0; i < hb.row.length; i++) {
-		if(40 + (hb.slot_size * 1.05) * i < hotbar_element.game.input.mouse.x / get_scale()
-			&& hotbar_element.game.input.mouse.x / get_scale() < 40 + (hb.slot_size * 1.05) * i + hb.slot_size
-			&& 40 < hotbar_element.game.input.mouse.y / get_scale()
-			&& hotbar_element.game.input.mouse.y / get_scale() < 40 + hb.slot_size) {
+		let sx = 40 + (hb.slot_size * 1.05) * i;
+		let sy = 40;
+		if(doRectsCollide(mx, my, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
 			hb.mouse_over = true;
-			if(hotbar_element.game.input.mouse.leftButtonPressed)
+			if(isMouseLeftButtonPressed(input) || isScreenTouched(input))
 				hb.iselected = i;
+		}
+	}
+
+	// Мобильные кнопки справа от хотбара
+	if(hotbar_element.game.mobile && isScreenTouched(input)) {
+		let step = hb.slot_size * 1.05;
+		let x_inv = 60 + step * hb.row.length;
+
+		// Кнопка сумки (инвентаря)
+		if (doRectsCollide(mx, my, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
+			let inv_el = hb.attached_to_object.data.inventory_element;
+			if (inv_el && !inv_el._mob_toggle_lock) {
+				inv_el.shown = !inv_el.shown;
+				inv_el._mob_toggle_lock = true; // Защита от дребезга
+			}
+		} else {
+			let inv_el = hb.attached_to_object.data.inventory_element;
+			if (inv_el) inv_el._mob_toggle_lock = false;
 		}
 	}
 }
@@ -216,32 +299,35 @@ function hotbar_draw(hotbar_object, ctx) {
 	let hb = hotbar_object.data;
 	for(let i = 0; i < hb.row.length; i++) {
 		ctx.globalAlpha = 0.9;
-		if(hb.iselected == i)
-			ctx.fillStyle = "cyan";
-		else
-			ctx.fillStyle = "blue";
+		ctx.fillStyle = (hb.iselected == i) ? "cyan" : "blue";
 		ctx.fillRect(40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size);
 		ctx.globalAlpha = 1.0;
 		item_icon_draw(ctx, hb.row[i], 40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size, hb.animation_state);
 	}
 
-	if(hotbar_object.game.mobile) {
+if(hotbar_object.game.mobile) {
 		let s = hb.slot_size;
 		let step = s * 1.05;
 		let y = 40;
+
+		// Функция-помощник для отрисовки фона кнопки (внутри hotbar_draw)
 		const drawButtonBg = (x) => {
 			ctx.fillStyle = "#4477ff";
 			ctx.globalAlpha = 0.9;
 			ctx.fillRect(x, y, s, s);
 			ctx.globalAlpha = 1.0;
 		};
+
+		// --- 1. КНОПКА ИНВЕНТАРЯ (Портфель) ---
 		let x_inv = 60 + step * hb.row.length;
 		drawButtonBg(x_inv);
+		
 		let pad = s * 0.2;
 		let bw = s - pad * 2;
 		let bh = s - pad * 2;
 		let bx = x_inv + pad;
 		let by = y + pad;
+		
 		ctx.fillStyle = "#a52a2a";
 		ctx.fillRect(bx, by + bh * 0.2, bw, bh * 0.8);
 		ctx.fillStyle = "#8b4513";
@@ -257,12 +343,16 @@ function hotbar_draw(hotbar_object, ctx) {
 		ctx.strokeStyle = "black";
 		ctx.lineWidth = s * 0.02;
 		ctx.strokeRect(bx, by + bh * 0.2, bw, bh * 0.8);
+
+		// --- 2. КНОПКА АЧИВОК (Кубок) ---
 		let x_ach = x_inv + step;
 		drawButtonBg(x_ach);
+
 		let ax = x_ach + s * 0.25;
 		let ay = y + s * 0.25;
 		let aw = s * 0.5;
 		let ah = s * 0.5;
+
 		ctx.fillStyle = "gold";
 		ctx.beginPath();
 		ctx.moveTo(ax, ay);
@@ -280,31 +370,40 @@ function hotbar_draw(hotbar_object, ctx) {
 		ctx.arc(ax, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
 		ctx.arc(ax + aw, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
 		ctx.stroke();
+
+		// --- 3. КНОПКА МЕНЮ (Три полоски / Бургер) ---
 		let x_menu = x_ach + step;
 		drawButtonBg(x_menu);
+
 		ctx.fillStyle = "white";
 		let barW = s * 0.5; // Длина полоски
 		let barH = s * 0.08; // Толщина полоски
 		let barX = x_menu + (s - barW) / 2; // Центрируем по горизонтали
+		
+		// Рисуем три полоски
 		ctx.fillRect(barX, y + s * 0.3, barW, barH);
 		ctx.fillRect(barX, y + s * 0.48, barW, barH);
 		ctx.fillRect(barX, y + s * 0.66, barW, barH);
+		
+		// Добавим легкую тень для объема
 		ctx.fillStyle = "rgba(0,0,0,0.3)";
 		ctx.fillRect(barX, y + s * 0.3 + barH, barW, barH * 0.3);
 	}
 }
 
+// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+
 function hotbar_get_selected_item(hotbar_element) {
+	// Если инвентарь открыт, мы НЕ должны использовать предметы из хотбара кликом в мире
+	let inv_el = hotbar_element.data.attached_to_object.data.inventory_element;
+	if (inv_el && inv_el.shown) return 0;
+
 	if(!hotbar_element.shown) {
 		if(hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {
 			let inv = hotbar_element.data.attached_to_object.data.inventory_element.data;
 			if(inv.jmove > -1 && inv.imove > -1) {
-				//if((ITEMS_GUNS.concat(ITEMS_MELEE)).includes(inv.items[inv.imove][inv.jmove])) {
-					if(inv.iselected == -1 && inv.jselected == -1)
-						return inv.items[inv.imove][inv.jmove];
-				//} else if(inv.imove == inv.iselected && inv.jmove == inv.jselected) {
-				//	return inv.items[inv.imove][inv.jmove];
-				//}
+				if(inv.iselected == -1 && inv.jselected == -1)
+					return inv.items[inv.imove][inv.jmove];
 			}
 		}
 		return 0;
@@ -342,14 +441,13 @@ function inventory_count_item(inventory_element, id) {
 }
 
 function inventory_clear_item(inventory_element, id, count, item_i=-1, item_j=-1) {
-
 	if(item_i == inventory_element.data.imove && item_j == inventory_element.data.jmove) {
 		inventory_element.data.imove = -1;
 		inventory_element.data.jmove = -1;
 	}
 
 	if(item_i > -1 && item_j > -1 && inventory_element.data.items[item_i][item_j] == id) {
-		inventory_element.data.items[item_i][item_j] = 0
+		inventory_element.data.items[item_i][item_j] = 0;
 		count--;
 	}
 
@@ -360,4 +458,3 @@ function inventory_clear_item(inventory_element, id, count, item_i=-1, item_j=-1
 				count--;
 			}
 }
-

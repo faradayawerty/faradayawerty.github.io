@@ -101,7 +101,8 @@ function menu_create() {
 		],
 		buttons: null,
 		can_touch_button: false,
-		touched_button_previus_frame: false
+		touched_button_previus_frame: false,
+		mobile: false
 	};
 	m.buttons = m.language_selection_buttons;
 	return m;
@@ -159,14 +160,17 @@ function menu_draw(ctx, m) {
 
 function menu_update(m, dt, input) {
 
+	if(!m.mobile && input.touch.length > 0)
+		m.mobile = true;
+
 	let would_be_able_to_touch_button = false;
 
 	for(let i = 0; i < m.buttons.length; i++)
-		if(doRectsCollide(input.mouse.x / get_scale(), input.mouse.y / get_scale(), 0, 0,
-			80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60)
+		if((!m.mobile && doRectsCollide(input.mouse.x / get_scale(), input.mouse.y / get_scale(), 0, 0,
+			80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60))
 			||
 			(input.touch && input.touch.length > 0 && doRectsCollide(input.touch[0].x / get_scale(), input.touch[0].y / get_scale(), 0, 0,
-				80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60))
+				80, 40 + 60 * i, 80 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60))
 		) {
 			m.iselected = i;
 			would_be_able_to_touch_button = true;
@@ -190,6 +194,7 @@ function menu_update(m, dt, input) {
 	} else if((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter', true) || isMouseLeftButtonPressed(input) || (isScreenTouched(input) && m.can_touch_button))) {
 		if(m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
+			console.log("нажато 'продолжить игру'");
 		} else if(m.buttons[m.iselected] == "respawn and continue game") {
 			m.shown = false;
 			m.main_menu_buttons[0] = "continue game";
