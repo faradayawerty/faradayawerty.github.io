@@ -104,7 +104,10 @@ function inventory_update(inventory_element, dt) {
 	
 	// --- ФИКС "ЕРЕСИ": ЕСЛИ КЛИКНУЛИ МИМО ВСЕХ ЯЧЕЕК ---
 	if(is_clicked && !slot_selected) {
-		// Если мы несли предмет, просто отменяем перенос (предмет остается там, где был)
+		if(inv.imove !== -1 && inv.jmove !== -1) {
+			// Выбрасываем предмет в мир
+			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+		}
 		inv.imove = -1;
 		inv.jmove = -1;
 	}
@@ -394,9 +397,9 @@ if(hotbar_object.game.mobile) {
 // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 
 function hotbar_get_selected_item(hotbar_element) {
-	// Если инвентарь открыт, мы НЕ должны использовать предметы из хотбара кликом в мире
+	// На телефоне если инвентарь открыт, мы НЕ должны использовать предметы из хотбара кликом в мире
 	let inv_el = hotbar_element.data.attached_to_object.data.inventory_element;
-	if (inv_el && inv_el.shown) return 0;
+	if (inv_el.game.mobile && inv_el && inv_el.shown) return 0;
 
 	if(!hotbar_element.shown) {
 		if(hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {

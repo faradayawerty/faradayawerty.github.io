@@ -320,13 +320,13 @@ function player_update(player_object, dt) {
 	// --- ДЕЙСТВИЯ ПЕРСОНАЖА (Стрельба, использование предметов) ---
 	// Выполняются только если нет активной задержки UI
 	if (true) {
-		let use_triggered = player_object.game.mobile ? isKeyDown(player_object.game.input, ' ', true) : player_object.game.input.mouse.leftButtonPressed;
+		let use_triggered = player_object.game.mobile ? isKeyDown(player_object.game.input, 'c', true) : player_object.game.input.mouse.leftButtonPressed;
 
 		if(use_triggered) {
 			// Проверка, что мы не кликаем по самому хотбару или открытому окну
 			let is_clicking_ui = (p.hotbar_element.shown && (player_object.game.input.mouse.y / get_scale() <= 40 + p.hotbar_element.data.slot_size))
 								|| p.inventory_element.shown || p.achievements_element.shown;
-			if(!is_clicking_ui) {
+			if(!is_clicking_ui || !player_object.game.mobile) {
 				player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
 				if(player_object.game.mobile) p.mobile_delay = 200;
 			}

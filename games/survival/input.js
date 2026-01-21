@@ -226,7 +226,7 @@ function drawMobileActionButtons(ctx, input) {
 		if (t.x > regions.pick.x1 && t.x < regions.pick.x2 && t.y > regions.pick.y1 && t.y < regions.pick.y2) isPickPressed = true;
 	}
 	
-	input.keys.down[' '] = isUsePressed;
+	input.keys.down['c'] = isUsePressed;
 	input.keys.down['f'] = isPickPressed;
 
 	const drawFlatBase = (x, y, bw, bh, active) => {
