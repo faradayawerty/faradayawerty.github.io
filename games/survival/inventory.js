@@ -30,6 +30,7 @@ function inventory_destroy(inventory_element) {
 	inventory_element.destroyed = true;
 }
 
+
 function inventory_update(inventory_element, dt) {
 	if(inventory_element.data.attached_to_object.data.ai_controlled)
 		inventory_element.shown = false;
@@ -40,13 +41,13 @@ function inventory_update(inventory_element, dt) {
 	let input = inventory_element.game.input;
 	let scale = get_scale();
 
-	// --- НОВАЯ ЛОГИКА ПОИСКА ТАЧА В ОБЛАСТИ ИНВЕНТАРЯ ---
+	// --- ЛОГИКА ТАЧА ---
 	let is_clicked = false;
+	let is_released = false; // Добавляем отслеживание отпускания пальца
 	let is_clicked_right = isMouseRightButtonPressed(input);
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 
-	// Определяем границы (приблизительная область всех слотов и кнопки закрытия)
 	let inv_rect = {
 		x: 40,
 		y: 40,
@@ -60,29 +61,29 @@ function inventory_update(inventory_element, dt) {
 			let tx = t.x / scale;
 			let ty = t.y / scale;
 
-			// Проверяем, попал ли этот конкретный палец в область инвентаря
 			if (doRectsCollide(tx, ty, 0, 0, inv_rect.x, inv_rect.y, inv_rect.w, inv_rect.h)) {
 				mx = tx;
 				my = ty;
 				foundTargetTouch = true;
-				
+
 				if (!inv._touch_lock) {
 					is_clicked = true;
 					inv._touch_lock = true;
 				}
-				break; // Нашли нужный палец, другие не смотрим
+				break;
 			}
 		}
-		
-		if (!foundTargetTouch) {
-			inv._touch_lock = false; // Сбрасываем лок, если пальцы вне инвентаря
+
+		if (!foundTargetTouch && inv._touch_lock) {
+			is_released = true;
+			inv._touch_lock = false;
 		}
 	} else {
+		if (inv._touch_lock) is_released = true; // Палец подняли
 		inv._touch_lock = false;
 		is_clicked = isMouseLeftButtonPressed(input);
 	}
-	
-	// Сохраняем координаты для отрисовки предмета в руке (в inventory_draw используй их)
+
 	inv.last_active_mx = mx;
 	inv.last_active_my = my;
 
@@ -104,31 +105,38 @@ function inventory_update(inventory_element, dt) {
 		for(let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
 			let sy = 40 + (inv.slot_size * 1.05) * i;
-			
+
 			if(doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
 				slot_selected = true;
 				inv.iselected = i;
 				inv.jselected = j;
 
-				if(is_clicked) {
-					if(inv.imove < 0 && inv.jmove < 0) {
-						if(inv.items[i][j] > 0) {
-							inv.imove = i;
-							inv.jmove = j;
-						}
-					} else {
+				// ВЗЯТЬ ПРЕДМЕТ (по нажатию)
+				if(is_clicked && inv.imove < 0 && inv.jmove < 0) {
+					if(inv.items[i][j] > 0) {
+						inv.imove = i;
+						inv.jmove = j;
+					}
+				}
+
+				// ПОЛОЖИТЬ ПРЕДМЕТ (по отпусканию или повторному клику мыши)
+				if((is_released || (is_clicked && !inventory_element.game.mobile)) && inv.imove >= 0 && inv.jmove >= 0) {
+					// Не меняем местами с самим собой
+					if (!(inv.imove === i && inv.jmove === j)) {
 						let temp = inv.items[i][j];
 						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 						inv.items[inv.imove][inv.jmove] = temp;
-						inv.imove = -1;
-						inv.jmove = -1;
 					}
+					inv.imove = -1;
+					inv.jmove = -1;
+					is_released = false; // Сбрасываем, чтобы не сработало выбрасывание
 				}
 			}
 		}
 	}
-	
-	if((is_clicked_right || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
+
+	// ВЫБРОСИТЬ (если отпустили палец мимо слотов)
+	if((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
 		if(inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 		}
@@ -141,23 +149,13 @@ function inventory_update(inventory_element, dt) {
 		inv.jselected = -1;
 	}
 
+	// Обработка клавиши Q и правой кнопки (оставляем без изменений)
 	if(isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
 		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
 		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
-		
 		if (dropI !== -1 && dropJ !== -1) {
 			inventory_drop_item(inventory_element, dropI, dropJ);
 			if (dropI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
-		}
-	}
-	
-	if(input.mouse.rightButtonPressed) {
-		if (inv.imove !== -1) {
-			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-			inv.imove = -1;
-			inv.jmove = -1;
-		} else if (inv.iselected !== -1) {
-			inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
 		}
 	}
 }
