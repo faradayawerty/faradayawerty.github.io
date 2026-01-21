@@ -44,7 +44,7 @@ function animal_update(ao, dt) {
 				let junk_id = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
 				item_create(ao.game, junk_id, a.body.position.x, a.body.position.y);
 			}
-			audio_play("data/sfx/raccoon_dies.mp3");
+			audio_play("data/sfx/raccoon_dies.mp3", 1.0);
 		} else {
 			if (Math.random() < 0.75) item_create(ao.game, ITEM_CANNED_MEAT, a.body.position.x, a.body.position.y);
 			audio_play("data/sfx/deer_dies_1.mp3");
@@ -114,7 +114,7 @@ function animal_draw(ao, ctx) {
 		ctx.fillStyle = "red";
 		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w, a.h * 0.05);
 		ctx.fillStyle = "lime";
-		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w * a.health / a.max_health, a.h * 0.05);
+		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w * Math.max(0, a.health) / a.max_health, a.h * 0.05);
 	}
 }
 
