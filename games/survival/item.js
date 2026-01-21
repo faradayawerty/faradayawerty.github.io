@@ -185,15 +185,31 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillStyle = "#442200";
 		ctx.fillRect(x + 0.48 * w, y + 0.25 * h, 0.04 * w, 0.04 * h);
 	} else if (id == ITEM_APPLE) {
-		// Яблоко более сложной формы
-		ctx.fillStyle = "#33aa11";
-		drawCircle(ctx, x + 0.42 * w, y + 0.55 * h, 0.18 * w, "#33aa11", "none", 0);
-		drawCircle(ctx, x + 0.58 * w, y + 0.55 * h, 0.18 * w, "#33aa11", "none", 0);
-		// Черешок и листик
-		drawLine(ctx, x + 0.5 * w, y + 0.4 * h, x + 0.5 * w, y + 0.25 * h, "#442200", 0.03 * w);
-		ctx.fillStyle = "#66ff33";
+		// Основное тело яблока (один большой эллипс)
+		ctx.fillStyle = "#ff4422"; // Цвет яблока
 		ctx.beginPath();
-		ctx.ellipse(x + 0.6 * w, y + 0.3 * h, 0.08 * w, 0.04 * w, Math.PI / 4, 0, Math.PI * 2);
+		// Рисуем чуть приплюснутый круг
+		ctx.ellipse(x + 0.5 * w, y + 0.6 * h, 0.22 * w, 0.25 * h, 0, 0, Math.PI * 2);
+		ctx.fill();
+
+		// Обводка только по внешнему контуру
+		ctx.strokeStyle = "#440000";
+		ctx.lineWidth = 0.03 * w;
+		ctx.stroke();
+
+		// Черешок (коричневая палочка)
+		drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y + 0.2 * h, "#442200", 0.04 * w);
+
+		// Листик
+		ctx.fillStyle = "#33aa11";
+		ctx.beginPath();
+		ctx.ellipse(x + 0.58 * w, y + 0.25 * h, 0.1 * w, 0.05 * w, -Math.PI / 4, 0, Math.PI * 2);
+		ctx.fill();
+
+		// Блик (белое пятнышко для объема), без обводки
+		ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+		ctx.beginPath();
+		ctx.ellipse(x + 0.42 * w, y + 0.5 * h, 0.06 * w, 0.09 * w, Math.PI / 6, 0, Math.PI * 2);
 		ctx.fill();
 	} else if (id == ITEM_CHERRIES) {
 		// Две вишни с изогнутыми веточками
