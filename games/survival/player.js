@@ -343,7 +343,7 @@ function player_update(player_object, dt) {
 
 			let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
 
-			if(closest_item && !closest_item.data.dropped) {
+			if(closest_item) {
 				let id = closest_item.data.id;
 				if((ITEMS_AMMOS.includes(id) && player_object.game.settings.auto_pickup["automatically pickup ammo"]) ||
 				   (ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) && player_object.game.settings.auto_pickup["automatically pickup food and drinks"]) ||
