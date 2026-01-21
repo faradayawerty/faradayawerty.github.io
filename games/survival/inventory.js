@@ -40,23 +40,51 @@ function inventory_update(inventory_element, dt) {
 	let input = inventory_element.game.input;
 	let scale = get_scale();
 
-	// Координаты (приоритет тачу, если он есть)
+	// --- НОВАЯ ЛОГИКА ПОИСКА ТАЧА В ОБЛАСТИ ИНВЕНТАРЯ ---
+	let is_clicked = false;
+	let is_clicked_right = isMouseRightButtonPressed(input);
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
-	let is_clicked = isMouseLeftButtonPressed(input);
+
+	// Определяем границы (приблизительная область всех слотов и кнопки закрытия)
+	let inv_rect = {
+		x: 40,
+		y: 40,
+		w: (inv.slot_size * 1.05) * inv.items[0].length + 60,
+		h: (inv.slot_size * 1.05) * inv.items.length
+	};
 
 	if (isScreenTouched(input)) {
-		mx = input.touch[0].x / scale;
-		my = input.touch[0].y / scale;
-		if (!inv._touch_lock) {
-			is_clicked = true;
-			inv._touch_lock = true;
-		} else {
-			is_clicked = false; 
+		let foundTargetTouch = false;
+		for (let t of input.touch) {
+			let tx = t.x / scale;
+			let ty = t.y / scale;
+
+			// Проверяем, попал ли этот конкретный палец в область инвентаря
+			if (doRectsCollide(tx, ty, 0, 0, inv_rect.x, inv_rect.y, inv_rect.w, inv_rect.h)) {
+				mx = tx;
+				my = ty;
+				foundTargetTouch = true;
+				
+				if (!inv._touch_lock) {
+					is_clicked = true;
+					inv._touch_lock = true;
+				}
+				break; // Нашли нужный палец, другие не смотрим
+			}
+		}
+		
+		if (!foundTargetTouch) {
+			inv._touch_lock = false; // Сбрасываем лок, если пальцы вне инвентаря
 		}
 	} else {
 		inv._touch_lock = false;
+		is_clicked = isMouseLeftButtonPressed(input);
 	}
+	
+	// Сохраняем координаты для отрисовки предмета в руке (в inventory_draw используй их)
+	inv.last_active_mx = mx;
+	inv.last_active_my = my;
 
 	// --- КНОПКА ЗАКРЫТИЯ ---
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
@@ -83,14 +111,12 @@ function inventory_update(inventory_element, dt) {
 				inv.jselected = j;
 
 				if(is_clicked) {
-					// Если в руках ничего нет — берем предмет из слота
 					if(inv.imove < 0 && inv.jmove < 0) {
 						if(inv.items[i][j] > 0) {
 							inv.imove = i;
 							inv.jmove = j;
 						}
 					} else {
-						// Если в руках уже есть предмет — меняем его местами с текущим слотом
 						let temp = inv.items[i][j];
 						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 						inv.items[inv.imove][inv.jmove] = temp;
@@ -102,10 +128,8 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 	
-	// --- ФИКС "ЕРЕСИ": ЕСЛИ КЛИКНУЛИ МИМО ВСЕХ ЯЧЕЕК ---
-	if(is_clicked && !slot_selected) {
+	if((is_clicked_right || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
 		if(inv.imove !== -1 && inv.jmove !== -1) {
-			// Выбрасываем предмет в мир
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 		}
 		inv.imove = -1;
@@ -117,7 +141,6 @@ function inventory_update(inventory_element, dt) {
 		inv.jselected = -1;
 	}
 
-	// Выбросить предмет на Q
 	if(isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
 		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
 		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
@@ -128,7 +151,6 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 	
-	// Правая кнопка мыши — тоже выброс
 	if(input.mouse.rightButtonPressed) {
 		if (inv.imove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
@@ -192,14 +214,16 @@ function inventory_draw(inventory_element, ctx) {
 
 	// 3. Предмет в руках (тянется за курсором)
 	if(inv.imove > -1 && inv.jmove > -1) {
-		let input = inventory_element.game.input;
-		let curX = (input.touch.length > 0) ? input.touch[0].x / scale : input.mouse.x / scale;
-		let curY = (input.touch.length > 0) ? input.touch[0].y / scale : input.mouse.y / scale;
-		
-		let drag_size = inv.slot_size * 0.8;
-		ctx.globalAlpha = 0.8;
-		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size/2, curY - drag_size/2, drag_size, drag_size, inv.animation_state);
-		ctx.globalAlpha = 1.0;
+	    let input = inventory_element.game.input;
+	    // Используем mx, my которые мы вычислили в update или ищем тач в области инвентаря снова
+	    // Но проще всего хранить координаты последнего активного тача в inv.data
+	    let curX = inv.last_active_mx || 0;
+	    let curY = inv.last_active_my || 0;
+
+	    let drag_size = inv.slot_size * 0.8;
+	    ctx.globalAlpha = 0.8;
+	    item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size/2, curY - drag_size/2, drag_size, drag_size, inv.animation_state);
+	    ctx.globalAlpha = 1.0;
 	}
 }
 
@@ -278,7 +302,7 @@ function hotbar_update(hotbar_element, dt) {
         for(let i = 0; i < hb.row.length; i++) {
             let sx = 40 + (hb.slot_size * 1.05) * i;
             let sy = 40;
-            if(doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
+            if((hotbar_element.game.mobile || input.mouse.leftButtonPressed) && doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
                 hb.mouse_over = true;
                 hb.iselected = i; // Выбираем слот
             }
