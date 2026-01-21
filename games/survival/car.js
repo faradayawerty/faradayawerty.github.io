@@ -58,6 +58,7 @@ function car_destroy(car_object) {
 	car_object.destroyed = true;
 }
 
+
 function car_update(car_object, dt) {
 	if(car_object.destroyed || !car_object.data.body)
 		return;
@@ -77,18 +78,35 @@ function car_update(car_object, dt) {
 		}
 	}
 	let p = car_object.data;
+
+	// ЛОГИКА СТРЕЛЬБЫ: ЛКМ на ПК или ЛЕВЫЙ джойстик на мобильном
+	let is_shooting = car_object.game.input.mouse.leftButtonPressed;
+	let dx = car_object.game.input.mouse.x - 0.5 * window.innerWidth;
+	let dy = car_object.game.input.mouse.y - 0.5 * window.innerHeight;
+
+	if (car_object.game.mobile) {
+		dx = car_object.game.input.joystick.left.dx;
+		dy = car_object.game.input.joystick.left.dy;
+		// Стреляем только если левый джойстик отклонен
+		is_shooting = (dx !== 0 || dy !== 0);
+	}
+
+	let g_test = Math.sqrt(dx * dx + dy * dy);
+
 	if(car_object.data.is_tank
 		&& player_object
 		&& player_object.data.car_object == car_object
-		&& car_object.game.input.mouse.leftButtonPressed
-		&& p.shot_cooldown >= 600) {
-		let theta = Math.atan2(car_object.game.input.mouse.y - 0.5 * window.innerHeight, car_object.game.input.mouse.x - 0.5 * window.innerWidth);
+		&& is_shooting
+		&& p.shot_cooldown >= 600
+		&& g_test > 0.01) { // Жесткая проверка, чтобы не было NaN
+
+		let theta = Math.atan2(dy, dx);
 		bullet_create(
 			car_object.game,
 			p.body.position.x + 0.5 * p.w * Math.cos(theta),
 			p.body.position.y + 0.5 * p.w * Math.sin(theta),
-			car_object.game.input.mouse.x - 0.5 * window.innerWidth,
-			car_object.game.input.mouse.y - 0.5 * window.innerHeight,
+			dx,
+			dy,
 			60,
 			15625 * (0.125 + 1.75 * Math.random()), false,
 			12.5,
@@ -97,9 +115,11 @@ function car_update(car_object, dt) {
 		p.shot_cooldown = 0;
 		audio_play("data/sfx/shotgun_1.mp3", 0.25);
 	}
+
 	let closest_animal = game_object_find_closest(car_object.game, p.body.position.x, p.body.position.y, "animal", 400);
 	if(closest_animal && Matter.Collision.collides(p.body, closest_animal.data.body) != null)
 		closest_animal.data.health -= 0.75 * dt;
+
 	if(car_object.data.health <= 0) {
 		let N = Math.random() * 4 - 1;
 		for(let i = 0; i < N; i++) {
@@ -115,8 +135,6 @@ function car_update(car_object, dt) {
 			let y = car_object.data.body.position.y + 50 * Math.sin(theta);
 			item_create(car_object.game, ITEM_FUEL, x, y);
 		}
-	}
-	if(car_object.data.health < 0) {
 		car_destroy(car_object);
 		return;
 	}
@@ -126,6 +144,7 @@ function car_draw(car_object, ctx) {
 	let player_object = game_object_find_closest(car_object.game, car_object.data.body.position.x, car_object.data.body.position.y, "player", 100);
   	fillMatterBody(ctx, car_object.data.body, car_object.data.color);
 	drawMatterBody(ctx, car_object.data.body, "white");
+
 	if(car_object.data.is_tank) {
 		let p = car_object.data;
 		ctx.strokeStyle = "black";
@@ -135,17 +154,32 @@ function car_draw(car_object, ctx) {
 		let px = p.body.position.x;
 		let py = p.body.position.y;
 		ctx.moveTo(px, py);
-		let gx = 0, gy = -1;
+
+		let gx = 0, gy = -1; 
 		if(player_object && !player_object.data.ai_controlled && player_object.data.car_object == car_object) {
-			gx = car_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
-			gy = car_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
+			if (car_object.game.mobile) {
+				// Дуло смотрит по левому джойстику (направление движения/стрельбы)
+				gx = car_object.game.input.joystick.left.dx;
+				gy = car_object.game.input.joystick.left.dy;
+			} else {
+				gx = car_object.game.input.mouse.x - 0.5 * ctx.canvas.width;
+				gy = car_object.game.input.mouse.y - 0.5 * ctx.canvas.height;
+			}
 		}
+
 		let g = Math.sqrt(gx * gx + gy * gy);
-		ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.w * gy / g);
+		// Безопасная отрисовка: если стоим, дуло смотрит вверх (gy = -1), если едем — по вектору g
+		if (g > 0.01) {
+			ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.w * gy / g);
+		} else {
+			ctx.lineTo(px, py - gl * p.w); 
+		}
+
 		ctx.lineWidth = lw;
 		ctx.stroke();
 		drawCircle(ctx, px, py, 0.45 * p.h, p.color, "black", 0.01 * p.w);
 	}
+
 	if(car_object.game.settings.indicators["show car health"] && car_object.data.health > 0) {
 		ctx.fillStyle = "red";
 		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h, 0.5 * car_object.data.h, 2);
@@ -153,6 +187,7 @@ function car_draw(car_object, ctx) {
 		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.25 * car_object.data.h,
 			0.5 * car_object.data.h * car_object.data.health / car_object.data.max_health, 2);
 	}
+
 	if(car_object.game.settings.indicators["show car fuel"]) {
 		ctx.fillStyle = "red";
 		ctx.fillRect(car_object.data.body.position.x - 0.25 * car_object.data.h, car_object.data.body.position.y - 0.2 * car_object.data.h, 0.5 * car_object.data.h, 2);
@@ -161,4 +196,3 @@ function car_draw(car_object, ctx) {
 			0.5 * car_object.data.h * car_object.data.fuel / car_object.data.max_fuel, 2);
 	}
 }
-

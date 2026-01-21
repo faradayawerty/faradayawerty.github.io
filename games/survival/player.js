@@ -235,10 +235,7 @@ function player_update(player_object, dt) {
 	if(p.ai_controlled) return;
 
 	// --- УПРАВЛЕНИЕ ВИДИМОСТЬЮ UI ---
-	//
-	if(p.inventory_element.shown) {
-		p.achievements_element.shown = false;
-	}
+	if(p.inventory_element.shown) p.achievements_element.shown = false;
 
 	if(p.inventory_element.shown || p.achievements_element.shown) {
 		p.hotbar_element.shown = false;
@@ -270,8 +267,6 @@ function player_update(player_object, dt) {
 
 		if (my >= button_y && my <= button_y + s) {
 			let x_start_buttons = 60 + step * 9;
-
-			// Кнопка Инвентаря
 			if (mx >= x_start_buttons && mx <= x_start_buttons + s) {
 				achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
 				p.inventory_element.shown = !p.inventory_element.shown;
@@ -281,7 +276,6 @@ function player_update(player_object, dt) {
 				p.inventory_element.data.jmove = -1;
 				p.mobile_delay = 300;
 			}
-			// Кнопка Достижений
 			else if (mx >= x_start_buttons + step && mx <= x_start_buttons + step + s) {
 				achievement_do(p.achievements_element.data.achievements, "achievements", p.achievements_shower_element);
 				p.achievements_element.shown = !p.achievements_element.shown;
@@ -289,7 +283,6 @@ function player_update(player_object, dt) {
 				p.hotbar_element.shown = !p.achievements_element.shown;
 				p.mobile_delay = 300;
 			}
-			// Кнопка Меню
 			else if (mx >= x_start_buttons + step * 2 && mx <= x_start_buttons + step * 2 + s) {
 				player_object.game.want_menu = true;
 				p.mobile_delay = 300;
@@ -297,8 +290,8 @@ function player_update(player_object, dt) {
 		}
 	}
 
-	// Клавиатура: Инвентарь
-	if(true && (isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true) || isKeyDown(player_object.game.input, 'у', true) || isKeyDown(player_object.game.input, 'ш', true))) {
+	// Клавиатура: Инвентарь и Достижения
+	if(isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true) || isKeyDown(player_object.game.input, 'у', true) || isKeyDown(player_object.game.input, 'ш', true)) {
 		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
 		p.inventory_element.shown = !p.inventory_element.shown;
 		p.inventory_element.data.imove = -1; p.inventory_element.data.jmove = -1;
@@ -307,8 +300,7 @@ function player_update(player_object, dt) {
 		p.mobile_delay = 300;
 	}
 
-	// Клавиатура: Достижения
-	if(true && (isKeyDown(p.achievements_element.game.input, 'j', true) || isKeyDown(p.achievements_element.game.input, 'r', true) || isKeyDown(p.achievements_element.game.input, 'о', true) || isKeyDown(p.achievements_element.game.input, 'к', true))) {
+	if(isKeyDown(p.achievements_element.game.input, 'j', true) || isKeyDown(p.achievements_element.game.input, 'r', true) || isKeyDown(p.achievements_element.game.input, 'о', true) || isKeyDown(p.achievements_element.game.input, 'к', true)) {
 		p.achievements_element.data.x = 75; p.achievements_element.data.y = 75;
 		achievement_do(p.achievements_element.data.achievements, "achievements", p.achievements_shower_element);
 		p.achievements_element.shown = !p.achievements_element.shown;
@@ -317,105 +309,122 @@ function player_update(player_object, dt) {
 		p.mobile_delay = 300;
 	}
 
-	// --- ДЕЙСТВИЯ ПЕРСОНАЖА (Стрельба, использование предметов) ---
-	// Выполняются только если нет активной задержки UI
-	if (true) {
-		let use_triggered = player_object.game.mobile ? isKeyDown(player_object.game.input, 'c', true) : player_object.game.input.mouse.leftButtonPressed;
-
-		if(use_triggered) {
-			// Проверка, что мы не кликаем по самому хотбару или открытому окну
-			let is_clicking_ui = (p.hotbar_element.shown && (player_object.game.input.mouse.y / get_scale() <= 40 + p.hotbar_element.data.slot_size))
-								|| p.inventory_element.shown || p.achievements_element.shown;
-			if(!is_clicking_ui || !player_object.game.mobile) {
-				player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
-				if(player_object.game.mobile) p.mobile_delay = 200;
-			}
+	// --- ПЕРЕМЕЩЕНИЕ И ДЕЙСТВИЯ ---
+	let use_triggered = player_object.game.mobile ? isKeyDown(player_object.game.input, 'c', true) : player_object.game.input.mouse.leftButtonPressed;
+	if(use_triggered) {
+		let is_clicking_ui = (p.hotbar_element.shown && (player_object.game.input.mouse.y / get_scale() <= 40 + p.hotbar_element.data.slot_size))
+							|| p.inventory_element.shown || p.achievements_element.shown;
+		if(!is_clicking_ui || !player_object.game.mobile) {
+			player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
+			if(player_object.game.mobile) p.mobile_delay = 200;
 		}
+	}
 
-		let vel = Matter.Vector.create(0, 0);
+	if(!p.car_object) {
+		// --- РЕЖИМ ПЕШКОМ ---
+		player_object.game.camera_target_body = p.body;
+		p.body.collisionFilter.mask = -1;
 
-		if(!p.car_object) {
-			player_object.game.camera_target_body = p.body;
-			p.body.collisionFilter.mask = -1;
-			vel = Matter.Vector.mult(getWishDir(player_object.game.input), p.speed);
+		let vel = Matter.Vector.mult(getWishDir(player_object.game.input), p.speed);
+		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, ' ', true);
 
-			let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, ' ', true);
+		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
 
-			let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
-
-			if(closest_item) {
-				let id = closest_item.data.id;
-				if((ITEMS_AMMOS.includes(id) && player_object.game.settings.auto_pickup["automatically pickup ammo"]) ||
-				   (ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) && player_object.game.settings.auto_pickup["automatically pickup food and drinks"]) ||
-				   ([ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(id) && player_object.game.settings.auto_pickup["automatically pickup health"]) ||
-				   (id == ITEM_FUEL && player_object.game.settings.auto_pickup["automatically pickup fuel"]) || f_down) {
-
-					if(item_pickup(p.inventory_element, closest_item)) {
-						achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
-						if(id == ITEM_GUN) achievement_do(p.achievements_element.data.achievements, "get a gun", p.achievements_shower_element);
-					}
-				}
-			} else if(f_down) { // Заход в машину (пробел или F)
-				p.car_object = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
-				if(p.car_object) {
-					audio_play("data/sfx/car_1.mp3", 0.25);
-					achievement_do(p.achievements_element.data.achievements, "get a ride", p.achievements_shower_element);
-					p.mobile_delay = 500;
+		if(closest_item) {
+			let id = closest_item.data.id;
+			if((ITEMS_AMMOS.includes(id) && player_object.game.settings.auto_pickup["automatically pickup ammo"]) ||
+			   (ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) && player_object.game.settings.auto_pickup["automatically pickup food and drinks"]) ||
+			   ([ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(id) && player_object.game.settings.auto_pickup["automatically pickup health"]) ||
+			   (id == ITEM_FUEL && player_object.game.settings.auto_pickup["automatically pickup fuel"]) || f_down) {
+				if(item_pickup(p.inventory_element, closest_item)) {
+					achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
+					if(id == ITEM_GUN) achievement_do(p.achievements_element.data.achievements, "get a gun", p.achievements_shower_element);
 				}
 			}
-
-			let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed) ||
-						   (player_object.game.mobile && (player_object.game.input.joystick.left.dx**2 + player_object.game.input.joystick.left.dy**2 > 0.01));
-
-			if(shooting && !p.inventory_element.shown && !p.achievements_element.shown) {
-				player_shoot(player_object, dt, null, getShootDir(player_object.game.input).x, getShootDir(player_object.game.input).y);
-				if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
-					achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
-			} else {
-				p.laser_sound_has_played = false; p.sword_protection = false;
-			}
-
-			if(p.hotbar_element.shown && (isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true)))
-				inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
-
-			if(Matter.Vector.magnitude(vel) > 0)
-				achievement_do(p.achievements_element.data.achievements, "first steps", p.achievements_shower_element);
-
-			Matter.Body.setVelocity(p.body, vel);
-		}
-
-		if(p.car_object) {
-			if(player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
-				let cl_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
-				if(cl_item && cl_item.data.id == ITEM_FUEL) item_pickup(p.inventory_element, cl_item);
-			}
-			let rotatedir = 0;
-			player_object.game.camera_target_body = p.car_object.data.body;
-			p.body.collisionFilter.mask = -3;
-			let wish = getWishDir(player_object.game.input);
-
-			if(wish.y < 0 && p.car_object.data.fuel > 0) {
-				vel = Matter.Vector.create(p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
-				p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
-				rotatedir = 1;
-			}
-			if(wish.y > 0 && p.car_object.data.fuel > 0) {
-				vel = Matter.Vector.create(-0.5 * p.car_object.data.speed * Math.cos(p.car_object.data.body.angle), -0.5 * p.car_object.data.speed * Math.sin(p.car_object.data.body.angle));
-				p.car_object.data.fuel = Math.max(p.car_object.data.fuel - 0.005 * dt, 0);
-				rotatedir = -1;
-			}
-			if(wish.x > 0) Matter.Body.rotate(p.car_object.data.body, rotatedir * 0.0015 * dt);
-			if(wish.x < 0) Matter.Body.rotate(p.car_object.data.body, -rotatedir * 0.0015 * dt);
-
-			Matter.Body.setVelocity(p.car_object.data.body, vel);
-			Matter.Body.setPosition(p.body, p.car_object.data.body.position);
-
-			let exit_key = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, ' ', true);
-			if(exit_key && p.mobile_delay <= 0) {
-				Matter.Body.setPosition(p.body, Matter.Vector.add(p.car_object.data.body.position, Matter.Vector.create(150, 0)));
-				p.car_object = null;
+		} else if(f_down && p.mobile_delay <= 0) {
+			// ВХОД В МАШИНУ
+			let found_car = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
+			if(found_car) {
+				p.car_object = found_car;
+				audio_play("data/sfx/car_1.mp3", 0.25);
+				achievement_do(p.achievements_element.data.achievements, "get a ride", p.achievements_shower_element);
 				p.mobile_delay = 500;
 			}
+		}
+
+		let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed) ||
+					   (player_object.game.mobile && (player_object.game.input.joystick.left.dx**2 + player_object.game.input.joystick.left.dy**2 > 0.01));
+
+		if(shooting && !p.inventory_element.shown && !p.achievements_element.shown) {
+			player_shoot(player_object, dt, null, getShootDir(player_object.game.input).x, getShootDir(player_object.game.input).y);
+		} else {
+			p.laser_sound_has_played = false; p.sword_protection = false;
+		}
+
+		if(p.hotbar_element.shown && (isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true)))
+			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
+
+		if(Matter.Vector.magnitude(vel) > 0)
+			achievement_do(p.achievements_element.data.achievements, "first steps", p.achievements_shower_element);
+
+		Matter.Body.setVelocity(p.body, vel);
+
+	} else {
+		// --- РЕЖИМ В МАШИНЕ ---
+		if(player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
+			let cl_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
+			if(cl_item && cl_item.data.id == ITEM_FUEL) item_pickup(p.inventory_element, cl_item);
+		}
+
+		let carBody = p.car_object.data.body;
+		let carData = p.car_object.data;
+		let wish = getWishDir(player_object.game.input);
+
+		player_object.game.camera_target_body = carBody;
+		p.body.collisionFilter.mask = -3;
+
+		let moveMag = 0;
+		let rotatedir = 0;
+
+		if (carData.fuel > 0) {
+			if (wish.y < -0.1) {
+				moveMag = carData.speed;
+				rotatedir = 1;
+				carData.fuel = Math.max(carData.fuel - 0.005 * dt, 0);
+			} else if (wish.y > 0.1) {
+				moveMag = -carData.speed * 0.5;
+				rotatedir = -1;
+				carData.fuel = Math.max(carData.fuel - 0.005 * dt, 0);
+			}
+
+			if (Math.abs(wish.x) > 0.1) {
+				let turnFactor = (moveMag !== 0) ? rotatedir : 0.5;
+				Matter.Body.rotate(carBody, turnFactor * (wish.x * 0.0018) * dt);
+			}
+		}
+
+		if (moveMag !== 0) {
+			Matter.Body.setVelocity(carBody, {
+				x: moveMag * Math.cos(carBody.angle),
+				y: moveMag * Math.sin(carBody.angle)
+			});
+		} else {
+			// Плавное торможение
+			Matter.Body.setVelocity(carBody, { x: carBody.velocity.x * 0.96, y: carBody.velocity.y * 0.96 });
+		}
+
+		Matter.Body.setPosition(p.body, carBody.position);
+
+		// ВЫХОД ИЗ МАШИНЫ
+		let exit_key = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
+		if(exit_key && p.mobile_delay <= 0) {
+			let sideAngle = carBody.angle + Math.PI / 2;
+			Matter.Body.setPosition(p.body, {
+				x: carBody.position.x + 120 * Math.cos(sideAngle),
+				y: carBody.position.y + 120 * Math.sin(sideAngle)
+			});
+			p.car_object = null;
+			p.mobile_delay = 500;
 		}
 	}
 }
