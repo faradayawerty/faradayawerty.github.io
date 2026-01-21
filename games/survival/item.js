@@ -41,6 +41,18 @@ let ITEM_MILK = 12;
 let ITEM_MONEY = 5;
 let ITEM_BOSSIFIER = 34;
 
+let ITEM_APPLE_CORE = 100;
+let ITEM_FISH_BONE = 101;
+let ITEM_EMPTY_BOTTLE = 102;
+let ITEM_TIN_CAN = 103;
+
+let ITEMS_JUNK = [
+	ITEM_APPLE_CORE,
+	ITEM_FISH_BONE,
+	ITEM_EMPTY_BOTTLE,
+	ITEM_TIN_CAN
+];
+
 ITEMS_AMMOS = [
 	ITEM_AMMO,
 	ITEM_PLASMA,
@@ -211,6 +223,78 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.beginPath();
 		ctx.ellipse(x + 0.42 * w, y + 0.5 * h, 0.06 * w, 0.09 * w, Math.PI / 6, 0, Math.PI * 2);
 		ctx.fill();
+	} else if (id == ITEM_APPLE_CORE) {
+		// Огрызок яблока
+		ctx.fillStyle = "#eeeecc";
+		ctx.beginPath(); // Тонкая сердцевина
+		ctx.ellipse(x + 0.5 * w, y + 0.5 * h, 0.08 * w, 0.2 * h, 0, 0, Math.PI * 2);
+		ctx.fill();
+		// Остатки кожухи сверху и снизу
+		ctx.fillStyle = "#ff4422";
+		ctx.fillRect(x + 0.4 * w, y + 0.3 * h, 0.2 * w, 0.05 * h);
+		ctx.fillRect(x + 0.4 * w, y + 0.65 * h, 0.2 * w, 0.05 * h);
+		drawLine(ctx, x + 0.5 * w, y + 0.3 * h, x + 0.5 * w, y + 0.15 * h, "#442200", 0.03 * w);
+	} else if (id == ITEM_FISH_BONE) {
+		// Рыбья кость
+		ctx.strokeStyle = "#dddddd";
+		ctx.lineWidth = 0.05 * w;
+		drawLine(ctx, x + 0.2 * w, y + 0.5 * h, x + 0.8 * w, y + 0.5 * h, "#dddddd"); // Хребет
+		for (let i = 0; i < 4; i++) { // Ребра
+			drawLine(ctx, x + (0.3 + i * 0.15) * w, y + 0.35 * h, x + (0.3 + i * 0.15) * w, y + 0.65 * h, "#dddddd");
+		}
+		// Голова (треугольник)
+		ctx.fillStyle = "#dddddd";
+		ctx.beginPath();
+		ctx.moveTo(x + 0.8 * w, y + 0.5 * h);
+		ctx.lineTo(x + 0.95 * w, y + 0.35 * h);
+		ctx.lineTo(x + 0.95 * w, y + 0.65 * h);
+		ctx.fill();
+	} else if (id == ITEM_EMPTY_BOTTLE) {
+		// Пустая бутылка
+		ctx.fillStyle = "rgba(150, 200, 255, 0.4)";
+		ctx.strokeStyle = "white";
+		ctx.lineWidth = 1;
+		ctx.fillRect(x + 0.35 * w, y + 0.3 * h, 0.3 * w, 0.5 * h);
+		ctx.fillRect(x + 0.42 * w, y + 0.15 * h, 0.15 * w, 0.15 * h);
+		ctx.strokeRect(x + 0.35 * w, y + 0.3 * h, 0.3 * w, 0.5 * h);
+	} else if (id == ITEM_TIN_CAN) {
+		// Реалистичная пустая консервная банка
+		let cx = x + 0.5 * w;
+		let cy = y + 0.5 * h;
+
+		// Основное тело (цилиндр)
+		ctx.fillStyle = "#999999";
+		ctx.fillRect(x + 0.3 * w, y + 0.35 * h, 0.4 * w, 0.4 * h);
+
+		// Кольца жесткости на банке
+		ctx.strokeStyle = "#777777";
+		ctx.lineWidth = 1;
+		drawLine(ctx, x + 0.3 * w, y + 0.45 * h, x + 0.7 * w, y + 0.45 * h, "#777777");
+		drawLine(ctx, x + 0.3 * w, y + 0.55 * h, x + 0.7 * w, y + 0.55 * h, "#777777");
+		drawLine(ctx, x + 0.3 * w, y + 0.65 * h, x + 0.7 * w, y + 0.65 * h, "#777777");
+
+		// Нижний эллипс (дно)
+		ctx.fillStyle = "#999999";
+		ctx.beginPath();
+		ctx.ellipse(cx, y + 0.75 * h, 0.2 * w, 0.05 * h, 0, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.stroke();
+
+		// Верхний эллипс (открытая часть)
+		ctx.fillStyle = "#444444"; // Темное нутро
+		ctx.beginPath();
+		ctx.ellipse(cx, y + 0.35 * h, 0.2 * w, 0.05 * h, 0, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.strokeStyle = "#bbbbbb";
+		ctx.stroke();
+
+		// Приоткрытая крышка
+		ctx.fillStyle = "#888888";
+		ctx.beginPath();
+		// Крышка торчит вверх и вбок
+		ctx.ellipse(x + 0.35 * w, y + 0.25 * h, 0.15 * w, 0.04 * h, -Math.PI / 4, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.stroke();
 	} else if (id == ITEM_CHERRIES) {
 		// Две вишни с изогнутыми веточками
 		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.35 * w, y + 0.65 * h, "#224400", 0.04 * w);
@@ -576,6 +660,14 @@ function item_pickup(inventory_element, item_object, force = false) {
 
 function item_name_translate(language, text) {
 	if (language == "русский") {
+		if (text == "apple core")
+			return "огрызок яблока";
+		if (text == "fish bone")
+			return "рыбья кость";
+		if (text == "empty bottle")
+			return "пустая бутылка";
+		if (text == "tin can")
+			return "консервная банка";
 		if (text == "gun")
 			return "пушка";
 		if (text == "shotgun")

@@ -145,8 +145,10 @@ function levels_set(g, level, old_level = null) {
 		for (let i = 0; i < Math.random() * 5; i++)
 			item_spawn(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500);
 
-		for (let i = 0; i < Math.random() * 40 - 35; i++)
-			animal_create(g, Ox + 1250 + (0.5 - Math.random()) * 1500, Oy + 1250 + (0.5 - Math.random()) * 1500);
+		for (let i = 0; i < Math.random() * 40 - 35; i++) {
+			let animals = ["deer", "raccoon"];
+			animal_create(g, Ox + 1250 + (0.5 - Math.random()) * 1500, Oy + 1250 + (0.5 - Math.random()) * 1500, animals[Math.floor(Math.random() * animals.length)]);
+		}
 
 		if (Math.random() > 0.995)
 			car_create(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, "#1177ff");
