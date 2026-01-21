@@ -39,52 +39,46 @@ function inventory_update(inventory_element, dt) {
 	let input = inventory_element.game.input;
 	let scale = get_scale();
 
-	// 1. База для ПК
+	// 1. Базовые координаты (ПК)
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 	let is_clicked = isMouseLeftButtonPressed(input);
 	let is_clicked_right = isMouseRightButtonPressed(input);
 	let is_released = false;
 
-	// 2. ЛОГИКА ТАЧА (Исправленная)
+	// 2. УЛУЧШЕННАЯ ЛОГИКА ТАЧА (Игнорируем джойстики)
 	if (isScreenTouched(input)) {
-		// Ищем палец, который НЕ джойстик
-		let freeTouch = null;
+		// Ищем палец, который НЕ является левым или правым джойстиком
+		let invTouch = null;
 		for (let t of input.touch) {
 			if (t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) {
-				freeTouch = t;
-				break;
+				invTouch = t;
+				break; // Берем первый подходящий палец для инвентаря
 			}
 		}
 
-		if (freeTouch) {
-			mx = freeTouch.x / scale;
-			my = freeTouch.y / scale;
+		if (invTouch) {
+			mx = invTouch.x / scale;
+			my = invTouch.y / scale;
 
-			// Если это НОВЫЙ id (палец только что коснулся или сменился)
-			if (inv.active_touch_id !== freeTouch.id) {
-				inv.active_touch_id = freeTouch.id;
-				is_clicked = true; // Считаем это нажатием
+			if (inv.active_touch_id !== invTouch.id) {
+				inv.active_touch_id = invTouch.id;
+				is_clicked = true; 
 				inv._touch_lock = true;
-			} else {
-				// Палец тот же самый, удерживаем
-				is_clicked = false;
 			}
 		} else {
-			// Если свободных пальцев больше нет, но раньше был захвачен id
-			if (inv.active_touch_id !== null) {
+			// Если палец, который управлял инвентарем, исчез
+			if (inv.active_touch_id !== -1 && inv.active_touch_id !== null) {
 				is_released = true;
 				inv.active_touch_id = null;
-				inv._touch_lock = false;
 			}
 		}
 	} else {
-		// Тачей вообще нет
 		if (inv.active_touch_id !== null) is_released = true;
 		inv.active_touch_id = null;
-		inv._touch_lock = false;
 	}
 
+    // Сохраняем координаты только если они валидны (не в зоне джойстика)
 	inv.last_active_mx = mx;
 	inv.last_active_my = my;
 
@@ -95,7 +89,6 @@ function inventory_update(inventory_element, dt) {
 		inventory_element.shown = false;
 		inv.imove = -1;
 		inv.jmove = -1;
-		inv.active_touch_id = null;
 		return;
 	}
 
@@ -113,13 +106,13 @@ function inventory_update(inventory_element, dt) {
 				inv.jselected = j;
 
 				if (is_clicked) {
-					if (inv.imove < 0 && inv.jmove < 0) {
+					if (inv.imove < 0) {
 						if (inv.items[i][j] > 0) {
 							inv.imove = i;
 							inv.jmove = j;
 						}
 					} else {
-						// Обмен
+						// Обмен ячеек
 						let temp = inv.items[i][j];
 						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 						inv.items[inv.imove][inv.jmove] = temp;
@@ -127,8 +120,9 @@ function inventory_update(inventory_element, dt) {
 						inv.jmove = -1;
 					}
 				}
-
-				if (is_released && inv.imove >= 0) {
+                
+                // Важно: отпускание над слотом
+				if (is_released && inv.imove !== -1) {
 					let temp = inv.items[i][j];
 					inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 					inv.items[inv.imove][inv.jmove] = temp;
@@ -139,8 +133,9 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 
-	// --- ИСПРАВЛЕННЫЙ ВЫБРОС ---
-	// Предмет выбрасывается только если мы отпустили палец/кнопку ВНЕ слота
+	// --- ФИКС ВЫБРОСА ---
+    // Предмет выбрасывается только если мы отпустили (is_released) его ВНЕ слота.
+    // Условие is_clicked здесь убрано, так как оно вызывало мгновенный дроп.
 	if ((is_clicked_right || is_released) && !slot_selected) {
 		if (inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
