@@ -1,4 +1,3 @@
-
 function drawButton(ctx, x, y, text) {
 	ctx.font = "36px sans";
 	ctx.fillStyle = 'black';
@@ -7,7 +6,7 @@ function drawButton(ctx, x, y, text) {
 	ctx.fillText(text, x + 1, y + 1);
 }
 
-function drawText(ctx, x, y, text, fontsize=18) {
+function drawText(ctx, x, y, text, fontsize = 18) {
 	ctx.font = fontsize + "px sans";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
@@ -34,7 +33,7 @@ function fillMatterBody(ctx, b, color) {
 	ctx.fill();
 }
 
-function drawMatterBody(ctx, b, color, lw=2) {
+function drawMatterBody(ctx, b, color, lw = 2) {
 	ctx.beginPath();
 	ctx.lineWidth = lw;
 	let vertices = b.vertices;
@@ -65,20 +64,19 @@ function drawLine(ctx, x1, y1, x2, y2, color, width) {
 
 // source: https://stackoverflow.com/questions/25095548/how-to-draw-a-circle-in-html5-canvas-using-javascript
 function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
-	  ctx.beginPath()
-	  ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
-	  if (fill) {
-		      ctx.fillStyle = fill
-		      ctx.fill()
-		    }
-	  if (stroke) {
-		      ctx.lineWidth = strokeWidth
-		      ctx.strokeStyle = stroke
-		      ctx.stroke()
-		    }
+	ctx.beginPath()
+	ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
+	if (fill) {
+		ctx.fillStyle = fill
+		ctx.fill()
+	}
+	if (stroke) {
+		ctx.lineWidth = strokeWidth
+		ctx.strokeStyle = stroke
+		ctx.stroke()
+	}
 }
 
 function smoothMin(a, b) {
-	return 0.5 * (a + b - 0.5 +  Math.sqrt(0.25 + (a - b) * (a - b)));
+	return 0.5 * (a + b - 0.5 + Math.sqrt(0.25 + (a - b) * (a - b)));
 }
-

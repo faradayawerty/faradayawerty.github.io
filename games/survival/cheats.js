@@ -1,4 +1,3 @@
-
 function cheat_all_weapons() {
 	item_create(game1, ITEM_GUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_SHOTGUN, 1250, 1250, false, false);
@@ -40,4 +39,3 @@ function cheat_godmode() {
 function cheat_all_bosses() {
 	game1.all_enemies_are_bosses = !game1.all_enemies_are_bosses;
 }
-

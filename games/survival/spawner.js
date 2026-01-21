@@ -1,5 +1,4 @@
-
-function spawner_create(g, x_, y_, w_, h_, func_spawn, limit, overall_limit, delay, color='orange') {
+function spawner_create(g, x_, y_, w_, h_, func_spawn, limit, overall_limit, delay, color = 'orange') {
 	let s = {
 		spawn: func_spawn, // (g, x, y)
 		x: x_,
@@ -22,7 +21,7 @@ function spawner_destroy(spawner_object) {
 }
 
 function spawner_update(spawner_object, dt) {
-	if(spawner_object.data.delay < 0) {
+	if (spawner_object.data.delay < 0) {
 		spawner_object.spawn(spawner_object.game,
 			spawner_object.data.x + Math.random() * spawner_object.data.w,
 			spawner_object.data.y + Math.random() * spawner_object.data.h);
@@ -48,4 +47,3 @@ function spawn_item(g, x, y) {
 	].concat(ITEMS_FOODS).concat(ITEMS_DRINKS);
 	item_create(g, items[Math.floor(items.length * Math.random())], x, y);
 }
-

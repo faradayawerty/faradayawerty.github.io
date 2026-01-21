@@ -1,4 +1,3 @@
-
 function decorative_rectangle_create(g, x_, y_, w_, h_, color_fill_, color_outline_) {
 	let r = {
 		color_fill: color_fill_,
@@ -9,7 +8,7 @@ function decorative_rectangle_create(g, x_, y_, w_, h_, color_fill_, color_outli
 		w: w_,
 		h: h_
 	};
-	let iobj = game_object_create(g, "decorative", r, function(){}, decorative_rectangle_draw, decorative_rectangle_destroy);
+	let iobj = game_object_create(g, "decorative", r, function() {}, decorative_rectangle_draw, decorative_rectangle_destroy);
 	let obj = g.objects[iobj];
 	obj.persistent = false;
 	return iobj;
@@ -27,7 +26,7 @@ function decorative_text_create(g, text_, x_, y_, size_, color_) {
 		size: Math.floor(size_),
 		color: color_
 	};
-	let iobj = game_object_create(g, "decorative", t, function(){}, decorative_text_draw, decorative_text_destroy);
+	let iobj = game_object_create(g, "decorative", t, function() {}, decorative_text_draw, decorative_text_destroy);
 	let obj = g.objects[iobj];
 	obj.persistent = false;
 	return iobj;
@@ -72,12 +71,12 @@ function decorative_building_create(g, x, y, w, h) {
 	decorative_rectangle_create(g, x, y, w, h, "#555555", "#333333");
 }
 
-function decorative_grass_create(g, x, y, w, h, trees=true) {
-	if(trees) {
+function decorative_grass_create(g, x, y, w, h, trees = true) {
+	if (trees) {
 		let N = w / 300.0;
 		let M = h / 300.0;
-		for(let i = 1; i < N - 1; i++) {
-			for(let j = 0.75; j < M - 1; j++) {
+		for (let i = 1; i < N - 1; i++) {
+			for (let j = 0.75; j < M - 1; j++) {
 				decorative_tree_create(g, x + (i + 0.5 * (Math.random() - 0.5)) * w / N, y + (j + 0.5 * (Math.random() - 0.5)) * h / M);
 			}
 		}
@@ -88,15 +87,16 @@ function decorative_grass_create(g, x, y, w, h, trees=true) {
 function decorative_parkinglot_create(g, x, y, w, h) {
 	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 	let R = 205;
-	decorative_rectangle_create(g, x + R/30, y + R/30, w - 2*R/30, h/161, "white", "white");
-	for(let i = 0; (i+1)*R < w - R/30; i++) {
-		decorative_rectangle_create(g, x + R/30 + i*R, y + R/30, w/161, h/2, "white", "white");
-		decorative_text_create(g, Math.floor(50 + Math.random() * 50), x + 8*R/30 + i*R, y + 12*R/30, R/5, "white");
+	decorative_rectangle_create(g, x + R / 30, y + R / 30, w - 2 * R / 30, h / 161, "white", "white");
+	for (let i = 0;
+		(i + 1) * R < w - R / 30; i++) {
+		decorative_rectangle_create(g, x + R / 30 + i * R, y + R / 30, w / 161, h / 2, "white", "white");
+		decorative_text_create(g, Math.floor(50 + Math.random() * 50), x + 8 * R / 30 + i * R, y + 12 * R / 30, R / 5, "white");
 	}
 }
 
 function decorative_tree_create(g, x, y) {
-	if(!g.settings.trees)
+	if (!g.settings.trees)
 		return;
 	bound_create(g, x, y + 145, 30, 30);
 	game_object_change_name(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "#224400"), "decorative_leaves");
@@ -106,9 +106,9 @@ function decorative_tree_create(g, x, y) {
 function decorative_road_create(g, x, y, w, h) {
 	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 	N = 8.0;
-	for(let i = 0; i < N && w > h; i++)
+	for (let i = 0; i < N && w > h; i++)
 		decorative_rectangle_create(g, x + (i + 0.25) * w / N, y + h / 2 - 0.05 * h, 0.5 * w / N, 0.1 * h, "#ffffff", "#ffffff");
-	for(let i = 0; i < N && h > w; i++)
+	for (let i = 0; i < N && h > w; i++)
 		decorative_rectangle_create(g, x + w / 2 - 0.05 * w, y + (i + 0.25) * h / N, 0.1 * w, 0.5 * h / N, "#ffffff", "#ffffff");
 }
 
@@ -122,11 +122,11 @@ function decorative_roof_create(g, x, y, w, h) {
 function decorative_roof_update(roof_object, dt) {
 	let r = roof_object.data;
 	let player_object = game_object_find_closest(roof_object.game, roof_object.data.x + 0.5 * r.w, roof_object.data.y + 0.5 * r.h, "player", Math.max(r.w, r.h));
-	if(!player_object)
+	if (!player_object)
 		return;
 	let g = roof_object.game;
 	let p = player_object.data;
-	if(doRectsCollide(p.body.position.x, p.body.position.y, 0, 0, r.x, r.y, r.w, r.h))
+	if (doRectsCollide(p.body.position.x, p.body.position.y, 0, 0, r.x, r.y, r.w, r.h))
 		r.transparency = 0.1;
 	else
 		r.transparency = 1.0;
@@ -140,4 +140,3 @@ function decorative_level_base_create(g, x, y) {
 //	let w = 40;
 //	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, w, "gray", "white"), "cooler");
 //}
-

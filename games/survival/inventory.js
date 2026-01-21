@@ -1,7 +1,6 @@
-
 // --- ИНВЕНТАРЬ ---
 
-function inventory_create(g, attached_to_object=null) {
+function inventory_create(g, attached_to_object = null) {
 	let inv = {
 		slot_size: 80,
 		cross_size: 40, // Размер кнопки закрытия
@@ -31,152 +30,159 @@ function inventory_destroy(inventory_element) {
 }
 
 function inventory_update(inventory_element, dt) {
-    if(inventory_element.data.attached_to_object.data.ai_controlled)
-        inventory_element.shown = false;
+	if (inventory_element.data.attached_to_object.data.ai_controlled)
+		inventory_element.shown = false;
 
-    if(!inventory_element.shown) return;
+	if (!inventory_element.shown) return;
 
-    let inv = inventory_element.data;
-    let input = inventory_element.game.input;
-    let scale = get_scale();
+	let inv = inventory_element.data;
+	let input = inventory_element.game.input;
+	let scale = get_scale();
 
-    // 1. База для ПК
-    let mx = input.mouse.x / scale;
-    let my = input.mouse.y / scale;
-    let is_clicked = isMouseLeftButtonPressed(input);
-    let is_clicked_right = isMouseRightButtonPressed(input);
-    let is_released = false;
+	// 1. База для ПК
+	let mx = input.mouse.x / scale;
+	let my = input.mouse.y / scale;
+	let is_clicked = isMouseLeftButtonPressed(input);
+	let is_clicked_right = isMouseRightButtonPressed(input);
+	let is_released = false;
 
-    // 2. ЛОГИКА ТАЧА (Исправленная)
-    if (isScreenTouched(input)) {
-        // Ищем палец, который НЕ джойстик
-        let freeTouch = null;
-        for (let t of input.touch) {
-            if (t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) {
-                freeTouch = t;
-                break;
-            }
-        }
+	// 2. ЛОГИКА ТАЧА (Исправленная)
+	if (isScreenTouched(input)) {
+		// Ищем палец, который НЕ джойстик
+		let freeTouch = null;
+		for (let t of input.touch) {
+			if (t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) {
+				freeTouch = t;
+				break;
+			}
+		}
 
-        if (freeTouch) {
-            mx = freeTouch.x / scale;
-            my = freeTouch.y / scale;
+		if (freeTouch) {
+			mx = freeTouch.x / scale;
+			my = freeTouch.y / scale;
 
-            // Если это НОВЫЙ id (палец только что коснулся или сменился)
-            if (inv.active_touch_id !== freeTouch.id) {
-                inv.active_touch_id = freeTouch.id;
-                is_clicked = true; // Считаем это нажатием
-                inv._touch_lock = true;
-            } else {
-                // Палец тот же самый, удерживаем
-                is_clicked = false;
-            }
-        } else {
-            // Если свободных пальцев больше нет, но раньше был захвачен id
-            if (inv.active_touch_id !== null) {
-                is_released = true;
-                inv.active_touch_id = null;
-                inv._touch_lock = false;
-            }
-        }
-    } else {
-        // Тачей вообще нет
-        if (inv.active_touch_id !== null) is_released = true;
-        inv.active_touch_id = null;
-        inv._touch_lock = false;
-    }
+			// Если это НОВЫЙ id (палец только что коснулся или сменился)
+			if (inv.active_touch_id !== freeTouch.id) {
+				inv.active_touch_id = freeTouch.id;
+				is_clicked = true; // Считаем это нажатием
+				inv._touch_lock = true;
+			} else {
+				// Палец тот же самый, удерживаем
+				is_clicked = false;
+			}
+		} else {
+			// Если свободных пальцев больше нет, но раньше был захвачен id
+			if (inv.active_touch_id !== null) {
+				is_released = true;
+				inv.active_touch_id = null;
+				inv._touch_lock = false;
+			}
+		}
+	} else {
+		// Тачей вообще нет
+		if (inv.active_touch_id !== null) is_released = true;
+		inv.active_touch_id = null;
+		inv._touch_lock = false;
+	}
 
-    inv.last_active_mx = mx;
-    inv.last_active_my = my;
+	inv.last_active_mx = mx;
+	inv.last_active_my = my;
 
-    // --- КНОПКА ЗАКРЫТИЯ ---
-    let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
-    let cross_y = 40;
-    if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
-        inventory_element.shown = false;
-        inv.imove = -1; inv.jmove = -1;
-        inv.active_touch_id = null;
-        return;
-    }
+	// --- КНОПКА ЗАКРЫТИЯ ---
+	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
+	let cross_y = 40;
+	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
+		inventory_element.shown = false;
+		inv.imove = -1;
+		inv.jmove = -1;
+		inv.active_touch_id = null;
+		return;
+	}
 
-    inv.animation_state += 0.02 * dt;
+	inv.animation_state += 0.02 * dt;
 
-    let slot_selected = false;
-    for(let i = 0; i < inv.items.length; i++) {
-        for(let j = 0; j < inv.items[i].length; j++) {
-            let sx = 40 + (inv.slot_size * 1.05) * j;
-            let sy = 40 + (inv.slot_size * 1.05) * i;
+	let slot_selected = false;
+	for (let i = 0; i < inv.items.length; i++) {
+		for (let j = 0; j < inv.items[i].length; j++) {
+			let sx = 40 + (inv.slot_size * 1.05) * j;
+			let sy = 40 + (inv.slot_size * 1.05) * i;
 
-            if(doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
-                slot_selected = true;
-                inv.iselected = i;
-                inv.jselected = j;
+			if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
+				slot_selected = true;
+				inv.iselected = i;
+				inv.jselected = j;
 
-                if(is_clicked) {
-                    if(inv.imove < 0 && inv.jmove < 0) {
-                        if(inv.items[i][j] > 0) {
-                            inv.imove = i;
-                            inv.jmove = j;
-                        }
-                    } else {
-                        // Обмен
-                        let temp = inv.items[i][j];
-                        inv.items[i][j] = inv.items[inv.imove][inv.jmove];
-                        inv.items[inv.imove][inv.jmove] = temp;
-                        inv.imove = -1; inv.jmove = -1;
-                    }
-                }
+				if (is_clicked) {
+					if (inv.imove < 0 && inv.jmove < 0) {
+						if (inv.items[i][j] > 0) {
+							inv.imove = i;
+							inv.jmove = j;
+						}
+					} else {
+						// Обмен
+						let temp = inv.items[i][j];
+						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
+						inv.items[inv.imove][inv.jmove] = temp;
+						inv.imove = -1;
+						inv.jmove = -1;
+					}
+				}
 
-                if (is_released && inv.imove >= 0) {
-                    let temp = inv.items[i][j];
-                    inv.items[i][j] = inv.items[inv.imove][inv.jmove];
-                    inv.items[inv.imove][inv.jmove] = temp;
-                    inv.imove = -1; inv.jmove = -1;
-                }
-            }
-        }
-    }
+				if (is_released && inv.imove >= 0) {
+					let temp = inv.items[i][j];
+					inv.items[i][j] = inv.items[inv.imove][inv.jmove];
+					inv.items[inv.imove][inv.jmove] = temp;
+					inv.imove = -1;
+					inv.jmove = -1;
+				}
+			}
+		}
+	}
 
-    // Выброс
-    if((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
-        if(inv.imove !== -1 && inv.jmove !== -1) {
-            inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-        }
-        inv.imove = -1; inv.jmove = -1;
-    }
+	// Выброс
+	if ((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
+		if (inv.imove !== -1 && inv.jmove !== -1) {
+			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+		}
+		inv.imove = -1;
+		inv.jmove = -1;
+	}
 
-    if(!slot_selected) {
-        inv.iselected = -1;
-        inv.jselected = -1;
-    }
+	if (!slot_selected) {
+		inv.iselected = -1;
+		inv.jselected = -1;
+	}
 
-    // Хоткей Q
-    if(isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
-        let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
-        let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
-        if (dropI !== -1 && dropJ !== -1) {
-            inventory_drop_item(inventory_element, dropI, dropJ);
-            if (dropI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
-        }
-    }
+	// Хоткей Q
+	if (isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
+		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
+		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
+		if (dropI !== -1 && dropJ !== -1) {
+			inventory_drop_item(inventory_element, dropI, dropJ);
+			if (dropI === inv.imove) {
+				inv.imove = -1;
+				inv.jmove = -1;
+			}
+		}
+	}
 }
 
 
 function inventory_draw(inventory_element, ctx) {
-	if(inventory_element.game.want_hide_inventory || !inventory_element.shown)
+	if (inventory_element.game.want_hide_inventory || !inventory_element.shown)
 		return;
 
 	let inv = inventory_element.data;
 	let scale = get_scale();
 
 	// 1. Отрисовка слотов
-	for(let i = 0; i < inv.items.length; i++) {
-		for(let j = 0; j < inv.items[i].length; j++) {
+	for (let i = 0; i < inv.items.length; i++) {
+		for (let j = 0; j < inv.items[i].length; j++) {
 			ctx.globalAlpha = 0.9;
 
-			if(inv.imove == i && inv.jmove == j)
+			if (inv.imove == i && inv.jmove == j)
 				ctx.fillStyle = "orange";
-			else if(inv.iselected == i && inv.jselected == j)
+			else if (inv.iselected == i && inv.jselected == j)
 				ctx.fillStyle = "cyan";
 			else
 				ctx.fillStyle = "blue";
@@ -191,11 +197,11 @@ function inventory_draw(inventory_element, ctx) {
 	}
 
 	// 2. Отрисовка кнопки закрытия
-	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15; 
-	let cross_y = 40; 
+	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
+	let cross_y = 40;
 	let cs = inv.cross_size;
 
-	if(inventory_element.game.mobile) {
+	if (inventory_element.game.mobile) {
 		ctx.fillStyle = "#444444";
 		ctx.fillRect(cross_x, cross_y, cs, cs);
 		ctx.strokeStyle = "white";
@@ -212,24 +218,24 @@ function inventory_draw(inventory_element, ctx) {
 	}
 
 	// 3. Предмет в руках (тянется за ПРАВИЛЬНЫМИ координатами)
-	if(inv.imove > -1 && inv.jmove > -1) {
+	if (inv.imove > -1 && inv.jmove > -1) {
 		let curX = inv.last_active_mx || 0;
 		let curY = inv.last_active_my || 0;
 
 		let drag_size = inv.slot_size * 0.8;
 		ctx.globalAlpha = 0.8;
-		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size/2, curY - drag_size/2, drag_size, drag_size, inv.animation_state);
+		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size / 2, curY - drag_size / 2, drag_size, drag_size, inv.animation_state);
 		ctx.globalAlpha = 1.0;
 	}
 }
 
 
-function inventory_drop_item(inventory_element, i, j, death=false) {
-	if(!inventory_element.data.attached_to_object || !inventory_element.data.attached_to_object.data.body)
+function inventory_drop_item(inventory_element, i, j, death = false) {
+	if (!inventory_element.data.attached_to_object || !inventory_element.data.attached_to_object.data.body)
 		return;
-	if(i < 0 || j < 0)
+	if (i < 0 || j < 0)
 		return;
-	if(inventory_element.data.items[i][j] == 0)
+	if (inventory_element.data.items[i][j] == 0)
 		return;
 	item_create(inventory_element.game, inventory_element.data.items[i][j],
 		inventory_element.data.attached_to_object.data.body.position.x + 100 * Math.cos(2 * Math.PI * Math.random()),
@@ -238,14 +244,14 @@ function inventory_drop_item(inventory_element, i, j, death=false) {
 }
 
 function inventory_drop_all_items(inventory_element) {
-	for(let i = 0; i < inventory_element.data.items.length; i++)
-		for(let j = 0; j < inventory_element.data.items[i].length; j++)
+	for (let i = 0; i < inventory_element.data.items.length; i++)
+		for (let j = 0; j < inventory_element.data.items[i].length; j++)
 			inventory_drop_item(inventory_element, i, j, true);
 }
 
 // --- ХОТБАР ---
 
-function hotbar_create(g, inv, attached_to_object=null) {
+function hotbar_create(g, inv, attached_to_object = null) {
 	let hb = {
 		iselected: 0,
 		row: inv.items[0],
@@ -265,78 +271,84 @@ function hotbar_destroy(hotbar_element) {
 }
 
 function hotbar_update(hotbar_element, dt) {
-    let hb = hotbar_element.data;
-    let input = hotbar_element.game.input;
-    let scale = get_scale();
-    hb.animation_state += 0.02 * dt;
+	let hb = hotbar_element.data;
+	let input = hotbar_element.game.input;
+	let scale = get_scale();
+	hb.animation_state += 0.02 * dt;
 
-    if(hb.attached_to_object.data.ai_controlled)
-        hotbar_element.shown = false;
+	if (hb.attached_to_object.data.ai_controlled)
+		hotbar_element.shown = false;
 
-    // Клавиши 1-9 (оставляем как есть)
-    for (let i = 0; i < 9; i++) {
-        if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
-    }
+	// Клавиши 1-9 (оставляем как есть)
+	for (let i = 0; i < 9; i++) {
+		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
+	}
 
-    if(isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
-    if(isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
+	if (isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
+	if (isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
 
-    hb.mouse_over = false;
+	hb.mouse_over = false;
 
-    // --- ИСПРАВЛЕНИЕ МУЛЬТИТАЧА ---
-    // Создаем список координат для проверки (мышь + все пальцы)
-    let pointsToCheck = [];
-    if (!isScreenTouched(input)) {
-        pointsToCheck.push({ x: input.mouse.x / scale, y: input.mouse.y / scale });
-    } else {
-        for (let t of input.touch) {
-            pointsToCheck.push({ x: t.x / scale, y: t.y / scale });
-        }
-    }
+	// --- ИСПРАВЛЕНИЕ МУЛЬТИТАЧА ---
+	// Создаем список координат для проверки (мышь + все пальцы)
+	let pointsToCheck = [];
+	if (!isScreenTouched(input)) {
+		pointsToCheck.push({
+			x: input.mouse.x / scale,
+			y: input.mouse.y / scale
+		});
+	} else {
+		for (let t of input.touch) {
+			pointsToCheck.push({
+				x: t.x / scale,
+				y: t.y / scale
+			});
+		}
+	}
 
-    // Проверяем каждую точку (палец или мышь) на попадание в слоты
-    for (let pt of pointsToCheck) {
-        for(let i = 0; i < hb.row.length; i++) {
-            let sx = 40 + (hb.slot_size * 1.05) * i;
-            let sy = 40;
-            if((hotbar_element.game.mobile || input.mouse.leftButtonPressed) && doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
-                hb.mouse_over = true;
-                hb.iselected = i; // Выбираем слот
-            }
-        }
+	// Проверяем каждую точку (палец или мышь) на попадание в слоты
+	for (let pt of pointsToCheck) {
+		for (let i = 0; i < hb.row.length; i++) {
+			let sx = 40 + (hb.slot_size * 1.05) * i;
+			let sy = 40;
+			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) && doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
+				hb.mouse_over = true;
+				hb.iselected = i; // Выбираем слот
+			}
+		}
 
-        // Проверка мобильных кнопок (Инвентарь, Ачивки, Меню)
-        if(hotbar_element.game.mobile) {
-            let step = hb.slot_size * 1.05;
-            let x_inv = 60 + step * hb.row.length;
-            
-            // Проверка кнопки сумки
-            if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
-                let inv_el = hb.attached_to_object.data.inventory_element;
-                if (inv_el && !inv_el._mob_toggle_lock) {
-                    inv_el.shown = !inv_el.shown;
-                    inv_el._mob_toggle_lock = true;
-                }
-            }
-        }
-    }
+		// Проверка мобильных кнопок (Инвентарь, Ачивки, Меню)
+		if (hotbar_element.game.mobile) {
+			let step = hb.slot_size * 1.05;
+			let x_inv = 60 + step * hb.row.length;
 
-    // Сброс лока переключения, если ни один палец не касается кнопок
-    let inv_el = hb.attached_to_object.data.inventory_element;
-    if (inv_el && inv_el._mob_toggle_lock) {
-        let stillTouching = false;
-        let step = hb.slot_size * 1.05;
-        let x_inv = 60 + step * hb.row.length;
-        for (let pt of pointsToCheck) {
-            if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) stillTouching = true;
-        }
-        if (!stillTouching) inv_el._mob_toggle_lock = false;
-    }
+			// Проверка кнопки сумки
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
+				let inv_el = hb.attached_to_object.data.inventory_element;
+				if (inv_el && !inv_el._mob_toggle_lock) {
+					inv_el.shown = !inv_el.shown;
+					inv_el._mob_toggle_lock = true;
+				}
+			}
+		}
+	}
+
+	// Сброс лока переключения, если ни один палец не касается кнопок
+	let inv_el = hb.attached_to_object.data.inventory_element;
+	if (inv_el && inv_el._mob_toggle_lock) {
+		let stillTouching = false;
+		let step = hb.slot_size * 1.05;
+		let x_inv = 60 + step * hb.row.length;
+		for (let pt of pointsToCheck) {
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) stillTouching = true;
+		}
+		if (!stillTouching) inv_el._mob_toggle_lock = false;
+	}
 }
 
 function hotbar_draw(hotbar_object, ctx) {
 	let hb = hotbar_object.data;
-	for(let i = 0; i < hb.row.length; i++) {
+	for (let i = 0; i < hb.row.length; i++) {
 		ctx.globalAlpha = 0.9;
 		ctx.fillStyle = (hb.iselected == i) ? "cyan" : "blue";
 		ctx.fillRect(40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size);
@@ -344,7 +356,7 @@ function hotbar_draw(hotbar_object, ctx) {
 		item_icon_draw(ctx, hb.row[i], 40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size, hb.animation_state);
 	}
 
-if(hotbar_object.game.mobile) {
+	if (hotbar_object.game.mobile) {
 		let s = hb.slot_size;
 		let step = s * 1.05;
 		let y = 40;
@@ -360,13 +372,13 @@ if(hotbar_object.game.mobile) {
 		// --- 1. КНОПКА ИНВЕНТАРЯ (Портфель) ---
 		let x_inv = 60 + step * hb.row.length;
 		drawButtonBg(x_inv);
-		
+
 		let pad = s * 0.2;
 		let bw = s - pad * 2;
 		let bh = s - pad * 2;
 		let bx = x_inv + pad;
 		let by = y + pad;
-		
+
 		ctx.fillStyle = "#a52a2a";
 		ctx.fillRect(bx, by + bh * 0.2, bw, bh * 0.8);
 		ctx.fillStyle = "#8b4513";
@@ -418,12 +430,12 @@ if(hotbar_object.game.mobile) {
 		let barW = s * 0.5; // Длина полоски
 		let barH = s * 0.08; // Толщина полоски
 		let barX = x_menu + (s - barW) / 2; // Центрируем по горизонтали
-		
+
 		// Рисуем три полоски
 		ctx.fillRect(barX, y + s * 0.3, barW, barH);
 		ctx.fillRect(barX, y + s * 0.48, barW, barH);
 		ctx.fillRect(barX, y + s * 0.66, barW, barH);
-		
+
 		// Добавим легкую тень для объема
 		ctx.fillStyle = "rgba(0,0,0,0.3)";
 		ctx.fillRect(barX, y + s * 0.3 + barH, barW, barH * 0.3);
@@ -437,33 +449,33 @@ function hotbar_get_selected_item(hotbar_element) {
 	let inv_el = hotbar_element.data.attached_to_object.data.inventory_element;
 	if (inv_el.game.mobile && inv_el && inv_el.shown) return 0;
 
-	if(!hotbar_element.shown) {
-		if(hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {
+	if (!hotbar_element.shown) {
+		if (hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {
 			let inv = hotbar_element.data.attached_to_object.data.inventory_element.data;
-			if(inv.jmove > -1 && inv.imove > -1) {
-				if(inv.iselected == -1 && inv.jselected == -1)
+			if (inv.jmove > -1 && inv.imove > -1) {
+				if (inv.iselected == -1 && inv.jselected == -1)
 					return inv.items[inv.imove][inv.jmove];
 			}
 		}
 		return 0;
-	} else if(hotbar_element.data.mouse_over) {
+	} else if (hotbar_element.data.mouse_over) {
 		return 0;
 	}
 	return hotbar_element.data.row[hotbar_element.data.iselected];
 }
 
 function inventory_has_item_from_list(inventory_element, item_ids) {
-	for(let i = item_ids.length - 1; i >= 0; i--) {
-		if(inventory_has_item(inventory_element, item_ids[i]))
+	for (let i = item_ids.length - 1; i >= 0; i--) {
+		if (inventory_has_item(inventory_element, item_ids[i]))
 			return item_ids[i];
 	}
 	return -1;
 }
 
 function inventory_has_item(inventory_element, id) {
-	for(let i = 0; i < inventory_element.data.items.length; i++) {
-		for(let j = 0; j < inventory_element.data.items[i].length; j++)
-			if(inventory_element.data.items[i][j] == id)
+	for (let i = 0; i < inventory_element.data.items.length; i++) {
+		for (let j = 0; j < inventory_element.data.items[i].length; j++)
+			if (inventory_element.data.items[i][j] == id)
 				return true;
 	}
 	return false;
@@ -471,28 +483,28 @@ function inventory_has_item(inventory_element, id) {
 
 function inventory_count_item(inventory_element, id) {
 	let ans = 0;
-	for(let i = 0; i < inventory_element.data.items.length; i++) {
-		for(let j = 0; j < inventory_element.data.items[i].length; j++)
-			if(inventory_element.data.items[i][j] == id)
+	for (let i = 0; i < inventory_element.data.items.length; i++) {
+		for (let j = 0; j < inventory_element.data.items[i].length; j++)
+			if (inventory_element.data.items[i][j] == id)
 				ans++;
 	}
 	return ans;
 }
 
-function inventory_clear_item(inventory_element, id, count, item_i=-1, item_j=-1) {
-	if(item_i == inventory_element.data.imove && item_j == inventory_element.data.jmove) {
+function inventory_clear_item(inventory_element, id, count, item_i = -1, item_j = -1) {
+	if (item_i == inventory_element.data.imove && item_j == inventory_element.data.jmove) {
 		inventory_element.data.imove = -1;
 		inventory_element.data.jmove = -1;
 	}
 
-	if(item_i > -1 && item_j > -1 && inventory_element.data.items[item_i][item_j] == id) {
+	if (item_i > -1 && item_j > -1 && inventory_element.data.items[item_i][item_j] == id) {
 		inventory_element.data.items[item_i][item_j] = 0;
 		count--;
 	}
 
-	for(let i = 0; i < inventory_element.data.items.length && count > 0; i++)
-		for(let j = 0; j < inventory_element.data.items[i].length && count > 0; j++)
-			if(inventory_element.data.items[i][j] == id) {
+	for (let i = 0; i < inventory_element.data.items.length && count > 0; i++)
+		for (let j = 0; j < inventory_element.data.items[i].length && count > 0; j++)
+			if (inventory_element.data.items[i][j] == id) {
 				inventory_element.data.items[i][j] = 0;
 				count--;
 			}

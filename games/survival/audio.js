@@ -1,4 +1,3 @@
-
 var GLOBAL_VOLUME = 80;
 
 function audios_get() {
@@ -21,7 +20,7 @@ function audios_get() {
 	return as;
 }
 
-function audio_create(path, volume=0.75) {
+function audio_create(path, volume = 0.75) {
 	let a = new Audio(path);
 	a.volume = volume;
 	a.preload = 'auto';
@@ -29,10 +28,9 @@ function audio_create(path, volume=0.75) {
 	return a;
 }
 
-function audio_play(path, volume=0.75) {
+function audio_play(path, volume = 0.75) {
 	let a = new Audio(path);
 	a.volume = volume * GLOBAL_VOLUME * 0.01;
 	a.preload = 'auto';
 	a.play();
 }
-

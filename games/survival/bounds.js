@@ -1,7 +1,6 @@
-
 function bound_create(g, x, y, w, h) {
 	let data = {
-		body: Matter.Bodies.rectangle(x + w/2, y + h/2, w, h, {
+		body: Matter.Bodies.rectangle(x + w / 2, y + h / 2, w, h, {
 			isStatic: true
 		})
 	};
@@ -13,7 +12,7 @@ function bound_create(g, x, y, w, h) {
 }
 
 function bound_destroy(bound_object) {
-	if(bound_object.destroyed)
+	if (bound_object.destroyed)
 		return;
 	Matter.Composite.remove(bound_object.game.engine.world, bound_object.data.body);
 	bound_object.data.body = null;
@@ -25,4 +24,3 @@ function bound_update(bound_object, dt) {}
 function bound_draw(bound_object, ctx) {
 	//drawMatterBody(ctx, bound_object.data.body, 'orange')
 }
-
