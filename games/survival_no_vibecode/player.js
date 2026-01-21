@@ -1375,8 +1375,6 @@ function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, sho
 
 function player_item_consume(player_object, id, anywhere=false) {
 
-	
-
 	let p = player_object.data;
 
 	let item_i = -1;
