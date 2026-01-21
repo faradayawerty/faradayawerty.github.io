@@ -31,149 +31,134 @@ function inventory_destroy(inventory_element) {
 }
 
 function inventory_update(inventory_element, dt) {
-	if(inventory_element.data.attached_to_object.data.ai_controlled)
-		inventory_element.shown = false;
+    if(inventory_element.data.attached_to_object.data.ai_controlled)
+        inventory_element.shown = false;
 
-	if(!inventory_element.shown) return;
+    if(!inventory_element.shown) return;
 
-	let inv = inventory_element.data;
-	let input = inventory_element.game.input;
-	let scale = get_scale();
+    let inv = inventory_element.data;
+    let input = inventory_element.game.input;
+    let scale = get_scale();
 
-	// 1. Инициализация базовых значений
-	let mx = input.mouse.x / scale;
-	let my = input.mouse.y / scale;
-	let is_clicked = isMouseLeftButtonPressed(input);
-	let is_clicked_right = isMouseRightButtonPressed(input);
-	let is_released = false;
+    // 1. База для ПК
+    let mx = input.mouse.x / scale;
+    let my = input.mouse.y / scale;
+    let is_clicked = isMouseLeftButtonPressed(input);
+    let is_clicked_right = isMouseRightButtonPressed(input);
+    let is_released = false;
 
-	// --- ЛОГИКА ТАЧА С ПРИВЯЗКОЙ ID ---
-	if (isScreenTouched(input)) {
-		let inv_rect = {
-			x: 40, y: 40,
-			w: (inv.slot_size * 1.05) * inv.items[0].length + 60,
-			h: (inv.slot_size * 1.05) * inv.items.length
-		};
+    // 2. ЛОГИКА ТАЧА (Исправленная)
+    if (isScreenTouched(input)) {
+        // Ищем палец, который НЕ джойстик
+        let freeTouch = null;
+        for (let t of input.touch) {
+            if (t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) {
+                freeTouch = t;
+                break;
+            }
+        }
 
-		let targetTouch = null;
+        if (freeTouch) {
+            mx = freeTouch.x / scale;
+            my = freeTouch.y / scale;
 
-		// Если мы уже "держим" предмет пальцем, ищем именно его по ID
-		if (inv.active_touch_id !== undefined && inv.active_touch_id !== null) {
-			targetTouch = input.touch.find(t => t.id === inv.active_touch_id);
+            // Если это НОВЫЙ id (палец только что коснулся или сменился)
+            if (inv.active_touch_id !== freeTouch.id) {
+                inv.active_touch_id = freeTouch.id;
+                is_clicked = true; // Считаем это нажатием
+                inv._touch_lock = true;
+            } else {
+                // Палец тот же самый, удерживаем
+                is_clicked = false;
+            }
+        } else {
+            // Если свободных пальцев больше нет, но раньше был захвачен id
+            if (inv.active_touch_id !== null) {
+                is_released = true;
+                inv.active_touch_id = null;
+                inv._touch_lock = false;
+            }
+        }
+    } else {
+        // Тачей вообще нет
+        if (inv.active_touch_id !== null) is_released = true;
+        inv.active_touch_id = null;
+        inv._touch_lock = false;
+    }
 
-			// Если палец с этим ID исчез — значит, произошел release
-			if (!targetTouch) {
-				is_released = true;
-				inv.active_touch_id = null;
-				inv._touch_lock = false;
-			}
-		}
+    inv.last_active_mx = mx;
+    inv.last_active_my = my;
 
-		// Если мы ничего не держим или палец еще не зафиксирован, ищем новое касание в зоне инвентаря
-		if (!targetTouch) {
-			for (let t of input.touch) {
-				let tx = t.x / scale;
-				let ty = t.y / scale;
-				if (doRectsCollide(tx, ty, 0, 0, inv_rect.x, inv_rect.y, inv_rect.w, inv_rect.h)) {
-					targetTouch = t;
-					inv.active_touch_id = t.id; // ФИКСИРУЕМ ПАЛЕЦ
-					break;
-				}
-			}
-		}
+    // --- КНОПКА ЗАКРЫТИЯ ---
+    let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
+    let cross_y = 40;
+    if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
+        inventory_element.shown = false;
+        inv.imove = -1; inv.jmove = -1;
+        inv.active_touch_id = null;
+        return;
+    }
 
-		if (targetTouch) {
-			mx = targetTouch.x / scale;
-			my = targetTouch.y / scale;
+    inv.animation_state += 0.02 * dt;
 
-			if (!inv._touch_lock) {
-				is_clicked = true;
-				inv._touch_lock = true;
-			}
-		}
-	} else {
-		// Если экран вообще не трогают — сбрасываем всё
-		if (inv.active_touch_id !== null && inv.active_touch_id !== undefined) {
-			is_released = true;
-		}
-		inv.active_touch_id = null;
-		inv._touch_lock = false;
-	}
+    let slot_selected = false;
+    for(let i = 0; i < inv.items.length; i++) {
+        for(let j = 0; j < inv.items[i].length; j++) {
+            let sx = 40 + (inv.slot_size * 1.05) * j;
+            let sy = 40 + (inv.slot_size * 1.05) * i;
 
-	// Координаты для отрисовки предмета в руке
-	inv.last_active_mx = mx;
-	inv.last_active_my = my;
+            if(doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
+                slot_selected = true;
+                inv.iselected = i;
+                inv.jselected = j;
 
-	// --- КНОПКА ЗАКРЫТИЯ ---
-	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
-	let cross_y = 40;
-	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
-		inventory_element.shown = false;
-		inv.imove = -1; inv.jmove = -1;
-		inv.active_touch_id = null; // Сброс при закрытии
-		return;
-	}
+                if(is_clicked) {
+                    if(inv.imove < 0 && inv.jmove < 0) {
+                        if(inv.items[i][j] > 0) {
+                            inv.imove = i;
+                            inv.jmove = j;
+                        }
+                    } else {
+                        // Обмен
+                        let temp = inv.items[i][j];
+                        inv.items[i][j] = inv.items[inv.imove][inv.jmove];
+                        inv.items[inv.imove][inv.jmove] = temp;
+                        inv.imove = -1; inv.jmove = -1;
+                    }
+                }
 
-	inv.animation_state += 0.02 * dt;
+                if (is_released && inv.imove >= 0) {
+                    let temp = inv.items[i][j];
+                    inv.items[i][j] = inv.items[inv.imove][inv.jmove];
+                    inv.items[inv.imove][inv.jmove] = temp;
+                    inv.imove = -1; inv.jmove = -1;
+                }
+            }
+        }
+    }
 
-	let slot_selected = false;
-	for(let i = 0; i < inv.items.length; i++) {
-		for(let j = 0; j < inv.items[i].length; j++) {
-			let sx = 40 + (inv.slot_size * 1.05) * j;
-			let sy = 40 + (inv.slot_size * 1.05) * i;
+    // Выброс
+    if((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
+        if(inv.imove !== -1 && inv.jmove !== -1) {
+            inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+        }
+        inv.imove = -1; inv.jmove = -1;
+    }
 
-			if(doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
-				slot_selected = true;
-				inv.iselected = i;
-				inv.jselected = j;
+    if(!slot_selected) {
+        inv.iselected = -1;
+        inv.jselected = -1;
+    }
 
-				if(is_clicked) {
-					if(inv.imove < 0 && inv.jmove < 0) {
-						if(inv.items[i][j] > 0) {
-							inv.imove = i;
-							inv.jmove = j;
-						}
-					} else {
-						// Обмен предметами
-						let temp = inv.items[i][j];
-						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
-						inv.items[inv.imove][inv.jmove] = temp;
-						inv.imove = -1; inv.jmove = -1;
-					}
-				}
-
-				if (is_released && inv.imove >= 0) {
-					let temp = inv.items[i][j];
-					inv.items[i][j] = inv.items[inv.imove][inv.jmove];
-					inv.items[inv.imove][inv.jmove] = temp;
-					inv.imove = -1; inv.jmove = -1;
-				}
-			}
-		}
-	}
-
-	// Выброс предмета (если отпустили вне слотов)
-	if((is_clicked_right || is_released) && !slot_selected) {
-		if(inv.imove !== -1 && inv.jmove !== -1) {
-			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-		}
-		inv.imove = -1; inv.jmove = -1;
-	}
-
-	if(!slot_selected) {
-		inv.iselected = -1;
-		inv.jselected = -1;
-	}
-
-	// Хоткей Q
-	if(isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
-		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
-		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
-		if (dropI !== -1 && dropJ !== -1) {
-			inventory_drop_item(inventory_element, dropI, dropJ);
-			if (dropI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
-		}
-	}
+    // Хоткей Q
+    if(isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
+        let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
+        let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
+        if (dropI !== -1 && dropJ !== -1) {
+            inventory_drop_item(inventory_element, dropI, dropJ);
+            if (dropI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
+        }
+    }
 }
 
 
