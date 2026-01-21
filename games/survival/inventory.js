@@ -30,8 +30,10 @@ function inventory_destroy(inventory_element) {
 }
 
 function inventory_update(inventory_element, dt) {
-	if (inventory_element.data.attached_to_object.data.ai_controlled)
+	// Если ИИ управляет объектом, инвентарь не обновляем
+	if (inventory_element.data.attached_to_object.data.ai_controlled) {
 		inventory_element.shown = false;
+	}
 
 	if (!inventory_element.shown) return;
 
@@ -39,61 +41,70 @@ function inventory_update(inventory_element, dt) {
 	let input = inventory_element.game.input;
 	let scale = get_scale();
 
-	// 1. Базовые координаты (ПК)
+	// 1. Исходные данные для ПК
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 	let is_clicked = isMouseLeftButtonPressed(input);
 	let is_clicked_right = isMouseRightButtonPressed(input);
 	let is_released = false;
 
-	// 2. УЛУЧШЕННАЯ ЛОГИКА ТАЧА (Игнорируем джойстики)
+	// 2. МОБИЛЬНАЯ ЛОГИКА (ГЕОЗОНА)
+	// Инвентарь находится сверху, джойстики снизу.
+	// Игнорируем любые тачи в нижней половине экрана.
 	if (isScreenTouched(input)) {
-		// Ищем палец, который НЕ является левым или правым джойстиком
-		let invTouch = null;
+		let validTouch = null;
+		let screenHeight = (window.innerHeight) / scale;
+		let touchBoundary = screenHeight * 0.5; // Граница — 50% высоты экрана
+
 		for (let t of input.touch) {
-			if (t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) {
-				invTouch = t;
-				break; // Берем первый подходящий палец для инвентаря
+			let ty = t.y / scale;
+			if (ty < touchBoundary) {
+				validTouch = t;
+				break;
 			}
 		}
 
-		if (invTouch) {
-			mx = invTouch.x / scale;
-			my = invTouch.y / scale;
+		if (validTouch) {
+			mx = validTouch.x / scale;
+			my = validTouch.y / scale;
 
-			if (inv.active_touch_id !== invTouch.id) {
-				inv.active_touch_id = invTouch.id;
-				is_clicked = true; 
-				inv._touch_lock = true;
+			// Фиксация момента нажатия (первое попадание пальца в зону инвентаря)
+			if (!inv._is_touching_inv) {
+				inv._is_touching_inv = true;
+				is_clicked = true;
 			}
 		} else {
-			// Если палец, который управлял инвентарем, исчез
-			if (inv.active_touch_id !== -1 && inv.active_touch_id !== null) {
+			// Если пальцев в верхней зоне нет, но в прошлом кадре был — это отпускание
+			if (inv._is_touching_inv) {
 				is_released = true;
-				inv.active_touch_id = null;
+				inv._is_touching_inv = false;
 			}
 		}
 	} else {
-		if (inv.active_touch_id !== null) is_released = true;
-		inv.active_touch_id = null;
+		// Тачей вообще нет
+		if (inv._is_touching_inv) is_released = true;
+		inv._is_touching_inv = false;
 	}
 
-    // Сохраняем координаты только если они валидны (не в зоне джойстика)
+	// Сохраняем последние координаты для отрисовки предмета в руке
 	inv.last_active_mx = mx;
 	inv.last_active_my = my;
 
-	// --- КНОПКА ЗАКРЫТИЯ ---
+	// 3. ВСПОМОГАТЕЛЬНЫЕ РАСЧЕТЫ
+	inv.animation_state += 0.02 * dt;
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
 	let cross_y = 40;
+
+	// 4. КНОПКА ЗАКРЫТИЯ
 	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
 		inventory_element.shown = false;
 		inv.imove = -1;
 		inv.jmove = -1;
+		inv._is_touching_inv = false;
 		return;
 	}
 
-	inv.animation_state += 0.02 * dt;
-
+	// 5. ЛОГИКА СЛОТОВ
 	let slot_selected = false;
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
@@ -105,14 +116,16 @@ function inventory_update(inventory_element, dt) {
 				inv.iselected = i;
 				inv.jselected = j;
 
+				// Нажали на слот
 				if (is_clicked) {
 					if (inv.imove < 0) {
+						// Взяли предмет
 						if (inv.items[i][j] > 0) {
 							inv.imove = i;
 							inv.jmove = j;
 						}
 					} else {
-						// Обмен ячеек
+						// Положили/Обменяли (вторым кликом на ПК)
 						let temp = inv.items[i][j];
 						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 						inv.items[inv.imove][inv.jmove] = temp;
@@ -120,8 +133,8 @@ function inventory_update(inventory_element, dt) {
 						inv.jmove = -1;
 					}
 				}
-                
-                // Важно: отпускание над слотом
+
+				// Отпустили над слотом (Drag-and-drop для мобилок)
 				if (is_released && inv.imove !== -1) {
 					let temp = inv.items[i][j];
 					inv.items[i][j] = inv.items[inv.imove][inv.jmove];
@@ -133,9 +146,8 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 
-	// --- ФИКС ВЫБРОСА ---
-    // Предмет выбрасывается только если мы отпустили (is_released) его ВНЕ слота.
-    // Условие is_clicked здесь убрано, так как оно вызывало мгновенный дроп.
+	// 6. ВЫБРОС ПРЕДМЕТА
+	// Выкидываем, если нажата ПКМ (комп) ИЛИ если предмет отпущен ВНЕ слотов (мобилка/комп)
 	if ((is_clicked_right || is_released) && !slot_selected) {
 		if (inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
@@ -144,12 +156,13 @@ function inventory_update(inventory_element, dt) {
 		inv.jmove = -1;
 	}
 
+	// Сброс подсветки, если мышь не над слотом
 	if (!slot_selected) {
 		inv.iselected = -1;
 		inv.jselected = -1;
 	}
 
-	// Хоткей Q
+	// 7. ХОТКЕЙ Q (Выброс)
 	if (isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
 		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
 		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
