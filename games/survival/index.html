@@ -58,7 +58,6 @@
 	<script>
 		let cvs1 = document.getElementById("canvas");
 		let ctx1 = cvs1.getContext("2d");
-		let dpr = window.devicePixelRatio || 1;
 
 		let engine1 = Matter.Engine.create();
 		let input1 = input_create();
@@ -77,33 +76,15 @@
 			return Math.min(window.innerWidth / 1200, window.innerHeight / 1200);
 		}
 
-		function resizeCanvas() {
-		    const width = window.innerWidth;
-		    const height = window.innerHeight;
-
-		    // Устанавливаем физический размер (количество точек отрисовки)
-		    cvs1.width = width * dpr;
-		    cvs1.height = height * dpr;
-
-		    // Устанавливаем логический размер (размер элемента на странице)
-		    cvs1.style.width = width + "px";
-		    cvs1.style.height = height + "px";
-
-		    // Отключаем сглаживание для четких пикселей
-		    ctx1.imageSmoothingEnabled = false;
-		    ctx1.webkitImageSmoothingEnabled = false;
-		    ctx1.mozImageSmoothingEnabled = false;
-		}
-
 		function animate(lastUpdateTime) {
 
 			// calculate delta time
 			let dt = Date.now() - lastUpdateTime;
 			lastUpdateTime = Date.now();
 
-			ctx1.setTransform(dpr, 0, 0, dpr, 0, 0);
-
 			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
+			ctx1.canvas.width = window.innerWidth;
+			ctx1.canvas.height = window.innerHeight;
 			ctx1.fillStyle = "black";
 			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
 
@@ -192,8 +173,6 @@
 		}
 
 		function main() {
-			window.addEventListener('resize', resizeCanvas);
-			resizeCanvas();
 			game_new(game1);
 			engine1.world.gravity.y = 0;
 			initializeKeyboardInput(input1.keys);
