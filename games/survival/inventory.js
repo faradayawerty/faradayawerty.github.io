@@ -224,6 +224,74 @@ function hotbar_draw(hotbar_object, ctx) {
 		ctx.globalAlpha = 1.0;
 		item_icon_draw(ctx, hb.row[i], 40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size, hb.animation_state);
 	}
+
+	if(hotbar_object.game.mobile) {
+		let s = hb.slot_size;
+		let step = s * 1.05;
+		let y = 40;
+		const drawButtonBg = (x) => {
+			ctx.fillStyle = "#4477ff";
+			ctx.globalAlpha = 0.9;
+			ctx.fillRect(x, y, s, s);
+			ctx.globalAlpha = 1.0;
+		};
+		let x_inv = 60 + step * hb.row.length;
+		drawButtonBg(x_inv);
+		let pad = s * 0.2;
+		let bw = s - pad * 2;
+		let bh = s - pad * 2;
+		let bx = x_inv + pad;
+		let by = y + pad;
+		ctx.fillStyle = "#a52a2a";
+		ctx.fillRect(bx, by + bh * 0.2, bw, bh * 0.8);
+		ctx.fillStyle = "#8b4513";
+		ctx.fillRect(bx, by + bh * 0.1, bw, bh * 0.4);
+		ctx.strokeStyle = "#8b4513";
+		ctx.lineWidth = s * 0.05;
+		ctx.beginPath();
+		ctx.arc(bx + bw / 2, by + bh * 0.1, bw * 0.2, Math.PI, 0);
+		ctx.stroke();
+		ctx.fillStyle = "yellow";
+		ctx.fillRect(bx + bw * 0.2, by + bh * 0.4, bw * 0.1, bh * 0.2);
+		ctx.fillRect(bx + bw * 0.7, by + bh * 0.4, bw * 0.1, bh * 0.2);
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = s * 0.02;
+		ctx.strokeRect(bx, by + bh * 0.2, bw, bh * 0.8);
+		let x_ach = x_inv + step;
+		drawButtonBg(x_ach);
+		let ax = x_ach + s * 0.25;
+		let ay = y + s * 0.25;
+		let aw = s * 0.5;
+		let ah = s * 0.5;
+		ctx.fillStyle = "gold";
+		ctx.beginPath();
+		ctx.moveTo(ax, ay);
+		ctx.lineTo(ax + aw, ay);
+		ctx.lineTo(ax + aw * 0.8, ay + ah * 0.6);
+		ctx.lineTo(ax + aw * 0.2, ay + ah * 0.6);
+		ctx.closePath();
+		ctx.fill();
+		ctx.strokeStyle = "orange";
+		ctx.lineWidth = s * 0.03;
+		ctx.stroke();
+		ctx.fillRect(ax + aw * 0.4, ay + ah * 0.6, aw * 0.2, ah * 0.3);
+		ctx.fillRect(ax + aw * 0.2, ay + ah * 0.8, aw * 0.6, ah * 0.2);
+		ctx.beginPath();
+		ctx.arc(ax, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
+		ctx.arc(ax + aw, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
+		ctx.stroke();
+		let x_menu = x_ach + step;
+		drawButtonBg(x_menu);
+		ctx.fillStyle = "white";
+		let barW = s * 0.5; // Длина полоски
+		let barH = s * 0.08; // Толщина полоски
+		let barX = x_menu + (s - barW) / 2; // Центрируем по горизонтали
+		ctx.fillRect(barX, y + s * 0.3, barW, barH);
+		ctx.fillRect(barX, y + s * 0.48, barW, barH);
+		ctx.fillRect(barX, y + s * 0.66, barW, barH);
+		ctx.fillStyle = "rgba(0,0,0,0.3)";
+		ctx.fillRect(barX, y + s * 0.3 + barH, barW, barH * 0.3);
+	}
 }
 
 function hotbar_get_selected_item(hotbar_element) {
