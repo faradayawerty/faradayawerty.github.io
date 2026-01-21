@@ -40,33 +40,59 @@ function inventory_update(inventory_element, dt) {
 	let input = inventory_element.game.input;
 	let scale = get_scale();
 
-	// Координаты (приоритет тачу, если он есть)
+	// 1. Сначала определяем базу для ПК (Мышь)
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 	let is_clicked = isMouseLeftButtonPressed(input);
 	let is_clicked_right = isMouseRightButtonPressed(input);
+	let is_released = false;
 
+	// 2. Если есть тач — ПЕРЕОПРЕДЕЛЯЕМ координаты и клик (Мультитач логика)
 	if (isScreenTouched(input)) {
-		mx = input.touch[0].x / scale;
-		my = input.touch[0].y / scale;
-		if (!inv._touch_lock) {
-			is_clicked = true;
-			inv._touch_lock = true;
-		} else {
-			is_clicked = false; 
+		let inv_rect = {
+			x: 40, y: 40,
+			w: (inv.slot_size * 1.05) * inv.items[0].length + 60,
+			h: (inv.slot_size * 1.05) * inv.items.length
+		};
+
+		let foundTouchInInv = false;
+		for (let t of input.touch) {
+			let tx = t.x / scale;
+			let ty = t.y / scale;
+
+			if (doRectsCollide(tx, ty, 0, 0, inv_rect.x, inv_rect.y, inv_rect.w, inv_rect.h)) {
+				mx = tx;
+				my = ty;
+				foundTouchInInv = true;
+				if (!inv._touch_lock) {
+					is_clicked = true;
+					inv._touch_lock = true;
+				} else {
+					is_clicked = false; // Удерживаем палец
+				}
+				break;
+			}
+		}
+
+		if (!foundTouchInInv && inv._touch_lock) {
+			is_released = true;
+			inv._touch_lock = false;
 		}
 	} else {
+		// Сброс лока, если тачей нет (мышь работает сама по себе)
 		inv._touch_lock = false;
 	}
+
+	// Координаты для отрисовки предмета в руке
+	inv.last_active_mx = mx;
+	inv.last_active_my = my;
 
 	// --- КНОПКА ЗАКРЫТИЯ ---
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
 	let cross_y = 40;
-
 	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
 		inventory_element.shown = false;
-		inv.imove = -1;
-		inv.jmove = -1;
+		inv.imove = -1; inv.jmove = -1;
 		return;
 	}
 
@@ -77,21 +103,20 @@ function inventory_update(inventory_element, dt) {
 		for(let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
 			let sy = 40 + (inv.slot_size * 1.05) * i;
-			
+
 			if(doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
 				slot_selected = true;
 				inv.iselected = i;
 				inv.jselected = j;
 
 				if(is_clicked) {
-					// Если в руках ничего нет — берем предмет из слота
 					if(inv.imove < 0 && inv.jmove < 0) {
 						if(inv.items[i][j] > 0) {
 							inv.imove = i;
 							inv.jmove = j;
 						}
 					} else {
-						// Если в руках уже есть предмет — меняем его местами с текущим слотом
+						// Обмен предметами (на ПК работает по второму клику, на таче по нажатию)
 						let temp = inv.items[i][j];
 						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 						inv.items[inv.imove][inv.jmove] = temp;
@@ -99,17 +124,23 @@ function inventory_update(inventory_element, dt) {
 						inv.jmove = -1;
 					}
 				}
+				// Дополнительно для тача: положить при отпускании
+				if (is_released && inv.imove >= 0) {
+					let temp = inv.items[i][j];
+					inv.items[i][j] = inv.items[inv.imove][inv.jmove];
+					inv.items[inv.imove][inv.jmove] = temp;
+					inv.imove = -1; inv.jmove = -1;
+				}
 			}
 		}
 	}
-	
-	if((is_clicked_right || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
+
+	// Выброс предмета
+	if((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
 		if(inv.imove !== -1 && inv.jmove !== -1) {
-			// Выбрасываем предмет в мир
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 		}
-		inv.imove = -1;
-		inv.jmove = -1;
+		inv.imove = -1; inv.jmove = -1;
 	}
 
 	if(!slot_selected) {
@@ -117,28 +148,17 @@ function inventory_update(inventory_element, dt) {
 		inv.jselected = -1;
 	}
 
-	// Выбросить предмет на Q
+	// Хоткей Q
 	if(isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
 		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
 		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
-		
 		if (dropI !== -1 && dropJ !== -1) {
 			inventory_drop_item(inventory_element, dropI, dropJ);
 			if (dropI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
 		}
 	}
-	
-	// Правая кнопка мыши — тоже выброс
-	if(input.mouse.rightButtonPressed) {
-		if (inv.imove !== -1) {
-			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-			inv.imove = -1;
-			inv.jmove = -1;
-		} else if (inv.iselected !== -1) {
-			inventory_drop_item(inventory_element, inv.iselected, inv.jselected);
-		}
-	}
 }
+
 
 function inventory_draw(inventory_element, ctx) {
 	if(inventory_element.game.want_hide_inventory || !inventory_element.shown)
@@ -151,18 +171,17 @@ function inventory_draw(inventory_element, ctx) {
 	for(let i = 0; i < inv.items.length; i++) {
 		for(let j = 0; j < inv.items[i].length; j++) {
 			ctx.globalAlpha = 0.9;
-			
+
 			if(inv.imove == i && inv.jmove == j)
-				ctx.fillStyle = "orange"; // Подсветка "откуда взяли"
+				ctx.fillStyle = "orange";
 			else if(inv.iselected == i && inv.jselected == j)
 				ctx.fillStyle = "cyan";
 			else
 				ctx.fillStyle = "blue";
-			
+
 			ctx.fillRect(40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size);
 			ctx.globalAlpha = 1.0;
 
-			// Отрисовка предмета (если он не в руках)
 			if (!(inv.imove === i && inv.jmove === j)) {
 				item_icon_draw(ctx, inv.items[i][j], 40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size, inv.animation_state);
 			}
@@ -170,8 +189,8 @@ function inventory_draw(inventory_element, ctx) {
 	}
 
 	// 2. Отрисовка кнопки закрытия
-	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15; 
-	let cross_y = 40; 
+	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15; 
+	let cross_y = 40; 
 	let cs = inv.cross_size;
 
 	if(inventory_element.game.mobile) {
@@ -190,18 +209,18 @@ function inventory_draw(inventory_element, ctx) {
 		ctx.stroke();
 	}
 
-	// 3. Предмет в руках (тянется за курсором)
+	// 3. Предмет в руках (тянется за ПРАВИЛЬНЫМИ координатами)
 	if(inv.imove > -1 && inv.jmove > -1) {
-		let input = inventory_element.game.input;
-		let curX = (input.touch.length > 0) ? input.touch[0].x / scale : input.mouse.x / scale;
-		let curY = (input.touch.length > 0) ? input.touch[0].y / scale : input.mouse.y / scale;
-		
+		let curX = inv.last_active_mx || 0;
+		let curY = inv.last_active_my || 0;
+
 		let drag_size = inv.slot_size * 0.8;
 		ctx.globalAlpha = 0.8;
 		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size/2, curY - drag_size/2, drag_size, drag_size, inv.animation_state);
 		ctx.globalAlpha = 1.0;
 	}
 }
+
 
 function inventory_drop_item(inventory_element, i, j, death=false) {
 	if(!inventory_element.data.attached_to_object || !inventory_element.data.attached_to_object.data.body)
