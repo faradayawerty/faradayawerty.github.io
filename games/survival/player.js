@@ -319,7 +319,7 @@ function player_update(player_object, dt) {
 
 	// --- ДЕЙСТВИЯ ПЕРСОНАЖА (Стрельба, использование предметов) ---
 	// Выполняются только если нет активной задержки UI
-	if (p.mobile_delay <= 0) {
+	if (true) {
 		let use_triggered = player_object.game.mobile ? isKeyDown(player_object.game.input, ' ', true) : player_object.game.input.mouse.leftButtonPressed;
 
 		if(use_triggered) {
