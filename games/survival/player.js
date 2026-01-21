@@ -407,7 +407,7 @@ function player_update(player_object, dt) {
 		}
 
 		// Теперь используем targetX и targetY в функции выстрела
-		if (shooting && !p.inventory_element.shown && !p.achievements_element.shown) {
+		if (shooting && !p.achievements_element.shown) {
 			// Мы передаем вычисленные координаты цели вместо стандартного getShootDir
 			player_shoot(player_object, dt, null, targetX, targetY);
 

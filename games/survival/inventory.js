@@ -30,131 +30,155 @@ function inventory_destroy(inventory_element) {
 }
 
 function inventory_update(inventory_element, dt) {
-	if (inventory_element.data.attached_to_object.data.ai_controlled)
-		inventory_element.shown = false;
+    // 0. ПРОВЕРКИ СОСТОЯНИЯ
+    if (inventory_element.data.attached_to_object.data.ai_controlled)
+        inventory_element.shown = false;
 
-	if (!inventory_element.shown) return;
+    if (!inventory_element.shown) return;
 
-	let inv = inventory_element.data;
-	let game = inventory_element.game;
-	let input = game.input;
-	let scale = get_scale();
-	let player_object = inv.attached_to_object;
+    let inv = inventory_element.data;
+    let game = inventory_element.game;
+    let input = game.input;
+    let scale = get_scale();
+    let player_object = inv.attached_to_object;
 
-	let mx = input.mouse.x / scale;
-	let my = input.mouse.y / scale;
-	let is_clicked = false;
-	let is_clicked_right = isMouseRightButtonPressed(input); // Фиксация ПКМ
+    // Инициализация переменных памяти, если их еще нет в объекте
+    if (inv.was_left_down === undefined) inv.was_left_down = false;
+    if (inv.was_right_down === undefined) inv.was_right_down = false;
 
-	// 1. ОПРЕДЕЛЕНИЕ КЛИКА (Разделение мобилки и ПК)
-	if (game.mobile) {
-		let freeTouch = input.touch.find(t => t.id !== input.joystick.left.id && t.id !== input.joystick.right.id);
-		if (freeTouch) {
-			mx = freeTouch.x / scale;
-			my = freeTouch.y / scale;
-			if (inv.active_touch_id !== freeTouch.id) {
-				inv.active_touch_id = freeTouch.id;
-				is_clicked = true;
-			}
-		} else {
-			inv.active_touch_id = null;
-		}
-	} else {
-		is_clicked = isMouseLeftButtonPressed(input);
-	}
+    let mx = input.mouse.x / scale;
+    let my = input.mouse.y / scale;
 
-	inv.last_active_mx = mx;
-	inv.last_active_my = my;
-	inv.animation_state += 0.02 * dt;
+    let is_clicked = false;
+    let is_clicked_right = false;
 
-	// Параметры мобильных кнопок действий
-	let btnW = 120, btnH = 50, gap = 20;
-	let startY = 60 + (inv.slot_size * 1.05) * inv.items.length;
-	let startX = 40;
+    // 1. ОПРЕДЕЛЕНИЕ КЛИКА (БЕЗ ОБНУЛЕНИЯ ГЛОБАЛЬНОГО INPUT)
+    if (game.mobile) {
+        // Логика для мобильных устройств (через ID тача)
+        let freeTouch = input.touch.find(t => t.id !== input.joystick.left.id && t.id !== input.joystick.right.id);
+        if (freeTouch) {
+            mx = freeTouch.x / scale;
+            my = freeTouch.y / scale;
+            if (inv.active_touch_id !== freeTouch.id) {
+                inv.active_touch_id = freeTouch.id;
+                is_clicked = true;
+            }
+        } else {
+            inv.active_touch_id = null;
+        }
+    } else {
+        // Логика для ПК: сравниваем текущее состояние с предыдущим кадром
+        let current_left = input.mouse.leftButtonPressed;
+        let current_right = input.mouse.rightButtonPressed;
 
-	// 2. ПКМ НА ПК: Быстрый выброс выбранного предмета
-	if (!game.mobile && is_clicked_right) {
-		if (inv.imove !== -1 && inv.jmove !== -1) {
-			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-			inv.imove = -1; inv.jmove = -1;
-			return;
-		}
-	}
+        if (current_left && !inv.was_left_down) is_clicked = true;
+        if (current_right && !inv.was_right_down) is_clicked_right = true;
 
-	// 3. МОБИЛЬНЫЕ КНОПКИ ДЕЙСТВИЯ (USE / DROP)
-	if (game.mobile && inv.imove !== -1 && is_clicked) {
-		if (doRectsCollide(mx, my, 0, 0, startX, startY, btnW, btnH)) {
-			let id = inv.items[inv.imove][inv.jmove];
-			if (id > 0) {
-				player_item_consume(player_object, id, false);
-				if (inv.imove !== -1 && inv.items[inv.imove][inv.jmove] === 0) {
-					inv.imove = -1; inv.jmove = -1;
-				}
-			}
-			return;
-		}
-		if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY, btnW, btnH)) {
-			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-			inv.imove = -1; inv.jmove = -1;
-			return;
-		}
-	}
+        // Сохраняем состояние для следующего кадра
+        inv.was_left_down = current_left;
+        inv.was_right_down = current_right;
+    }
 
-	// 4. КНОПКА ЗАКРЫТИЯ
-	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
-	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, 40, inv.cross_size, inv.cross_size)) {
-		inventory_element.shown = false;
-		inv.imove = -1; inv.jmove = -1;
-		return;
-	}
+    inv.last_active_mx = mx;
+    inv.last_active_my = my;
+    inv.animation_state += 0.02 * dt;
 
-	// 5. ЛОГИКА СЛОТОВ
-	let slot_hit = false;
-	for (let i = 0; i < inv.items.length; i++) {
-		for (let j = 0; j < inv.items[i].length; j++) {
-			let sx = 40 + (inv.slot_size * 1.05) * j;
-			let sy = 40 + (inv.slot_size * 1.05) * i;
+    // Параметры мобильных кнопок действий
+    let btnW = 120, btnH = 50, gap = 20;
+    let startY = 60 + (inv.slot_size * 1.05) * inv.items.length;
+    let startX = 40;
 
-			if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
-				slot_hit = true;
-				inv.iselected = i;
-				inv.jselected = j;
+    // 2. ПКМ НА ПК: Быстрый выброс выбранного ("висящего на курсоре") предмета
+    if (!game.mobile && is_clicked_right) {
+        if (inv.imove !== -1 && inv.jmove !== -1) {
+            inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+            inv.imove = -1; inv.jmove = -1;
+            return; // Прерываем, так как действие выполнено
+        }
+    }
 
-				if (is_clicked) {
-					if (inv.imove === -1) {
-						if (inv.items[i][j] > 0) { inv.imove = i; inv.jmove = j; }
-					} else {
-						if (inv.imove === i && inv.jmove === j) {
-							inv.imove = -1; inv.jmove = -1;
-						} else {
-							let temp = inv.items[i][j];
-							inv.items[i][j] = inv.items[inv.imove][inv.jmove];
-							inv.items[inv.imove][inv.jmove] = temp;
-							inv.imove = -1; inv.jmove = -1;
-						}
-					}
-				}
+    // 3. МОБИЛЬНЫЕ КНОПКИ ДЕЙСТВИЯ (USE / DROP)
+    if (game.mobile && inv.imove !== -1 && is_clicked) {
+        // Кнопка USE
+        if (doRectsCollide(mx, my, 0, 0, startX, startY, btnW, btnH)) {
+            let id = inv.items[inv.imove][inv.jmove];
+            if (id > 0) {
+                player_item_consume(player_object, id, false);
+                if (inv.imove !== -1 && inv.items[inv.imove][inv.jmove] === 0) {
+                    inv.imove = -1; inv.jmove = -1;
+                }
+            }
+            return;
+        }
+        // Кнопка DROP
+        if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY, btnW, btnH)) {
+            inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+            inv.imove = -1; inv.jmove = -1;
+            return;
+        }
+    }
 
-				// Дополнительно: ПКМ по слоту на ПК сразу выбрасывает предмет из него
-				if (!game.mobile && is_clicked_right && inv.items[i][j] > 0) {
-					inventory_drop_item(inventory_element, i, j);
-					if (inv.imove === i && inv.jmove === j) { inv.imove = -1; inv.jmove = -1; }
-				}
-			}
-		}
-	}
+    // 4. КНОПКА ЗАКРЫТИЯ (Крестик)
+    let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
+    if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, 40, inv.cross_size, inv.cross_size)) {
+        inventory_element.shown = false;
+        inv.imove = -1; inv.jmove = -1;
+        return;
+    }
 
-	if (!slot_hit) { inv.iselected = -1; inv.jselected = -1; }
+    // 5. ЛОГИКА СЛОТОВ
+    let slot_hit = false;
+    for (let i = 0; i < inv.items.length; i++) {
+        for (let j = 0; j < inv.items[i].length; j++) {
+            let sx = 40 + (inv.slot_size * 1.05) * j;
+            let sy = 40 + (inv.slot_size * 1.05) * i;
 
-	// 7. ХОТКЕЙ Q
-	if (isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
-		let dI = (inv.imove !== -1) ? inv.imove : inv.iselected;
-		let dJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
-		if (dI !== -1 && dJ !== -1) {
-			inventory_drop_item(inventory_element, dI, dJ);
-			if (dI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
-		}
-	}
+            if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
+                slot_hit = true;
+                inv.iselected = i;
+                inv.jselected = j;
+
+                // ЛКМ (или основной тач) по слоту
+                if (is_clicked) {
+                    if (inv.imove === -1) {
+                        // Если ничего не несем — берем предмет
+                        if (inv.items[i][j] > 0) { inv.imove = i; inv.jmove = j; }
+                    } else {
+                        // Если предмет в руках
+                        if (inv.imove === i && inv.jmove === j) {
+                            // Клик по тому же слоту — отмена выбора
+                            inv.imove = -1; inv.jmove = -1;
+                        } else {
+                            // Обмен предметами между слотами
+                            let temp = inv.items[i][j];
+                            inv.items[i][j] = inv.items[inv.imove][inv.jmove];
+                            inv.items[inv.imove][inv.jmove] = temp;
+                            inv.imove = -1; inv.jmove = -1;
+                        }
+                    }
+                }
+
+                // ПКМ по слоту на ПК — мгновенный выброс
+                if (!game.mobile && is_clicked_right && inv.items[i][j] > 0) {
+                    inventory_drop_item(inventory_element, i, j);
+                    // Если выбрасываем тот предмет, который «несли», сбрасываем выделение
+                    if (inv.imove === i && inv.jmove === j) { inv.imove = -1; inv.jmove = -1; }
+                }
+            }
+        }
+    }
+
+    if (!slot_hit) { inv.iselected = -1; inv.jselected = -1; }
+
+    // 6. ГОРЯЧАЯ КЛАВИША Q (Выбросить)
+    if (isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
+        let dI = (inv.imove !== -1) ? inv.imove : inv.iselected;
+        let dJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
+        if (dI !== -1 && dJ !== -1 && inv.items[dI][dJ] > 0) {
+            inventory_drop_item(inventory_element, dI, dJ);
+            if (dI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
+        }
+    }
 }
 
 
