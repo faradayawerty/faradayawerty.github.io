@@ -357,6 +357,8 @@ function player_update(player_object, dt) {
 
 		if(shooting && !p.inventory_element.shown && !p.achievements_element.shown) {
 			player_shoot(player_object, dt, null, getShootDir(player_object.game.input).x, getShootDir(player_object.game.input).y);
+			if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
+				achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
 		} else {
 			p.laser_sound_has_played = false; p.sword_protection = false;
 		}
