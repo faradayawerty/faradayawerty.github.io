@@ -424,9 +424,12 @@ function player_draw(player_object, ctx) {
 	let p = player_object.data;
 	if(p.immunity % 350 > 175)
 		return;
+    
 	if(!p.car_object) {
 		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");
+
+		// --- ИНДИКАТОРЫ ХАРАКТЕРИСТИК ---
 		if(player_object.game.settings.indicators["show player health"]) {
 			ctx.fillStyle = "red";
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, p.h * 0.05);
@@ -446,172 +449,121 @@ function player_draw(player_object, ctx) {
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
 		}
 
+		// --- ЛАЗЕРНЫЙ ЛУЧ ---
 		if(p.shooting_laser) {
-
 			let r = Math.cos(0.1 * p.item_animstate) * 15;
 			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
 			let b = Math.sin(0.1 * p.item_animstate) * 15;
-			r = Math.floor(r*r);
-			g = Math.floor(g*g);
-			b = Math.floor(b*b);
+			r = Math.floor(r*r); g = Math.floor(g*g); b = Math.floor(b*b);
 			let color = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
 
-			ctx.beginPath();
-			ctx.lineWidth = p.w * 0.65;
-			ctx.strokeStyle = color;
-			let px = p.body.position.x;
-			let py = p.body.position.y;
-			let gx = p.w * 60 * Math.cos(p.laser_direction);
-			let gy = p.w * 60 * Math.sin(p.laser_direction);
-			let ggx = gx;
-			let ggy = gy;
-			let gg = Math.sqrt(ggx * ggx + ggy * ggy);
-			ggx = ggx / gg;
-			ggy = ggy / gg;
-			px = px + 1.7 * p.w * ggx;
-			py = py + 1.7 * p.w * ggy;
-			ctx.moveTo(px, py);
-			ctx.lineTo(px + gx, py + gy);
-			ctx.stroke();
+			const drawLaserLine = (width, strokeCol) => {
+				ctx.beginPath();
+				ctx.lineWidth = width;
+				ctx.strokeStyle = strokeCol;
+				let gx = p.w * 60 * Math.cos(p.laser_direction);
+				let gy = p.w * 60 * Math.sin(p.laser_direction);
+				let gLen = Math.sqrt(gx * gx + gy * gy) || 1;
+				let px = p.body.position.x + 1.7 * p.w * (gx / gLen);
+				let py = p.body.position.y + 1.7 * p.w * (gy / gLen);
+				ctx.moveTo(px, py);
+				ctx.lineTo(px + gx, py + gy);
+				ctx.stroke();
+			};
 
-			ctx.beginPath();
-			ctx.lineWidth = p.w * 0.45;
-			ctx.strokeStyle = "white";
-			px = p.body.position.x;
-			py = p.body.position.y;
-			gx = p.w * 60 * Math.cos(p.laser_direction);
-			gy = p.w * 60 * Math.sin(p.laser_direction);
-			ggx = gx;
-			ggy = gy;
-			gg = Math.sqrt(ggx * ggx + ggy * ggy);
-			ggx = ggx / gg;
-			ggy = ggy / gg;
-			px = px + 1.7 * p.w * ggx;
-			py = py + 1.7 * p.w * ggy;
-			ctx.moveTo(px, py);
-			ctx.lineTo(px + gx, py + gy);
-			ctx.stroke();
-
+			drawLaserLine(p.w * 0.65, color);
+			drawLaserLine(p.w * 0.45, "white");
 			p.shooting_laser = false;
 		}
 
-		if(player_object.game.settings.player_draw_gun &&
-			ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
-
+		// --- ОРУЖИЕ (ПУШКИ) ---
+		if(player_object.game.settings.player_draw_gun && ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
 
-			let mx = 1;
-			let my = 1;
-			let cx = 0;
-			let cy = 0;
+			let mx = 1, my = 0, cx = 0, cy = 0;
 
 			if(p.ai_controlled) {
-				let closest_enemy = game_object_find_closest(player_object.game, player_object.data.body.position.x, player_object.data.body.position.y, "enemy", 1000);
+				let closest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000);
 				if(closest_enemy) {
 					mx = closest_enemy.data.body.position.x;
 					my = closest_enemy.data.body.position.y;
 					cx = p.body.position.x;
 					cy = p.body.position.y;
+				} else { mx = p.body.position.x + 1; my = p.body.position.y; cx = p.body.position.x; cy = p.body.position.y; }
+			} else if (player_object.game.mobile) {
+				// МОБИЛЬНАЯ ЛОГИКА: используем правый джойстик
+				cx = 0; cy = 0;
+				mx = player_object.game.input.joystick.right.dx;
+				my = player_object.game.input.joystick.right.dy;
+				
+				// Если правый не трогаем, смотрим по левому (направлению движения)
+				if (mx === 0 && my === 0) {
+					mx = player_object.game.input.joystick.left.dx;
+					my = player_object.game.input.joystick.left.dy;
 				}
+				// Дефолт, если оба стоят
+				if (mx === 0 && my === 0) mx = 1; 
 			} else {
+				// ПК ЛОГИКА: Мышь
 				mx = player_object.game.input.mouse.x;
 				my = player_object.game.input.mouse.y;
 				cx = 0.5 * ctx.canvas.width;
-				cy = 0.5 * ctx.canvas.height;		
-				if(player_object.game.mobile) {
-					mx = player_object.game.input.joystick.dx + cx;
-					my = player_object.game.input.joystick.dy + cy;
-				}
+				cy = 0.5 * ctx.canvas.height;
 			}
 
+			let item = hotbar_get_selected_item(p.hotbar_element);
 			ctx.strokeStyle = "black";
 			let lw = 0.25 * p.w;
 			let gl = 1;
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN)
-				ctx.strokeStyle = "#117733";
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_LASER_GUN) {
-				ctx.strokeStyle = "purple";
-				lw *= 1.25;
-				gl *= 1.75;
-				px = p.body.position.x;
-				py = p.body.position.y;
-			}
 
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN)
-				ctx.strokeStyle = "#773311";
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_SHOTGUN)
-				ctx.strokeStyle = "#111133";
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN)
-				ctx.strokeStyle = "#551111";
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS) {
-				ctx.strokeStyle = "#551111";
-				lw *= 0.75;
-				gl *= 0.75;
+			// Настройка цветов и размеров
+			if(item == ITEM_GREEN_GUN) ctx.strokeStyle = "#117733";
+			if(item == ITEM_LASER_GUN) { ctx.strokeStyle = "purple"; lw *= 1.25; gl *= 1.75; px = p.body.position.x; py = p.body.position.y; }
+			if(item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
+			if(item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle = "#111133";
+			if(item == ITEM_RED_SHOTGUN) ctx.strokeStyle = "#551111";
+			if(item == ITEM_MINIGUN) ctx.strokeStyle = "#113377";
+			if(item == ITEM_PLASMA_LAUNCHER) { ctx.strokeStyle = "#331133"; lw *= 2.25; gl *= 1.5; }
+			if(item == ITEM_PLASMA_PISTOL) ctx.strokeStyle = "#331133";
+			if(item == ITEM_ROCKET_LAUNCHER) { ctx.strokeStyle = "#111133"; lw *= 2.25; gl *= 1.5; }
+
+			// Расчет направления
+			let gx = mx - cx;
+			let gy = my - cy;
+			let g = Math.sqrt(gx * gx + gy * gy) || 1;
+
+			// Отрисовка второго ствола для парных пистолетов
+			if(item == ITEM_RED_PISTOLS || item == ITEM_RAINBOW_PISTOLS) {
+				if(item == ITEM_RED_PISTOLS) ctx.strokeStyle = "#551111";
+				else ctx.strokeStyle = "purple";
+				
+				let p2x = p.body.position.x + 0.55 * p.w;
+				let p2y = p.body.position.y - 0.45 * p.h;
 				ctx.beginPath();
-				let px = p.body.position.x - 0.45 * p.w + p.w;
-				let py = p.body.position.y - 0.45 * p.h;
-				ctx.moveTo(px, py);
-				let gx = 1, gy = 1;
-				gx = mx - cx;
-				gy = my - cy;
-				let g = Math.sqrt(gx * gx + gy * gy);
-				ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
-				ctx.lineWidth = lw;
+				ctx.lineWidth = lw * 0.75;
+				ctx.moveTo(p2x, p2y);
+				ctx.lineTo(p2x + (gl * 0.75) * p.w * gx / g, p2y + (gl * 0.75) * p.h * gy / g);
 				ctx.stroke();
-			}
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS) {
-				ctx.strokeStyle = "purple";
-				lw *= 0.75;
-				gl *= 0.75;
-				ctx.beginPath();
-				let px = p.body.position.x - 0.45 * p.w + p.w;
-				let py = p.body.position.y - 0.45 * p.h;
-				ctx.moveTo(px, py);
-				let gx = 1, gy = 1;
-				gx = mx - cx;
-				gy = my - cy;
-				let g = Math.sqrt(gx * gx + gy * gy);
-				ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
-				ctx.lineWidth = lw;
-				ctx.stroke();
-			}
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN)
-				ctx.strokeStyle = "#113377";
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER) {
-				ctx.strokeStyle = "#331133";
-				lw *= 2.25;
-				gl *= 1.5;
-			}
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_PISTOL) {
-				ctx.strokeStyle = "#331133";
-			}
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER) {
-				ctx.strokeStyle = "#111133";
-				lw *= 2.25;
-				gl *= 1.5;
 			}
 			
+			// Основной ствол
 			ctx.beginPath();
-			ctx.moveTo(px, py);
-			let gx = 1, gy = 1;
-			gx = mx - cx;
-			gy = my - cy;
-			let g = Math.sqrt(gx * gx + gy * gy);
-			ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
 			ctx.lineWidth = lw;
+			ctx.moveTo(px, py);
+			ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
 			ctx.stroke();
 
-			ctx.lineWidth = 2;
+			ctx.lineWidth = 2; // Сброс
 		} else if(p.sword_visible) {
+			// --- ХОЛОДНОЕ ОРУЖИЕ ---
 			let px = p.body.position.x - p.w * 0.45;
 			let py = p.body.position.y - p.h * 0.45;
 			let sword_length = 100;
 			ctx.beginPath();
 			ctx.moveTo(px, py);
 			let col = "#55aa11";
-			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN)
-				col = "brown";
+			if(hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN) col = "brown";
 			ctx.strokeStyle = col;
 			ctx.lineTo(px + Math.cos(p.sword_direction) * sword_length, py + Math.sin(p.sword_direction) * sword_length);
 			ctx.lineWidth = 0.25 * p.w;
@@ -624,47 +576,35 @@ function player_draw(player_object, ctx) {
 			}
 			p.sword_visible = false;
 		} else if(hotbar_get_selected_item(p.hotbar_element) > 0) {
+			// --- ИКОНКА ПРЕДМЕТА ---
 			let px = p.body.position.x - 0.25 * p.w, py = p.body.position.y - 0.25 * p.h;
 			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element), px, py, 0.5 * p.w, 0.5 * p.h, p.item_animstate);
 		}
-		if(p.shield_blue_health > 0) {
+
+		// --- ЩИТЫ ---
+		const drawShield = (health, maxHealth, fill, stroke) => {
+			if (health <= 0) return;
 			ctx.fillStyle = "gray";
 			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w, p.h * 0.05);
-			ctx.fillStyle = "cyan";
-			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_blue_health / p.shield_blue_health_max, p.h * 0.05);
+			ctx.fillStyle = fill;
+			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * health / maxHealth, p.h * 0.05);
 			ctx.globalAlpha = 0.25;
-			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, "#115577", "#113377", 0.05 * p.w);
+			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, fill, stroke, 0.05 * p.w);
 			ctx.globalAlpha = 1.0;
-		}
-		if(p.shield_green_health > 0) {
-			ctx.fillStyle = "gray";
-			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w, p.h * 0.05);
-			ctx.fillStyle = "lime";
-			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_green_health / p.shield_green_health_max, p.h * 0.05);
-			ctx.globalAlpha = 0.25;
-			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, "#117755", "#117733", 0.05 * p.w);
-			ctx.globalAlpha = 1.0;
-		}
+		};
+
+		drawShield(p.shield_blue_health, p.shield_blue_health_max, "#115577", "#113377");
+		drawShield(p.shield_green_health, p.shield_green_health_max, "lime", "#117733");
+		
 		if(p.shield_rainbow_health > 0) {
-			let r = Math.cos(0.1 * p.item_animstate) * 15;
-			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
-			let b = Math.sin(0.1 * p.item_animstate) * 15;
-			r = Math.floor(r*r);
-			g = Math.floor(g*g);
-			b = Math.floor(b*b);
-			let color = "#"+(r).toString(16).padStart(2,'0') + (g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0');
-			let color1 = "#"+(g).toString(16).padStart(2,'0') + (b).toString(16).padStart(2,'0') + (r).toString(16).padStart(2,'0');
-			ctx.fillStyle = "gray";
-			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w, p.h * 0.05);
-			ctx.fillStyle = color;
-			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position.y - 1.85 * p.h, 2.5 * p.w * p.shield_rainbow_health / p.shield_rainbow_health_max, p.h * 0.05);
-			ctx.globalAlpha = 0.25;
-			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, color, "white", 0.05 * p.w);
-			ctx.globalAlpha = 1.0;
+			let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15, 2));
+			let g = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15, 2));
+			let b = Math.floor(Math.pow(Math.sin(0.1 * p.item_animstate) * 15, 2));
+			let color = "#"+r.toString(16).padStart(2,'0') + g.toString(16).padStart(2,'0') + b.toString(16).padStart(2,'0');
+			drawShield(p.shield_rainbow_health, p.shield_rainbow_health_max, color, "white");
 		}
 	}
 }
-
 
 function player_shoot(player_object, dt, target_body=null, shoot_dir_x=null, shoot_dir_y=null) {
 

@@ -47,7 +47,7 @@ function getShootDir(input) {
 
 function getWishDir(input) {
 	if(input.touch.length > 0)
-		return {x: Math.sqrt(2) * input.joystick.right.dx, y: Math.sqrt(2) * input.joystick.right.dy}
+		return {x: Math.sqrt(Math.sqrt(2)) * input.joystick.right.dx, y: Math.sqrt(Math.sqrt(2)) * input.joystick.right.dy}
 	
 	let vel = Matter.Vector.create(0, 0);
 	if(input.keys.down['d'] || input.keys.down['в']) vel = Matter.Vector.add(vel, Matter.Vector.create(1, 0));
