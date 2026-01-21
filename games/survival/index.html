@@ -82,6 +82,26 @@
 			let dt = Date.now() - lastUpdateTime;
 			lastUpdateTime = Date.now();
 
+			// 1. Получаем коэффициент пикселей (DPR)
+			let dpr = window.devicePixelRatio || 1;
+
+			// 2. Определяем нужный размер в логических пикселях
+			let logicalWidth = window.innerWidth;
+			let logicalHeight = window.innerHeight;
+
+			// 3. Устанавливаем физический размер холста (умножаем на DPR)
+			if (cvs1.width !== logicalWidth * dpr || cvs1.height !== logicalHeight * dpr) {
+			    cvs1.width = logicalWidth * dpr;
+			    cvs1.height = logicalHeight * dpr;
+
+			    // 4. ОЧЕНЬ ВАЖНО: Масштабируем контекст, чтобы весь остальной
+			    // рисовальный код (drawImage, fillRect) не пришлось переписывать
+			    ctx1.scale(dpr, dpr);
+			}
+
+		// Теперь canvas занимает все пиксели экрана, но координаты
+		// внутри ctx1 ведут себя так, будто экран все еще размера innerWidth/Height
+
 			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
 			ctx1.canvas.width = window.innerWidth;
 			ctx1.canvas.height = window.innerHeight;
