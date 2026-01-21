@@ -7,8 +7,8 @@ function achievements_create(g) {
 		offset_y: 50,
 		x: 50 + 100,
 		y: 50 + 100,
-		xx: 50 + 500, // x before mouse click
-		yy: 50 + 500, // y before mouse click
+		xx: 50 + 500,
+		yy: 50 + 500,
 		mxx: 0,
 		myy: 0,
 		clicked: false,
@@ -16,225 +16,281 @@ function achievements_create(g) {
 		animstate: 0,
 		cross_width: 0,
 		achievements: [
-
-			// game machanics achievements
-			{
-				name: "joining in",
-				desc: "launch the game",
-				name_rus: "к бою",
-				desc_rus: "зайти в игру",
-				req: null,
-				done: false
-			},
-			{
-				name: "discovering inventory",
-				desc: "discover inventory by pressing E or I",
-				name_rus: "открытие инвентаря",
-				desc_rus: "откройте инвентарь, нажав E или I",
-				req: "joining in",
-				done: false
-			},
-			{
-				name: "full inventory",
-				desc: "fill up the inventory with items fully; hint: use Q to drop an item from the inventory",
-				name_rus: "полный инвентарь",
-				desc_rus: "полностью заполните инвентарь предметами; подсказка: используйте Q, чтобы выбросить предмет из инвентаря",
-				req: "discovering inventory",
-				done: false
-			},
-			{
-				name: "achievements",
-				desc: "open achievements menu using J or R",
-				name_rus: "достижения",
-				desc_rus: "откройте меню достижений, нажав J или R",
-				req: "joining in",
-				done: false
-			},
-
-			// movement achievements
-			{
-				name: "first steps",
-				desc: "make first steps using WASD",
-				name_rus: "первые шаги",
-				desc_rus: "совершите первые шаги, используя WASD",
-				req: "joining in",
-				done: false
-			},
-			{
-				name: "outside the box",
-				desc: "leave the current level",
-				name_rus: "по ту сторону",
-				desc_rus: "покиньте текущий уровень, выйдя за его пределы",
-				req: "first steps",
-				done: false
-			},
-			{
-				name: "get a ride",
-				desc: "get a ride in the car by standing close to it and pressing F or SPACE",
-				name_rus: "поехали",
-				desc_rus: "сядьте в автомобиль, подойдя к нему близко и нажав F или SPACE",
-				req: "first steps",
-				done: false
-			},
-
-			// item achievements,
-			{
-				name: "pick an item",
-				desc: "pick up an item by standing close to it and pressing F or SPACE",
-				name_rus: "подобрать предмет",
-				desc_rus: "подберите предмет, подойдя к нему близко и нажав F или SPACE",
-				req: "outside the box",
-				done: false
-			},
-			{
-				name: "yummy",
-				desc: "eat canned meat to reduce the feeling of hunger",
-				name_rus: "вкусняшка",
-				desc_rus: "съешьте тушенку для снижения чувства голода",
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "stay hydrated",
-				desc: "drink a can of water to quench your thirst",
-				name_rus: "поддержка водного баланса",
-				desc_rus: "выпейте воду, чтобы утолить жажду",
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "healthy lifestyle",
-				desc: "use a health pack to heal",
-				name_rus: "здоровый образ жизни",
-				desc_rus: "воспользуйтесь аптечкой, чтобы восстановить здоровье",
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "fuel up",
-				desc: "use gasoline to refuel a car",
-				name_rus: "заправка",
-				desc_rus: "воспользуйтесь бензином, чтобы заправить автомобиль",
-				req: "pick an item",
-				done: false
-			},
-
-			// weapon achievements
-			{
-				name: "get a gun",
-				desc: "find a gun and pick it up",
-				name_rus: "получить оружие",
-				desc_rus: "найдите и подберите оружие",
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "need for ammo",
-				desc: "try shooting a gun without having any ammo for it",
-				name_rus: "нужны патроны",
-				desc_rus: "попробуйте выстрелить из оружия, не имея подходящих патронов",
-				req: "get a gun",
-				done: false
-			},
-
-			// enemy achievements
-			{
-				name: "shoot 'em up",
-				desc: "kill an enemy by shooting at it",
-				name_rus: "зомби шутер",
-				desc_rus: "убейте врага, выстрелив по нему",
-				req: "get a gun",
-				done: false
-			},
-			{
-				name: "big guy",
-				desc: "kill the boss; it is able to spawn when enough enemies are killed",
-				name_rus: "большой парень",
-				desc_rus: "убейте босса; босс появляется, если игрок убивает достаточное количество врагов",
-				req: "shoot 'em up",
-				done: false
-			},
-			{
-				name: "they can shoot?",
-				desc: "kill the first shooting enemy",
-				name_rus: "они умеют стрелять?",
-				desc_rus: "убейте первого стрелка",
-				req: "big guy",
-				done: false
-			},
-			{
-				name: "big shooting guy",
-				desc: "kill a shooting boss; it is able to spawn when enough shooting enemies are killed",
-				name_rus: "большой стрелок",
-				desc_rus: "убейте босса стрелка; стреляющий босс появляется, если игрок убивает достаточное количество стрелков",
-				req: "big guy",
-				done: false
-			},
-			{
-				name: "red shooter",
-				desc: "kill one red shooter",
-				name_rus: "красный стрелок",
-				desc_rus: "убейте одного красного стрелка",
-				req: "big shooting guy",
-				done: false
-			},
-			{
-				name: "big red guy",
-				desc: "kill red boss; it is able to spawn when enough red shooting enemies are killed",
-				name_rus: "большой красный парень",
-				desc_rus: "убейте красного босса; красный босс появляется, если игрок убивает достаточное количество красных стрелков",
-				req: "big shooting guy",
-				done: false
-			},
-			{
-				name: "he has a sword?",
-				desc: "kill one yellow enemy",
-				name_rus: "у него меч?",
-				desc_rus: "убейте одного желтого врага",
-				req: "big red guy",
-				done: false
-			},
-			{
-				name: "big guy with a sword",
-				desc: "kill yellow boss; it is able to spawn when enough yellow enemies are killed",
-				name_rus: "большой парень с мечом",
-				desc_rus: "убейте желтого босса; желтый босс появляется, если игрок убивает достаточное количество желтых врагов",
-				req: "big red guy",
-				done: false
-			},
-			{
-				name: "rocket shooter",
-				desc: "kill one rocket shooting enemy",
-				name_rus: "стрелок с ракетницей",
-				desc_rus: "убейте одного стрелка с ракетницей",
-				req: "big guy with a sword",
-				done: false
-			},
-			{
-				name: "big military guy",
-				desc: "kill the boss with a rocket launcher; it is able to spawn when enough rocket shooting enemies are killed",
-				name_rus: "большой военный парень",
-				desc_rus: "убейте босса с ракетницей; босс с ракетницей появляется, если игрок убивает достаточное количество противников с ракетницей",
-				req: "big guy with a sword",
-				done: false
-			},
-			{
-				name: "rainbow",
-				desc: "kill one rainbow enemy",
-				name_rus: "радуга",
-				desc_rus: "убейте одного радужного противника",
-				req: "big military guy",
-				done: false
-			},
-			{
-				name: "huge rainbow guy",
-				desc: "kill the rainbow boss; it is able to spawn when enough rainbow enemies are killed",
-				name_rus: "гигантский радужный парень",
-				desc_rus: "убейте радужного босса; радужный босс появляется, если игрок убивает достаточное количество радужных врагов",
-				req: "big military guy",
-				done: false
-			},
-		]
+					{
+						name: "joining in",
+						desc: "launch the game",
+						name_rus: "к бою",
+						desc_rus: "зайти в игру",
+						req: null,
+						done: false
+					},
+					{
+						name: "discovering inventory",
+						desc: {
+							mobile: "open inventory by tapping the backpack icon",
+							pc: "discover inventory by pressing E or I"
+						},
+						name_rus: "открытие инвентаря",
+						desc_rus: {
+							mobile: "откройте инвентарь, нажав на иконку рюкзака",
+							pc: "откройте инвентарь, нажав E или I"
+						},
+						req: "joining in",
+						done: false
+					},
+					{
+						name: "full inventory",
+						desc: {
+							mobile: "fill up the inventory with items fully; hint: drag an item to the drop zone to remove it",
+							pc: "fill up the inventory with items fully; hint: use Q to drop an item from the inventory"
+						},
+						name_rus: "полный инвентарь",
+						desc_rus: {
+							mobile: "полностью заполните инвентарь; подсказка: перетащите предмет вне инвентаря, чтобы выкинуть его",
+							pc: "полностью заполните инвентарь предметами; подсказка: используйте Q, чтобы выбросить предмет из инвентаря"
+						},
+						req: "discovering inventory",
+						done: false
+					},
+					{
+						name: "achievements",
+						desc: {
+							mobile: "open achievements menu using the gold cup button",
+							pc: "open achievements menu using J or R"
+						},
+						name_rus: "достижения",
+						desc_rus: {
+							mobile: "откройте меню достижений, нажав на кнопку с кубком",
+							pc: "откройте меню достижений, нажав J или R"
+						},
+						req: "joining in",
+						done: false
+					},
+					{
+						name: "first steps",
+						desc: {
+							mobile: "make first steps using the left joystick",
+							pc: "make first steps using WASD"
+						},
+						name_rus: "первые шаги",
+						desc_rus: {
+							mobile: "совершите первые шаги, используя левый джойстик",
+							pc: "совершите первые шаги, используя WASD"
+						},
+						req: "joining in",
+						done: false
+					},
+					{
+						name: "outside the box",
+						desc: "leave the current level",
+						name_rus: "по ту сторону",
+						desc_rus: "покиньте текущий уровень, выйдя за его пределы",
+						req: "first steps",
+						done: false
+					},
+					{
+						name: "get a ride",
+						desc: {
+							mobile: "get a ride in the car by standing close to it and pressing PICK UP / CAR",
+							pc: "get a ride in the car by standing close to it and pressing F or SPACE"
+						},
+						name_rus: "поехали",
+						desc_rus: {
+							mobile: "сядьте в автомобиль, подойдя к нему близко и нажав кнопку PICK UP / CAR",
+							pc: "сядьте в автомобиль, подойдя к нему близко и нажав F или SPACE"
+						},
+						req: "first steps",
+						done: false
+					},
+					{
+						name: "pick an item",
+						desc: {
+							mobile: "pick up an item by standing close to it and pressing PICK UP",
+							pc: "pick up an item by standing close to it and pressing F or SPACE"
+						},
+						name_rus: "подобрать предмет",
+						desc_rus: {
+							mobile: "подберите предмет, подойдя к нему близко и нажав кнопку PICK UP",
+							pc: "подберите предмет, подойдя к нему близко и нажав F или SPACE"
+						},
+						req: "outside the box",
+						done: false
+					},
+{
+						name: "yummy",
+						desc: {
+							mobile: "eat canned meat: select it in hotbar, close inventory and press USE",
+							pc: "eat canned meat: select it in inventory and left-click on your character"
+						},
+						name_rus: "вкусняшка",
+						desc_rus: {
+							mobile: "съешьте тушенку: выберите её в хотбаре, закройте инвентарь и нажмите USE",
+							pc: "съешьте тушенку: выберите её в инвентаре и нажмите ЛКМ по игроку"
+						},
+						req: "pick an item",
+						done: false
+					},
+					{
+						name: "stay hydrated",
+						desc: {
+							mobile: "drink water: select it in hotbar, close inventory and press USE",
+							pc: "drink water: select it in inventory and left-click on your character"
+						},
+						name_rus: "поддержка водного баланса",
+						desc_rus: {
+							mobile: "выпейте воду: выберите её в хотбаре, закройте инвентарь и нажмите USE",
+							pc: "выпейте воду: выберите её в инвентаре и нажмите ЛКМ по игроку"
+						},
+						req: "pick an item",
+						done: false
+					},
+					{
+						name: "healthy lifestyle",
+						desc: {
+							mobile: "use health pack: select it in hotbar, close inventory and press USE",
+							pc: "use health pack: select it in inventory and left-click on your character"
+						},
+						name_rus: "здоровый образ жизни",
+						desc_rus: {
+							mobile: "используйте аптечку: выберите её в хотбаре, закройте инвентарь и нажмите USE",
+							pc: "используйте аптечку: выберите её в инвентаре и нажмите ЛКМ по игроку"
+						},
+						req: "pick an item",
+						done: false
+					},
+					{
+						name: "fuel up",
+						desc: {
+							mobile: "use gasoline to refuel a car by standing close to it pressing USE",
+							pc: "use gasoline to refuel a car by standing close to it and pressing left mouse button"
+						},
+						name_rus: "заправка",
+						desc_rus: {
+							mobile: "используйте бензин, чтобы заправить авто через кнопку USE, подойдя близко к автомобилю и взяв бензин в руки в хотбаре",
+							pc: "воспользуйтесь бензином, чтобы заправить автомобиль, для этого встаньте к нему близко с бензином в руках и нажмите лкм"
+						},
+						req: "pick an item",
+						done: false
+					},
+					{
+						name: "get a gun",
+						desc: "find a gun and pick it up",
+						name_rus: "получить оружие",
+						desc_rus: "найдите и подберите оружие",
+						req: "pick an item",
+						done: false
+					},
+					{
+						name: "need for ammo",
+						desc: {
+							mobile: "try shooting with the right joystick without having any ammo",
+							pc: "try shooting a gun without having any ammo for it"
+						},
+						name_rus: "нужны патроны",
+						desc_rus: {
+							mobile: "попробуйте выстрелить правым джойстиком, не имея подходящих патронов",
+							pc: "попробуйте выстрелить из оружия, не имея подходящих патронов"
+						},
+						req: "get a gun",
+						done: false
+					},
+					{
+						name: "shoot 'em up",
+						desc: "kill an enemy by shooting at it",
+						name_rus: "зомби шутер",
+						desc_rus: "убейте врага, выстрелив по нему",
+						req: "get a gun",
+						done: false
+					},
+					{
+						name: "big guy",
+						desc: "kill the boss; it is able to spawn when enough enemies are killed",
+						name_rus: "большой парень",
+						desc_rus: "убейте босса; босс появляется, если игрок убивает достаточное количество врагов",
+						req: "shoot 'em up",
+						done: false
+					},
+					{
+						name: "they can shoot?",
+						desc: "kill the first shooting enemy",
+						name_rus: "они умеют стрелять?",
+						desc_rus: "убейте первого стрелка",
+						req: "big guy",
+						done: false
+					},
+					{
+						name: "big shooting guy",
+						desc: "kill a shooting boss; it is able to spawn when enough shooting enemies are killed",
+						name_rus: "большой стрелок",
+						desc_rus: "убейте босса стрелка; стреляющий босс появляется, если игрок убивает достаточное количество стрелков",
+						req: "big guy",
+						done: false
+					},
+					{
+						name: "red shooter",
+						desc: "kill one red shooter",
+						name_rus: "красный стрелок",
+						desc_rus: "убейте одного красного стрелка",
+						req: "big shooting guy",
+						done: false
+					},
+					{
+						name: "big red guy",
+						desc: "kill red boss; it is able to spawn when enough red shooting enemies are killed",
+						name_rus: "большой красный парень",
+						desc_rus: "убейте красного босса; красный босс появляется, если игрок убивает достаточное количество красных стрелков",
+						req: "big shooting guy",
+						done: false
+					},
+					{
+						name: "he has a sword?",
+						desc: "kill one yellow enemy",
+						name_rus: "у него меч?",
+						desc_rus: "убейте одного желтого врага",
+						req: "big red guy",
+						done: false
+					},
+					{
+						name: "big guy with a sword",
+						desc: "kill yellow boss; it is able to spawn when enough yellow enemies are killed",
+						name_rus: "большой парень с мечом",
+						desc_rus: "убейте желтого босса; желтый босс появляется, если игрок убивает достаточное количество желтых врагов",
+						req: "big red guy",
+						done: false
+					},
+					{
+						name: "rocket shooter",
+						desc: "kill one rocket shooting enemy",
+						name_rus: "стрелок с ракетницей",
+						desc_rus: "убейте одного стрелка с ракетницей",
+						req: "big guy with a sword",
+						done: false
+					},
+					{
+						name: "big military guy",
+						desc: "kill the boss with a rocket launcher; it is able to spawn when enough rocket shooting enemies are killed",
+						name_rus: "большой военный парень",
+						desc_rus: "убейте босса с ракетницей; босс с ракетницей появляется, если игрок убивает достаточное количество противников с ракетницей",
+						req: "big guy with a sword",
+						done: false
+					},
+					{
+						name: "rainbow",
+						desc: "kill one rainbow enemy",
+						name_rus: "радуга",
+						desc_rus: "убейте одного радужного противника",
+						req: "big military guy",
+						done: false
+					},
+					{
+						name: "huge rainbow guy",
+						desc: "kill the rainbow boss; it is able to spawn when enough rainbow enemies are killed",
+						name_rus: "гигантский радужный парень",
+						desc_rus: "убейте радужного босса; радужный босс появляется, если игрок убивает достаточное количество радужных врагов",
+						req: "big military guy",
+						done: false
+					},
+				]
 	};
 	return game_gui_element_create(g, "achievements", ach, achievements_update, achievements_draw, achievements_destroy);
 }
@@ -748,9 +804,18 @@ function achievements_shower_draw(ashe, ctx) {
 		ctx.strokeRect(x, y, w, h);
 		ctx.globalAlpha *= 2;
 
-		let text = "achivement get: " + ach + "! press R or J to view";
-		if(ashe.game.settings.language == "русский")
-			text = "получено достижение: " + achievement_get(ashe.data.attached_to.data.achievements, ach).name_rus + "! нажмите R или J";
+		// Проверка флага мобильного устройства прямо в кадре отрисовки
+		let isMob = ashe.game.mobile;
+		let helpText = isMob ? "tap the gold cup" : "press R or J";
+		let helpTextRus = isMob ? "нажмите на кубок" : "нажмите R или J";
+
+		let achData = achievement_get(ashe.data.attached_to.data.achievements, ach);
+		let text = "achievement get: " + ach + "! " + helpText + " to view";
+		
+		if(ashe.game.settings.language == "русский") {
+			text = "получено достижение: " + achData.name_rus + "! " + helpTextRus;
+		}
+
 		drawText(ctx, x + 1.25 * size, y + 0.6 * size, text, 20);
 		achievement_icon_draw(ctx, ashe.data.attached_to.data.achievements, ach, x + 0.125 * size, y + 0.125 * size, 0.75 * size, 0.75 * size,
 				false, 50, 50, 1000, 1000, ashe.data.animstate, false);
@@ -778,15 +843,23 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 
 	let lines = [];
 
-	let name = achievement_get(as, ach).name;
+	let achData = achievement_get(as, ach);
+	let name = achData.name;
 	if(ae.game.settings.language == "русский")
-		name = achievement_get(as, ach).name_rus;
+		name = achData.name_rus;
+	
 	lines.push("** " + name + " **");
 	lines.push("");
 
-	let desc = achievement_get(as, ach).desc;
-	if(ae.game.settings.language == "русский")
-		desc = achievement_get(as, ach).desc_rus;
+	// Динамический выбор описания
+	let descRaw = (ae.game.settings.language == "русский") ? achData.desc_rus : achData.desc;
+	let desc = "";
+	
+	if (typeof descRaw === 'object' && descRaw !== null) {
+		desc = ae.game.mobile ? descRaw.mobile : descRaw.pc;
+	} else {
+		desc = descRaw;
+	}
 
 	let fontsize = Math.floor(W / 27);
 	let charlim = Math.floor(1.25 * W / fontsize);
@@ -810,9 +883,7 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw=1000, bbh=1000) {
 	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
 		false, 0, 0, window.innerWidth / get_scale(), window.innerHeight / get_scale(), ae.data.animstate);
 
-
 	for(let i = 0; i < lines.length; i++) {
 		drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i], fontsize);
 	}
 }
-
