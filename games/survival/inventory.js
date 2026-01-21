@@ -36,215 +36,213 @@ function inventory_update(inventory_element, dt) {
 	if (!inventory_element.shown) return;
 
 	let inv = inventory_element.data;
-	let input = inventory_element.game.input;
+	let game = inventory_element.game;
+	let input = game.input;
 	let scale = get_scale();
+	let player_object = inv.attached_to_object;
 
-	// 1. База для ПК
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
-	let is_clicked = isMouseLeftButtonPressed(input);
-	let is_clicked_right = isMouseRightButtonPressed(input);
-	let is_released = false;
+	let is_clicked = false;
+	let is_clicked_right = isMouseRightButtonPressed(input); // Фиксация ПКМ
 
-	// 2. ЛОГИКА ТАЧА С ЗАЩИТОЙ ОТ СКАЧКОВ
-	if (isScreenTouched(input)) {
-		let freeTouch = null;
-		for (let t of input.touch) {
-			if (t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) {
-				freeTouch = t;
-				break;
-			}
-		}
-
+	// 1. ОПРЕДЕЛЕНИЕ КЛИКА (Разделение мобилки и ПК)
+	if (game.mobile) {
+		let freeTouch = input.touch.find(t => t.id !== input.joystick.left.id && t.id !== input.joystick.right.id);
 		if (freeTouch) {
-			let touch_x = freeTouch.x / scale;
-			let touch_y = freeTouch.y / scale;
-
-			// Проверка на резкий скачок (только если мы уже что-то тащим или тач удерживается)
-			let jump_threshold = inv.slot_size * 8;
-
-			if (inv.active_touch_id === freeTouch.id && (inv.imove !== -1 || inv._touch_lock)) {
-				let dx = touch_x - (inv.last_active_mx || touch_x);
-				let dy = touch_y - (inv.last_active_my || touch_y);
-				let dist = Math.sqrt(dx * dx + dy * dy);
-
-				if (dist > jump_threshold) {
-					// Скачок зафиксирован: оставляем старые координаты
-					mx = inv.last_active_mx;
-					my = inv.last_active_my;
-				} else {
-					mx = touch_x;
-					my = touch_y;
-				}
-			} else {
-				mx = touch_x;
-				my = touch_y;
-			}
-
-			// Логика смены ID касания
+			mx = freeTouch.x / scale;
+			my = freeTouch.y / scale;
 			if (inv.active_touch_id !== freeTouch.id) {
 				inv.active_touch_id = freeTouch.id;
 				is_clicked = true;
-				inv._touch_lock = true;
-			} else {
-				is_clicked = false;
 			}
 		} else {
-			if (inv.active_touch_id !== null) {
-				is_released = true;
-				inv.active_touch_id = null;
-				inv._touch_lock = false;
-			}
+			inv.active_touch_id = null;
 		}
 	} else {
-		if (inv.active_touch_id !== null) is_released = true;
-		inv.active_touch_id = null;
-		inv._touch_lock = false;
+		is_clicked = isMouseLeftButtonPressed(input);
 	}
 
-	// Сохраняем "отфильтрованные" координаты для следующего кадра
 	inv.last_active_mx = mx;
 	inv.last_active_my = my;
+	inv.animation_state += 0.02 * dt;
 
-	// --- КНОПКА ЗАКРЫТИЯ ---
+	// Параметры мобильных кнопок действий
+	let btnW = 120, btnH = 50, gap = 20;
+	let startY = 60 + (inv.slot_size * 1.05) * inv.items.length;
+	let startX = 40;
+
+	// 2. ПКМ НА ПК: Быстрый выброс выбранного предмета
+	if (!game.mobile && is_clicked_right) {
+		if (inv.imove !== -1 && inv.jmove !== -1) {
+			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+			inv.imove = -1; inv.jmove = -1;
+			return;
+		}
+	}
+
+	// 3. МОБИЛЬНЫЕ КНОПКИ ДЕЙСТВИЯ (USE / DROP)
+	if (game.mobile && inv.imove !== -1 && is_clicked) {
+		if (doRectsCollide(mx, my, 0, 0, startX, startY, btnW, btnH)) {
+			let id = inv.items[inv.imove][inv.jmove];
+			if (id > 0) {
+				player_item_consume(player_object, id, false);
+				if (inv.imove !== -1 && inv.items[inv.imove][inv.jmove] === 0) {
+					inv.imove = -1; inv.jmove = -1;
+				}
+			}
+			return;
+		}
+		if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY, btnW, btnH)) {
+			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
+			inv.imove = -1; inv.jmove = -1;
+			return;
+		}
+	}
+
+	// 4. КНОПКА ЗАКРЫТИЯ
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
-	let cross_y = 40;
-	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
+	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, 40, inv.cross_size, inv.cross_size)) {
 		inventory_element.shown = false;
-		inv.imove = -1;
-		inv.jmove = -1;
-		inv.active_touch_id = null;
+		inv.imove = -1; inv.jmove = -1;
 		return;
 	}
 
-	inv.animation_state += 0.02 * dt;
-
-	let slot_selected = false;
+	// 5. ЛОГИКА СЛОТОВ
+	let slot_hit = false;
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
 			let sy = 40 + (inv.slot_size * 1.05) * i;
 
-			// Проверка коллизии происходит по отфильтрованным координатам mx/my
 			if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
-				slot_selected = true;
+				slot_hit = true;
 				inv.iselected = i;
 				inv.jselected = j;
 
 				if (is_clicked) {
-					if (inv.imove < 0 && inv.jmove < 0) {
-						if (inv.items[i][j] > 0) {
-							inv.imove = i;
-							inv.jmove = j;
-						}
+					if (inv.imove === -1) {
+						if (inv.items[i][j] > 0) { inv.imove = i; inv.jmove = j; }
 					} else {
-						// Обмен
-						let temp = inv.items[i][j];
-						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
-						inv.items[inv.imove][inv.jmove] = temp;
-						inv.imove = -1;
-						inv.jmove = -1;
+						if (inv.imove === i && inv.jmove === j) {
+							inv.imove = -1; inv.jmove = -1;
+						} else {
+							let temp = inv.items[i][j];
+							inv.items[i][j] = inv.items[inv.imove][inv.jmove];
+							inv.items[inv.imove][inv.jmove] = temp;
+							inv.imove = -1; inv.jmove = -1;
+						}
 					}
 				}
 
-				if (is_released && inv.imove >= 0) {
-					let temp = inv.items[i][j];
-					inv.items[i][j] = inv.items[inv.imove][inv.jmove];
-					inv.items[inv.imove][inv.jmove] = temp;
-					inv.imove = -1;
-					inv.jmove = -1;
+				// Дополнительно: ПКМ по слоту на ПК сразу выбрасывает предмет из него
+				if (!game.mobile && is_clicked_right && inv.items[i][j] > 0) {
+					inventory_drop_item(inventory_element, i, j);
+					if (inv.imove === i && inv.jmove === j) { inv.imove = -1; inv.jmove = -1; }
 				}
 			}
 		}
 	}
 
-	// --- ВЫБРОС ПРЕДМЕТА ---
-	// На мобилках выбрасываем, если кликнули мимо слотов или отпустили палец в пустом месте
-	if ((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
-		if (inv.imove !== -1 && inv.jmove !== -1) {
-			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-		}
-		inv.imove = -1;
-		inv.jmove = -1;
-	}
+	if (!slot_hit) { inv.iselected = -1; inv.jselected = -1; }
 
-	if (!slot_selected) {
-		inv.iselected = -1;
-		inv.jselected = -1;
-	}
-
-	// --- ХОТКЕЙ Q ---
+	// 7. ХОТКЕЙ Q
 	if (isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
-		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
-		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
-		if (dropI !== -1 && dropJ !== -1) {
-			inventory_drop_item(inventory_element, dropI, dropJ);
-			if (dropI === inv.imove) {
-				inv.imove = -1;
-				inv.jmove = -1;
-			}
+		let dI = (inv.imove !== -1) ? inv.imove : inv.iselected;
+		let dJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
+		if (dI !== -1 && dJ !== -1) {
+			inventory_drop_item(inventory_element, dI, dJ);
+			if (dI === inv.imove) { inv.imove = -1; inv.jmove = -1; }
 		}
 	}
 }
+
 
 function inventory_draw(inventory_element, ctx) {
-	if (inventory_element.game.want_hide_inventory || !inventory_element.shown)
-		return;
+    if (inventory_element.game.want_hide_inventory || !inventory_element.shown)
+        return;
 
-	let inv = inventory_element.data;
-	let scale = get_scale();
+    let inv = inventory_element.data;
+    let game = inventory_element.game;
 
-	// 1. Отрисовка слотов
-	for (let i = 0; i < inv.items.length; i++) {
-		for (let j = 0; j < inv.items[i].length; j++) {
-			ctx.globalAlpha = 0.9;
+    // 1. Отрисовка слотов
+    for (let i = 0; i < inv.items.length; i++) {
+        for (let j = 0; j < inv.items[i].length; j++) {
+            let sx = 40 + (inv.slot_size * 1.05) * j;
+            let sy = 40 + (inv.slot_size * 1.05) * i;
 
-			if (inv.imove == i && inv.jmove == j)
-				ctx.fillStyle = "orange";
-			else if (inv.iselected == i && inv.jselected == j)
-				ctx.fillStyle = "cyan";
-			else
-				ctx.fillStyle = "blue";
+            ctx.globalAlpha = 0.9;
+            if (inv.imove === i && inv.jmove === j)
+                ctx.fillStyle = "orange"; // Выбранный предмет
+            else if (inv.iselected === i && inv.jselected === j)
+                ctx.fillStyle = "cyan"; // Наведенная мышь/палец
+            else
+                ctx.fillStyle = "blue";
 
-			ctx.fillRect(40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size);
-			ctx.globalAlpha = 1.0;
+            ctx.fillRect(sx, sy, inv.slot_size, inv.slot_size);
+            ctx.globalAlpha = 1.0;
 
-			if (!(inv.imove === i && inv.jmove === j)) {
-				item_icon_draw(ctx, inv.items[i][j], 40 + (inv.slot_size * 1.05) * j, 40 + (inv.slot_size * 1.05) * i, inv.slot_size, inv.slot_size, inv.animation_state);
-			}
-		}
-	}
+            // На ПК не рисуем иконку в слоте, если мы её "тащим" (она рисуется у мыши)
+            // На мобилках imove — это просто выбор, поэтому иконка остается в слоте
+            if (game.mobile || !(inv.imove === i && inv.jmove === j)) {
+                item_icon_draw(ctx, inv.items[i][j], sx, sy, inv.slot_size, inv.slot_size, inv.animation_state);
+            }
+        }
+    }
 
-	// 2. Отрисовка кнопки закрытия
-	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
-	let cross_y = 40;
-	let cs = inv.cross_size;
+    // 2. Отрисовка кнопок USE/DROP для мобилок
+    if (game.mobile && inv.imove !== -1) {
+        let btnW = 120, btnH = 50, gap = 20;
+        let startY = 60 + (inv.slot_size * 1.05) * inv.items.length;
+        let startX = 40;
 
-	if (inventory_element.game.mobile) {
-		ctx.fillStyle = "#444444";
-		ctx.fillRect(cross_x, cross_y, cs, cs);
-		ctx.strokeStyle = "white";
-		ctx.lineWidth = 2;
-		ctx.strokeRect(cross_x, cross_y, cs, cs);
+        const drawStyledBtn = (x, y, w, h, text, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(x, y, w, h, 8); else ctx.fillRect(x, y, w, h);
+            ctx.fill();
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.stroke();
 
-		ctx.beginPath();
-		ctx.lineWidth = 3;
-		ctx.moveTo(cross_x + cs * 0.25, cross_y + cs * 0.25);
-		ctx.lineTo(cross_x + cs * 0.75, cross_y + cs * 0.75);
-		ctx.moveTo(cross_x + cs * 0.75, cross_y + cs * 0.25);
-		ctx.lineTo(cross_x + cs * 0.25, cross_y + cs * 0.75);
-		ctx.stroke();
-	}
+            ctx.fillStyle = "white";
+            ctx.font = "bold 18px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(text, x + w / 2, y + h / 2 + 6);
+        };
 
-	// 3. Предмет в руках (тянется за ПРАВИЛЬНЫМИ координатами)
-	if (inv.imove > -1 && inv.jmove > -1) {
-		let curX = inv.last_active_mx || 0;
-		let curY = inv.last_active_my || 0;
+        drawStyledBtn(startX, startY, btnW, btnH, "USE", "#228822");
+        drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, "DROP", "#882222");
+    }
 
-		let drag_size = inv.slot_size * 0.8;
-		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size / 2, curY - drag_size / 2, drag_size, drag_size, inv.animation_state);
-	}
+    // 3. Кнопка закрытия
+    let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
+    let cross_y = 40;
+    let cs = inv.cross_size;
+
+    ctx.fillStyle = "#444444";
+    ctx.fillRect(cross_x, cross_y, cs, cs);
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cross_x, cross_y, cs, cs);
+    ctx.beginPath();
+    ctx.moveTo(cross_x + cs * 0.25, cross_y + cs * 0.25);
+    ctx.lineTo(cross_x + cs * 0.75, cross_y + cs * 0.75);
+    ctx.moveTo(cross_x + cs * 0.75, cross_y + cs * 0.25);
+    ctx.lineTo(cross_x + cs * 0.25, cross_y + cs * 0.75);
+    ctx.stroke();
+
+    // 4. Предмет в руках (только для ПК при Drag-and-Drop)
+    if (!game.mobile && inv.imove > -1 && inv.jmove > -1) {
+        let curX = inv.last_active_mx || 0;
+        let curY = inv.last_active_my || 0;
+        let drag_size = inv.slot_size * 0.8;
+        ctx.globalAlpha = 0.8;
+        item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size / 2, curY - drag_size / 2, drag_size, drag_size, inv.animation_state);
+        ctx.globalAlpha = 1.0;
+    }
 }
+
 
 
 function inventory_drop_item(inventory_element, i, j, death = false) {
