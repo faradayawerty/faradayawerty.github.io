@@ -24,7 +24,8 @@ function getButtonRegions(ctx) {
 	let gap = 16;
 	let totalWidth = w_use + gap + w_pick;
 	let startX = (w - totalWidth) / 2;
-	let uy = h - h_btn * 1.2;
+
+	let uy = 5 * h / 6;
 
 	return {
 		use: { x1: startX, x2: startX + w_use, y1: uy - h_btn/2, y2: uy + h_btn/2 },

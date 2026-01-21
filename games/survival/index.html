@@ -114,6 +114,8 @@
 				game1.settings.trees = menu1.want_trees;
 			if(menu1.want_debug != game1.debug)
 				game1.debug = menu1.want_debug;
+			if(menu1.want_auto_aim != game1.settings.auto_aim)
+			    game1.settings.auto_aim = menu1.want_auto_aim;
 
 			if(menu1.want_save) {
 				game_save(game1);

@@ -71,11 +71,18 @@ ITEMS_MELEE = [
 ];
 
 ITEMS_FOODS = [
-	ITEM_CANNED_MEAT
+	ITEM_CANNED_MEAT,
+	ITEM_ORANGE,
+	ITEM_APPLE,
+	ITEM_CHERRIES,
+	ITEM_CHICKEN_LEG,
+	ITEM_CHOCOLATE
 ];
 
 ITEMS_DRINKS = [
-	ITEM_WATER
+	ITEM_WATER,
+	ITEM_COLA,
+	ITEM_MILK
 ];
 
 // TODO fix item limit
@@ -171,6 +178,62 @@ function item_draw(item_object, ctx) {
 function item_icon_draw(ctx, id, x, y, w, h, animstate=null) {
 	if(id == 0) {
 		return
+	} else if(id == ITEM_ORANGE) {
+		// Апельсин с бликом и текстурой
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "#ff8800", "#773311", 0.05 * w);
+		drawCircle(ctx, x + 0.4 * w, y + 0.4 * h, 0.05 * w, "#ffaa44", "#ffaa44", 0); // Блик
+		// Маленькая точка сверху (черешок)
+		ctx.fillStyle = "#442200";
+		ctx.fillRect(x + 0.48 * w, y + 0.25 * h, 0.04 * w, 0.04 * h);
+	} else if(id == ITEM_APPLE) {
+		// Яблоко более сложной формы
+		ctx.fillStyle = "#33aa11";
+		drawCircle(ctx, x + 0.42 * w, y + 0.55 * h, 0.18 * w, "#33aa11", "none", 0);
+		drawCircle(ctx, x + 0.58 * w, y + 0.55 * h, 0.18 * w, "#33aa11", "none", 0);
+		// Черешок и листик
+		drawLine(ctx, x + 0.5 * w, y + 0.4 * h, x + 0.5 * w, y + 0.25 * h, "#442200", 0.03 * w);
+		ctx.fillStyle = "#66ff33";
+		ctx.beginPath();
+		ctx.ellipse(x + 0.6 * w, y + 0.3 * h, 0.08 * w, 0.04 * w, Math.PI / 4, 0, Math.PI * 2);
+		ctx.fill();
+	} else if(id == ITEM_CHERRIES) {
+		// Две вишни с изогнутыми веточками
+		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.35 * w, y + 0.65 * h, "#224400", 0.04 * w);
+		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.65 * w, y + 0.65 * h, "#224400", 0.04 * w);
+		drawCircle(ctx, x + 0.35 * w, y + 0.7 * h, 0.12 * w, "#cc0000", "#660000", 0.02 * w);
+		drawCircle(ctx, x + 0.65 * w, y + 0.7 * h, 0.12 * w, "#ee0000", "#660000", 0.02 * w);
+		// Маленькие блики
+		drawCircle(ctx, x + 0.32 * w, y + 0.65 * h, 0.03 * w, "white", "none", 0);
+		drawCircle(ctx, x + 0.62 * w, y + 0.65 * h, 0.03 * w, "white", "none", 0);
+	} else if(id == ITEM_CHICKEN_LEG) {
+		// Куриная ножка с эффектом зажаристой корочки
+		drawLine(ctx, x + 0.5 * w, y + 0.6 * h, x + 0.5 * w, y + 0.85 * h, "#eeeeee", 0.08 * w); // Кость
+		drawCircle(ctx, x + 0.45 * w, y + 0.85 * h, 0.05 * w, "#eeeeee", "#cccccc", 0.01 * w); // Сустав
+		drawCircle(ctx, x + 0.55 * w, y + 0.85 * h, 0.05 * w, "#eeeeee", "#cccccc", 0.01 * w); // Сустав
+		// Мясо
+		ctx.fillStyle = "#884411";
+		ctx.beginPath();
+		ctx.ellipse(x + 0.5 * w, y + 0.4 * h, 0.2 * w, 0.28 * h, 0, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.fillStyle = "#aa6622"; // Светлая часть сверху
+		ctx.beginPath();
+		ctx.ellipse(x + 0.45 * w, y + 0.35 * h, 0.12 * w, 0.18 * h, 0, 0, Math.PI * 2);
+		ctx.fill();
+	} else if(id == ITEM_CHOCOLATE) {
+		// Шоколадка в обертке
+		ctx.fillStyle = "#331100"; // Сам шоколад
+		ctx.fillRect(x + w * 0.2, y + h * 0.15, w * 0.6, h * 0.7);
+		// Красная обертка, закрывающая нижнюю часть
+		ctx.fillStyle = "#aa0000";
+		ctx.fillRect(x + w * 0.2, y + h * 0.45, w * 0.6, h * 0.45);
+		// Детали шоколадных долек
+		ctx.strokeStyle = "#220800";
+		ctx.lineWidth = 1;
+		ctx.strokeRect(x + w * 0.25, y + h * 0.2, w * 0.2, h * 0.2);
+		ctx.strokeRect(x + w * 0.55, y + h * 0.2, w * 0.2, h * 0.2);
+		// Золотистая полоска на обертке
+		ctx.fillStyle = "#d4af37";
+		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.6, h * 0.05);
 	} else if(id == ITEM_GUN) {
 		ctx.fillStyle = "black";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);

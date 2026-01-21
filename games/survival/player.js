@@ -332,10 +332,17 @@ function player_update(player_object, dt) {
 
 		if(closest_item) {
 			let id = closest_item.data.id;
-			if((ITEMS_AMMOS.includes(id) && player_object.game.settings.auto_pickup["automatically pickup ammo"]) ||
-			   (ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) && player_object.game.settings.auto_pickup["automatically pickup food and drinks"]) ||
-			   ([ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(id) && player_object.game.settings.auto_pickup["automatically pickup health"]) ||
-			   (id == ITEM_FUEL && player_object.game.settings.auto_pickup["automatically pickup fuel"]) || f_down) {
+			if (
+				(
+					(ITEMS_AMMOS.includes(id) && player_object.game.settings.auto_pickup["automatically pickup ammo"]) ||
+					(ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) && player_object.game.settings.auto_pickup["automatically pickup food and drinks"]) ||
+					(ITEMS_GUNS.concat(ITEMS_MELEE).includes(id) && player_object.game.settings.auto_pickup["automatically pickup weapons"]) ||
+					([ITEM_SHIELD, ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW].includes(id) && player_object.game.settings.auto_pickup["automatically pickup shields"]) ||
+					([ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(id) && player_object.game.settings.auto_pickup["automatically pickup health"]) ||
+					(id == ITEM_FUEL && player_object.game.settings.auto_pickup["automatically pickup fuel"])
+				) && !closest_item.data.dropped
+				|| f_down
+			) {
 				if(item_pickup(p.inventory_element, closest_item)) {
 					achievement_do(p.achievements_element.data.achievements, "pick an item", p.achievements_shower_element);
 					if(id == ITEM_GUN) achievement_do(p.achievements_element.data.achievements, "get a gun", p.achievements_shower_element);
@@ -355,12 +362,46 @@ function player_update(player_object, dt) {
 		let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed) ||
 					   (player_object.game.mobile && (player_object.game.input.joystick.left.dx**2 + player_object.game.input.joystick.left.dy**2 > 0.01));
 
+		// Находим направление стрельбы
+		let shootDir = getShootDir(player_object.game.input);
+		let targetX = shootDir.x;
+		let targetY = shootDir.y;
+
+		// --- ЛОГИКА AUTOMATIC AIM ---
+		if (player_object.game.settings.auto_aim) {
+		    // Ищем ближайшего врага в радиусе, например, 800 пикселей
+		    let nearest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 800);
+
+		    if (nearest_enemy) {
+			  // Вычисляем вектор до врага
+			  let dx = nearest_enemy.data.body.position.x - p.body.position.x;
+			  let dy = nearest_enemy.data.body.position.y - p.body.position.y;
+
+			  let item = hotbar_get_selected_item(p.hotbar_element);
+			  if(item == ITEM_RED_PISTOLS || item == ITEM_RAINBOW_PISTOLS) {
+				  dx += p.w;
+				  dy += p.h;
+			  }
+
+			  // Нормализуем вектор (приводим к длине 1)
+			  let mag = Math.sqrt(dx * dx + dy * dy);
+			  if (mag > 0) {
+				targetX = dx / mag * 100;
+				targetY = dy / mag * 100;
+			  }
+		    }
+		}
+
+		// Теперь используем targetX и targetY в функции выстрела
 		if(shooting && !p.inventory_element.shown && !p.achievements_element.shown) {
-			player_shoot(player_object, dt, null, getShootDir(player_object.game.input).x, getShootDir(player_object.game.input).y);
-			if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
-				achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
+		    // Мы передаем вычисленные координаты цели вместо стандартного getShootDir
+		    player_shoot(player_object, dt, null, targetX, targetY);
+
+		    if(!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
+			  achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
 		} else {
-			p.laser_sound_has_played = false; p.sword_protection = false;
+		    p.laser_sound_has_played = false;
+		    p.sword_protection = false;
 		}
 
 		if(p.hotbar_element.shown && (isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true)))
@@ -505,16 +546,19 @@ function player_draw(player_object, ctx) {
 			} else if (player_object.game.mobile) {
 				// МОБИЛЬНАЯ ЛОГИКА: используем правый джойстик
 				cx = 0; cy = 0;
-				mx = player_object.game.input.joystick.right.dx;
-				my = player_object.game.input.joystick.right.dy;
+				mx = player_object.game.input.joystick.left.dx;
+				my = player_object.game.input.joystick.left.dy;
 				
 				// Если правый не трогаем, смотрим по левому (направлению движения)
 				if (mx === 0 && my === 0) {
-					mx = player_object.game.input.joystick.left.dx;
-					my = player_object.game.input.joystick.left.dy;
+					mx = player_object.game.input.joystick.right.dx;
+					my = player_object.game.input.joystick.right.dy;
 				}
 				// Дефолт, если оба стоят
-				if (mx === 0 && my === 0) mx = 1; 
+				if (mx === 0 && my === 0) {
+					mx = -1; 
+					my = 1; 
+				}
 			} else {
 				// ПК ЛОГИКА: Мышь
 				mx = player_object.game.input.mouse.x;
@@ -530,10 +574,10 @@ function player_draw(player_object, ctx) {
 
 			// Настройка цветов и размеров
 			if(item == ITEM_GREEN_GUN) ctx.strokeStyle = "#117733";
-			if(item == ITEM_LASER_GUN) { ctx.strokeStyle = "purple"; lw *= 1.25; gl *= 1.75; px = p.body.position.x; py = p.body.position.y; }
+			if(item == ITEM_LASER_GUN) { ctx.strokeStyle = "purple"; lw *= 2.25; gl *= 2.4; px = p.body.position.x; py = p.body.position.y; }
 			if(item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
 			if(item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle = "#111133";
-			if(item == ITEM_RED_SHOTGUN) ctx.strokeStyle = "#551111";
+			if(item == ITEM_RED_SHOTGUN) { ctx.strokeStyle = "#551111"; lw *= 1.25; gl *= 1.5; };
 			if(item == ITEM_MINIGUN) ctx.strokeStyle = "#113377";
 			if(item == ITEM_PLASMA_LAUNCHER) { ctx.strokeStyle = "#331133"; lw *= 2.25; gl *= 1.5; }
 			if(item == ITEM_PLASMA_PISTOL) ctx.strokeStyle = "#331133";
@@ -560,9 +604,9 @@ function player_draw(player_object, ctx) {
 			
 			// Основной ствол
 			ctx.beginPath();
-			ctx.lineWidth = lw;
+			ctx.lineWidth = lw * 0.75;
 			ctx.moveTo(px, py);
-			ctx.lineTo(px + gl * p.w * gx / g, py + gl * p.h * gy / g);
+			ctx.lineTo(px + gl * 0.75 * p.w * gx / g, py + gl * 0.75 * p.h * gy / g);
 			ctx.stroke();
 
 			ctx.lineWidth = 2; // Сброс

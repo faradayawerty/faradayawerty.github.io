@@ -6,6 +6,7 @@ function menu_create() {
 		want_spawn_ai: false,
 		want_player_respawn: false,
 		want_autorespawn: false,
+		want_auto_aim: false,
 		want_player_color: "red",
 		want_player_draw_gun: true,
 		want_enemies_spawn: true,
@@ -32,7 +33,9 @@ function menu_create() {
 			"automatically pickup food and drinks": false,
 			"automatically pickup fuel": false,
 			"automatically pickup health": false,
-			"automatically pickup ammo": false
+			"automatically pickup ammo": false,
+			"automatically pickup weapons": false, // Добавлено
+			"automatically pickup shields": false  // Добавлено
 		},
 		iselected: 0,
 		language_selection_buttons: [
@@ -59,6 +62,7 @@ function menu_create() {
 			//"~SETTINGS",
 			"player color",
 			"player draw gun",
+			"automatic aim", // Добавлено
 			"enemies spawn",
 			"automatic respawn",
 			//"show hints",
@@ -97,6 +101,8 @@ function menu_create() {
 			"automatically pickup fuel",
 			"automatically pickup health",
 			"automatically pickup ammo",
+			"automatically pickup weapons", // Добавлено
+			"automatically pickup shields", // Добавлено
 			"back to settings"
 		],
 		buttons: null,
@@ -122,6 +128,8 @@ function menu_draw(ctx, m) {
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_color);
 		else if(m.buttons[i] == "player draw gun")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_draw_gun);
+		else if(m.buttons[i] == "automatic aim")
+			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_auto_aim);
 		else if(m.buttons[i] == "ammo pickup in last slot")
 			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_ammo_pickup_last);
 		else if(m.buttons[i] == "show hints")
@@ -281,6 +289,8 @@ function menu_update(m, dt, input) {
 				m.want_language = "english";
 			else if(m.want_language == "english")
 				m.want_language = "русский";
+		} else if(m.buttons[m.iselected] == "automatic aim") {
+		    m.want_auto_aim = !m.want_auto_aim;
 		}
 	}
 
@@ -399,6 +409,12 @@ function menu_translate(lang, str) {
 			str = "СМЕРТЬ";
 		else if(str == "SETTINGS")
 			str = "НАСТРОЙКИ";
+		else if(str == "automatically pickup weapons")
+			str = "автоматически подбирать оружие";
+		else if(str == "automatically pickup shields")
+			str = "автоматически подбирать защитные поля";
+		else if(str == "automatic aim")
+    			str = "автоматическое прицеливание";
 	}
 	return prefix + str;
 }

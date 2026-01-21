@@ -244,58 +244,73 @@ function hotbar_destroy(hotbar_element) {
 }
 
 function hotbar_update(hotbar_element, dt) {
-	let hb = hotbar_element.data;
-	let input = hotbar_element.game.input;
-	let scale = get_scale();
-	hb.animation_state += 0.02 * dt;
+    let hb = hotbar_element.data;
+    let input = hotbar_element.game.input;
+    let scale = get_scale();
+    hb.animation_state += 0.02 * dt;
 
-	if(hb.attached_to_object.data.ai_controlled)
-		hotbar_element.shown = false;
+    if(hb.attached_to_object.data.ai_controlled)
+        hotbar_element.shown = false;
 
-	// Клавиши 1-9
-	for (let i = 0; i < 9; i++) {
-		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
-	}
+    // Клавиши 1-9 (оставляем как есть)
+    for (let i = 0; i < 9; i++) {
+        if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
+    }
 
-	if(isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
-	if(isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
+    if(isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
+    if(isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
 
-	// Клик по слоту хотбара
-	hb.mouse_over = false;
-	let mx = input.mouse.x / scale;
-	let my = input.mouse.y / scale;
-	if (isScreenTouched(input)) {
-		mx = input.touch[0].x / scale;
-		my = input.touch[0].y / scale;
-	}
+    hb.mouse_over = false;
 
-	for(let i = 0; i < hb.row.length; i++) {
-		let sx = 40 + (hb.slot_size * 1.05) * i;
-		let sy = 40;
-		if(doRectsCollide(mx, my, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
-			hb.mouse_over = true;
-			if(isMouseLeftButtonPressed(input) || isScreenTouched(input))
-				hb.iselected = i;
-		}
-	}
+    // --- ИСПРАВЛЕНИЕ МУЛЬТИТАЧА ---
+    // Создаем список координат для проверки (мышь + все пальцы)
+    let pointsToCheck = [];
+    if (!isScreenTouched(input)) {
+        pointsToCheck.push({ x: input.mouse.x / scale, y: input.mouse.y / scale });
+    } else {
+        for (let t of input.touch) {
+            pointsToCheck.push({ x: t.x / scale, y: t.y / scale });
+        }
+    }
 
-	// Мобильные кнопки справа от хотбара
-	if(hotbar_element.game.mobile && isScreenTouched(input)) {
-		let step = hb.slot_size * 1.05;
-		let x_inv = 60 + step * hb.row.length;
+    // Проверяем каждую точку (палец или мышь) на попадание в слоты
+    for (let pt of pointsToCheck) {
+        for(let i = 0; i < hb.row.length; i++) {
+            let sx = 40 + (hb.slot_size * 1.05) * i;
+            let sy = 40;
+            if(doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
+                hb.mouse_over = true;
+                hb.iselected = i; // Выбираем слот
+            }
+        }
 
-		// Кнопка сумки (инвентаря)
-		if (doRectsCollide(mx, my, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
-			let inv_el = hb.attached_to_object.data.inventory_element;
-			if (inv_el && !inv_el._mob_toggle_lock) {
-				inv_el.shown = !inv_el.shown;
-				inv_el._mob_toggle_lock = true; // Защита от дребезга
-			}
-		} else {
-			let inv_el = hb.attached_to_object.data.inventory_element;
-			if (inv_el) inv_el._mob_toggle_lock = false;
-		}
-	}
+        // Проверка мобильных кнопок (Инвентарь, Ачивки, Меню)
+        if(hotbar_element.game.mobile) {
+            let step = hb.slot_size * 1.05;
+            let x_inv = 60 + step * hb.row.length;
+            
+            // Проверка кнопки сумки
+            if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
+                let inv_el = hb.attached_to_object.data.inventory_element;
+                if (inv_el && !inv_el._mob_toggle_lock) {
+                    inv_el.shown = !inv_el.shown;
+                    inv_el._mob_toggle_lock = true;
+                }
+            }
+        }
+    }
+
+    // Сброс лока переключения, если ни один палец не касается кнопок
+    let inv_el = hb.attached_to_object.data.inventory_element;
+    if (inv_el && inv_el._mob_toggle_lock) {
+        let stillTouching = false;
+        let step = hb.slot_size * 1.05;
+        let x_inv = 60 + step * hb.row.length;
+        for (let pt of pointsToCheck) {
+            if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) stillTouching = true;
+        }
+        if (!stillTouching) inv_el._mob_toggle_lock = false;
+    }
 }
 
 function hotbar_draw(hotbar_object, ctx) {

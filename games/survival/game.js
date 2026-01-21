@@ -18,6 +18,7 @@ function game_create(input_, engine_, audios_) {
 		engine: engine_,
 		settings: {
 			language: "english",
+			auto_aim: false, // Добавлено
 			player_color: "red",
 			player_draw_gun: true,
 			enemies_spawn: true,
@@ -40,7 +41,9 @@ function game_create(input_, engine_, audios_) {
 				"automatically pickup food and drinks": false,
 				"automatically pickup fuel": false,
 				"automatically pickup health": false,
-				"automatically pickup ammo": false
+				"automatically pickup ammo": false,
+				"automatically pickup weapons": false, // Добавлено
+				"automatically pickup shields": false  // Добавлено
 			},
 			ammo_pickup_last: true,
 			respawn_on_current_level: true
