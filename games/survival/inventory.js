@@ -46,9 +46,8 @@ function inventory_update(inventory_element, dt) {
 	let is_clicked_right = isMouseRightButtonPressed(input);
 	let is_released = false;
 
-	// 2. ЛОГИКА ТАЧА (Исправленная)
+	// 2. ЛОГИКА ТАЧА С ЗАЩИТОЙ ОТ СКАЧКОВ
 	if (isScreenTouched(input)) {
-		// Ищем палец, который НЕ джойстик
 		let freeTouch = null;
 		for (let t of input.touch) {
 			if (t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) {
@@ -58,20 +57,39 @@ function inventory_update(inventory_element, dt) {
 		}
 
 		if (freeTouch) {
-			mx = freeTouch.x / scale;
-			my = freeTouch.y / scale;
+			let touch_x = freeTouch.x / scale;
+			let touch_y = freeTouch.y / scale;
 
-			// Если это НОВЫЙ id (палец только что коснулся или сменился)
+			// Проверка на резкий скачок (только если мы уже что-то тащим или тач удерживается)
+			let jump_threshold = inv.slot_size * 8;
+
+			if (inv.active_touch_id === freeTouch.id && (inv.imove !== -1 || inv._touch_lock)) {
+				let dx = touch_x - (inv.last_active_mx || touch_x);
+				let dy = touch_y - (inv.last_active_my || touch_y);
+				let dist = Math.sqrt(dx * dx + dy * dy);
+
+				if (dist > jump_threshold) {
+					// Скачок зафиксирован: оставляем старые координаты
+					mx = inv.last_active_mx;
+					my = inv.last_active_my;
+				} else {
+					mx = touch_x;
+					my = touch_y;
+				}
+			} else {
+				mx = touch_x;
+				my = touch_y;
+			}
+
+			// Логика смены ID касания
 			if (inv.active_touch_id !== freeTouch.id) {
 				inv.active_touch_id = freeTouch.id;
-				is_clicked = true; // Считаем это нажатием
+				is_clicked = true;
 				inv._touch_lock = true;
 			} else {
-				// Палец тот же самый, удерживаем
 				is_clicked = false;
 			}
 		} else {
-			// Если свободных пальцев больше нет, но раньше был захвачен id
 			if (inv.active_touch_id !== null) {
 				is_released = true;
 				inv.active_touch_id = null;
@@ -79,12 +97,12 @@ function inventory_update(inventory_element, dt) {
 			}
 		}
 	} else {
-		// Тачей вообще нет
 		if (inv.active_touch_id !== null) is_released = true;
 		inv.active_touch_id = null;
 		inv._touch_lock = false;
 	}
 
+	// Сохраняем "отфильтрованные" координаты для следующего кадра
 	inv.last_active_mx = mx;
 	inv.last_active_my = my;
 
@@ -107,6 +125,7 @@ function inventory_update(inventory_element, dt) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
 			let sy = 40 + (inv.slot_size * 1.05) * i;
 
+			// Проверка коллизии происходит по отфильтрованным координатам mx/my
 			if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
 				slot_selected = true;
 				inv.iselected = i;
@@ -139,7 +158,8 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 
-	// Выброс
+	// --- ВЫБРОС ПРЕДМЕТА ---
+	// На мобилках выбрасываем, если кликнули мимо слотов или отпустили палец в пустом месте
 	if ((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
 		if (inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
@@ -153,7 +173,7 @@ function inventory_update(inventory_element, dt) {
 		inv.jselected = -1;
 	}
 
-	// Хоткей Q
+	// --- ХОТКЕЙ Q ---
 	if (isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
 		let dropI = (inv.imove !== -1) ? inv.imove : inv.iselected;
 		let dropJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
@@ -166,7 +186,6 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 }
-
 
 function inventory_draw(inventory_element, ctx) {
 	if (inventory_element.game.want_hide_inventory || !inventory_element.shown)
@@ -223,9 +242,7 @@ function inventory_draw(inventory_element, ctx) {
 		let curY = inv.last_active_my || 0;
 
 		let drag_size = inv.slot_size * 0.8;
-		ctx.globalAlpha = 0.8;
 		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size / 2, curY - drag_size / 2, drag_size, drag_size, inv.animation_state);
-		ctx.globalAlpha = 1.0;
 	}
 }
 
