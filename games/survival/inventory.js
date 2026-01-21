@@ -40,14 +40,14 @@ function inventory_update(inventory_element, dt) {
 	let input = inventory_element.game.input;
 	let scale = get_scale();
 
-	// 1. Сначала определяем базу для ПК (Мышь)
+	// 1. Инициализация базовых значений
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 	let is_clicked = isMouseLeftButtonPressed(input);
 	let is_clicked_right = isMouseRightButtonPressed(input);
 	let is_released = false;
 
-	// 2. Если есть тач — ПЕРЕОПРЕДЕЛЯЕМ координаты и клик (Мультитач логика)
+	// --- ЛОГИКА ТАЧА С ПРИВЯЗКОЙ ID ---
 	if (isScreenTouched(input)) {
 		let inv_rect = {
 			x: 40, y: 40,
@@ -55,31 +55,48 @@ function inventory_update(inventory_element, dt) {
 			h: (inv.slot_size * 1.05) * inv.items.length
 		};
 
-		let foundTouchInInv = false;
-		for (let t of input.touch) {
-			let tx = t.x / scale;
-			let ty = t.y / scale;
+		let targetTouch = null;
 
-			if (doRectsCollide(tx, ty, 0, 0, inv_rect.x, inv_rect.y, inv_rect.w, inv_rect.h)) {
-				mx = tx;
-				my = ty;
-				foundTouchInInv = true;
-				if (!inv._touch_lock) {
-					is_clicked = true;
-					inv._touch_lock = true;
-				} else {
-					is_clicked = false; // Удерживаем палец
-				}
-				break;
+		// Если мы уже "держим" предмет пальцем, ищем именно его по ID
+		if (inv.active_touch_id !== undefined && inv.active_touch_id !== null) {
+			targetTouch = input.touch.find(t => t.id === inv.active_touch_id);
+
+			// Если палец с этим ID исчез — значит, произошел release
+			if (!targetTouch) {
+				is_released = true;
+				inv.active_touch_id = null;
+				inv._touch_lock = false;
 			}
 		}
 
-		if (!foundTouchInInv && inv._touch_lock) {
-			is_released = true;
-			inv._touch_lock = false;
+		// Если мы ничего не держим или палец еще не зафиксирован, ищем новое касание в зоне инвентаря
+		if (!targetTouch) {
+			for (let t of input.touch) {
+				let tx = t.x / scale;
+				let ty = t.y / scale;
+				if (doRectsCollide(tx, ty, 0, 0, inv_rect.x, inv_rect.y, inv_rect.w, inv_rect.h)) {
+					targetTouch = t;
+					inv.active_touch_id = t.id; // ФИКСИРУЕМ ПАЛЕЦ
+					break;
+				}
+			}
+		}
+
+		if (targetTouch) {
+			mx = targetTouch.x / scale;
+			my = targetTouch.y / scale;
+
+			if (!inv._touch_lock) {
+				is_clicked = true;
+				inv._touch_lock = true;
+			}
 		}
 	} else {
-		// Сброс лока, если тачей нет (мышь работает сама по себе)
+		// Если экран вообще не трогают — сбрасываем всё
+		if (inv.active_touch_id !== null && inv.active_touch_id !== undefined) {
+			is_released = true;
+		}
+		inv.active_touch_id = null;
 		inv._touch_lock = false;
 	}
 
@@ -93,6 +110,7 @@ function inventory_update(inventory_element, dt) {
 	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, cross_y, inv.cross_size, inv.cross_size)) {
 		inventory_element.shown = false;
 		inv.imove = -1; inv.jmove = -1;
+		inv.active_touch_id = null; // Сброс при закрытии
 		return;
 	}
 
@@ -116,15 +134,14 @@ function inventory_update(inventory_element, dt) {
 							inv.jmove = j;
 						}
 					} else {
-						// Обмен предметами (на ПК работает по второму клику, на таче по нажатию)
+						// Обмен предметами
 						let temp = inv.items[i][j];
 						inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 						inv.items[inv.imove][inv.jmove] = temp;
-						inv.imove = -1;
-						inv.jmove = -1;
+						inv.imove = -1; inv.jmove = -1;
 					}
 				}
-				// Дополнительно для тача: положить при отпускании
+
 				if (is_released && inv.imove >= 0) {
 					let temp = inv.items[i][j];
 					inv.items[i][j] = inv.items[inv.imove][inv.jmove];
@@ -135,8 +152,8 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 
-	// Выброс предмета
-	if((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
+	// Выброс предмета (если отпустили вне слотов)
+	if((is_clicked_right || is_released) && !slot_selected) {
 		if(inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 		}
