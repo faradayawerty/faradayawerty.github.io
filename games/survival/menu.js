@@ -194,7 +194,6 @@ function menu_update(m, dt, input) {
 	} else if((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter', true) || isMouseLeftButtonPressed(input) || (isScreenTouched(input) && m.can_touch_button))) {
 		if(m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
-			console.log("нажато 'продолжить игру'");
 		} else if(m.buttons[m.iselected] == "respawn and continue game") {
 			m.shown = false;
 			m.main_menu_buttons[0] = "continue game";
