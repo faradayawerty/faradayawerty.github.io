@@ -139,8 +139,9 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 
-	// Выброс
-	if ((is_clicked_right || is_released || (inventory_element.game.mobile && is_clicked)) && !slot_selected) {
+	// --- ИСПРАВЛЕННЫЙ ВЫБРОС ---
+	// Предмет выбрасывается только если мы отпустили палец/кнопку ВНЕ слота
+	if ((is_clicked_right || is_released) && !slot_selected) {
 		if (inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 		}
