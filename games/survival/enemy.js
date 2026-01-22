@@ -797,6 +797,13 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	ctx.lineTo(x - w * 0.1, y - h * 0.5);
 	ctx.fill();
 
+	// Правое ухо (чуть короче или со своим изгибом)
+	ctx.beginPath();
+	ctx.moveTo(x + w * 0.4, y - h * 0.5);
+	ctx.lineTo(x + w * 0.6, y - h * 0.85); // Немного другая высота для асимметрии
+	ctx.lineTo(x + w * 0.1, y - h * 0.5);
+	ctx.fill();
+
 	// 2. Тело
 	fillMatterBody(ctx, e.body, "#555555");
 	drawMatterBody(ctx, e.body, e.color_outline, 2);

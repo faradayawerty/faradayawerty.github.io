@@ -323,15 +323,39 @@ function player_update(player_object, dt) {
 		p.mobile_delay = 300;
 	}
 
-	// --- ПЕРЕМЕЩЕНИЕ И ДЕЙСТВИЯ ---
-	let use_triggered = player_object.game.mobile ? isKeyDown(player_object.game.input, 'c', true) : player_object.game.input.mouse.leftButtonPressed;
+	// 1. Получаем координаты и данные
+	let scale = get_scale();
+	let mx = player_object.game.input.mouse.x / scale;
+	let my = player_object.game.input.mouse.y / scale;
+	let hb = p.hotbar_element.data;
+
+	// 2. Считаем область хотбара
+	// Базовая ширина всех слотов (1-9)
+	let hb_total_width = (hb.slot_size * 1.05) * hb.row.length;
+
+	// Если мобилка, добавляем к ширине пространство, занимаемое доп. кнопками (портфель, кубок, меню)
+	if (player_object.game.mobile) {
+	    // 3 кнопки по размеру слота + зазор 20px от основного ряда
+	    hb_total_width += (hb.slot_size * 1.05) * 3 + 20; 
+	}
+
+	// Проверка: находится ли курсор/палец в зоне хотбара
+	let is_clicking_hotbar = doRectsCollide(mx, my, 0, 0, 40, 40, hb_total_width, hb.slot_size);
+
+	// 3. Основная логика использования
+	let use_triggered = player_object.game.mobile 
+	    ? isKeyDown(player_object.game.input, 'c', true) 
+	    : player_object.game.input.mouse.leftButtonPressed;
+
 	if (use_triggered) {
-		let is_clicking_ui = (p.hotbar_element.shown && (player_object.game.input.mouse.y / get_scale() <= 40 + p.hotbar_element.data.slot_size)) ||
-			p.inventory_element.shown || p.achievements_element.shown;
-		if (!is_clicking_ui || !player_object.game.mobile) {
-			player_item_consume(player_object, hotbar_get_selected_item(p.hotbar_element));
+	    // Если хотбар скрыт ИЛИ клик за пределами его области
+	    if (!p.hotbar_element.shown || !is_clicking_hotbar) {
+		  let item = hotbar_get_selected_item(p.hotbar_element);
+		  if (item > 0) {
+			player_item_consume(player_object, item);
 			if (player_object.game.mobile) p.mobile_delay = 200;
-		}
+		  }
+	    }
 	}
 
 	if (!p.car_object) {
@@ -373,7 +397,20 @@ function player_update(player_object, dt) {
 			}
 		}
 
-		let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed) ||
+		// Рассчитываем попадание по хотбару для блокировки стрельбы
+		let scale = get_scale();
+		let hb = p.hotbar_element.data;
+		let hb_w = (hb.slot_size * 1.05) * hb.row.length;
+		if (player_object.game.mobile) hb_w += (hb.slot_size * 1.05) * 3 + 20;
+
+		let is_clicking_hotbar = p.hotbar_element.shown && doRectsCollide(
+			player_object.game.input.mouse.x / scale,
+			player_object.game.input.mouse.y / scale,
+			0, 0, 40, 40, hb_w, hb.slot_size
+		);
+
+		// Условие стрельбы: на мобилках джойстик, на ПК — ЛКМ (но не по хотбару)
+		let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed && !is_clicking_hotbar) ||
 			(player_object.game.mobile && (player_object.game.input.joystick.left.dx ** 2 + player_object.game.input.joystick.left.dy ** 2 > 0.01));
 
 		// Находим направление стрельбы
@@ -383,11 +420,8 @@ function player_update(player_object, dt) {
 
 		// --- ЛОГИКА AUTOMATIC AIM ---
 		if (player_object.game.settings.auto_aim) {
-			// Ищем ближайшего врага в радиусе, например, 800 пикселей
 			let nearest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 800);
-
 			if (nearest_enemy) {
-				// Вычисляем вектор до врага
 				let dx = nearest_enemy.data.body.position.x - p.body.position.x;
 				let dy = nearest_enemy.data.body.position.y - p.body.position.y;
 
@@ -397,7 +431,6 @@ function player_update(player_object, dt) {
 					dy += p.h;
 				}
 
-				// Нормализуем вектор (приводим к длине 1)
 				let mag = Math.sqrt(dx * dx + dy * dy);
 				if (mag > 0) {
 					targetX = dx / mag * 100;
@@ -406,9 +439,7 @@ function player_update(player_object, dt) {
 			}
 		}
 
-		// Теперь используем targetX и targetY в функции выстрела
 		if (shooting && !p.achievements_element.shown) {
-			// Мы передаем вычисленные координаты цели вместо стандартного getShootDir
 			player_shoot(player_object, dt, null, targetX, targetY);
 
 			if (!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
