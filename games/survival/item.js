@@ -273,6 +273,42 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 			ctx.fillRect(x + w * 0.7, y + h * 0.35, w * 0.1, h * 0.1); // Маленькая ракета сверху
 		}
 	} else if (id == ITEM_MINIGUN) {
+
+		// Ужимаем всё по вертикали и центрируем, чтобы влезло в слот
+		    let mw = w * 0.9;  // Общая ширина конструкции (90% от слота)
+		    let mh = h * 0.25; // Высота стала меньше, чтобы казаться длиннее
+		    let mx = x + w * 0.05; 
+		    let my = y + h * 0.45;
+
+		    // 1. Задний блок (корпус)
+		    ctx.fillStyle = "#113377";
+		    ctx.fillRect(mx, my, mw * 0.3, mh * 1.2); 
+
+		    // 2. Длинный блок стволов (барабан)
+		    ctx.fillStyle = "#2255aa";
+		    ctx.fillRect(mx + mw * 0.3, my + mh * 0.1, mw * 0.7, mh * 0.8);
+
+		    // 3. Теневые прорези для эффекта стволов
+		    ctx.fillStyle = "#0a1f44";
+		    ctx.fillRect(mx + mw * 0.3, my + mh * 0.3, mw * 0.7, mh * 0.1);
+		    ctx.fillRect(mx + mw * 0.3, my + mh * 0.6, mw * 0.7, mh * 0.1);
+
+		    // 4. Муфты (кольца стяжки) - делают вид более "оружейным"
+		    ctx.fillStyle = "#113377";
+		    ctx.fillRect(mx + mw * 0.6, my + mh * 0.1, mw * 0.06, mh * 0.8);
+		    ctx.fillRect(mx + mw * 0.94, my + mh * 0.1, mw * 0.06, mh * 0.8);
+
+		    // 5. Тонкая рукоятка сверху (вписанная в слот)
+		    ctx.strokeStyle = "#113377";
+		    ctx.lineWidth = h * 0.03;
+		    ctx.beginPath();
+		    ctx.moveTo(mx + mw * 0.1, my);
+		    ctx.lineTo(mx + mw * 0.1, my - mh * 0.4);
+		    ctx.lineTo(mx + mw * 0.5, my - mh * 0.4);
+		    ctx.lineTo(mx + mw * 0.5, my + mh * 0.1);
+		    ctx.stroke();
+
+	} else if (id == ITEM_MINIGUN) {
 		// Миниган: Три тонких ствола и блок
 		ctx.fillStyle = "#113377";
 		ctx.fillRect(x + w * 0.1, y + h * 0.35, w * 0.3, h * 0.4); // Задний блок
@@ -286,8 +322,10 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillRect(x + w * 0.1, y + h * 0.35, w * 0.7, h * 0.3);
 		ctx.fillStyle = "#ff00ff";
 		ctx.fillRect(x + w * 0.8, y + h * 0.35, w * 0.1, h * 0.3); // Линза на конце
-		ctx.strokeStyle = "white";
-		ctx.strokeRect(x + w * 0.2, y + h * 0.45, w * 0.5, h * 0.1); // Провод
+		//let hue = (animstate * 10) % 360;
+		//ctx.fillStyle = `hsl(${hue}, 70%, 50%)`; 
+		ctx.fillStyle = "white";
+		ctx.fillRect(x + w * 0.2, y + h * 0.45, w * 0.5, h * 0.1); // Провод
 	} else if (id == ITEM_PLASMA_LAUNCHER || id == ITEM_ROCKET_LAUNCHER) {
 		// Тяжелые пушки: Громоздкий корпус
 		let col = id == ITEM_PLASMA_LAUNCHER ? "#331133" : "#111133";
