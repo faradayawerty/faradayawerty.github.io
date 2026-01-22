@@ -136,6 +136,17 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type = "r
 		e.color_outline = "white";
 		e.damage = 256 * e.damage;
 	}
+	if (type == "raccoon") {
+		e.type = "raccoon";
+		e.health = 21250000;
+		e.max_health = 21250000;
+		e.speed = 8.125;
+		e.color = "#444444";
+		e.color_outline = "#ff0000";
+		e.damage = 256 * e.damage;
+		e.shooting_range = 600;
+		e.shooting_delay = 500;
+	}
 	if (boss) {
 		e.damage = 5 * e.damage;
 		e.health = 30 * e.max_health;
@@ -285,6 +296,48 @@ function enemy_update(enemy_object, dt) {
 				}
 				dx = 0;
 				dy = 0;
+			}
+		}
+		if (e.type == "raccoon" && target_object && e.boss) {
+			let v = dist(e.body.position, target_object.data.body.position);
+			if (v < e.shooting_range) {
+
+				if (e.shooting_delay >= 500) {
+					let tx = target_object.data.body.position.x - e.body.position.x;
+					let ty = target_object.data.body.position.y - e.body.position.y;
+					let dist_val = Math.sqrt(tx * tx + ty * ty);
+
+					// Направление (нормализованный вектор)
+					let dx = tx / dist_val;
+					let dy = ty / dist_val;
+
+					// Константы для поворота на 22.5 градуса
+					let cosA = 0.9238;
+					let sinA = 0.3826;
+
+					// Параметры мусора
+					let bullet_speed = 24;
+					let bullet_damage = e.damage;
+					let bullet_size = e.w * 0.25; // Сделаем мусор чуть крупнее обычных пуль
+
+					// 1. Мусор прямо
+					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
+						dx, dy, bullet_speed, bullet_damage, true, bullet_size);
+
+					// 2. Мусор влево (-22.5 градуса)
+					let vx_left = dx * cosA - dy * (-sinA);
+					let vy_left = dx * (-sinA) + dy * cosA;
+					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
+						vx_left, vy_left, bullet_speed, bullet_damage, true, bullet_size);
+
+					// 3. Мусор вправо (+22.5 градуса)
+					let vx_right = dx * cosA - dy * sinA;
+					let vy_right = dx * sinA + dy * cosA;
+					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
+						vx_right, vy_right, bullet_speed, bullet_damage, true, bullet_size);
+
+					e.shooting_delay = 0;
+				}
 			}
 		}
 		e.color_gradient += 0.01 * dt;
@@ -545,6 +598,8 @@ function enemy_update(enemy_object, dt) {
 							item_create(enemy_object.game, ITEM_RED_PISTOLS, e.body.position.x, e.body.position.y, false, false);
 						if (target_object && target_object.name == "player")
 							achievement_do(target_object.data.achievements_element.data.achievements, "big red guy", target_object.data.achievements_shower_element);
+					} else if (e.type == "raccoon") {
+						item_create(enemy_object.game, ITEM_JUNK_CANNON, e.body.position.x, e.body.position.y);
 					} else if (e.type == "sword") {
 						if (Math.random() < 0.33)
 							item_create(enemy_object.game, ITEM_GREEN_GUN, e.body.position.x, e.body.position.y, false, false);
@@ -727,6 +782,67 @@ function enemy_draw(enemy_object, ctx) {
 	}
 	if (e.type == "deer")
 		animal_deer_draw_horns(ctx, e.body.position.x, e.body.position.y, e.w, e.h);
+	if (e.type == "raccoon") {
+		enemy_raccoon_boss_draw(ctx, e.body.position.x, e.body.position.y, e.w, e.h, e);
+	}
+}
+
+function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
+	// 1. Ушки (более острые и рваные)
+	ctx.fillStyle = "#333333";
+	// Левое ухо со шрамом
+	ctx.beginPath();
+	ctx.moveTo(x - w * 0.4, y - h * 0.5);
+	ctx.lineTo(x - w * 0.6, y - h * 0.9); // Длиннее
+	ctx.lineTo(x - w * 0.1, y - h * 0.5);
+	ctx.fill();
+
+	// 2. Тело
+	fillMatterBody(ctx, e.body, "#555555");
+	drawMatterBody(ctx, e.body, e.color_outline, 2);
+
+	// 3. Маска (черная, с подтеками)
+	ctx.fillStyle = "#111111";
+	ctx.fillRect(x - w * 0.5, y - h * 0.25, w, h * 0.4);
+
+	// 4. Злые глаза (светятся красным)
+	let eyeSize = w * 0.12;
+	ctx.fillStyle = "#ff0000";
+	ctx.shadowBlur = 15; // Эффект свечения
+	ctx.shadowColor = "red";
+	ctx.beginPath();
+	ctx.arc(x - w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
+	ctx.arc(x + w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.shadowBlur = 0; // Сбрасываем тени
+
+	// Зрачки (узкие вертикальные)
+	ctx.fillStyle = "black";
+	ctx.fillRect(x - w * 0.26, y - h * 0.15, w * 0.02, h * 0.2);
+	ctx.fillRect(x + w * 0.24, y - h * 0.15, w * 0.02, h * 0.2);
+
+	// 5. Оскал (зубы)
+	ctx.strokeStyle = "white";
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.moveTo(x - w * 0.2, y + h * 0.2);
+	ctx.lineTo(x - w * 0.1, y + h * 0.3);
+	ctx.lineTo(x, y + h * 0.2);
+	ctx.lineTo(x + w * 0.1, y + h * 0.3);
+	ctx.lineTo(x + w * 0.2, y + h * 0.2);
+	ctx.stroke();
+
+	// 6. Хвост (грязный и облезлый)
+	let tailX = x - w * 0.5;
+	let tailY = y + h * 0.3;
+	for (let i = 0; i < 6; i++) {
+		ctx.strokeStyle = (i % 2 === 0) ? "#222222" : "#666666";
+		ctx.lineWidth = h * 0.25;
+		ctx.beginPath();
+		ctx.moveTo(tailX - (i * w * 0.12), tailY + Math.sin(e.color_gradient + i) * 5);
+		ctx.lineTo(tailX - ((i + 1) * w * 0.12), tailY + Math.sin(e.color_gradient + i + 1) * 5);
+		ctx.stroke();
+	}
 }
 
 function enemy_boss_exists(g) {

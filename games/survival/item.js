@@ -45,12 +45,22 @@ let ITEM_APPLE_CORE = 100;
 let ITEM_FISH_BONE = 101;
 let ITEM_EMPTY_BOTTLE = 102;
 let ITEM_TIN_CAN = 103;
+let ITEM_OLD_SHOE = 104;
+let ITEM_BENT_FORK = 105;
+let ITEM_CRUMPLED_PAPER = 106;
+let ITEM_DEAD_BATTERY = 107;
+
+let ITEM_JUNK_CANNON = 108;
 
 let ITEMS_JUNK = [
 	ITEM_APPLE_CORE,
 	ITEM_FISH_BONE,
 	ITEM_EMPTY_BOTTLE,
-	ITEM_TIN_CAN
+	ITEM_TIN_CAN,
+	ITEM_OLD_SHOE,
+	ITEM_BENT_FORK,
+	ITEM_CRUMPLED_PAPER,
+	ITEM_DEAD_BATTERY
 ];
 
 ITEMS_AMMOS = [
@@ -73,7 +83,8 @@ ITEMS_GUNS = [
 	ITEM_RAINBOW_PISTOLS,
 	ITEM_LASER_GUN,
 	ITEM_PLASMA_PISTOL,
-	ITEM_ROCKET_SHOTGUN
+	ITEM_ROCKET_SHOTGUN,
+	ITEM_JUNK_CANNON
 ];
 
 ITEMS_MELEE = [
@@ -196,6 +207,180 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		// Маленькая точка сверху (черешок)
 		ctx.fillStyle = "#442200";
 		ctx.fillRect(x + 0.48 * w, y + 0.25 * h, 0.04 * w, 0.04 * h);
+	} else if (id == ITEM_GUN) {
+		// Пистолет: Г-образная форма
+		ctx.fillStyle = "#333";
+		ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.2); // Ствол
+		ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.15, h * 0.3); // Рукоятка
+		ctx.fillStyle = "#555";
+		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.05); // Затвор
+
+	} else if (id == ITEM_RED_PISTOLS || id == ITEM_RAINBOW_PISTOLS) {
+		  // Общая функция для рисования одного пистолета
+		  let drawSinglePistol = (px, py, scale, color) => {
+			ctx.fillStyle = color;
+			// Ствол
+			ctx.fillRect(px, py, w * 0.35 * scale, h * 0.12 * scale);
+			// Рукоятка (под углом или просто вертикально вниз)
+			ctx.fillRect(px, py + h * 0.05 * scale, w * 0.1 * scale, h * 0.18 * scale);
+			// Затвор (сверху чуть светлее для объема)
+			ctx.fillStyle = "rgba(255,255,255,0.2)";
+			ctx.fillRect(px + w * 0.05 * scale, py, w * 0.25 * scale, h * 0.04 * scale);
+		  };
+
+		  // Определяем основной цвет
+		  let mainColor = "#dd1111"; // По умолчанию красный
+		  if (id == ITEM_RAINBOW_PISTOLS && animstate != null) {
+			// Динамический цвет для радужных пистолетов
+			let hue = (animstate * 10) % 360;
+			mainColor = `hsl(${hue}, 70%, 50%)`;
+		  } else if (id == ITEM_RAINBOW_PISTOLS) {
+			mainColor = "purple";
+		  }
+
+		  // Рисуем два пистолета со смещением
+		  // Первый (чуть выше и левее)
+		  drawSinglePistol(x + w * 0.15, y + h * 0.25, 1.2, mainColor);
+		  
+		  // Второй (чуть ниже и правее)
+		  drawSinglePistol(x + w * 0.45, y + h * 0.55, 1.2, mainColor);
+
+		  // Добавим контур для "вписывания" в мир, если нужно
+		  ctx.strokeStyle = "rgba(0,0,0,0.5)";
+		  ctx.lineWidth = 1;
+		  // Опционально можно обвести оба пистолета
+
+	} else if (id == ITEM_PLASMA_PISTOL) {
+		// Плазменный пистолет: Фиолетовое свечение
+		ctx.fillStyle = "#331133";
+		ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.25);
+		ctx.fillStyle = "#ff00ff";
+		ctx.fillRect(x + w * 0.4, y + h * 0.45, w * 0.3, h * 0.1); // Энергоячейка
+	} else if (id == ITEM_GREEN_GUN) {
+		// Зеленая пушка: Длинная, с магазином
+		ctx.fillStyle = "#117733";
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.15); // Ствол
+		ctx.fillStyle = "#0a441e";
+		ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.1, h * 0.3); // Длинный магазин
+	} else if (id == ITEM_RED_SHOTGUN || id == ITEM_SHOTGUN || id == ITEM_ROCKET_SHOTGUN) {
+		// Дробовики: Толстое цевье и приклад
+		let col = id == ITEM_RED_SHOTGUN ? "#dd1111" : (id == ITEM_ROCKET_SHOTGUN ? "#111133" : "#773311");
+		ctx.fillStyle = col;
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.25); // Ствол
+		ctx.fillStyle = "#333";
+		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.4, h * 0.15); // Цевье
+		if (id == ITEM_ROCKET_SHOTGUN) {
+			ctx.fillStyle = "orange";
+			ctx.fillRect(x + w * 0.7, y + h * 0.35, w * 0.1, h * 0.1); // Маленькая ракета сверху
+		}
+	} else if (id == ITEM_MINIGUN) {
+		// Миниган: Три тонких ствола и блок
+		ctx.fillStyle = "#113377";
+		ctx.fillRect(x + w * 0.1, y + h * 0.35, w * 0.3, h * 0.4); // Задний блок
+		ctx.fillStyle = "#555";
+		ctx.fillRect(x + w * 0.4, y + h * 0.4, w * 0.5, h * 0.05); // Ствол 1
+		ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.5, h * 0.05); // Ствол 2
+		ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.5, h * 0.05); // Ствол 3
+	} else if (id == ITEM_LASER_GUN) {
+		// Лазер: Футуристичная форма с линзой
+		ctx.fillStyle = "purple";
+		ctx.fillRect(x + w * 0.1, y + h * 0.35, w * 0.7, h * 0.3);
+		ctx.fillStyle = "#ff00ff";
+		ctx.fillRect(x + w * 0.8, y + h * 0.35, w * 0.1, h * 0.3); // Линза на конце
+		ctx.strokeStyle = "white";
+		ctx.strokeRect(x + w * 0.2, y + h * 0.45, w * 0.5, h * 0.1); // Провод
+	} else if (id == ITEM_PLASMA_LAUNCHER || id == ITEM_ROCKET_LAUNCHER) {
+		// Тяжелые пушки: Громоздкий корпус
+		let col = id == ITEM_PLASMA_LAUNCHER ? "#331133" : "#111133";
+		ctx.fillStyle = col;
+		ctx.fillRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.45);
+		ctx.fillStyle = "#000";
+		ctx.fillRect(x + w * 0.3, y + h * 0.3, w * 0.4, h * 0.1); // Ручка сверху
+		ctx.fillStyle = id == ITEM_PLASMA_LAUNCHER ? "cyan" : "red";
+		ctx.beginPath();
+		ctx.arc(x + w * 0.8, y + h * 0.52, w * 0.1, 0, Math.PI * 2); // Индикатор заряда
+		ctx.fill();
+	} else if (id == ITEM_OLD_SHOE) {
+		// Старый ботинок
+		ctx.fillStyle = "#553311";
+		ctx.fillRect(x + 0.2 * w, y + 0.6 * h, 0.6 * w, 0.2 * h); // Подошва
+		ctx.fillRect(x + 0.2 * w, y + 0.3 * h, 0.3 * w, 0.4 * h); // Пятка/голенище
+	} else if (id == ITEM_BENT_FORK) {
+		// Гнутая вилка
+		ctx.strokeStyle = "#aaa";
+		ctx.lineWidth = 2;
+		drawLine(ctx, x + 0.5 * w, y + 0.8 * h, x + 0.5 * w, y + 0.4 * h, "#aaa"); // Ручка
+		drawLine(ctx, x + 0.4 * w, y + 0.2 * h, x + 0.4 * w, y + 0.4 * h, "#aaa"); // Зуб 1
+		drawLine(ctx, x + 0.6 * w, y + 0.1 * h, x + 0.6 * w, y + 0.4 * h, "#aaa"); // Зуб 2 гнутый
+	} else if (id == ITEM_JUNK_CANNON) {
+		// МУСОРНАЯ ПУШКА (выглядит как труба с примотанным скотчем баком)
+		ctx.fillStyle = "#444";
+		ctx.fillRect(x + 0.1 * w, y + 0.4 * h, 0.8 * w, 0.25 * h); // Ствол
+		ctx.fillStyle = "#222";
+		ctx.fillRect(x + 0.2 * w, y + 0.6 * h, 0.15 * w, 0.2 * h); // Рукоятка
+		ctx.fillStyle = "#556677"; // Бак сверху
+		ctx.beginPath();
+		ctx.arc(x + 0.5 * w, y + 0.35 * h, 0.2 * w, 0, Math.PI, true);
+		ctx.fill();
+		// Синяя изолента
+		ctx.strokeStyle = "blue";
+		ctx.lineWidth = 3;
+		drawLine(ctx, x + 0.4 * w, y + 0.3 * h, x + 0.4 * w, y + 0.65 * h, "blue");
+	} else if (id == ITEM_CRUMPLED_PAPER) {
+		// Скомканная бумага
+		ctx.fillStyle = "#ffffff";
+		ctx.strokeStyle = "#cccccc";
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		// Рисуем неровный многоугольник (эффект мятой бумаги)
+		ctx.moveTo(x + 0.3 * w, y + 0.3 * h);
+		ctx.lineTo(x + 0.5 * w, y + 0.25 * h);
+		ctx.lineTo(x + 0.7 * w, y + 0.4 * h);
+		ctx.lineTo(x + 0.65 * w, y + 0.7 * h);
+		ctx.lineTo(x + 0.4 * w, y + 0.75 * h);
+		ctx.lineTo(x + 0.25 * w, y + 0.5 * h);
+		ctx.closePath();
+		ctx.fill();
+		ctx.stroke();
+		// Складки внутри
+		drawLine(ctx, x + 0.4 * w, y + 0.4 * h, x + 0.6 * w, y + 0.5 * h, "#dddddd", 1);
+	} else if (id == ITEM_DEAD_BATTERY) {
+		// Серая севшая батарейка
+		ctx.fillStyle = "#444444"; // Корпус
+		ctx.fillRect(x + 0.35 * w, y + 0.3 * h, 0.3 * w, 0.5 * h);
+		ctx.fillStyle = "#222222"; // Ржавое дно
+		ctx.fillRect(x + 0.35 * w, y + 0.7 * h, 0.3 * w, 0.1 * h);
+		ctx.fillStyle = "#777777"; // Пипка сверху
+		ctx.fillRect(x + 0.45 * w, y + 0.22 * h, 0.1 * w, 0.08 * h);
+		// Значок "минус" или пустоты
+		drawLine(ctx, x + 0.42 * w, y + 0.55 * h, x + 0.58 * w, y + 0.55 * h, "#333333", 2);
+	} else if (id == ITEM_JUNK_CANNON) {
+		// МУСОРНАЯ ПУШКА
+		// Ствол (широкая ржавая труба)
+		ctx.fillStyle = "#555555";
+		ctx.fillRect(x + 0.1 * w, y + 0.4 * h, 0.7 * w, 0.3 * h);
+		ctx.strokeStyle = "#333333";
+		ctx.lineWidth = 2;
+		ctx.strokeRect(x + 0.1 * w, y + 0.4 * h, 0.7 * w, 0.3 * h);
+
+		// Воронка сзади (куда засыпать мусор)
+		ctx.fillStyle = "#777777";
+		ctx.beginPath();
+		ctx.moveTo(x + 0.1 * w, y + 0.4 * h);
+		ctx.lineTo(x + 0.05 * w, y + 0.25 * h);
+		ctx.lineTo(x + 0.3 * w, y + 0.25 * h);
+		ctx.lineTo(x + 0.25 * w, y + 0.4 * h);
+		ctx.fill();
+		ctx.stroke();
+
+		// Синяя изолента (скрепляет детали)
+		ctx.fillStyle = "#0033aa";
+		ctx.fillRect(x + 0.35 * w, y + 0.38 * h, 0.1 * w, 0.34 * h);
+		ctx.fillRect(x + 0.55 * w, y + 0.38 * h, 0.1 * w, 0.34 * h);
+
+		// Рукоятка
+		ctx.fillStyle = "#222222";
+		ctx.fillRect(x + 0.2 * w, y + 0.7 * h, 0.1 * w, 0.15 * h);
 	} else if (id == ITEM_APPLE) {
 		// Основное тело яблока (один большой эллипс)
 		ctx.fillStyle = "#ff4422"; // Цвет яблока
@@ -826,6 +1011,9 @@ function item_spawn(g, x, y, enemy_type = null) {
 
 	if (enemy_type == "deer")
 		item = ITEM_CANNED_MEAT;
+
+	if (enemy_type == "raccoon")
+		item = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
 
 	item_create(g, item, x, y);
 }

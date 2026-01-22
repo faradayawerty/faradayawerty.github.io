@@ -335,6 +335,7 @@ function game_objects_arrange(g) {
 		"item",
 		"car",
 		"bullet",
+		"trashbullet",
 		"decorative_wall",
 		"decorative",
 		"decorative_grass",

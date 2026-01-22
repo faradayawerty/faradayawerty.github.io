@@ -13,6 +13,7 @@ function cheat_all_weapons() {
 	item_create(game1, ITEM_RAINBOW_PISTOLS, 1250, 1250, false, false);
 	item_create(game1, ITEM_LASER_GUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_HORN, 1250, 1250, false, false);
+	item_create(game1, ITEM_JUNK_CANNON, 1250, 1250, false, false);
 }
 
 function cheat_supplies() {
@@ -30,6 +31,7 @@ function cheat_supplies() {
 	item_create(game1, ITEM_RED_PLASMA, 1250, 1250, false, false);
 	item_create(game1, ITEM_ROCKET, 1250, 1250, false, false);
 	item_create(game1, ITEM_RAINBOW_AMMO, 1250, 1250, false, false);
+	item_create(game1, ITEM_FISH_BONE, 1250, 1250, false, false);
 }
 
 function cheat_godmode() {

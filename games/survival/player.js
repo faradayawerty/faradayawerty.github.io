@@ -523,9 +523,7 @@ function player_draw(player_object, ctx) {
 			let r = Math.cos(0.1 * p.item_animstate) * 15;
 			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
 			let b = Math.sin(0.1 * p.item_animstate) * 15;
-			r = Math.floor(r * r);
-			g = Math.floor(g * g);
-			b = Math.floor(b * b);
+			r = Math.floor(r * r); g = Math.floor(g * g); b = Math.floor(b * b);
 			let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16).padStart(2, '0') + (b).toString(16).padStart(2, '0');
 
 			const drawLaserLine = (width, strokeCol) => {
@@ -547,127 +545,114 @@ function player_draw(player_object, ctx) {
 			p.shooting_laser = false;
 		}
 
-		// --- ОРУЖИЕ (ПУШКИ) ---
-		if (player_object.game.settings.player_draw_gun && ITEMS_GUNS.includes(hotbar_get_selected_item(p.hotbar_element))) {
+		// --- ОРУЖИЕ ---
+		let selected_item = hotbar_get_selected_item(p.hotbar_element);
+		if (player_object.game.settings.player_draw_gun && ITEMS_GUNS.includes(selected_item)) {
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
 
-			let mx = 1,
-				my = 0,
-				cx = 0,
-				cy = 0;
-
+			let mx = 1, my = 0, cx = 0, cy = 0;
 			if (p.ai_controlled) {
-				let closest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000);
-				if (closest_enemy) {
-					mx = closest_enemy.data.body.position.x;
-					my = closest_enemy.data.body.position.y;
-					cx = p.body.position.x;
-					cy = p.body.position.y;
-				} else {
-					mx = p.body.position.x + 1;
-					my = p.body.position.y;
-					cx = p.body.position.x;
-					cy = p.body.position.y;
-				}
+				let target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000);
+				mx = target ? target.data.body.position.x : p.body.position.x + 1;
+				my = target ? target.data.body.position.y : p.body.position.y;
+				cx = p.body.position.x; cy = p.body.position.y;
 			} else if (player_object.game.mobile) {
-				// МОБИЛЬНАЯ ЛОГИКА: используем правый джойстик
-				cx = 0;
-				cy = 0;
-				mx = player_object.game.input.joystick.left.dx;
-				my = player_object.game.input.joystick.left.dy;
-
-				// Если правый не трогаем, смотрим по левому (направлению движения)
-				if (mx === 0 && my === 0) {
-					mx = player_object.game.input.joystick.right.dx;
-					my = player_object.game.input.joystick.right.dy;
-				}
-				// Дефолт, если оба стоят
-				if (mx === 0 && my === 0) {
-					mx = -1;
-					my = 1;
-				}
+				mx = player_object.game.input.joystick.left.dx || player_object.game.input.joystick.right.dx || -1;
+				my = player_object.game.input.joystick.left.dy || player_object.game.input.joystick.right.dy || 1;
+				cx = 0; cy = 0;
 			} else {
-				// ПК ЛОГИКА: Мышь
 				mx = player_object.game.input.mouse.x;
 				my = player_object.game.input.mouse.y;
 				cx = 0.5 * ctx.canvas.width;
 				cy = 0.5 * ctx.canvas.height;
 			}
 
-			let item = hotbar_get_selected_item(p.hotbar_element);
-			ctx.strokeStyle = "black";
-			let lw = 0.25 * p.w;
-			let gl = 1;
-
-			// Настройка цветов и размеров
-			if (item == ITEM_GREEN_GUN) ctx.strokeStyle = "#117733";
-			if (item == ITEM_LASER_GUN) {
-				ctx.strokeStyle = "purple";
-				lw *= 2.25;
-				gl *= 2.4;
-				px = p.body.position.x;
-				py = p.body.position.y;
-			}
-			if (item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
-			if (item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle = "#111133";
-			if (item == ITEM_RED_SHOTGUN) {
-				ctx.strokeStyle = "#551111";
-				lw *= 1.25;
-				gl *= 1.5;
-			};
-			if (item == ITEM_MINIGUN) ctx.strokeStyle = "#113377";
-			if (item == ITEM_PLASMA_LAUNCHER) {
-				ctx.strokeStyle = "#331133";
-				lw *= 2.25;
-				gl *= 1.5;
-			}
-			if (item == ITEM_PLASMA_PISTOL) ctx.strokeStyle = "#331133";
-			if (item == ITEM_ROCKET_LAUNCHER) {
-				ctx.strokeStyle = "#111133";
-				lw *= 2.25;
-				gl *= 1.5;
-			}
-
-			// Расчет направления
 			let gx = mx - cx;
 			let gy = my - cy;
-			let g = Math.sqrt(gx * gx + gy * gy) || 1;
+			let dist = Math.sqrt(gx * gx + gy * gy) || 1;
 
-			// Отрисовка второго ствола для парных пистолетов
-			if (item == ITEM_RED_PISTOLS || item == ITEM_RAINBOW_PISTOLS) {
-				if (item == ITEM_RED_PISTOLS) ctx.strokeStyle = "#551111";
-				else ctx.strokeStyle = "purple";
+			ctx.strokeStyle = "black";
+			let lw = 0.25 * p.w; 
+			let gl = 0.8;        
 
+			// --- ПРИМЕНЕНИЕ ТВОИХ ПРАВОК ---
+			if (selected_item == ITEM_GREEN_GUN) {
+				ctx.strokeStyle = "#117733";
+				gl = 1.6; // В два раза длиннее обычного (0.8 * 2)
+			}
+			if (selected_item == ITEM_LASER_GUN) {
+				ctx.strokeStyle = "purple";
+				lw *= 2.0; // Было 2.25, уменьшили на ~10%
+				gl = 1.8;
+				px = p.body.position.x; py = p.body.position.y;
+			}
+			// ДРОБОВИКИ И ПУЛЕМЕТ (сделали более узкими)
+			if (selected_item == ITEM_SHOTGUN || selected_item == ITEM_ROCKET_SHOTGUN || selected_item == ITEM_RED_SHOTGUN || selected_item == ITEM_MINIGUN) {
+				lw *= 1.25; // Сузили (вместо lw * 1.8 теперь lw * 0.9, что на 50% меньше от прошлого варианта)
+				gl = 1.3;
+				if (selected_item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
+				if (selected_item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle = "#111133";
+				if (selected_item == ITEM_RED_SHOTGUN) ctx.strokeStyle = "#551111";
+				if (selected_item == ITEM_MINIGUN) { ctx.strokeStyle = "#113377"; gl = 1.5; lw *= 1.125; }
+			}
+			if (selected_item == ITEM_JUNK_CANNON) {
+				ctx.strokeStyle = "#444444";
+				lw *= 2.8; gl = 1.6;
+			}
+			if (selected_item == ITEM_PLASMA_LAUNCHER || selected_item == ITEM_ROCKET_LAUNCHER) {
+				ctx.strokeStyle = (selected_item == ITEM_PLASMA_LAUNCHER) ? "#331133" : "#111133";
+				lw *= 2.25; gl = 1.3;
+			}
+			if (selected_item == ITEM_PLASMA_PISTOL) ctx.strokeStyle = "#331133";
+
+			// Отрисовка ПАРНЫХ ПИСТОЛЕТОВ (Одинаковый размер)
+			if (selected_item == ITEM_RED_PISTOLS || selected_item == ITEM_RAINBOW_PISTOLS) {
+				let hue = (p.item_animstate * 24) % 360;
+				ctx.strokeStyle = (selected_item == ITEM_RED_PISTOLS) ? "#551111" : `hsl(${hue}, 80%, 50%)`;
 				let p2x = p.body.position.x + 0.55 * p.w;
 				let p2y = p.body.position.y - 0.45 * p.h;
 				ctx.beginPath();
-				ctx.lineWidth = lw * 0.75;
+				ctx.lineWidth = lw; // Размер как у основного
 				ctx.moveTo(p2x, p2y);
-				ctx.lineTo(p2x + (gl * 0.75) * p.w * gx / g, p2y + (gl * 0.75) * p.h * gy / g);
+				ctx.lineTo(p2x + gl * p.w * gx / dist, p2y + gl * p.h * gy / dist);
 				ctx.stroke();
 			}
 
 			// Основной ствол
 			ctx.beginPath();
-			ctx.lineWidth = lw * 0.75;
+			ctx.lineWidth = lw;
 			ctx.moveTo(px, py);
-			ctx.lineTo(px + gl * 0.75 * p.w * gx / g, py + gl * 0.75 * p.h * gy / g);
+			ctx.lineTo(px + gl * p.w * gx / dist, py + gl * p.h * gy / dist);
 			ctx.stroke();
 
-			ctx.lineWidth = 2; // Сброс
+			if (selected_item == ITEM_JUNK_CANNON) {
+				ctx.strokeStyle = "#0033aa"; // Изолента
+				ctx.lineWidth = lw * 1.1;
+				let tapePos = 0.4;
+				ctx.beginPath();
+				ctx.moveTo(px + (gl * tapePos * p.w) * gx / dist, py + (gl * tapePos * p.h) * gy / dist);
+				ctx.lineTo(px + (gl * (tapePos + 0.1) * p.w) * gx / dist, py + (gl * (tapePos + 0.1) * p.h) * gy / dist);
+				ctx.stroke();
+				ctx.strokeStyle = "#333333"; // Раструб
+				ctx.lineWidth = lw * 1.3;
+				ctx.beginPath();
+				ctx.moveTo(px + (gl * 0.95 * p.w) * gx / dist, py + (gl * 0.95 * p.h) * gy / dist);
+				ctx.lineTo(px + (gl * 1.05 * p.w) * gx / dist, py + (gl * 1.05 * p.h) * gy / dist);
+				ctx.stroke();
+			}
+			ctx.lineWidth = 2;
 		} else if (p.sword_visible) {
 			// --- ХОЛОДНОЕ ОРУЖИЕ ---
 			let px = p.body.position.x - p.w * 0.45;
 			let py = p.body.position.y - p.h * 0.45;
 			let sword_length = 100;
+			let col = (hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN) ? "brown" : "#55aa11";
 			ctx.beginPath();
-			ctx.moveTo(px, py);
-			let col = "#55aa11";
-			if (hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN) col = "brown";
 			ctx.strokeStyle = col;
-			ctx.lineTo(px + Math.cos(p.sword_direction) * sword_length, py + Math.sin(p.sword_direction) * sword_length);
 			ctx.lineWidth = 0.25 * p.w;
+			ctx.moveTo(px, py);
+			ctx.lineTo(px + Math.cos(p.sword_direction) * sword_length, py + Math.sin(p.sword_direction) * sword_length);
 			ctx.stroke();
 			if (hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN) {
 				let dx = Math.cos(p.sword_direction) * sword_length;
@@ -676,11 +661,9 @@ function player_draw(player_object, ctx) {
 				drawLine(ctx, px + 0.3 * dx, py + 0.3 * dy, px + 0.85 * dx + 0.25 * dy, py + 0.85 * dy - 0.25 * dx, "brown", p.w * 0.2);
 			}
 			p.sword_visible = false;
-		} else if (hotbar_get_selected_item(p.hotbar_element) > 0) {
-			// --- ИКОНКА ПРЕДМЕТА ---
-			let px = p.body.position.x - 0.25 * p.w,
-				py = p.body.position.y - 0.25 * p.h;
-			item_icon_draw(ctx, hotbar_get_selected_item(p.hotbar_element), px, py, 0.5 * p.w, 0.5 * p.h, p.item_animstate);
+		} else if (selected_item > 0) {
+			let px = p.body.position.x - 0.25 * p.w, py = p.body.position.y - 0.25 * p.h;
+			item_icon_draw(ctx, selected_item, px, py, 0.5 * p.w, 0.5 * p.h, p.item_animstate);
 		}
 
 		// --- ЩИТЫ ---
@@ -694,10 +677,8 @@ function player_draw(player_object, ctx) {
 			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, fill, stroke, 0.05 * p.w);
 			ctx.globalAlpha = 1.0;
 		};
-
 		drawShield(p.shield_blue_health, p.shield_blue_health_max, "#115577", "#113377");
 		drawShield(p.shield_green_health, p.shield_green_health_max, "lime", "#117733");
-
 		if (p.shield_rainbow_health > 0) {
 			let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15, 2));
 			let g = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15, 2));
@@ -767,6 +748,61 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (Math.random() < 0.00005 * dt)
 			inventory_clear_item(p.inventory_element, ITEM_RAINBOW_AMMO, 1);
 	}
+
+
+	// --- МУСОРНАЯ ПУШКА (ФИНАЛЬНОЕ ОРУЖИЕ) ---
+	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_JUNK_CANNON && p.shot_cooldown <= 0) {
+
+		let junk_id = -1;
+		for (let i = 0; i < ITEMS_JUNK.length; i++) {
+			if (inventory_has_item(p.inventory_element, ITEMS_JUNK[i])) {
+				junk_id = ITEMS_JUNK[i];
+				break;
+			}
+		}
+
+		if (junk_id != -1) {
+			let theta = Math.atan2(ty - sy, tx - sx);
+			let angles = [0, Math.PI / 8, -Math.PI / 8];
+
+			// Расстояние от центра игрока до точки появления снаряда
+			// p.w * 1.5 — это примерно край пушки в руках игрока
+			let offset = p.w * 1.5;
+
+			angles.forEach(angleOffset => {
+				let finalAngle = theta + angleOffset;
+				let dx = Math.cos(finalAngle);
+				let dy = Math.sin(finalAngle);
+
+				// Вычисляем координаты появления со смещением
+				let spawnX = p.body.position.x + Math.cos(theta) * offset;
+				let spawnY = p.body.position.y + Math.sin(theta) * offset;
+
+				trash_bullet_create(
+					player_object.game,
+					spawnX,
+					spawnY,
+					dx,
+					dy,
+					25,
+					150 * 15625 * base_damage * (1 + Math.random()),
+					false,
+					45
+				);
+			});
+
+			p.shot_cooldown = 250;
+
+			if (Math.random() < 0.25) {
+				inventory_clear_item(p.inventory_element, junk_id, 1);
+			}
+
+			if (enable_audio) {
+				audio_play("data/sfx/shotgun_1.mp3", 0.5);
+			}
+		}
+	}
+
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN &&
 		true &&
 		p.shot_cooldown <= 0 &&
