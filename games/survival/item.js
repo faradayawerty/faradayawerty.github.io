@@ -206,6 +206,74 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		// Маленькая точка сверху (черешок)
 		ctx.fillStyle = "#442200";
 		ctx.fillRect(x + 0.48 * w, y + 0.25 * h, 0.04 * w, 0.04 * h);
+
+	} else if (id == ITEM_GREEN_GUN) {
+		const darkGreen = "#0a3311";
+		const acidGreen = "#44ff00";
+		const midGreen = "#117733";
+		const tentacleColor = "#22aa44";
+
+		// Безопасный animstate (если вдруг пришел null)
+		const t_anim = 2 * animstate || 0;
+
+		// 1. Приклад и рукоять (L-образная форма)
+		ctx.fillStyle = darkGreen;
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.2, h * 0.15); // Задняя часть
+		ctx.fillRect(x + w * 0.15, y + h * 0.55, w * 0.08, h * 0.15); // Рукоять
+
+		// 2. Основной ствол
+		ctx.fillStyle = midGreen;
+		ctx.fillRect(x + w * 0.3, y + h * 0.42, w * 0.6, h * 0.12);
+
+		// 3. ПИЯВКИ (Отрисовка вынесена из IF, чтобы не исчезали)
+		ctx.strokeStyle = tentacleColor;
+		ctx.lineWidth = w * 0.05 * 0.75;
+		ctx.lineCap = "round";
+
+		const drawLeech = (startX, startY, maxAmp, freq, phase, length) => {
+			ctx.beginPath();
+			ctx.moveTo(startX, startY);
+
+			const segments = 16;
+			for (let i = 0; i <= segments; i++) {
+				const t = i / segments;
+				const segX = startX + (length * t);
+
+				// Твоя формула затухания (статичное основание)
+				const damping = 1 - Math.exp(-6 * t * t);
+				const wave = Math.sin(t_anim * freq + t * Math.PI * phase) * maxAmp * damping;
+
+				const segY = startY + wave + (t * 5); // Наклон вниз
+				ctx.lineTo(segX, segY);
+
+				if (i === segments) {
+					ctx.fillStyle = acidGreen;
+					ctx.fillRect(segX - 1, segY - 1, 3, 3);
+				}
+			}
+			ctx.stroke();
+		};
+
+		// Точка старта чуть утоплена в магазин (x + w * 0.5)
+		// Верхняя
+		drawLeech(x + w * 0.5, y + h * 0.56, 3, 0.06, 2.0, w * 0.25);
+		// Нижняя
+		drawLeech(x + w * 0.5, y + h * 0.65, 3.5, 0.07, 2.8, w * 0.22);
+
+		// 2. Магазин
+		ctx.fillStyle = darkGreen;
+		ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.15, h * 0.25);
+		ctx.fillStyle = acidGreen;
+		let slosh = Math.sin(t_anim * 0.01) * 1.5;
+		ctx.fillRect(x + w * 0.42, y + h * 0.55 + slosh, w * 0.11, h * 0.15 - slosh);
+
+		// 4. Дуло
+		ctx.fillStyle = darkGreen;
+		ctx.fillRect(x + w * 0.88, y + h * 0.4, w * 0.06, h * 0.16);
+
+
+
+
 	} else if (id == ITEM_GUN) {
 		// Пистолет: Г-образная форма
 		ctx.fillStyle = "#333";
@@ -214,9 +282,60 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillStyle = "#555";
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.05); // Затвор
 
+	} else if (id == ITEM_SWORD) {
+		// БАМБУКОВЫЙ МЕЧ: ИСПРАВЛЕННЫЙ И ЧИСТЫЙ
+		ctx.save();
+		ctx.translate(x + w * 0.5, y + h * 0.5);
+		ctx.rotate(Math.PI / 4);
+
+		let bladeColor = "#55aa11";
+		let strokeColor = "#bbaa11";
+
+		let bW = 0.14 * w; // Ширина лезвия
+		let bH = 0.65 * h; // Длина только лезвия
+		let hW = 0.1 * w; // Ширина рукояти
+		let hH = 0.3 * h; // Длина рукояти
+		let guardY = 0.2 * h; // Точка пересечения (гарда)
+
+		// 1. Лезвие (теперь оно заканчивается ровно над гардой)
+		ctx.fillStyle = bladeColor;
+		ctx.fillRect(-bW / 2, guardY - bH, bW, bH);
+
+		ctx.strokeStyle = strokeColor;
+		ctx.lineWidth = 0.03 * w;
+		ctx.strokeRect(-bW / 2, guardY - bH, bW, bH);
+
+		// 2. Узлы бамбука
+		ctx.strokeStyle = "rgba(0,0,0,0.25)";
+		for (let i = 1; i < 4; i++) {
+			let nodeY = (guardY - bH) + (i * bH * 0.25);
+			drawLine(ctx, -bW / 2, nodeY, bW / 2, nodeY, "rgba(0,0,0,0.25)", 1.5);
+		}
+
+		// 6. Блик
+		ctx.fillStyle = "rgba(255,255,255,0.2)";
+		ctx.fillRect(-bW * 0.2, guardY - bH * 0.9, bW * 0.25, bH * 0.8);
+
+		// 3. Рукоять (рисуем ДО гарды, чтобы она была под ней)
+		ctx.fillStyle = "#443311";
+		ctx.fillRect(-hW / 2, guardY, hW, hH);
+		ctx.strokeStyle = "rgba(0,0,0,0.4)";
+		ctx.strokeRect(-hW / 2, guardY, hW, hH);
+
+		// 4. Гарда (Цуба) - перекрывает стык лезвия и рукояти
+		drawCircle(ctx, 0, guardY, 0.12 * w, "#332211", strokeColor, 0.02 * w);
+
+		// 5. Обмотка на рукояти
+		for (let i = 1; i < 4; i++) {
+			let ry = guardY + (i * hH * 0.25);
+			drawLine(ctx, -hW / 2, ry, hW / 2, ry, "rgba(0,0,0,0.3)", 1);
+		}
+
+		ctx.restore();
+
 	} else if (id == ITEM_RED_PISTOLS || id == ITEM_RAINBOW_PISTOLS) {
-		  // Общая функция для рисования одного пистолета
-		  let drawSinglePistol = (px, py, scale, color) => {
+		// Общая функция для рисования одного пистолета
+		let drawSinglePistol = (px, py, scale, color) => {
 			ctx.fillStyle = color;
 			// Ствол
 			ctx.fillRect(px, py, w * 0.35 * scale, h * 0.12 * scale);
@@ -225,29 +344,29 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 			// Затвор (сверху чуть светлее для объема)
 			ctx.fillStyle = "rgba(255,255,255,0.2)";
 			ctx.fillRect(px + w * 0.05 * scale, py, w * 0.25 * scale, h * 0.04 * scale);
-		  };
+		};
 
-		  // Определяем основной цвет
-		  let mainColor = "#dd1111"; // По умолчанию красный
-		  if (id == ITEM_RAINBOW_PISTOLS && animstate != null) {
+		// Определяем основной цвет
+		let mainColor = "#dd1111"; // По умолчанию красный
+		if (id == ITEM_RAINBOW_PISTOLS && animstate != null) {
 			// Динамический цвет для радужных пистолетов
 			let hue = (animstate * 10) % 360;
 			mainColor = `hsl(${hue}, 70%, 50%)`;
-		  } else if (id == ITEM_RAINBOW_PISTOLS) {
+		} else if (id == ITEM_RAINBOW_PISTOLS) {
 			mainColor = "purple";
-		  }
+		}
 
-		  // Рисуем два пистолета со смещением
-		  // Первый (чуть выше и левее)
-		  drawSinglePistol(x + w * 0.15, y + h * 0.25, 1.2, mainColor);
-		  
-		  // Второй (чуть ниже и правее)
-		  drawSinglePistol(x + w * 0.45, y + h * 0.55, 1.2, mainColor);
+		// Рисуем два пистолета со смещением
+		// Первый (чуть выше и левее)
+		drawSinglePistol(x + w * 0.15, y + h * 0.25, 1.2, mainColor);
 
-		  // Добавим контур для "вписывания" в мир, если нужно
-		  ctx.strokeStyle = "rgba(0,0,0,0.5)";
-		  ctx.lineWidth = 1;
-		  // Опционально можно обвести оба пистолета
+		// Второй (чуть ниже и правее)
+		drawSinglePistol(x + w * 0.45, y + h * 0.55, 1.2, mainColor);
+
+		// Добавим контур для "вписывания" в мир, если нужно
+		ctx.strokeStyle = "rgba(0,0,0,0.5)";
+		ctx.lineWidth = 1;
+		// Опционально можно обвести оба пистолета
 
 	} else if (id == ITEM_PLASMA_PISTOL) {
 		// Плазменный пистолет: Фиолетовое свечение
@@ -255,6 +374,80 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.25);
 		ctx.fillStyle = "#ff00ff";
 		ctx.fillRect(x + w * 0.4, y + h * 0.45, w * 0.3, h * 0.1); // Энергоячейка
+
+	} else if (id == ITEM_GREEN_GUN) {
+		// Основные цвета
+		const darkGreen = "#0a3311"; // Корпус
+		const acidGreen = "#44ff00"; // Кислота
+		const midGreen = "#117733"; // Ствол
+
+		// 1. Приклад и рукоять (L-образная форма)
+		ctx.fillStyle = darkGreen;
+		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.2, h * 0.15); // Задняя часть
+		ctx.fillRect(x + w * 0.15, y + h * 0.55, w * 0.08, h * 0.15); // Рукоять
+
+		// 2. Основной ствол
+		ctx.fillStyle = midGreen;
+		ctx.fillRect(x + w * 0.3, y + h * 0.42, w * 0.6, h * 0.12);
+
+		// 3. Магазин-колба (с эффектом заполненности)
+		// Корпус колбы (темный контур)
+		ctx.fillStyle = darkGreen;
+		ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.15, h * 0.3);
+		// Жидкость внутри (светлая часть)
+		ctx.fillStyle = acidGreen;
+		ctx.fillRect(x + w * 0.43, y + h * 0.6, w * 0.09, h * 0.18);
+
+		// 4. "Органический" элемент (Пиявка)
+		// Добавим нарост сверху ствола
+		ctx.fillStyle = acidGreen;
+		ctx.fillRect(x + w * 0.35, y + h * 0.38, w * 0.2, h * 0.05);
+
+		// Маленькие светящиеся точки (токсины)
+		ctx.fillRect(x + w * 0.6, y + h * 0.45, w * 0.05, h * 0.05);
+		ctx.fillRect(x + w * 0.7, y + h * 0.45, w * 0.05, h * 0.05);
+
+		// 5. Дуло (насадка)
+		ctx.fillStyle = darkGreen;
+		ctx.fillRect(x + w * 0.9, y + h * 0.4, w * 0.05, h * 0.16);
+
+
+	} else if (id == ITEM_GREEN_GUN) {
+		// Параметры для удобства
+		const gunY = y + h * 0.4;
+		const gunH = h * 0.2;
+
+		// 1. Приклад и основная часть (темно-зеленый металл)
+		ctx.fillStyle = "#0a3311";
+		ctx.fillRect(x + w * 0.1, gunY, w * 0.3, gunH * 1.2);
+
+		// 2. Ствол с градиентом (эффект разъеденного металла)
+		let barrelGrad = ctx.createLinearGradient(x + w * 0.4, 0, x + w * 0.9, 0);
+		barrelGrad.addColorStop(0, "#117733");
+		barrelGrad.addColorStop(1, "#33ff66");
+		ctx.fillStyle = barrelGrad;
+		ctx.fillRect(x + w * 0.4, gunY + gunH * 0.1, w * 0.5, gunH * 0.8);
+
+		// 3. Прозрачный магазин-колба (Acid Reservoir)
+		// Тень внутри магазина
+		ctx.fillStyle = "#05220a";
+		ctx.fillRect(x + w * 0.42, gunY + gunH, w * 0.12, h * 0.35);
+		// Сама кислота (ярко-зеленая)
+		ctx.fillStyle = "#44ff00";
+		ctx.fillRect(x + w * 0.44, gunY + gunH + 5, w * 0.08, h * 0.25);
+
+		// 4. Окуляры/Трубки "Пиявки" (органические детали)
+		ctx.strokeStyle = "#22aa44";
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.2, gunY);
+		ctx.quadraticCurveTo(x + w * 0.3, y + h * 0.2, x + w * 0.5, gunY);
+		ctx.stroke();
+
+		// 5. Блик на стволе (придает объем)
+		ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+		ctx.fillRect(x + w * 0.4, gunY + gunH * 0.2, w * 0.4, 2);
+
 	} else if (id == ITEM_GREEN_GUN) {
 		// Зеленая пушка: Длинная, с магазином
 		ctx.fillStyle = "#117733";
@@ -275,38 +468,38 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 	} else if (id == ITEM_MINIGUN) {
 
 		// Ужимаем всё по вертикали и центрируем, чтобы влезло в слот
-		    let mw = w * 0.9;  // Общая ширина конструкции (90% от слота)
-		    let mh = h * 0.25; // Высота стала меньше, чтобы казаться длиннее
-		    let mx = x + w * 0.05; 
-		    let my = y + h * 0.45;
+		let mw = w * 0.9; // Общая ширина конструкции (90% от слота)
+		let mh = h * 0.25; // Высота стала меньше, чтобы казаться длиннее
+		let mx = x + w * 0.05;
+		let my = y + h * 0.45;
 
-		    // 1. Задний блок (корпус)
-		    ctx.fillStyle = "#113377";
-		    ctx.fillRect(mx, my, mw * 0.3, mh * 1.2); 
+		// 1. Задний блок (корпус)
+		ctx.fillStyle = "#113377";
+		ctx.fillRect(mx, my, mw * 0.3, mh * 1.2);
 
-		    // 2. Длинный блок стволов (барабан)
-		    ctx.fillStyle = "#2255aa";
-		    ctx.fillRect(mx + mw * 0.3, my + mh * 0.1, mw * 0.7, mh * 0.8);
+		// 2. Длинный блок стволов (барабан)
+		ctx.fillStyle = "#2255aa";
+		ctx.fillRect(mx + mw * 0.3, my + mh * 0.1, mw * 0.7, mh * 0.8);
 
-		    // 3. Теневые прорези для эффекта стволов
-		    ctx.fillStyle = "#0a1f44";
-		    ctx.fillRect(mx + mw * 0.3, my + mh * 0.3, mw * 0.7, mh * 0.1);
-		    ctx.fillRect(mx + mw * 0.3, my + mh * 0.6, mw * 0.7, mh * 0.1);
+		// 3. Теневые прорези для эффекта стволов
+		ctx.fillStyle = "#0a1f44";
+		ctx.fillRect(mx + mw * 0.3, my + mh * 0.3, mw * 0.7, mh * 0.1);
+		ctx.fillRect(mx + mw * 0.3, my + mh * 0.6, mw * 0.7, mh * 0.1);
 
-		    // 4. Муфты (кольца стяжки) - делают вид более "оружейным"
-		    ctx.fillStyle = "#113377";
-		    ctx.fillRect(mx + mw * 0.6, my + mh * 0.1, mw * 0.06, mh * 0.8);
-		    ctx.fillRect(mx + mw * 0.94, my + mh * 0.1, mw * 0.06, mh * 0.8);
+		// 4. Муфты (кольца стяжки) - делают вид более "оружейным"
+		ctx.fillStyle = "#113377";
+		ctx.fillRect(mx + mw * 0.6, my + mh * 0.1, mw * 0.06, mh * 0.8);
+		ctx.fillRect(mx + mw * 0.94, my + mh * 0.1, mw * 0.06, mh * 0.8);
 
-		    // 5. Тонкая рукоятка сверху (вписанная в слот)
-		    ctx.strokeStyle = "#113377";
-		    ctx.lineWidth = h * 0.03;
-		    ctx.beginPath();
-		    ctx.moveTo(mx + mw * 0.1, my);
-		    ctx.lineTo(mx + mw * 0.1, my - mh * 0.4);
-		    ctx.lineTo(mx + mw * 0.5, my - mh * 0.4);
-		    ctx.lineTo(mx + mw * 0.5, my + mh * 0.1);
-		    ctx.stroke();
+		// 5. Тонкая рукоятка сверху (вписанная в слот)
+		ctx.strokeStyle = "#113377";
+		ctx.lineWidth = h * 0.03;
+		ctx.beginPath();
+		ctx.moveTo(mx + mw * 0.1, my);
+		ctx.lineTo(mx + mw * 0.1, my - mh * 0.4);
+		ctx.lineTo(mx + mw * 0.5, my - mh * 0.4);
+		ctx.lineTo(mx + mw * 0.5, my + mh * 0.1);
+		ctx.stroke();
 
 	} else if (id == ITEM_MINIGUN) {
 		// Миниган: Три тонких ствола и блок
@@ -579,6 +772,29 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.strokeStyle = "#bbaa11";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+	} else if (id == ITEM_HORN) {
+		ctx.save(); // Сохраняем состояние
+
+		// Находим центр объекта
+		let centerX = x + w / 2;
+		let centerY = y + h / 2;
+
+		// Переносим центр координат и поворачиваем на 45 градусов
+		ctx.translate(centerX, centerY);
+		ctx.rotate(-45 * Math.PI / 180);
+
+		ctx.fillStyle = "brown";
+
+		// Рисуем прямоугольник относительно нового центра (0,0)
+		// Раньше было: x + w * 0.1, y + h * 0.425
+		// Теперь: -w/2 + w*0.1, -h/2 + h*0.425
+		ctx.fillRect(-w * 0.4, -h * 0.075, w * 0.8, h * 0.15);
+
+		// Рисуем линии (координаты также смещаем на centerX и centerY)
+		drawLine(ctx, 0, 0, w * 0.3, h * 0.3, "brown", w * 0.1);
+		drawLine(ctx, -w * 0.1, 0, w * 0.2, -h * 0.3, "brown", w * 0.1);
+
+		ctx.restore(); // Возвращаем всё как было
 	} else if (id == ITEM_HORN) {
 		ctx.fillStyle = "brown";
 		ctx.fillRect(x + w * 0.1, y + h * 0.425, w * 0.8, h * 0.15);

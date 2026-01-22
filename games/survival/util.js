@@ -14,14 +14,6 @@ function drawText(ctx, x, y, text, fontsize = 18) {
 	ctx.fillText(text, x + 1, y + 1);
 }
 
-function drawHint(ctx, x, y, text) {
-	ctx.font = "8px sans";
-	ctx.fillStyle = 'black';
-	ctx.fillText(text, x, y);
-	ctx.fillStyle = 'white';
-	ctx.fillText(text, x + 1, y + 1);
-}
-
 function fillMatterBody(ctx, b, color) {
 	ctx.beginPath();
 	let vertices = b.vertices;

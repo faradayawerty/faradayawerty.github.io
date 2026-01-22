@@ -1,4 +1,293 @@
-// --- ИНВЕНТАРЬ ---
+let ITEM_DATA = {
+	[ITEM_GREEN_GUN]: {
+		name: "Acid Leech",
+		desc: "Infinite toxic payload fueled by your own energy reserves.",
+		name_rus: "Кислотная пиявка",
+		desc_rus: "Бесконечный запас токсинов, работающий напрямую от вашей энергии."
+	},
+	[ITEM_SHIELD_GREEN]: {
+		name: "Kinetic Barrier",
+		desc: "Reinforced field that absorbs high-impact energy.",
+		name_rus: "Кинетический барьер",
+		desc_rus: "Усиленное поле, поглощающее энергию сильных ударов."
+	},
+	[ITEM_ROCKET_LAUNCHER]: {
+		name: "Seeker Launcher",
+		desc: "Fires high-velocity homing projectiles.",
+		name_rus: "Установка «Ищейка»",
+		desc_rus: "Выпускает высокоскоростные самонаводящиеся снаряды."
+	},
+	[ITEM_ROCKET_SHOTGUN]: {
+		name: "Homing Flak",
+		desc: "Spreads micro-missiles that lock onto nearby heat signatures.",
+		name_rus: "Самонаводящаяся дробь",
+		desc_rus: "Разбрасывает микро-ракеты, захватывающие тепловые сигнатуры."
+	},
+	[ITEM_GUN]: {
+		name: "Pistol",
+		desc: "Standard 9mm handgun.",
+		name_rus: "Пистолет",
+		desc_rus: "Стандартный 9-мм пистолет."
+	},
+	[ITEM_SHOTGUN]: {
+		name: "Shotgun",
+		desc: "Powerful close-range weapon.",
+		name_rus: "Дробовик",
+		desc_rus: "Мощное оружие для ближнего боя."
+	},
+	[ITEM_MINIGUN]: {
+		name: "Minigun",
+		desc: "Extremely high fire rate.",
+		name_rus: "Миниган",
+		desc_rus: "Экстремально высокая скорострельность."
+	},
+	[ITEM_PLASMA_LAUNCHER]: {
+		name: "Plasma Launcher",
+		desc: "Fires unstable plasma spheres.",
+		name_rus: "Плазмомет",
+		desc_rus: "Стреляет нестабильными сферами плазмы."
+	},
+	[ITEM_RED_PISTOLS]: {
+		name: "Red Pistols",
+		desc: "Dual pistols with increased damage.",
+		name_rus: "Красные пистолеты",
+		desc_rus: "Парные пистолеты с повышенным уроном."
+	},
+	[ITEM_RED_SHOTGUN]: {
+		name: "Red Shotgun",
+		desc: "Enhanced model with tighter spread.",
+		name_rus: "Красный дробовик",
+		desc_rus: "Улучшенная модель с кучной стрельбой."
+	},
+	[ITEM_RAINBOW_PISTOLS]: {
+		name: "Rainbow Pistols",
+		desc: "Chaos in every shot.",
+		name_rus: "Радужные пистолеты",
+		desc_rus: "Хаос в каждом выстреле."
+	},
+	[ITEM_LASER_GUN]: {
+		name: "Laser Gun",
+		desc: "High-precision energy beam.",
+		name_rus: "Лазерная пушка",
+		desc_rus: "Высокоточный энергетический луч."
+	},
+	[ITEM_PLASMA_PISTOL]: {
+		name: "Plasma Pistol",
+		desc: "Compact plasma firing sidearm.",
+		name_rus: "Плазменный пистолет",
+		desc_rus: "Компактное плазменное оружие."
+	},
+	[ITEM_JUNK_CANNON]: {
+		name: "Junk Cannon",
+		desc: "Turns trash into lethal projectiles.",
+		name_rus: "Хламотрон",
+		desc_rus: "Превращает мусор в смертоносные снаряды."
+	},
+
+	// Ближний бой (ITEMS_MELEE)
+	[ITEM_SWORD]: {
+		name: "Sword",
+		desc: "A blade for honorable combat.",
+		name_rus: "Меч",
+		desc_rus: "Лезвие для благородного боя."
+	},
+	[ITEM_HORN]: {
+		name: "Horn",
+		desc: "Sharp and sturdy. Don't ask where it's from.",
+		name_rus: "Рог",
+		desc_rus: "Острый и прочный. Не спрашивай, откуда он."
+	},
+
+	// Боеприпасы (ITEMS_AMMOS)
+	[ITEM_AMMO]: {
+		name: "Ammo",
+		desc: "Standard bullets.",
+		name_rus: "Патроны",
+		desc_rus: "Стандартные пули."
+	},
+	[ITEM_PLASMA]: {
+		name: "Plasma Cells",
+		desc: "Energy source for plasma weapons.",
+		name_rus: "Плазменные ячейки",
+		desc_rus: "Источник энергии для плазменного оружия."
+	},
+	[ITEM_RED_PLASMA]: {
+		name: "Red Plasma",
+		desc: "Overcharged plasma energy.",
+		name_rus: "Красная плазма",
+		desc_rus: "Перегруженная плазменная энергия."
+	},
+	[ITEM_GREEN_AMMO]: {
+		name: "Corrosive Ammo",
+		desc: "Bullets filled with acid.",
+		name_rus: "Кислотные пули",
+		desc_rus: "Пули, наполненные кислотой."
+	},
+	[ITEM_ROCKET]: {
+		name: "Rockets",
+		desc: "Explosive projectiles.",
+		name_rus: "Ракеты",
+		desc_rus: "Взрывоопасные снаряды."
+	},
+	[ITEM_RAINBOW_AMMO]: {
+		name: "Rainbow Core",
+		desc: "Shifts elements unpredictably.",
+		name_rus: "Радужное ядро",
+		desc_rus: "Непредсказуемо меняет стихии."
+	},
+
+	// Ресурсы и выживание
+	[ITEM_HEALTH]: {
+		name: "Health Kit",
+		desc: "Restores a portion of HP.",
+		name_rus: "Аптечка",
+		desc_rus: "Восстанавливает часть здоровья."
+	},
+	[ITEM_HEALTH_GREEN]: {
+		name: "Advanced Medkit",
+		desc: "Powerful regenerative chemicals.",
+		name_rus: "Улучшенная аптечка",
+		desc_rus: "Мощные регенерирующие химикаты."
+	},
+	[ITEM_FUEL]: {
+		name: "Gasoline",
+		desc: "Used to refuel vehicles.",
+		name_rus: "Бензин",
+		desc_rus: "Используется для заправки машин."
+	},
+	[ITEM_SHIELD]: {
+		name: "Energy Shield",
+		desc: "Provides temporary protection.",
+		name_rus: "Энергетический щит",
+		desc_rus: "Дает временную защиту."
+	},
+	[ITEM_SHIELD_RAINBOW]: {
+		name: "Prismatic Shield",
+		desc: "Maximum protection against all types.",
+		name_rus: "Призматический щит",
+		desc_rus: "Максимальная защита от всех типов урона."
+	},
+	[ITEM_MONEY]: {
+		name: "Money",
+		desc: "Can be used for trading.",
+		name_rus: "Деньги",
+		desc_rus: "Можно использовать для торговли."
+	},
+	[ITEM_BOSSIFIER]: {
+		name: "Bossifier",
+		desc: "Unleashes hidden potential. Use with caution.",
+		name_rus: "Боссификатор",
+		desc_rus: "Раскрывает скрытый потенциал. Использовать осторожно."
+	},
+
+	// Еда (ITEMS_FOODS)
+	[ITEM_CANNED_MEAT]: {
+		name: "Canned Meat",
+		desc: "Nutritious and long-lasting.",
+		name_rus: "Тушенка",
+		desc_rus: "Питательно и долго хранится."
+	},
+	[ITEM_ORANGE]: {
+		name: "Orange",
+		desc: "Rich in Vitamin C.",
+		name_rus: "Апельсин",
+		desc_rus: "Богат витамином C."
+	},
+	[ITEM_APPLE]: {
+		name: "Apple",
+		desc: "A fresh, crunchy snack.",
+		name_rus: "Яблоко",
+		desc_rus: "Свежий и хрустящий перекус."
+	},
+	[ITEM_CHERRIES]: {
+		name: "Cherries",
+		desc: "Small but sweet.",
+		name_rus: "Вишни",
+		desc_rus: "Маленькие, но сладкие."
+	},
+	[ITEM_CHICKEN_LEG]: {
+		name: "Chicken Leg",
+		desc: "Fried to perfection.",
+		name_rus: "Куриная ножка",
+		desc_rus: "Идеально прожарена."
+	},
+	[ITEM_CHOCOLATE]: {
+		name: "Chocolate",
+		desc: "Quick energy boost.",
+		name_rus: "Шоколад",
+		desc_rus: "Быстрый заряд энергии."
+	},
+
+	// Напитки (ITEMS_DRINKS)
+	[ITEM_WATER]: {
+		name: "Water",
+		desc: "Essential for survival.",
+		name_rus: "Вода",
+		desc_rus: "Необходима для выживания."
+	},
+	[ITEM_COLA]: {
+		name: "Cola",
+		desc: "Sugary and carbonated.",
+		name_rus: "Кола",
+		desc_rus: "Сладкая и газированная."
+	},
+	[ITEM_MILK]: {
+		name: "Milk",
+		desc: "Good for your bones.",
+		name_rus: "Молоко",
+		desc_rus: "Полезно для костей."
+	},
+
+	// Мусор (ITEMS_JUNK)
+	[ITEM_APPLE_CORE]: {
+		name: "Apple Core",
+		desc: "Someone already ate the good part.",
+		name_rus: "Огрызок",
+		desc_rus: "Кто-то уже съел все вкусное."
+	},
+	[ITEM_FISH_BONE]: {
+		name: "Fish Bone",
+		desc: "Leftovers from a meal.",
+		name_rus: "Рыбья кость",
+		desc_rus: "Остатки чьего-то обеда."
+	},
+	[ITEM_EMPTY_BOTTLE]: {
+		name: "Empty Bottle",
+		desc: "Could be recycled or filled.",
+		name_rus: "Пустая бутылка",
+		desc_rus: "Можно переработать или наполнить."
+	},
+	[ITEM_TIN_CAN]: {
+		name: "Tin Can",
+		desc: "Sharp edges, be careful.",
+		name_rus: "Консервная банка",
+		desc_rus: "Острые края, будь осторожен."
+	},
+	[ITEM_OLD_SHOE]: {
+		name: "Old Shoe",
+		desc: "The sole is falling off.",
+		name_rus: "Старый ботинок",
+		desc_rus: "Подошва вот-зат отвалится."
+	},
+	[ITEM_BENT_FORK]: {
+		name: "Bent Fork",
+		desc: "Useless for eating.",
+		name_rus: "Гнутая вилка",
+		desc_rus: "Бесполезна для еды."
+	},
+	[ITEM_CRUMPLED_PAPER]: {
+		name: "Crumpled Paper",
+		desc: "Indecipherable scribbles.",
+		name_rus: "Ком мятой бумаги",
+		desc_rus: "Неразборчивые каракули."
+	},
+	[ITEM_DEAD_BATTERY]: {
+		name: "Dead Battery",
+		desc: "No power left in this one.",
+		name_rus: "Севшая батарейка",
+		desc_rus: "В ней не осталось энергии."
+	}
+};
 
 function inventory_create(g, attached_to_object = null) {
 	let inv = {
@@ -288,6 +577,19 @@ function inventory_draw(inventory_element, ctx) {
 		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size / 2, curY - drag_size / 2, drag_size, drag_size, inv.animation_state);
 		ctx.globalAlpha = 1.0;
 	}
+
+	// 5. Отрисовка подсказки (Tooltip)
+	// Рисуем в самом конце, чтобы подсказка была ПОВЕРХ всего инвентаря
+	if (inv.iselected !== -1 && inv.jselected !== -1) {
+		let item_id = inv.items[inv.iselected][inv.jselected];
+
+		// Показываем только если в слоте есть предмет и мы его сейчас не тащим (на ПК)
+		if (item_id > 0 && (game.mobile || inv.imove === -1)) {
+			let tooltipX = inv.last_active_mx + 20;
+			let tooltipY = inv.last_active_my + 20;
+			inventory_draw_item_popup(ctx, game, item_id, tooltipX, tooltipY);
+		}
+	}
 }
 
 
@@ -570,4 +872,63 @@ function inventory_clear_item(inventory_element, id, count, item_i = -1, item_j 
 				inventory_element.data.items[i][j] = 0;
 				count--;
 			}
+}
+
+function inventory_draw_item_popup(ctx, game, item_id, x, y) {
+	let data = ITEM_DATA[item_id] || {
+		name: "???",
+		desc: "Unknown item",
+		name_rus: "???",
+		desc_rus: "Неизвестный предмет"
+	};
+
+	let isRus = game.settings.language === "русский";
+	let name = isRus ? data.name_rus : data.name;
+	let desc = isRus ? data.desc_rus : data.desc;
+
+	let W = 350;
+	let H = 150;
+	let fontsize = 16;
+
+	// Чтобы окно не уходило за край экрана
+	let scale = get_scale();
+	if (x + W > window.innerWidth / scale) x -= W;
+	if (y + H > window.innerHeight / scale) y -= H;
+
+	ctx.save();
+	ctx.globalAlpha = 0.9;
+	ctx.fillStyle = "black";
+	ctx.strokeStyle = "gray";
+	ctx.lineWidth = 2;
+
+	// Рисуем рамку
+	ctx.fillRect(x, y, W, H);
+	ctx.strokeRect(x, y, W, H);
+
+	// Заголовок
+	ctx.globalAlpha = 1.0;
+	ctx.fillStyle = "yellow";
+	ctx.font = `bold ${fontsize + 2}px Arial`;
+	ctx.textAlign = "left";
+	ctx.fillText(name, x + 10, y + 25);
+
+	// Описание с простейшим переносом
+	ctx.fillStyle = "white";
+	ctx.font = `${fontsize}px Arial`;
+
+	let words = desc.split(' ');
+	let line = "";
+	let lineY = y + 50;
+	for (let n = 0; n < words.length; n++) {
+		let testLine = line + words[n] + " ";
+		if (testLine.length > 30) {
+			ctx.fillText(line, x + 10, lineY);
+			line = words[n] + " ";
+			lineY += fontsize * 1.2;
+		} else {
+			line = testLine;
+		}
+	}
+	ctx.fillText(line, x + 10, lineY);
+	ctx.restore();
 }

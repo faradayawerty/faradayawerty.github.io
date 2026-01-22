@@ -335,27 +335,27 @@ function player_update(player_object, dt) {
 
 	// Если мобилка, добавляем к ширине пространство, занимаемое доп. кнопками (портфель, кубок, меню)
 	if (player_object.game.mobile) {
-	    // 3 кнопки по размеру слота + зазор 20px от основного ряда
-	    hb_total_width += (hb.slot_size * 1.05) * 3 + 20; 
+		// 3 кнопки по размеру слота + зазор 20px от основного ряда
+		hb_total_width += (hb.slot_size * 1.05) * 3 + 20;
 	}
 
 	// Проверка: находится ли курсор/палец в зоне хотбара
 	let is_clicking_hotbar = doRectsCollide(mx, my, 0, 0, 40, 40, hb_total_width, hb.slot_size);
 
 	// 3. Основная логика использования
-	let use_triggered = player_object.game.mobile 
-	    ? isKeyDown(player_object.game.input, 'c', true) 
-	    : player_object.game.input.mouse.leftButtonPressed;
+	let use_triggered = player_object.game.mobile ?
+		isKeyDown(player_object.game.input, 'c', true) :
+		player_object.game.input.mouse.leftButtonPressed;
 
 	if (use_triggered) {
-	    // Если хотбар скрыт ИЛИ клик за пределами его области
-	    if (!p.hotbar_element.shown || !is_clicking_hotbar) {
-		  let item = hotbar_get_selected_item(p.hotbar_element);
-		  if (item > 0) {
-			player_item_consume(player_object, item);
-			if (player_object.game.mobile) p.mobile_delay = 200;
-		  }
-	    }
+		// Если хотбар скрыт ИЛИ клик за пределами его области
+		if (!p.hotbar_element.shown || !is_clicking_hotbar) {
+			let item = hotbar_get_selected_item(p.hotbar_element);
+			if (item > 0) {
+				player_item_consume(player_object, item);
+				if (player_object.game.mobile) p.mobile_delay = 200;
+			}
+		}
 	}
 
 	if (!p.car_object) {
@@ -554,7 +554,9 @@ function player_draw(player_object, ctx) {
 			let r = Math.cos(0.1 * p.item_animstate) * 15;
 			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
 			let b = Math.sin(0.1 * p.item_animstate) * 15;
-			r = Math.floor(r * r); g = Math.floor(g * g); b = Math.floor(b * b);
+			r = Math.floor(r * r);
+			g = Math.floor(g * g);
+			b = Math.floor(b * b);
 			let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16).padStart(2, '0') + (b).toString(16).padStart(2, '0');
 
 			const drawLaserLine = (width, strokeCol) => {
@@ -582,16 +584,21 @@ function player_draw(player_object, ctx) {
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
 
-			let mx = 1, my = 0, cx = 0, cy = 0;
+			let mx = 1,
+				my = 0,
+				cx = 0,
+				cy = 0;
 			if (p.ai_controlled) {
 				let target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 1000);
 				mx = target ? target.data.body.position.x : p.body.position.x + 1;
 				my = target ? target.data.body.position.y : p.body.position.y;
-				cx = p.body.position.x; cy = p.body.position.y;
+				cx = p.body.position.x;
+				cy = p.body.position.y;
 			} else if (player_object.game.mobile) {
 				mx = player_object.game.input.joystick.left.dx || player_object.game.input.joystick.right.dx || -1;
 				my = player_object.game.input.joystick.left.dy || player_object.game.input.joystick.right.dy || 1;
-				cx = 0; cy = 0;
+				cx = 0;
+				cy = 0;
 			} else {
 				mx = player_object.game.input.mouse.x;
 				my = player_object.game.input.mouse.y;
@@ -604,8 +611,8 @@ function player_draw(player_object, ctx) {
 			let dist = Math.sqrt(gx * gx + gy * gy) || 1;
 
 			ctx.strokeStyle = "black";
-			let lw = 0.25 * p.w; 
-			let gl = 0.8;        
+			let lw = 0.25 * p.w;
+			let gl = 0.8;
 
 			// --- ПРИМЕНЕНИЕ ТВОИХ ПРАВОК ---
 			if (selected_item == ITEM_GREEN_GUN) {
@@ -616,7 +623,8 @@ function player_draw(player_object, ctx) {
 				ctx.strokeStyle = "purple";
 				lw *= 2.0; // Было 2.25, уменьшили на ~10%
 				gl = 1.8;
-				px = p.body.position.x; py = p.body.position.y;
+				px = p.body.position.x;
+				py = p.body.position.y;
 			}
 			// ДРОБОВИКИ И ПУЛЕМЕТ (сделали более узкими)
 			if (selected_item == ITEM_SHOTGUN || selected_item == ITEM_ROCKET_SHOTGUN || selected_item == ITEM_RED_SHOTGUN || selected_item == ITEM_MINIGUN) {
@@ -625,15 +633,21 @@ function player_draw(player_object, ctx) {
 				if (selected_item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
 				if (selected_item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle = "#111133";
 				if (selected_item == ITEM_RED_SHOTGUN) ctx.strokeStyle = "#551111";
-				if (selected_item == ITEM_MINIGUN) { ctx.strokeStyle = "#113377"; gl = 1.5; lw *= 1.125; }
+				if (selected_item == ITEM_MINIGUN) {
+					ctx.strokeStyle = "#113377";
+					gl = 1.5;
+					lw *= 1.125;
+				}
 			}
 			if (selected_item == ITEM_JUNK_CANNON) {
 				ctx.strokeStyle = "#444444";
-				lw *= 2.8; gl = 1.6;
+				lw *= 2.8;
+				gl = 1.6;
 			}
 			if (selected_item == ITEM_PLASMA_LAUNCHER || selected_item == ITEM_ROCKET_LAUNCHER) {
 				ctx.strokeStyle = (selected_item == ITEM_PLASMA_LAUNCHER) ? "#331133" : "#111133";
-				lw *= 2.25; gl = 1.3;
+				lw *= 2.25;
+				gl = 1.3;
 			}
 			if (selected_item == ITEM_PLASMA_PISTOL) ctx.strokeStyle = "#331133";
 
@@ -693,7 +707,8 @@ function player_draw(player_object, ctx) {
 			}
 			p.sword_visible = false;
 		} else if (selected_item > 0) {
-			let px = p.body.position.x - 0.25 * p.w, py = p.body.position.y - 0.25 * p.h;
+			let px = p.body.position.x - 0.25 * p.w,
+				py = p.body.position.y - 0.25 * p.h;
 			item_icon_draw(ctx, selected_item, px, py, 0.5 * p.w, 0.5 * p.h, p.item_animstate);
 		}
 
