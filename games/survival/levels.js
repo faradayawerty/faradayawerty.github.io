@@ -41,7 +41,7 @@ let LEVEL_TILES_SUBURBAN_ZONE = [
 ];
 let TILES = {
 	[LEVEL_TILE_CITY_GAS_STATION]: {
-		weight: 25,
+		weight: 50,
 		connections: {
 			N: 0,
 			E: 1,
@@ -50,7 +50,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_CITY_POLICE]: {
-		weight: 25,
+		weight: 50,
 		connections: {
 			N: 0,
 			E: 1,
@@ -59,7 +59,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_CITY_HOSPITAL]: {
-		weight: 25,
+		weight: 50,
 		connections: {
 			N: 1,
 			E: 1,
@@ -68,7 +68,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_CITY_FIRE_STATION]: {
-		weight: 25,
+		weight: 50,
 		connections: {
 			N: 1,
 			E: 0,
@@ -333,6 +333,8 @@ function levels_set(g, level, old_level = null) {
 			"#d2b48c", "#5d2e0c");
 		decorative_rectangle_create(g, Ox + 1355, Oy + 1850, 145, 150,
 			"#999999", "#999999");
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
+			"#222222", "#222222");
 		decorative_grass_create(g, Ox, Oy + 1450, 100, 100, true);
 		base_color = DECORATIVE_COLOR_GRASS;
 		if (!level_visited) {
@@ -341,26 +343,18 @@ function levels_set(g, level, old_level = null) {
 		}
 	} else if (tile == LEVEL_TILE_RESIDENTIAL_NW) {
 		decorative_level_base_create(g, Ox, Oy);
-		
 		decorative_rectangle_create(g, Ox, Oy + 1130, 1370, 240, "#999999",
 			"#999999");
-		
 		decorative_rectangle_create(g, Ox + 1130, Oy, 240, 1370, "#999999",
 			"#999999");
 		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
-		
-		
 		decorative_house_v2(g, Ox + 150, Oy + 150, 850, 850, "down", "#d2b48c",
 			"#8b4513");
-		
 		decorative_house_v2(g, Ox + 150, Oy + 1500, 850, 850, "up", "#c2b280",
 			"#4a2c2a");
-		
-		
 		decorative_house_v2(g, Ox + 1500, Oy + 150, 850, 850, "left", "#e3dac9",
 			"#5d2e0c");
-		
 		decorative_grass_create(g, Ox + 1200, Oy + 1000, 1295, 1450, true);
 		
 		decorative_rectangle_create(g, Ox + 1355, Oy + 500, 145, 150, "#999999",
@@ -369,6 +363,8 @@ function levels_set(g, level, old_level = null) {
 			"#999999");
 		decorative_rectangle_create(g, Ox + 500, Oy + 1355, 150, 145, "#999999",
 			"#999999");
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
+			"#222222", "#222222");
 		base_color = DECORATIVE_COLOR_GRASS;
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile);
@@ -395,6 +391,8 @@ function levels_set(g, level, old_level = null) {
 			"#999999", "#999999");
 		decorative_rectangle_create(g, Ox + 1850, Oy + 1355, 150, 145,
 			"#999999", "#999999");
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
+			"#222222", "#222222");
 		base_color = DECORATIVE_COLOR_GRASS;
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
