@@ -17,7 +17,7 @@ function game_create(input_, engine_, audios_) {
 		engine: engine_,
 		settings: {
 			language: "english",
-			auto_aim: false, 
+			auto_aim: false,
 			player_color: "red",
 			player_draw_gun: true,
 			enemies_spawn: true,
@@ -41,8 +41,8 @@ function game_create(input_, engine_, audios_) {
 				"automatically pickup fuel": false,
 				"automatically pickup health": false,
 				"automatically pickup ammo": false,
-				"automatically pickup weapons": false, 
-				"automatically pickup shields": false 
+				"automatically pickup weapons": false,
+				"automatically pickup shields": false
 			},
 			ammo_pickup_last: true,
 			respawn_on_current_level: true
@@ -64,7 +64,7 @@ function game_create(input_, engine_, audios_) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
 		saved_achievements: [],
-		enemies: { 
+		enemies: {
 			"regular": true,
 			"shooting": false,
 			"shooting red": false,
@@ -119,13 +119,11 @@ function game_new(g) {
 }
 
 function game_object_create(g, name_, data_, func_update, func_draw, func_destroy, unique_name_ = null) {
-
 	let debug_line = "creating " + name_;
 	if (name_ != "item" && name_ != "bound" && name_ != "decorative" && name_ != "bullet" && name_ != "rocket")
 		g.debug_console.unshift(debug_line);
 	if (g.debug_console.length > 50)
 		g.debug_console.pop();
-
 	if (unique_name_ && g.objects.find((obj) => obj.unique_name == unique_name_))
 		return -1;
 	let obj = {
@@ -163,7 +161,6 @@ function game_update(g, dt) {
 	g.level_set_delay += dt;
 	if (!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
-		
 	}
 	if (isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
@@ -224,10 +221,8 @@ function game_draw(g, ctx) {
 		if (!g.objects[i].destroyed)
 			g.objects[i].draw(g.objects[i], ctx);
 	ctx.restore();
-
 	if (!g.show_gui)
 		return;
-
 	if (g.debug) {
 		ctx.save();
 		ctx.scale(get_scale(), get_scale());
@@ -235,20 +230,13 @@ function game_draw(g, ctx) {
 			drawText(ctx, 50, 110 + i * 20, g.debug_console[i]);
 		ctx.restore();
 	}
-
 	ctx.save()
 	ctx.scale(get_scale(), get_scale());
-	
-	
-	
-	
-	
 	for (let i = 0; i < g.gui_elements.length; i++) {
 		if (!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
 			g.gui_elements[i].draw(g.gui_elements[i], ctx);
 	}
 	ctx.restore();
-
 	if (g.mobile) {
 		drawJoysticks(ctx, g.input.joystick);
 		drawMobileActionButtons(ctx, g.input);
@@ -281,6 +269,7 @@ function game_destroy_level(g, old_level = null) {
 				if (["decorative_roof",
 						"decorative_leaves",
 						"decorative_trunk",
+						"decorative_fuel_pump",
 						"decorative_wall",
 						"decorative",
 						"decorative_grass",
@@ -391,10 +380,8 @@ function game_get_max_enemy(g) {
 }
 
 function game_object_make_savable(obj) {
-
 	if (obj.destroyed)
 		return null;
-
 	if (obj.name == "item") {
 		let saved_obj = {
 			name: "item",
@@ -408,7 +395,6 @@ function game_object_make_savable(obj) {
 		};
 		return saved_obj;
 	}
-
 	if (obj.name == "car") {
 		let saved_obj = {
 			name: "car",
@@ -422,7 +408,6 @@ function game_object_make_savable(obj) {
 		};
 		return saved_obj;
 	}
-
 	if (obj.name == "enemy") {
 		let saved_obj = {
 			name: "enemy",
@@ -436,7 +421,6 @@ function game_object_make_savable(obj) {
 		};
 		return saved_obj;
 	}
-
 	if (obj.name == "player") {
 		let saved_obj = {
 			name: "player",
@@ -456,37 +440,18 @@ function game_object_make_savable(obj) {
 				achievements: []
 			}
 		};
-
 		for (let i = 0; i < obj.data.inventory_element.data.items.length; i++) {
 			for (let j = 0; j < obj.data.inventory_element.data.items[i].length; j++)
 				saved_obj.data.items[i][j] = obj.data.inventory_element.data.items[i][j];
 		}
-
 		saved_obj.data.achievements = obj.data.achievements_element.data.achievements.filter((ach) => ach.done);
-
 		return saved_obj;
 	}
-
 	return null;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 function game_save(g) {
-
 	let objs = [];
-
 	let state_object = {
 		name: "state",
 		enemies: {
@@ -503,15 +468,12 @@ function game_save(g) {
 		visited_levels: g.visited_levels,
 		assigned_tiles: g.assigned_tiles
 	};
-
 	objs.push(state_object);
-
 	for (let i = 0; i < g.objects.length; i++) {
 		let obj = game_object_make_savable(g.objects[i]);
 		if (obj)
 			objs.push(obj);
 	}
-
 	let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(objs));
 	let filename = "faw_survival_save_" + Math.floor(Math.random() * 1000) + ".json";
 	let dlAnchorElem = document.getElementById('downloadAnchorElem');
@@ -519,8 +481,6 @@ function game_save(g) {
 	dlAnchorElem.setAttribute("download", filename);
 	dlAnchorElem.click();
 }
-
-
 
 function game_load(g) {
 	let input = document.getElementById('file-input');
@@ -531,13 +491,10 @@ function game_load(g) {
 		reader.onload = readerEvent => {
 			let content = readerEvent.target.result;
 			let saved_objects = JSON.parse(content);
-
 			game_destroy_all_gui_elements(g);
 			game_destroy_all_objects(g);
-
 			for (let i = 0; i < saved_objects.length; i++) {
 				let obj = saved_objects[i];
-
 				if (obj.name == "state") {
 					g.enemies["regular"] = obj.enemies["regular"];
 					g.enemies["shooting"] = obj.enemies["shooting"];
@@ -551,7 +508,6 @@ function game_load(g) {
 					g.visited_levels = obj.visited_levels;
 					g.assigned_tiles = obj.assigned_tiles;
 				}
-
 				if (obj.name == "player") {
 					let iplayer = player_create(g, obj.data.x, obj.data.y, false, obj.data.ai_controlled);
 					let plr = g.objects[iplayer];
@@ -559,25 +515,21 @@ function game_load(g) {
 						for (let j = 0; j < plr.data.inventory_element.data.items[i].length; j++)
 							plr.data.inventory_element.data.items[i][j] = obj.data.items[i][j];
 					}
-					try { 
+					try {
 						for (let i = 0; i < obj.data.achievements.length; i++)
 							achievement_do(plr.data.achievements_element.data.achievements, obj.data.achievements[i].name, plr.data.achievements_shower_element, true);
 					} catch (e) {
 						g.debug_console.unshift(e);
 					}
-
 				}
 				if (obj.name == "enemy")
 					enemy_create(g, obj.data.x, obj.data.y, obj.data.boss, obj.data.is_minion, obj.data.type);
-
 				if (obj.name == "item")
 					item_create(g, obj.data.id, obj.data.x, obj.data.y, obj.data.dropped, obj.data.despawn);
-
 				if (obj.name == "car")
 					car_create(g, obj.data.x, obj.data.y, obj.data.color, obj.data.is_tank, true);
 			}
 		}
-		
 		try {
 			input.value = '';
 			if (input.value) {

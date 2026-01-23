@@ -300,31 +300,23 @@ function achievements_destroy(ae) {
 }
 
 function achievements_update(ae, dt) {
-
 	ae.data.animstate += 0.0075 * dt;
-
 	let as = ae.data.achievements;
-
 	if (ae.game.input.mouse.leftButtonPressed && !ae.game.mobile) {
-
 		let mx = ae.game.input.mouse.x / get_scale();
 		let my = ae.game.input.mouse.y / get_scale();
 		if (ae.data.offset_x < mx && mx < ae.data.offset_x + ae.data.width &&
 			ae.data.offset_y < my && my < ae.data.offset_y + ae.data.height) {
-
 			if (!ae.data.clicked) {
 				ae.data.xx = ae.data.x;
 				ae.data.yy = ae.data.y;
 				ae.data.mxx = mx;
 				ae.data.myy = my;
 			}
-
 			let dx = mx - ae.data.mxx;
 			let dy = my - ae.data.myy;
-
 			ae.data.x = ae.data.xx + dx;
 			ae.data.y = ae.data.yy + dy;
-
 			ae.data.clicked = true;
 		}
 	} else if (ae.data.clicked && !ae.game.mobile) {
@@ -332,14 +324,12 @@ function achievements_update(ae, dt) {
 		ae.data.yy = ae.game.input.mouse.y / get_scale();
 		ae.data.clicked = false;
 	}
-
 	let mx = ae.game.input.mouse.x;
 	let my = ae.game.input.mouse.y;
 	if (ae.game.mobile && ae.game.input.touch.length > 0) {
 		let mx = ae.game.input.touch[0].x;
 		let my = ae.game.input.touch[0].y;
 	}
-
 	if ((ae.game.input.mouse.leftButtonPressed || isScreenTouched(ae.game.input)) &&
 		(false || doRectsCollide(mx / get_scale(), my / get_scale(), 0, 0, ae.data.offset_x + ae.data.width - ae.data.cross_width, ae.data.offset_y, ae.data.cross_width, ae.data.cross_width))) {
 		ae.shown = false;
@@ -348,35 +338,25 @@ function achievements_update(ae, dt) {
 }
 
 function achievements_draw(ae, ctx) {
-
 	let as = ae.data.achievements;
-
 	ctx.globalAlpha = 0.75;
-
-	
 	ctx.fillStyle = "black";
 	ctx.fillRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data.height);
 	ctx.strokeStyle = "white";
 	ctx.strokeRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data.height);
-
 	ctx.globalAlpha = 1.0;
-
-
 	let cross_width = ae.data.width * 0.025;
 	ae.data.cross_width = cross_width;
-
 	ctx.fillStyle = "#444444";
 	ctx.fillRect(ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y, cross_width, cross_width);
 	ctx.strokeStyle = "white";
 	ctx.strokeRect(ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y, cross_width, cross_width);
 	drawLine(ctx, ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y, ae.data.offset_x + ae.data.width, ae.data.offset_y + cross_width, "white", 0.1 * cross_width);
 	drawLine(ctx, ae.data.offset_x + ae.data.width - cross_width, ae.data.offset_y + cross_width, ae.data.offset_x + ae.data.width, ae.data.offset_y, "white", 0.1 * cross_width);
-
 	let x = ae.data.x;
 	let y = ae.data.y;
 	let w = ae.data.icon_size;
 	let h = ae.data.icon_size;
-
 	let achs = [
 		[
 			"joining in",
@@ -417,16 +397,13 @@ function achievements_draw(ae, ctx) {
 			"huge rainbow guy",
 		],
 	]
-
 	let mx = ae.game.input.mouse.x / get_scale();
 	let my = ae.game.input.mouse.y / get_scale();
-
 	for (let i = 0; i < achs.length; i++) {
 		for (let j = 0; j < achs[i].length; j++)
 			achievement_icon_draw(ctx, as, achs[i][j], x + 2 * i * w, y + 2 * j * h, w, h,
 				false, 50, 50, 1000, 1000, ae.data.animstate);
 	}
-
 	for (let i = 0; i < achs.length; i++) {
 		for (let j = 0; j < achs[i].length; j++)
 			if (x + 2 * i * w < mx && mx < x + 2 * i * w + w && y + 2 * j * h < my && my < y + 2 * j * h + h && achs[i][j]) {
@@ -441,10 +418,8 @@ function achievements_translate(lang, text) {
 }
 
 function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx = 50, bby = 50, bbw = 1000, bbh = 1000, animstate = null, back = true) {
-
 	if (x < bbx || x > bbw - 0.2 * w || y < bby || y > bbh - 0.2 * h || !name)
 		return;
-
 	let ach = achievement_get(as, name);
 	if (achievement_get(as, name).req && !achievement_get(as, achievement_get(as, name).req).done)
 		return;
@@ -452,7 +427,6 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx = 50
 		if (ach)
 			done = ach.done;
 	}
-
 	let c0 = "red";
 	let c1 = "yellow";
 	let c2 = "lime";
@@ -487,7 +461,6 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx = 50
 		c14 = "#333333";
 		c16 = "#111111";
 	}
-
 	let c15 = "black";
 	if (animstate != null) {
 		let r = Math.cos(0.1 * animstate) * 15;
@@ -502,9 +475,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx = 50
 		if (!done)
 			c15 = "#" + (avg).toString(16).padStart(2, '0') + (avg).toString(16).padStart(2, '0') + (avg).toString(16).padStart(2, '0');
 	}
-
 	ctx.lineWidth = 0.025 * w;
-
 	if (back || true) {
 		ctx.globalAlpha *= 0.25;
 		ctx.fillStyle = done ? "green" : "red";
@@ -513,7 +484,6 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx = 50
 		ctx.strokeRect(x, y, w, h);
 		ctx.globalAlpha *= 4;
 	}
-
 	if (name == "joining in") {
 		ctx.fillStyle = c0;
 		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
@@ -690,8 +660,6 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx = 50
 		ctx.fillRect(x + 0.3 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.3 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		
-		
 	} else if (name == "get a ride") {
 		ctx.fillStyle = c5;
 		ctx.fillRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
@@ -786,34 +754,26 @@ function achievements_shower_update(ashe, dt) {
 
 function achievements_shower_draw(ashe, ctx) {
 	for (let i = 0; i < ashe.data.achievements.length; i++) {
-
 		let ach = ashe.data.achievements[i];
-
 		let x = ashe.data.x;
 		let y = ashe.data.y + ashe.data.h * 1.25 * i;
 		let w = ashe.data.w;
 		let h = ashe.data.h;
 		let size = Math.min(w, h);
-
 		ctx.globalAlpha *= 0.5;
 		ctx.fillStyle = "black";
 		ctx.fillRect(x, y, w, h);
 		ctx.strokeStyle = "gray";
 		ctx.strokeRect(x, y, w, h);
 		ctx.globalAlpha *= 2;
-
-		
 		let isMob = ashe.game.mobile;
 		let helpText = isMob ? "tap the gold cup" : "press R or J";
 		let helpTextRus = isMob ? "нажмите на кубок" : "нажмите R или J";
-
 		let achData = achievement_get(ashe.data.attached_to.data.achievements, ach);
 		let text = "achievement get: " + ach + "! " + helpText + " to view";
-
 		if (ashe.game.settings.language == "русский") {
 			text = "получено достижение: " + achData.name_rus + "! " + helpTextRus;
 		}
-
 		drawText(ctx, x + 1.25 * size, y + 0.6 * size, text, 20);
 		achievement_icon_draw(ctx, ashe.data.attached_to.data.achievements, ach, x + 0.125 * size, y + 0.125 * size, 0.75 * size, 0.75 * size,
 			false, 50, 50, 1000, 1000, ashe.data.animstate, false);
@@ -830,38 +790,28 @@ function achievements_shower_destroy(ashe) {
 
 function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh = 1000) {
 	let as = ae.data.achievements;
-
 	let W = bbw * 0.65;
 	let H = bbh * 0.25;
-
 	if (x + W > window.innerWidth / get_scale())
 		x = x - W;
 	if (y + H > window.innerHeight / get_scale())
 		y = y - H;
-
 	let lines = [];
-
 	let achData = achievement_get(as, ach);
 	let name = achData.name;
 	if (ae.game.settings.language == "русский")
 		name = achData.name_rus;
-
 	lines.push("** " + name + " **");
 	lines.push("");
-
-	
 	let descRaw = (ae.game.settings.language == "русский") ? achData.desc_rus : achData.desc;
 	let desc = "";
-
 	if (typeof descRaw === 'object' && descRaw !== null) {
 		desc = ae.game.mobile ? descRaw.mobile : descRaw.pc;
 	} else {
 		desc = descRaw;
 	}
-
 	let fontsize = Math.floor(W / 27);
 	let charlim = Math.floor(1.25 * W / fontsize);
-
 	let words = desc.split(' ');
 	let line = "";
 	for (let i = 0; i < words.length; i++) {
@@ -872,15 +822,12 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh = 1000
 		line += words[i] + " ";
 	}
 	lines.push(line);
-
 	ctx.fillStyle = "black";
 	ctx.fillRect(x, y, W, H);
 	ctx.strokeStyle = "gray";
 	ctx.strokeRect(x, y, W, H);
-
 	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
 		false, 0, 0, window.innerWidth / get_scale(), window.innerHeight / get_scale(), ae.data.animstate);
-
 	for (let i = 0; i < lines.length; i++) {
 		drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i], fontsize);
 	}

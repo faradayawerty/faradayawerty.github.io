@@ -21,6 +21,4 @@ function bound_destroy(bound_object) {
 
 function bound_update(bound_object, dt) {}
 
-function bound_draw(bound_object, ctx) {
-	
-}
+function bound_draw(bound_object, ctx) {}

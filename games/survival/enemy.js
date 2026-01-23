@@ -1,4 +1,3 @@
-
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type = "random") {
 	if (!g.settings.enemies_spawn)
 		return -1;
@@ -37,7 +36,6 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type = "r
 		}
 		if (Math.random() > 1 - 0.25 * m) {
 			boss = true;
-			
 		}
 	}
 	if (type == "shooting laser") {
@@ -184,7 +182,6 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type = "r
 		e.shooting_range = 2.25 * e.shooting_range;
 		e.is_minion = true;
 	}
-
 	Matter.Composite.add(g.engine.world, e.body);
 	return game_object_create(g, "enemy", e, enemy_update, enemy_draw, enemy_destroy);
 }
@@ -204,13 +201,11 @@ function enemy_destroy(enemy_object, death = true) {
 					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["shooting"] = true;
 			}
-
 			if (enemy_object.data.type == "shooting") {
 				if (!g.enemies["shooting red"])
 					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["shooting red"] = true;
 			}
-
 			if (enemy_object.data.type == "shooting red") {
 				if (!g.enemies["sword"])
 					g.kills_for_boss = Math.max(16, g.kills_for_boss);
@@ -226,7 +221,6 @@ function enemy_destroy(enemy_object, death = true) {
 					g.kills_for_boss = Math.max(16, g.kills_for_boss);
 				g.enemies["shooting laser"] = true;
 			}
-
 			if (enemy_object.data.type == "shooting laser") {
 				g.kills_for_boss = Math.max(4, g.kills_for_boss);
 			}
@@ -234,15 +228,12 @@ function enemy_destroy(enemy_object, death = true) {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
 		}
-
 		g.debug_console.unshift("need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
 	}
-
 	if (enemy_object.data.boss && enemy_object.data.hit_by_player && enemy_object.data.hunger <= 0 && death) {
 		g.kills_for_boss = Math.max(32, g.kills_for_boss);
 		g.debug_console.unshift("couldn't defeat boss, need kills for boss: " + g.kills_for_boss + ", kills: " + g.kills);
 	}
-
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
 	enemy_object.data.body = null;
 	enemy_object.destroyed = true;
@@ -301,41 +292,27 @@ function enemy_update(enemy_object, dt) {
 		if (e.type == "raccoon" && target_object && e.boss) {
 			let v = dist(e.body.position, target_object.data.body.position);
 			if (v < e.shooting_range) {
-
 				if (e.shooting_delay >= 500) {
 					let tx = target_object.data.body.position.x - e.body.position.x;
 					let ty = target_object.data.body.position.y - e.body.position.y;
 					let dist_val = Math.sqrt(tx * tx + ty * ty);
-
-					
 					let dx = tx / dist_val;
 					let dy = ty / dist_val;
-
-					
 					let cosA = 0.9238;
 					let sinA = 0.3826;
-
-					
 					let bullet_speed = 24;
 					let bullet_damage = e.damage;
-					let bullet_size = e.w * 0.25; 
-
-					
+					let bullet_size = e.w * 0.25;
 					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
 						dx, dy, bullet_speed, bullet_damage, true, bullet_size);
-
-					
 					let vx_left = dx * cosA - dy * (-sinA);
 					let vy_left = dx * (-sinA) + dy * cosA;
 					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
 						vx_left, vy_left, bullet_speed, bullet_damage, true, bullet_size);
-
-					
 					let vx_right = dx * cosA - dy * sinA;
 					let vy_right = dx * sinA + dy * cosA;
 					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
 						vx_right, vy_right, bullet_speed, bullet_damage, true, bullet_size);
-
 					e.shooting_delay = 0;
 				}
 			}
@@ -389,7 +366,6 @@ function enemy_update(enemy_object, dt) {
 		if (e.type == "shooting laser" && e.is_minion) {
 			if (v < e.shooting_range) {
 				if (e.shooting_delay >= 300) {
-					
 					let colors = ["red", "orange", "yellow", "lime", "cyan", "blue", "purple"];
 					N = 7;
 					for (let i = 0; i < N; i++) {
@@ -564,7 +540,6 @@ function enemy_update(enemy_object, dt) {
 	}
 	if (enemy_object.data.health <= 0) {
 		if (enemy_object.data.hit_by_player) {
-
 			if (target_object && target_object.name == "player") {
 				let p = target_object.data;
 				achievement_do(p.achievements_element.data.achievements, "shoot 'em up", p.achievements_shower_element);
@@ -579,7 +554,6 @@ function enemy_update(enemy_object, dt) {
 				if (enemy_object.data.type == "shooting laser")
 					achievement_do(p.achievements_element.data.achievements, "rainbow", p.achievements_shower_element);
 			}
-
 			let N = 1;
 			if (enemy_object.data.boss) {
 				if (enemy_object.data.hunger > 0) {
@@ -788,47 +762,33 @@ function enemy_draw(enemy_object, ctx) {
 }
 
 function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
-	
 	ctx.fillStyle = "#333333";
-	
 	ctx.beginPath();
 	ctx.moveTo(x - w * 0.4, y - h * 0.5);
-	ctx.lineTo(x - w * 0.6, y - h * 0.9); 
+	ctx.lineTo(x - w * 0.6, y - h * 0.9);
 	ctx.lineTo(x - w * 0.1, y - h * 0.5);
 	ctx.fill();
-
-	
 	ctx.beginPath();
 	ctx.moveTo(x + w * 0.4, y - h * 0.5);
-	ctx.lineTo(x + w * 0.6, y - h * 0.85); 
+	ctx.lineTo(x + w * 0.6, y - h * 0.85);
 	ctx.lineTo(x + w * 0.1, y - h * 0.5);
 	ctx.fill();
-
-	
 	fillMatterBody(ctx, e.body, "#555555");
 	drawMatterBody(ctx, e.body, e.color_outline, 2);
-
-	
 	ctx.fillStyle = "#111111";
 	ctx.fillRect(x - w * 0.5, y - h * 0.25, w, h * 0.4);
-
-	
 	let eyeSize = w * 0.12;
 	ctx.fillStyle = "#ff0000";
-	ctx.shadowBlur = 15; 
+	ctx.shadowBlur = 15;
 	ctx.shadowColor = "red";
 	ctx.beginPath();
 	ctx.arc(x - w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
 	ctx.arc(x + w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.shadowBlur = 0; 
-
-	
+	ctx.shadowBlur = 0;
 	ctx.fillStyle = "black";
 	ctx.fillRect(x - w * 0.26, y - h * 0.15, w * 0.02, h * 0.2);
 	ctx.fillRect(x + w * 0.24, y - h * 0.15, w * 0.02, h * 0.2);
-
-	
 	ctx.strokeStyle = "white";
 	ctx.lineWidth = 2;
 	ctx.beginPath();
@@ -838,8 +798,6 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	ctx.lineTo(x + w * 0.1, y + h * 0.3);
 	ctx.lineTo(x + w * 0.2, y + h * 0.2);
 	ctx.stroke();
-
-	
 	let tailX = x - w * 0.5;
 	let tailY = y + h * 0.3;
 	for (let i = 0; i < 6; i++) {

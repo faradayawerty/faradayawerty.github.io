@@ -33,8 +33,8 @@ function menu_create() {
 			"automatically pickup fuel": false,
 			"automatically pickup health": false,
 			"automatically pickup ammo": false,
-			"automatically pickup weapons": false, 
-			"automatically pickup shields": false 
+			"automatically pickup weapons": false,
+			"automatically pickup shields": false
 		},
 		iselected: 0,
 		language_selection_buttons: [
@@ -46,25 +46,20 @@ function menu_create() {
 			"back to settings"
 		],
 		main_menu_buttons: [
-			
 			"continue game",
 			"settings",
 			"save game",
 			"load game",
 		],
 		menu_respawn_buttons: [
-			
 			"respawn and continue game",
-			
 		],
 		settings_buttons: [
-			
 			"player color",
 			"player draw gun",
-			"automatic aim", 
+			"automatic aim",
 			"enemies spawn",
 			"automatic respawn",
-			
 			"language",
 			"ammo pickup in last slot",
 			"lose items on death",
@@ -100,8 +95,8 @@ function menu_create() {
 			"automatically pickup fuel",
 			"automatically pickup health",
 			"automatically pickup ammo",
-			"automatically pickup weapons", 
-			"automatically pickup shields", 
+			"automatically pickup weapons",
+			"automatically pickup shields",
 			"back to settings"
 		],
 		buttons: null,
@@ -166,12 +161,9 @@ function menu_draw(ctx, m) {
 }
 
 function menu_update(m, dt, input) {
-
 	if (!m.mobile && input.touch.length > 0)
 		m.mobile = true;
-
 	let would_be_able_to_touch_button = false;
-
 	for (let i = 0; i < m.buttons.length; i++)
 		if ((!m.mobile && doRectsCollide(input.mouse.x / get_scale(), input.mouse.y / get_scale(), 0, 0,
 				80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60)) ||
@@ -181,14 +173,12 @@ function menu_update(m, dt, input) {
 			m.iselected = i;
 			would_be_able_to_touch_button = true;
 		}
-
 	if (m.buttons == m.menu_respawn_buttons && m.want_autorespawn) {
 		m.shown = false;
 		m.main_menu_buttons[0] = "continue game";
 		m.want_player_respawn = true;
 		menu1.buttons = menu1.main_menu_buttons;
 	}
-
 	if ((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) && m.iselected < m.buttons.length - 1) {
 		m.iselected += 1;
 	} else if ((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp', true)) && m.iselected > 0) {
@@ -291,17 +281,14 @@ function menu_update(m, dt, input) {
 			m.want_auto_aim = !m.want_auto_aim;
 		}
 	}
-
 	if (would_be_able_to_touch_button && !m.touched_button_previus_frame)
 		m.can_touch_button = true;
 	else
 		m.can_touch_button = false;
-
 	if (isScreenTouched(input))
 		m.touched_button_previus_frame = true;
 	else
 		m.touched_button_previus_frame = false;
-
 }
 
 function menu_translate(lang, str) {

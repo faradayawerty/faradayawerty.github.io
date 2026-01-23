@@ -1,4 +1,3 @@
-
 function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false, size = 6, lifetime = 1500, color_fill = "yellow", color_outline = "orange", invisible = false) {
 	let bullets = g.objects.filter((obj) => obj.name == "bullet");
 	if (bullets.length > 300)
@@ -32,7 +31,6 @@ function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 function bullet_destroy(bullet_object) {
 	if (bullet_object.destroyed)
 		return;
-	
 	Matter.Composite.remove(bullet_object.game.engine.world, bullet_object.data.body);
 	bullet_object.data.body = null;
 	bullet_object.destroyed = true;

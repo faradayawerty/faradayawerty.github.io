@@ -1,9 +1,5 @@
 function rocket_create(g, x, y, dx, dy, w, target_object, damage, health, enemy = true, speed = 10, lifetime = 4800) {
 	let rockets = g.objects.filter((obj) => obj.name == "rocket");
-	
-	
-	
-	
 	let r = {
 		lifetime: lifetime,
 		health: health,
@@ -44,12 +40,10 @@ function rocket_update(rocket_object, dt) {
 	} else {
 		rocket_object.data.lifetime -= dt;
 	}
-
 	if (r.health < 0) {
 		rocket_destroy(rocket_object);
 		return;
 	}
-
 	if (!r.enemy) {
 		r.target_object = game_object_find_closest(rocket_object.game, r.body.position.x, r.body.position.y, "enemy", 300);
 		if (!r.target_object)
@@ -62,14 +56,12 @@ function rocket_update(rocket_object, dt) {
 			rocket_object.name = "rocket";
 		}
 	}
-
 	if (r.target_object) {
 		if (r.target_object.destroyed ||
 			r.target_object.name != "animal" && r.target_object.name != "player" && r.target_object.name != "enemy" && r.target_object.name != "car" && r.target_object.name != "rocket" ||
 			r.target_object.name == "car" && r.target_object.data.is_tank) {
 			r.target_object = null;
 		} else {
-			
 			if (r.target_object.name == "player" && r.target_object.data.car_object) {
 				r.target_object = r.target_object.data.car_object;
 			}

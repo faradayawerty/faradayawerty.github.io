@@ -1,36 +1,102 @@
+
 var GLOBAL_VOLUME = 80;
+const AUDIO_CACHE = {};
 
-function audios_get() {
-	let as = {
-		deer_dies_1: audio_create("data/sfx/deer_dies_1.mp3"),
-		car_1: audio_create("data/sfx/car_1.mp3"),
-		beam_of_laser_fires_1: audio_create("data/sfx/beam_of_laser_fires_1.mp3", 0.25),
-		shotgun_1: audio_create("data/sfx/shotgun_1.mp3", 0.25),
-		gunshot_1: audio_create("data/sfx/gunshot_1.mp3", 0.25),
-		plasmagun_1: audio_create("data/sfx/plasmagun_1.mp3", 0.125),
-		sword_1: audio_create("data/sfx/sword_1.mp3"),
-		red_pistols_1: audio_create("data/sfx/red_pistols_1.mp3", 0.125),
-		rocketlauncher_1: audio_create("data/sfx/rocketlauncher_1.mp3", 0.125),
-		shield_1: audio_create("data/sfx/shield_1.mp3"),
-		healing_1: audio_create("data/sfx/healing_1.mp3"),
-		water_1: audio_create("data/sfx/water_1.mp3", 1.0),
-		eating_1: audio_create("data/sfx/eating_1.mp3", 1.0),
-		minigun_last_played: Date.now()
-	};
-	return as;
-}
-
+/**
+ * Создает объект Audio и принудительно загружает файл.
+ */
 function audio_create(path, volume = 0.75) {
-	let a = new Audio(path);
-	a.volume = volume;
-	a.preload = 'auto';
-	a.loop = false;
-	return a;
+    return new Promise((resolve) => {
+        const a = new Audio();
+        
+        a.oncanplaythrough = () => resolve(a);
+        
+        a.onerror = () => {
+            console.error(`[Audio Error]: Не удалось загрузить файл: ${path}`);
+            resolve(null); 
+        };
+
+        a.src = path;
+        a.preload = 'auto';
+        a.dataset.baseVolume = volume;
+        a.load(); 
+    });
 }
 
-function audio_play(path, volume = 0.75) {
-	let a = new Audio(path);
-	a.volume = volume * GLOBAL_VOLUME * 0.01;
-	a.preload = 'auto';
-	a.play();
+/**
+ * Инициализация всех звуков. 
+ * Я добавил сюда все файлы из твоего терминала.
+ */
+async function audio_init() {
+    console.log("Начало загрузки аудио...");
+    
+    // Список всех твоих файлов с громкостью по умолчанию
+    const soundList = [
+        { name: "achievement_get_1", vol: 0.8 },
+        { name: "achievement_get_2", vol: 0.8 },
+        { name: "car_1", vol: 0.75 },
+        { name: "gunshot_1", vol: 0.25 },
+        { name: "raccoon_dies", vol: 0.75 },
+        { name: "shield_1", vol: 0.75 },
+        { name: "water_1", vol: 1.0 },
+        { name: "deer_dies_1", vol: 0.75 },
+        { name: "healing_1", vol: 0.75 },
+        { name: "red_pistols_1", vol: 0.15 },
+        { name: "shotgun_1", vol: 0.25 },
+        { name: "zombie_boss_dies_1", vol: 0.8 },
+        { name: "beam_of_laser_fires_1", vol: 0.25 },
+        { name: "eating_1", vol: 1.0 },
+        { name: "plasmagun_1", vol: 0.15 },
+        { name: "rocketlauncher_1", vol: 0.15 },
+        { name: "sword_1", vol: 0.75 },
+        { name: "zombie_dies_1", vol: 0.7 }
+    ];
+
+    const promises = soundList.map(s => {
+        const path = `data/sfx/${s.name}.mp3`;
+        return audio_create(path, s.vol).then(audioObj => {
+            if (audioObj) {
+                AUDIO_CACHE[path] = audioObj;
+            }
+        });
+    });
+
+    await Promise.all(promises);
+    console.log("Загрузка аудио завершена. Кэш готов.");
+}
+
+/**
+ * Проигрывает звук по пути. 
+ * Если пути нет в кэше, пытается загрузить его на лету.
+ */
+function audio_play(path, volume = null) {
+    const master = AUDIO_CACHE[path];
+    
+    if (master) {
+        try {
+            let clone = master.cloneNode();
+            let v = (volume !== null) ? volume : parseFloat(master.dataset.baseVolume);
+            clone.volume = v * (GLOBAL_VOLUME / 100);
+            
+            const playPromise = clone.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Ошибка может быть, если игрок еще не кликнул по экрану
+                });
+            }
+        } catch (err) {
+            console.error(`[Audio Runtime Error]: ${path}`, err);
+        }
+    } else {
+        // Фоллбек: если забыли предзагрузить, грузим сейчас
+        console.warn(`[Audio Missing]: ${path}. Загружаю экстренно...`);
+        audio_create(path, volume || 0.75).then(audioObj => {
+            if (audioObj) {
+                AUDIO_CACHE[path] = audioObj;
+                let v = (volume !== null) ? volume : 0.75;
+                audioObj.volume = v * (GLOBAL_VOLUME / 100);
+                audioObj.play().catch(() => {});
+            }
+        });
+    }
 }

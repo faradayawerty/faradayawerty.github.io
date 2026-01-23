@@ -32,7 +32,6 @@ function input_create() {
 	};
 }
 
-
 function getButtonRegions(ctx) {
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
@@ -44,9 +43,7 @@ function getButtonRegions(ctx) {
 	let gap = 16;
 	let totalWidth = w_use + gap + w_pick;
 	let startX = (w - totalWidth) / 2;
-
 	let uy = 5 * h / 6;
-
 	return {
 		use: {
 			x1: startX,
@@ -88,7 +85,6 @@ function getWishDir(input) {
 			x: Math.sqrt(Math.sqrt(2)) * input.joystick.right.dx,
 			y: Math.sqrt(Math.sqrt(2)) * input.joystick.right.dy
 		}
-
 	let vel = Matter.Vector.create(0, 0);
 	if (input.keys.down['d'] || input.keys.down['в']) vel = Matter.Vector.add(vel, Matter.Vector.create(1, 0));
 	if (input.keys.down['a'] || input.keys.down['ф']) vel = Matter.Vector.add(vel, Matter.Vector.create(-1, 0));
@@ -96,7 +92,6 @@ function getWishDir(input) {
 	if (input.keys.down['w'] || input.keys.down['ц']) vel = Matter.Vector.add(vel, Matter.Vector.create(0, -1));
 	return vel;
 }
-
 
 function isMouseWheelUp(input) {
 	let val = input.mouse.wheelUp;
@@ -176,7 +171,6 @@ function touchHandler(touch, joystick, ctx, e) {
 			y: (et.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight
 		});
 	}
-
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
 	joystick.radius = Math.min(w / 16, h / 16);
@@ -184,7 +178,6 @@ function touchHandler(touch, joystick, ctx, e) {
 	joystick.left.y = 5 * h / 6;
 	joystick.right.x = 5 * w / 6;
 	joystick.right.y = 5 * h / 6;
-
 	for (let t of touch) {
 		if (t.id === joystick.left.id) {
 			let dx = t.x - joystick.left.x;
@@ -207,22 +200,14 @@ function initializeTouchInput(touch, joystick, ctx) {
 	window.addEventListener('touchstart', function(e) {
 		let regions = getButtonRegions(ctx);
 		let deadZoneHeight = ctx.canvas.height * 0.5;
-
 		for (let i = 0; i < e.changedTouches.length; i++) {
 			let t = e.changedTouches[i];
 			let tx = (t.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
 			let ty = (t.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
-
-			
 			if (ty < deadZoneHeight) continue;
-
-			
 			let hitButton = (tx > regions.use.x1 && tx < regions.use.x2 && ty > regions.use.y1 && ty < regions.use.y2) ||
 				(tx > regions.pick.x1 && tx < regions.pick.x2 && ty > regions.pick.y1 && ty < regions.pick.y2);
-
 			if (hitButton) continue;
-
-			
 			if (tx < ctx.canvas.width / 2 && joystick.left.id === -1) joystick.left.id = t.identifier;
 			else if (tx >= ctx.canvas.width / 2 && joystick.right.id === -1) joystick.right.id = t.identifier;
 		}
@@ -230,11 +215,9 @@ function initializeTouchInput(touch, joystick, ctx) {
 	}, {
 		passive: false
 	});
-
 	window.addEventListener('touchmove', e => touchHandler(touch, joystick, ctx, e), {
 		passive: false
 	});
-
 	const stopTouch = (e) => {
 		for (let i = 0; i < e.changedTouches.length; i++) {
 			let id = e.changedTouches[i].identifier;
@@ -283,27 +266,22 @@ function drawJoysticks(ctx, joystick) {
 
 function drawMobileActionButtons(ctx, input) {
 	if (!input || input.touch === undefined) return;
-
 	let regions = getButtonRegions(ctx);
 	let ux = (regions.use.x1 + regions.use.x2) / 2;
 	let uy = (regions.use.y1 + regions.use.y2) / 2;
 	let fx = (regions.pick.x1 + regions.pick.x2) / 2;
 	let fy = (regions.pick.y1 + regions.pick.y2) / 2;
-
 	let w_use = regions.use.x2 - regions.use.x1;
 	let w_pick = regions.pick.x2 - regions.pick.x1;
 	let h_btn = regions.use.y2 - regions.use.y1;
-
 	let isUsePressed = false;
 	let isPickPressed = false;
 	for (let t of input.touch) {
 		if (t.x > regions.use.x1 && t.x < regions.use.x2 && t.y > regions.use.y1 && t.y < regions.use.y2) isUsePressed = true;
 		if (t.x > regions.pick.x1 && t.x < regions.pick.x2 && t.y > regions.pick.y1 && t.y < regions.pick.y2) isPickPressed = true;
 	}
-
 	input.keys.down['c'] = isUsePressed;
 	input.keys.down['f'] = isPickPressed;
-
 	const drawFlatBase = (x, y, bw, bh, active) => {
 		ctx.globalAlpha = active ? 0.8 : 0.35;
 		ctx.fillStyle = "#4477ff";
@@ -315,11 +293,8 @@ function drawMobileActionButtons(ctx, input) {
 		ctx.stroke();
 		ctx.globalAlpha = 1.0;
 	};
-
 	let p = 2.2;
 	let th = p * 5;
-
-	
 	drawFlatBase(ux, uy, w_use, h_btn, isUsePressed);
 	ctx.fillStyle = "white";
 	const renderLet = (data, ox, oy) => {
@@ -332,8 +307,6 @@ function drawMobileActionButtons(ctx, input) {
 	renderLet(["# #", "# #", "# #", "# #", "###"], ux - p * 5.5, uy - th / 2);
 	renderLet(["###", "#  ", "###", "  #", "###"], ux - p * 1.5, uy - th / 2);
 	renderLet(["###", "#  ", "###", "#  ", "###"], ux + p * 2.5, uy - th / 2);
-
-	
 	drawFlatBase(fx, fy, w_pick, h_btn, isPickPressed);
 	ctx.fillStyle = "white";
 	let curX = fx - (p * 34) / 2;

@@ -54,7 +54,6 @@ function drawLine(ctx, x1, y1, x2, y2, color, width) {
 	ctx.stroke();
 }
 
-
 function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
 	ctx.beginPath()
 	ctx.arc(x, y, radius, 0, 2 * Math.PI, false)

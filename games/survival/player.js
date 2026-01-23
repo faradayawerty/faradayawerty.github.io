@@ -51,7 +51,7 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 	p.achievements_shower_element = g.gui_elements[achievements_shower_create(g, p.achievements_element)];
 	if (!p.ai_controlled) {
 		p.achievements_shower_element.shown = true;
-		for (let i = 0; i < g.saved_achievements.length; i++) 
+		for (let i = 0; i < g.saved_achievements.length; i++)
 			achievement_do(p.achievements_element.data.achievements, g.saved_achievements[i].name, p.achievements_shower_element, true);
 		g.saved_achievements = [];
 	}
@@ -135,19 +135,13 @@ function player_die(player_object) {
 }
 
 function player_update(player_object, dt) {
-
 	if (dt < 1000 / 120 && !player_object || player_object.destroyed || !player_object.data.body)
 		return;
-
 	let p = player_object.data;
-
-	
 	if (p.mobile_delay === undefined) p.mobile_delay = 0;
 	if (p.mobile_delay > 0) p.mobile_delay -= dt;
-
 	if (!menu1.shown)
 		achievement_do(p.achievements_element.data.achievements, "joining in", p.achievements_shower_element);
-
 	let has_empty = false;
 	for (let i = 0; i < p.inventory_element.data.items.length; i++)
 		for (let j = 0; j < p.inventory_element.data.items[i].length; j++)
@@ -155,10 +149,7 @@ function player_update(player_object, dt) {
 				has_empty = true;
 	if (!has_empty)
 		achievement_do(p.achievements_element.data.achievements, "full inventory", p.achievements_shower_element);
-
 	let max_levels = 600;
-
-	
 	if (p.body.position.x < -max_levels * 2500) Matter.Body.setPosition(p.body, {
 		x: max_levels * 2500,
 		y: p.body.position.y
@@ -175,102 +166,77 @@ function player_update(player_object, dt) {
 		x: p.body.position.x,
 		y: -max_levels * 2500
 	}, false);
-
 	if (p.shot_cooldown > 0) p.shot_cooldown -= dt;
 	if (p.shotgun_cooldown > 0) p.shotgun_cooldown -= dt;
 	if (p.minigun_cooldown > 0) p.minigun_cooldown -= dt;
-
 	p.item_animstate += 0.01 * dt;
-
 	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.01 * dt;
 	if (p.shield_green_health > 0) p.shield_green_health -= 0.01 * dt;
 	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.01 * dt;
-
-	
 	if (p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(p.health) + ", change " + Math.round(p.saved_health - p.health) +
 			": hunger: " + Math.round(p.hunger) + ", thirst: " + Math.round(p.thirst) +
 			", at x:" + Math.round(p.body.position.x) + " y:" + Math.round(p.body.position.y));
 	}
-
 	p.saved_health = p.health;
 	p.saved_hunger = p.hunger;
 	p.saved_thirst = p.thirst;
-
 	if (p.immunity > 0) p.immunity -= dt;
-
 	if (player_object.data.health <= 0 && !player_object.game.godmode) {
 		player_die(player_object);
 		return;
 	}
-
 	if (player_object.game.godmode) {
 		p.health = p.max_health;
 		p.hunger = p.max_hunger;
 		p.thirst = p.max_thirst;
 	}
-
-	
 	if (p.thirst > 0 && achievement_get(p.achievements_element.data.achievements, "first steps").done) {
 		if (p.shield_green_health > 0) p.thirst = Math.max(0, p.thirst - 0.0005 * dt);
 		else if (p.shield_rainbow_health > 0) p.thirst = Math.max(0, p.thirst - 0.00000025 * dt);
 		else p.thirst = Math.max(0, p.thirst - 0.001 * dt);
 	}
 	if (p.thirst <= 0) p.health -= 0.01 * dt;
-
 	if (p.hunger > 0 && achievement_get(p.achievements_element.data.achievements, "first steps").done) {
 		if (p.shield_green_health > 0) p.hunger = Math.max(0, p.hunger - 0.0005 * dt);
 		else if (p.shield_rainbow_health > 0) p.hunger = Math.max(0, p.hunger - 0.00000025 * dt);
 		else p.hunger = Math.max(0, p.hunger - 0.001 * dt);
 	}
 	if (p.hunger <= 0) p.health -= 0.005 * dt;
-
 	p.speed = p.max_speed;
 	if (p.thirst < 0.33 * p.max_thirst) p.speed *= 0.875;
 	if (p.hunger < 0.11 * p.max_hunger) p.speed *= 0.75;
 	if (p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
-
-	
 	if (p.want_level == null) {
 		if (!level_visible(player_object.game, "0x0", player_object)) levels_set(player_object.game, "0x0");
 		p.want_level = "0x0";
 	}
-
 	let old_level = p.want_level;
 	p.want_level = (Math.floor(p.body.position.x / 2500)) + "x" + (Math.floor(p.body.position.y / 2500));
-
 	if (old_level != p.want_level) {
 		if (!level_visible(player_object.game, old_level, player_object)) game_destroy_level(player_object.game, old_level);
 		if (!level_visible(player_object.game, p.want_level, player_object)) levels_set(player_object.game, p.want_level, old_level);
 		achievement_do(p.achievements_element.data.achievements, "outside the box", p.achievements_shower_element);
 	}
-
 	if (p.ai_controlled) return;
-
-	
 	if (p.inventory_element.shown) p.achievements_element.shown = false;
-
 	if (p.inventory_element.shown || p.achievements_element.shown) {
 		p.hotbar_element.shown = false;
 		p.achievements_shower_element.shown = false;
 	} else {
 		p.achievements_shower_element.shown = true;
 	}
-
 	if (!p.inventory_element.shown && !p.hotbar_element.shown && !p.achievements_element.shown) {
 		p.hotbar_element.shown = true;
 		p.achievements_shower_element.shown = true;
 	}
-
 	if (player_object.game.want_hide_inventory) {
 		p.inventory_element.shown = false;
 		p.hotbar_element.shown = true;
 		p.achievements_element.shown = false;
 		player_object.game.want_hide_inventory = false;
 	}
-
-	
 	if (p.mobile_delay <= 0 && player_object.game.input.mouse.leftButtonPressed && p.hotbar_element.shown) {
 		let mx = player_object.game.input.mouse.x / get_scale();
 		let my = player_object.game.input.mouse.y / get_scale();
@@ -278,7 +244,6 @@ function player_update(player_object, dt) {
 		let s = hb.slot_size;
 		let step = s * 1.05;
 		let button_y = 40;
-
 		if (my >= button_y && my <= button_y + s) {
 			let x_start_buttons = 60 + step * 9;
 			if (mx >= x_start_buttons && mx <= x_start_buttons + s) {
@@ -301,8 +266,6 @@ function player_update(player_object, dt) {
 			}
 		}
 	}
-
-	
 	if (isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true) || isKeyDown(player_object.game.input, 'у', true) || isKeyDown(player_object.game.input, 'ш', true)) {
 		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
 		p.inventory_element.shown = !p.inventory_element.shown;
@@ -312,7 +275,6 @@ function player_update(player_object, dt) {
 		p.achievements_element.shown = false;
 		p.mobile_delay = 300;
 	}
-
 	if (isKeyDown(p.achievements_element.game.input, 'j', true) || isKeyDown(p.achievements_element.game.input, 'r', true) || isKeyDown(p.achievements_element.game.input, 'о', true) || isKeyDown(p.achievements_element.game.input, 'к', true)) {
 		p.achievements_element.data.x = 75;
 		p.achievements_element.data.y = 75;
@@ -322,33 +284,19 @@ function player_update(player_object, dt) {
 		p.hotbar_element.shown = !p.achievements_element.shown;
 		p.mobile_delay = 300;
 	}
-
-	
 	let scale = get_scale();
 	let mx = player_object.game.input.mouse.x / scale;
 	let my = player_object.game.input.mouse.y / scale;
 	let hb = p.hotbar_element.data;
-
-	
-	
 	let hb_total_width = (hb.slot_size * 1.05) * hb.row.length;
-
-	
 	if (player_object.game.mobile) {
-		
 		hb_total_width += (hb.slot_size * 1.05) * 3 + 20;
 	}
-
-	
 	let is_clicking_hotbar = doRectsCollide(mx, my, 0, 0, 40, 40, hb_total_width, hb.slot_size);
-
-	
 	let use_triggered = player_object.game.mobile ?
 		isKeyDown(player_object.game.input, 'c', true) :
 		player_object.game.input.mouse.leftButtonPressed;
-
 	if (use_triggered) {
-		
 		if (!p.hotbar_element.shown || !is_clicking_hotbar) {
 			let item = hotbar_get_selected_item(p.hotbar_element);
 			if (item > 0) {
@@ -357,17 +305,12 @@ function player_update(player_object, dt) {
 			}
 		}
 	}
-
 	if (!p.car_object) {
-		
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
-
 		let vel = Matter.Vector.mult(getWishDir(player_object.game.input), p.speed);
 		let f_down = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, ' ', true);
-
 		let closest_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 100);
-
 		if (closest_item) {
 			let id = closest_item.data.id;
 			if (
@@ -387,7 +330,6 @@ function player_update(player_object, dt) {
 				}
 			}
 		} else if (f_down && p.mobile_delay <= 0) {
-			
 			let found_car = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 			if (found_car) {
 				p.car_object = found_car;
@@ -396,41 +338,30 @@ function player_update(player_object, dt) {
 				p.mobile_delay = 500;
 			}
 		}
-
-		
 		let scale = get_scale();
 		let hb = p.hotbar_element.data;
 		let hb_w = (hb.slot_size * 1.05) * hb.row.length;
 		if (player_object.game.mobile) hb_w += (hb.slot_size * 1.05) * 3 + 20;
-
 		let is_clicking_hotbar = p.hotbar_element.shown && doRectsCollide(
 			player_object.game.input.mouse.x / scale,
 			player_object.game.input.mouse.y / scale,
 			0, 0, 40, 40, hb_w, hb.slot_size
 		);
-
-		
 		let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed && !is_clicking_hotbar) ||
 			(player_object.game.mobile && (player_object.game.input.joystick.left.dx ** 2 + player_object.game.input.joystick.left.dy ** 2 > 0.01));
-
-		
 		let shootDir = getShootDir(player_object.game.input);
 		let targetX = shootDir.x;
 		let targetY = shootDir.y;
-
-		
 		if (player_object.game.settings.auto_aim) {
 			let nearest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 800);
 			if (nearest_enemy) {
 				let dx = nearest_enemy.data.body.position.x - p.body.position.x;
 				let dy = nearest_enemy.data.body.position.y - p.body.position.y;
-
 				let item = hotbar_get_selected_item(p.hotbar_element);
 				if (item == ITEM_RED_PISTOLS || item == ITEM_RAINBOW_PISTOLS) {
 					dx += p.w;
 					dy += p.h;
 				}
-
 				let mag = Math.sqrt(dx * dx + dy * dy);
 				if (mag > 0) {
 					targetX = dx / mag * 100;
@@ -438,42 +369,31 @@ function player_update(player_object, dt) {
 				}
 			}
 		}
-
 		if (shooting && !p.achievements_element.shown) {
 			player_shoot(player_object, dt, null, targetX, targetY);
-
 			if (!inventory_has_item(p.inventory_element, ITEM_AMMO) && hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
 				achievement_do(p.achievements_element.data.achievements, "need for ammo", p.achievements_shower_element);
 		} else {
 			p.laser_sound_has_played = false;
 			p.sword_protection = false;
 		}
-
 		if (p.hotbar_element.shown && (isKeyDown(player_object.game.input, 'q', true) || isKeyDown(player_object.game.input, 'й', true)))
 			inventory_drop_item(p.inventory_element, 0, p.hotbar_element.data.iselected);
-
 		if (Matter.Vector.magnitude(vel) > 0)
 			achievement_do(p.achievements_element.data.achievements, "first steps", p.achievements_shower_element);
-
 		Matter.Body.setVelocity(p.body, vel);
-
 	} else {
-		
 		if (player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
 			let cl_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
 			if (cl_item && cl_item.data.id == ITEM_FUEL) item_pickup(p.inventory_element, cl_item);
 		}
-
 		let carBody = p.car_object.data.body;
 		let carData = p.car_object.data;
 		let wish = getWishDir(player_object.game.input);
-
 		player_object.game.camera_target_body = carBody;
 		p.body.collisionFilter.mask = -3;
-
 		let moveMag = 0;
 		let rotatedir = 0;
-
 		if (carData.fuel > 0) {
 			if (wish.y < -0.1) {
 				moveMag = carData.speed;
@@ -484,29 +404,23 @@ function player_update(player_object, dt) {
 				rotatedir = -1;
 				carData.fuel = Math.max(carData.fuel - 0.005 * dt, 0);
 			}
-
 			if (Math.abs(wish.x) > 0.1) {
 				let turnFactor = (moveMag !== 0) ? rotatedir : 0.5;
 				Matter.Body.rotate(carBody, turnFactor * (wish.x * 0.0018) * dt);
 			}
 		}
-
 		if (moveMag !== 0) {
 			Matter.Body.setVelocity(carBody, {
 				x: moveMag * Math.cos(carBody.angle),
 				y: moveMag * Math.sin(carBody.angle)
 			});
 		} else {
-			
 			Matter.Body.setVelocity(carBody, {
 				x: carBody.velocity.x * 0.96,
 				y: carBody.velocity.y * 0.96
 			});
 		}
-
 		Matter.Body.setPosition(p.body, carBody.position);
-
-		
 		let exit_key = isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		if (exit_key && p.mobile_delay <= 0) {
 			let sideAngle = carBody.angle + Math.PI / 2;
@@ -524,12 +438,9 @@ function player_draw(player_object, ctx) {
 	let p = player_object.data;
 	if (p.immunity % 350 > 175)
 		return;
-
 	if (!p.car_object) {
 		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");
-
-		
 		if (player_object.game.settings.indicators["show player health"]) {
 			ctx.fillStyle = "red";
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, p.h * 0.05);
@@ -548,8 +459,6 @@ function player_draw(player_object, ctx) {
 			ctx.fillStyle = "orange";
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
 		}
-
-		
 		if (p.shooting_laser) {
 			let r = Math.cos(0.1 * p.item_animstate) * 15;
 			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
@@ -558,7 +467,6 @@ function player_draw(player_object, ctx) {
 			g = Math.floor(g * g);
 			b = Math.floor(b * b);
 			let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16).padStart(2, '0') + (b).toString(16).padStart(2, '0');
-
 			const drawLaserLine = (width, strokeCol) => {
 				ctx.beginPath();
 				ctx.lineWidth = width;
@@ -572,18 +480,14 @@ function player_draw(player_object, ctx) {
 				ctx.lineTo(px + gx, py + gy);
 				ctx.stroke();
 			};
-
 			drawLaserLine(p.w * 0.65, color);
 			drawLaserLine(p.w * 0.45, "white");
 			p.shooting_laser = false;
 		}
-
-		
 		let selected_item = hotbar_get_selected_item(p.hotbar_element);
 		if (player_object.game.settings.player_draw_gun && ITEMS_GUNS.includes(selected_item)) {
 			let px = p.body.position.x - 0.45 * p.w;
 			let py = p.body.position.y - 0.45 * p.h;
-
 			let mx = 1,
 				my = 0,
 				cx = 0,
@@ -605,30 +509,25 @@ function player_draw(player_object, ctx) {
 				cx = 0.5 * ctx.canvas.width;
 				cy = 0.5 * ctx.canvas.height;
 			}
-
 			let gx = mx - cx;
 			let gy = my - cy;
 			let dist = Math.sqrt(gx * gx + gy * gy) || 1;
-
 			ctx.strokeStyle = "black";
 			let lw = 0.25 * p.w;
 			let gl = 0.8;
-
-			
 			if (selected_item == ITEM_GREEN_GUN) {
 				ctx.strokeStyle = "#117733";
-				gl = 1.6; 
+				gl = 1.6;
 			}
 			if (selected_item == ITEM_LASER_GUN) {
 				ctx.strokeStyle = "purple";
-				lw *= 2.0; 
+				lw *= 2.0;
 				gl = 1.8;
 				px = p.body.position.x;
 				py = p.body.position.y;
 			}
-			
 			if (selected_item == ITEM_SHOTGUN || selected_item == ITEM_ROCKET_SHOTGUN || selected_item == ITEM_RED_SHOTGUN || selected_item == ITEM_MINIGUN) {
-				lw *= 1.25; 
+				lw *= 1.25;
 				gl = 1.3;
 				if (selected_item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
 				if (selected_item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle = "#111133";
@@ -650,36 +549,31 @@ function player_draw(player_object, ctx) {
 				gl = 1.3;
 			}
 			if (selected_item == ITEM_PLASMA_PISTOL) ctx.strokeStyle = "#331133";
-
-			
 			if (selected_item == ITEM_RED_PISTOLS || selected_item == ITEM_RAINBOW_PISTOLS) {
 				let hue = (p.item_animstate * 24) % 360;
 				ctx.strokeStyle = (selected_item == ITEM_RED_PISTOLS) ? "#551111" : `hsl(${hue}, 80%, 50%)`;
 				let p2x = p.body.position.x + 0.55 * p.w;
 				let p2y = p.body.position.y - 0.45 * p.h;
 				ctx.beginPath();
-				ctx.lineWidth = lw; 
+				ctx.lineWidth = lw;
 				ctx.moveTo(p2x, p2y);
 				ctx.lineTo(p2x + gl * p.w * gx / dist, p2y + gl * p.h * gy / dist);
 				ctx.stroke();
 			}
-
-			
 			ctx.beginPath();
 			ctx.lineWidth = lw;
 			ctx.moveTo(px, py);
 			ctx.lineTo(px + gl * p.w * gx / dist, py + gl * p.h * gy / dist);
 			ctx.stroke();
-
 			if (selected_item == ITEM_JUNK_CANNON) {
-				ctx.strokeStyle = "#0033aa"; 
+				ctx.strokeStyle = "#0033aa";
 				ctx.lineWidth = lw * 1.1;
 				let tapePos = 0.4;
 				ctx.beginPath();
 				ctx.moveTo(px + (gl * tapePos * p.w) * gx / dist, py + (gl * tapePos * p.h) * gy / dist);
 				ctx.lineTo(px + (gl * (tapePos + 0.1) * p.w) * gx / dist, py + (gl * (tapePos + 0.1) * p.h) * gy / dist);
 				ctx.stroke();
-				ctx.strokeStyle = "#333333"; 
+				ctx.strokeStyle = "#333333";
 				ctx.lineWidth = lw * 1.3;
 				ctx.beginPath();
 				ctx.moveTo(px + (gl * 0.95 * p.w) * gx / dist, py + (gl * 0.95 * p.h) * gy / dist);
@@ -688,7 +582,6 @@ function player_draw(player_object, ctx) {
 			}
 			ctx.lineWidth = 2;
 		} else if (p.sword_visible) {
-			
 			let px = p.body.position.x - p.w * 0.45;
 			let py = p.body.position.y - p.h * 0.45;
 			let sword_length = 100;
@@ -711,8 +604,6 @@ function player_draw(player_object, ctx) {
 				py = p.body.position.y - 0.25 * p.h;
 			item_icon_draw(ctx, selected_item, px, py, 0.5 * p.w, 0.5 * p.h, p.item_animstate);
 		}
-
-		
 		const drawShield = (health, maxHealth, fill, stroke) => {
 			if (health <= 0) return;
 			ctx.fillStyle = "gray";
@@ -736,21 +627,15 @@ function player_draw(player_object, ctx) {
 }
 
 function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null, shoot_dir_y = null) {
-
 	if (player_object.data.immunity > 0)
 		return;
-
 	let base_damage = 0.5;
-
 	let p = player_object.data;
-
 	let sx = 0;
 	let sy = 0;
 	let tx = 1;
 	let ty = 1;
-
 	let enable_audio = !p.ai_controlled;
-
 	if (!p.ai_controlled) {
 		sx = 0.5 * window.innerWidth;
 		sy = 0.5 * window.innerHeight;
@@ -761,17 +646,14 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (shoot_dir_y)
 			ty = shoot_dir_y + sy;
 	}
-
 	if (target_body) {
 		sx = p.body.position.x;
 		sy = p.body.position.y;
 		tx = target_body.position.x;
 		ty = target_body.position.y;
-
 		tx = (tx - sx) * 10 + sx;
 		ty = (ty - sy) * 10 + sy;
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_LASER_GUN &&
 		true &&
 		inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
@@ -794,11 +676,7 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (Math.random() < 0.00005 * dt)
 			inventory_clear_item(p.inventory_element, ITEM_RAINBOW_AMMO, 1);
 	}
-
-
-	
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_JUNK_CANNON && p.shot_cooldown <= 0) {
-
 		let junk_id = -1;
 		for (let i = 0; i < ITEMS_JUNK.length; i++) {
 			if (inventory_has_item(p.inventory_element, ITEMS_JUNK[i])) {
@@ -806,24 +684,16 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 				break;
 			}
 		}
-
 		if (junk_id != -1) {
 			let theta = Math.atan2(ty - sy, tx - sx);
 			let angles = [0, Math.PI / 8, -Math.PI / 8];
-
-			
-			
 			let offset = p.w * 1.5;
-
 			angles.forEach(angleOffset => {
 				let finalAngle = theta + angleOffset;
 				let dx = Math.cos(finalAngle);
 				let dy = Math.sin(finalAngle);
-
-				
 				let spawnX = p.body.position.x + Math.cos(theta) * offset;
 				let spawnY = p.body.position.y + Math.sin(theta) * offset;
-
 				trash_bullet_create(
 					player_object.game,
 					spawnX,
@@ -836,19 +706,15 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 					45
 				);
 			});
-
 			p.shot_cooldown = 250;
-
 			if (Math.random() < 0.25) {
 				inventory_clear_item(p.inventory_element, junk_id, 1);
 			}
-
 			if (enable_audio) {
 				audio_play("data/sfx/shotgun_1.mp3", 0.5);
 			}
 		}
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN &&
 		true &&
 		p.shot_cooldown <= 0 &&
@@ -868,7 +734,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (enable_audio)
 			audio_play("data/sfx/gunshot_1.mp3", 0.25);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_PISTOL &&
 		true &&
 		p.shot_cooldown <= 0 &&
@@ -893,7 +758,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (enable_audio)
 			audio_play("data/sfx/red_pistols_1.mp3", 0.25);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN &&
 		true &&
 		p.shotgun_cooldown <= 0 &&
@@ -914,7 +778,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (enable_audio)
 			audio_play("data/sfx/shotgun_1.mp3", 0.25);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN &&
 		true &&
 		p.minigun_cooldown <= 0 &&
@@ -936,7 +799,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 			player_object.game.audio.minigun_last_played = Date.now();
 		}
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER &&
 		true &&
 		p.shot_cooldown <= 0 &&
@@ -961,7 +823,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (enable_audio)
 			audio_play("data/sfx/plasmagun_1.mp3", 0.125);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS &&
 		true &&
 		p.shot_cooldown <= 0 &&
@@ -1000,7 +861,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
 		audio_play("data/sfx/red_pistols_1.mp3", 0.125);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_SHOTGUN &&
 		true &&
 		p.shot_cooldown <= 0 &&
@@ -1028,7 +888,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (enable_audio)
 			audio_play("data/sfx/rocketlauncher_1.mp3", 0.125);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN &&
 		true &&
 		p.shot_cooldown <= 0 &&
@@ -1056,8 +915,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (enable_audio)
 			audio_play("data/sfx/red_pistols_1.mp3", 0.125);
 	}
-
-	
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_SWORD && true) {
 		if (Math.cos(p.sword_direction) < -0.985)
 			audio_play("data/sfx/sword_1.mp3");
@@ -1102,7 +959,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		p.sword_visible = true;
 		p.sword_protection = true;
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN && true) {
 		if (Math.cos(p.sword_direction) < -0.955)
 			audio_play("data/sfx/sword_1.mp3");
@@ -1147,7 +1003,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		p.sword_visible = true;
 		p.sword_protection = true;
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN &&
 		true &&
 		p.minigun_cooldown <= 0) {
@@ -1171,7 +1026,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		p.thirst -= 0.0125 * dt
 		audio_play("data/sfx/red_pistols_1.mp3", 0.125);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER &&
 		true &&
 		p.shot_cooldown <= 0 &&
@@ -1195,21 +1049,16 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 			inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
 		audio_play("data/sfx/rocketlauncher_1.mp3", 0.125);
 	}
-
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS &&
 		true &&
 		p.shot_cooldown <= 0 &&
 		inventory_has_item_from_list(p.inventory_element, [ITEM_AMMO, ITEM_RED_PLASMA, ITEM_PLASMA, ITEM_RAINBOW_AMMO, ITEM_ROCKET]) > -1) {
 		let theta = Math.atan2(ty - sy, tx - sx);
-
 		let colors = ["red", "orange", "yellow", "lime", "cyan", "blue", "purple"];
 		let color1 = null;
 		let color2 = null;
-
 		p.gradient += 0.01 * dt;
-
 		let shot_sound = "red_pistols_1";
-
 		if (inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
 			color1 = colors[Math.floor(p.gradient) % 7];
 			color2 = "white";
@@ -1232,7 +1081,6 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
 			shot_sound = "gunshot_1"
 		}
-
 		if (!inventory_has_item(p.inventory_element, ITEM_ROCKET) || inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
 			bullet_create(
 				player_object.game,
@@ -1299,40 +1147,32 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 }
 
 function player_item_consume(player_object, id, anywhere = false) {
-
 	let p = player_object.data;
-
 	let item_i = -1;
 	let item_j = -1;
-
 	if (!anywhere && p.hotbar_element.shown) {
 		item_i = 0;
 		item_j = player_object.data.hotbar_element.data.iselected;
 	}
-
 	if (!anywhere && p.inventory_element.shown) {
 		item_i = p.inventory_element.data.imove;
 		item_j = p.inventory_element.data.jmove;
 	}
-
 	if (id == ITEM_FUEL && true) {
 		let c = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 		if (c) {
 			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.1 + 0.1));
 			c.data.health += Math.min(c.data.max_health - c.data.health, c.data.max_health * (Math.random() * 0.1 + 0.1));
-			
 			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 			achievement_do(p.achievements_element.data.achievements, "fuel up", p.achievements_shower_element);
 		}
 	}
-
 	if (id == ITEM_BOSSIFIER && true) {
 		let eo = null;
 		let ao = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "animal", 500);
 		if (ao) {
 			enemy_create(ao.game, ao.data.body.position.x, ao.data.body.position.y, true, false, ao.data.type);
 			animal_destroy(ao, false);
-			
 			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		} else {
 			eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 500);
@@ -1340,11 +1180,9 @@ function player_item_consume(player_object, id, anywhere = false) {
 		if (eo) {
 			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position.y, true, false, eo.data.type);
 			enemy_destroy(eo);
-			
 			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		}
 	}
-
 	if (id == ITEM_SHIELD && true) {
 		p.shield_blue_health = p.shield_blue_health_max;
 		p.shield_green_health = 0;
@@ -1352,7 +1190,6 @@ function player_item_consume(player_object, id, anywhere = false) {
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/shield_1.mp3");
 	}
-
 	if (id == ITEM_SHIELD_GREEN && true) {
 		p.shield_blue_health = 0;
 		p.shield_green_health = p.shield_green_health_max;
@@ -1360,7 +1197,6 @@ function player_item_consume(player_object, id, anywhere = false) {
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/shield_1.mp3");
 	}
-
 	if (id == ITEM_SHIELD_RAINBOW && true) {
 		p.shield_blue_health = 0;
 		p.shield_green_health = 0;
@@ -1368,14 +1204,12 @@ function player_item_consume(player_object, id, anywhere = false) {
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/shield_1.mp3");
 	}
-
 	if (id == ITEM_HEALTH && true) {
 		achievement_do(p.achievements_element.data.achievements, "healthy lifestyle", p.achievements_shower_element);
 		p.health += Math.min(p.max_health - p.health, (Math.random() * 0.125 + 0.125) * p.max_health);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/healing_1.mp3");
 	}
-
 	if (id == ITEM_HEALTH_GREEN && true) {
 		p.health = Math.min(p.max_health, p.health + p.max_health * (Math.random() * 0.125 + 0.375));
 		p.hunger = Math.min(p.max_hunger, p.hunger + p.max_hunger * (Math.random() * 0.125 + 0.375));
@@ -1383,14 +1217,12 @@ function player_item_consume(player_object, id, anywhere = false) {
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/healing_1.mp3");
 	}
-
 	if (ITEMS_DRINKS.includes(id) && true) {
 		achievement_do(p.achievements_element.data.achievements, "stay hydrated", p.achievements_shower_element);
 		p.thirst += Math.min(p.max_thirst - p.thirst, (Math.random() * 0.125 + 0.125) * p.max_thirst);
 		inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		audio_play("data/sfx/water_1.mp3");
 	}
-
 	if (ITEMS_FOODS.includes(id) && true) {
 		achievement_do(p.achievements_element.data.achievements, "yummy", p.achievements_shower_element);
 		p.hunger += Math.min(p.max_hunger - p.hunger, (Math.random() * 0.125 + 0.125) * p.max_hunger);

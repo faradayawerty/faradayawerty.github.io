@@ -59,18 +59,15 @@
 	<script>
 		let cvs1 = document.getElementById("canvas");
 		let ctx1 = cvs1.getContext("2d");
-
 		let engine1 = Matter.Engine.create();
 		let input1 = input_create();
-		let audios1 = audios_get();
+		let audios1 = null;
 		let menu1 = menu_create();
 		let game1 = game_create(input1, engine1, audios1);
-
 		document.addEventListener("visibilitychange", function() {
 			if (document.hidden)
 				menu1.shown = true;
 		});
-
 		document.addEventListener('contextmenu', event => event.preventDefault());
 
 		function get_scale() {
@@ -78,17 +75,14 @@
 		}
 
 		function animate(lastUpdateTime) {
-
 			// calculate delta time
 			let dt = Date.now() - lastUpdateTime;
 			lastUpdateTime = Date.now();
-
 			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
 			ctx1.canvas.width = window.innerWidth;
 			ctx1.canvas.height = window.innerHeight;
 			ctx1.fillStyle = "black";
 			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
-
 			// update game settings
 			if (menu1.want_player_color != game1.settings.player_color)
 				game1.settings.player_color = menu1.want_player_color;
@@ -116,7 +110,6 @@
 				game1.debug = menu1.want_debug;
 			if (menu1.want_auto_aim != game1.settings.auto_aim)
 				game1.settings.auto_aim = menu1.want_auto_aim;
-
 			if (menu1.want_save) {
 				game_save(game1);
 				menu1.want_save = false;
@@ -125,10 +118,8 @@
 				game_load(game1);
 				menu1.want_load = false;
 			}
-
 			if (game1.mobile)
 				menu1.iselected = -1;
-
 			// update game if menu is not shown, else update menu
 			if (isKeyDown(input1, 'escape', true)) {
 				menu1.shown = !menu1.shown;
@@ -163,17 +154,16 @@
 				game_update(game1, dt);
 				Matter.Engine.update(engine1, dt);
 			}
-
 			game_draw(game1, ctx1);
 			if (menu1.shown)
 				menu_draw(ctx1, menu1);
-
 			window.requestAnimationFrame(function() {
 				animate(lastUpdateTime);
 			});
 		}
 
 		function main() {
+			audio_init();
 			game_new(game1);
 			engine1.world.gravity.y = 0;
 			initializeKeyboardInput(input1.keys);
@@ -181,7 +171,6 @@
 			initializeTouchInput(input1.touch, input1.joystick, ctx1);
 			animate(Date.now());
 		}
-
 		main()
 	</script>
 </body>
