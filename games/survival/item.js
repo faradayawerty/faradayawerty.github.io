@@ -196,14 +196,24 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 			chance_fuel = 0;
 			available_food = [ITEM_APPLE, ITEM_ORANGE, ITEM_CHERRIES, ITEM_CANNED_MEAT];
 		} else if (tile === LEVEL_TILE_CITY_FIRE_STATION) {
-			chance_food = 5;
-			chance_drink = 1;
+			chance_food = 10;
+			chance_drink = 60;
 			chance_ammo = 1;
 			chance_gun = 1;
 			chance_health = 1;
 			chance_shield = 10;
-			chance_fuel = 40;
+			chance_fuel = 1;
 			available_food = ITEMS_FOODS;
+		} else if (tile === LEVEL_TILE_CITY_GAS_STATION) {
+			chance_food = 30;
+			chance_drink = 20;
+			chance_ammo = 1;
+			chance_gun = 5;
+			chance_health = 1;
+			chance_shield = 10;
+			chance_fuel = 80;
+			available_food = ITEMS_FOODS;
+			available_drinks = ITEMS_DRINKS;
 		} else if (tile === LEVEL_TILE_RESIDENTIAL_L) {
 			chance_food = 50;
 			chance_drink = 50;

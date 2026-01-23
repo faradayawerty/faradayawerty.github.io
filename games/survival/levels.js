@@ -14,6 +14,7 @@ let LEVEL_TILE_CITY_POLICE = 10;
 let LEVEL_TILE_CITY_HOSPITAL = 11;
 let LEVEL_TILE_CITY_FIRE_STATION = 12;
 let LEVEL_TILE_RESIDENTIAL_L = 13;
+let LEVEL_TILE_CITY_GAS_STATION = 14; // Новый ID
 
 let LEVEL_TILES_FOREST_ZONE = [
 	LEVEL_TILE_DEFAULT,
@@ -30,10 +31,21 @@ let LEVEL_TILES_CITY_ZONE = [
 	LEVEL_TILE_CITY_POLICE,
 	LEVEL_TILE_CITY_HOSPITAL,
 	LEVEL_TILE_CITY_FIRE_STATION,
-	LEVEL_TILE_RESIDENTIAL_L
+	LEVEL_TILE_RESIDENTIAL_L,
+	LEVEL_TILE_CITY_GAS_STATION
 ];
 
 let TILES = {
+
+	[LEVEL_TILE_CITY_GAS_STATION]: {
+		weight: 25, // Вероятность появления
+		connections: {
+			N: 0,
+			E: 1,
+			S: 0,
+			W: 1
+		}
+	},
 
 	[LEVEL_TILE_CITY_POLICE]: {
 		weight: 25,
@@ -167,9 +179,9 @@ function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 
 	let N = Math.random() * 80 - 77;
 
-	if(tile === LEVEL_TILE_DEFAULT)
+	if (tile === LEVEL_TILE_DEFAULT)
 		N = Math.max(0, Math.random() * 20 - 18) + 1;
-	else if(LEVEL_TILES_FOREST_ZONE.includes())
+	else if (LEVEL_TILES_FOREST_ZONE.includes())
 		N = Math.random() * 20 - 17;
 
 	for (let i = 0; i < N; i++) {
@@ -262,6 +274,31 @@ function levels_set(g, level, old_level = null) {
 		decorative_grass_create(g, Ox, Oy, 1090, 1090, false);
 		decorative_rectangle_create(g, Ox, Oy + 1150, 2500, 200, "#222222", "#222222");
 		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
+
+	} else if (tile == LEVEL_TILE_CITY_GAS_STATION) {
+		// База уровня
+		decorative_level_base_create(g, Ox, Oy, "gray");
+
+		// 1. Основная дорога, проходящая через тайл
+		decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+
+		// 2. Сама заправка (ставим её чуть выше дороги)
+		// Ox + 250 (отступ слева), Oy + 150 (отступ сверху)
+		// Ширина 2000, Высота 900
+		decorative_gas_station_create(g, Ox + 250, Oy + 150, 2000, 900, level_visited);
+
+		// 3. Парковка (под дорогой для заезжающих машин)
+		decorative_parkinglot_create(g, Ox + 250, Oy + 1400, 2000, 500, level_visited, ["default", "pickup"]);
+		decorative_parkinglot_create(g, Ox + 250, Oy + 1950, 2000, 500, level_visited, ["default", "pickup"]);
+
+		// 4. Трава по краям для красоты
+		decorative_grass_create(g, Ox, Oy, 200, 2500, true); // Левая полоса
+		decorative_grass_create(g, Ox + 2300, Oy, 200, 2500, true); // Правая полоса
+
+		if (!level_visited) {
+			levels_spawn_items(g, Ox, Oy, tile = tile);
+			levels_spawn_enemies(g, Ox, Oy, player_object, tile = tile);
+		}
 	} else if (tile == LEVEL_TILE_CITY_POLICE) {
 		decorative_level_base_create(g, Ox, Oy);
 		decorative_police_station_v3(g, Ox + 250, Oy + 50, 2000, 900);

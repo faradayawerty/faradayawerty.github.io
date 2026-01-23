@@ -327,6 +327,7 @@ function game_objects_arrange(g) {
 		"decorative_roof",
 		"decorative_leaves",
 		"decorative_trunk",
+		"decorative_fuel_pump",
 		"shield",
 		"rocket",
 		"player",
