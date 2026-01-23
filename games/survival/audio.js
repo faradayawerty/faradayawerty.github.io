@@ -1,10 +1,10 @@
 var GLOBAL_VOLUME = 80;
 const AUDIO_CACHE = {};
-const AUDIO_CHANNELS = {}; 
+const AUDIO_CHANNELS = {};
+
 function audio_create(path, volume = 0.75) {
 	return new Promise((resolve) => {
 		const a = new Audio();
-		
 		a.src = path;
 		a.preload = 'auto';
 		a.dataset.baseVolume = volume;
@@ -12,7 +12,7 @@ function audio_create(path, volume = 0.75) {
 		a.onerror = () => {
 			console.error(
 				`[Audio Error]: Не удалось загрузить файл: ${path}`
-				);
+			);
 			resolve(null);
 		};
 		a.load();
@@ -104,21 +104,20 @@ async function audio_init() {
 	await Promise.all(promises);
 	console.log("Загрузка аудио завершена. Кэш готов.");
 }
+
 function audio_play(path, volume = null) {
 	let master = AUDIO_CACHE[path];
-	
 	if (!master) {
 		console.warn(`[Audio Missing]: ${path}. Экстренная загрузка...`);
 		audio_create(path, volume || 0.75).then(audioObj => {
 			if (audioObj) {
 				AUDIO_CACHE[path] = audioObj;
 				audio_play(path,
-				volume); 
+					volume);
 			}
 		});
 		return;
 	}
-	
 	if (!AUDIO_CHANNELS[path]) {
 		AUDIO_CHANNELS[path] = {
 			nodes: Array.from({
@@ -130,19 +129,14 @@ function audio_play(path, volume = null) {
 	const pool = AUDIO_CHANNELS[path];
 	const channel = pool.nodes[pool.index];
 	try {
-		
 		let baseVol = volume !== null ? volume : parseFloat(master.dataset
 			.baseVolume);
 		channel.volume = baseVol * (GLOBAL_VOLUME / 100);
-		
 		channel.currentTime = 0;
 		const playPromise = channel.play();
 		if (playPromise !== undefined) {
-			playPromise.catch(() => {
-				
-			});
+			playPromise.catch(() => {});
 		}
-		
 		pool.index = (pool.index + 1) % pool.nodes.length;
 	} catch (err) {
 		console.error(`[Audio Runtime Error]: ${path}`, err);

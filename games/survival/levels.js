@@ -11,8 +11,10 @@ let LEVEL_TILE_ROAD_TURN_ES = 9;
 let LEVEL_TILE_CITY_POLICE = 10;
 let LEVEL_TILE_CITY_HOSPITAL = 11;
 let LEVEL_TILE_CITY_FIRE_STATION = 12;
-let LEVEL_TILE_RESIDENTIAL_L = 13;
 let LEVEL_TILE_CITY_GAS_STATION = 14;
+let LEVEL_TILE_RESIDENTIAL_NW = 15;
+let LEVEL_TILE_RESIDENTIAL_NE = 16;
+let LEVEL_TILE_RESIDENTIAL_T_SOUTH = 17;
 let LEVEL_TILES_FOREST_ZONE = [
 	LEVEL_TILE_DEFAULT,
 	LEVEL_TILE_ROAD_HORIZONTAL,
@@ -27,8 +29,15 @@ let LEVEL_TILES_CITY_ZONE = [
 	LEVEL_TILE_CITY_POLICE,
 	LEVEL_TILE_CITY_HOSPITAL,
 	LEVEL_TILE_CITY_FIRE_STATION,
-	LEVEL_TILE_RESIDENTIAL_L,
-	LEVEL_TILE_CITY_GAS_STATION
+	LEVEL_TILE_CITY_GAS_STATION,
+	LEVEL_TILE_RESIDENTIAL_NW,
+	LEVEL_TILE_RESIDENTIAL_NE,
+	LEVEL_TILE_RESIDENTIAL_T_SOUTH
+];
+let LEVEL_TILES_SUBURBAN_ZONE = [
+	LEVEL_TILE_RESIDENTIAL_NW,
+	LEVEL_TILE_RESIDENTIAL_NE,
+	LEVEL_TILE_RESIDENTIAL_T_SOUTH
 ];
 let TILES = {
 	[LEVEL_TILE_CITY_GAS_STATION]: {
@@ -64,15 +73,6 @@ let TILES = {
 			N: 1,
 			E: 0,
 			S: 1,
-			W: 0
-		}
-	},
-	[LEVEL_TILE_RESIDENTIAL_L]: {
-		weight: 25,
-		connections: {
-			N: 1,
-			E: 1,
-			S: 0,
 			W: 0
 		}
 	},
@@ -139,8 +139,17 @@ let TILES = {
 			W: 1
 		}
 	},
-	[LEVEL_TILE_ROAD_TURN_EN]: {
-		weight: 100,
+	[LEVEL_TILE_RESIDENTIAL_NW]: {
+		weight: 25,
+		connections: {
+			N: 1,
+			E: 0,
+			S: 0,
+			W: 1
+		}
+	},
+	[LEVEL_TILE_RESIDENTIAL_NE]: {
+		weight: 25,
 		connections: {
 			N: 1,
 			E: 1,
@@ -148,13 +157,13 @@ let TILES = {
 			W: 0
 		}
 	},
-	[LEVEL_TILE_ROAD_TURN_ES]: {
-		weight: 100,
+	[LEVEL_TILE_RESIDENTIAL_T_SOUTH]: {
+		weight: 25,
 		connections: {
 			N: 0,
 			E: 1,
 			S: 1,
-			W: 0
+			W: 1
 		}
 	}
 };
@@ -298,7 +307,74 @@ function levels_set(g, level, old_level = null) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
 			levels_spawn_enemies(g, Ox, Oy, player_object, tile = tile);
 		}
-	} else if (tile == LEVEL_TILE_RESIDENTIAL_L) {
+	} else if (tile == LEVEL_TILE_RESIDENTIAL_T_SOUTH) {
+		decorative_level_base_create(g, Ox, Oy, DECORATIVE_COLOR_GRASS);
+		decorative_rectangle_create(g, Ox, Oy + 1130, 2500, 240, "#999999",
+			"#999999");
+		decorative_rectangle_create(g, Ox + 1130, Oy + 1130, 240, 1370,
+			"#999999", "#999999");
+		decorative_road_create(g, Ox, Oy + 1150, 2500,
+			200);
+		decorative_road_create(g, Ox + 1150, Oy + 1150, 200,
+			1350);
+		decorative_house_v2(g, Ox + 150, Oy + 150, 850, 850, "down", "#d2b48c",
+			"#8b4513");
+		decorative_rectangle_create(g, Ox + 500, Oy + 1000, 150, 145, "#999999",
+			"#999999");
+		decorative_house_v2(g, Ox + 1500, Oy + 150, 850, 850, "down", "#e3dac9",
+			"#5d2e0c");
+		decorative_rectangle_create(g, Ox + 1850, Oy + 1000, 150, 145,
+			"#999999", "#999999");
+		decorative_house_v2(g, Ox + 150, Oy + 1500, 850, 850, "right",
+			"#c2b280", "#4a2c2a");
+		decorative_rectangle_create(g, Ox + 1000, Oy + 1850, 145, 150,
+			"#999999", "#999999");
+		decorative_house_v2(g, Ox + 1500, Oy + 1500, 850, 850, "left",
+			"#d2b48c", "#5d2e0c");
+		decorative_rectangle_create(g, Ox + 1355, Oy + 1850, 145, 150,
+			"#999999", "#999999");
+		decorative_grass_create(g, Ox, Oy + 1450, 100, 100, true);
+		base_color = DECORATIVE_COLOR_GRASS;
+		if (!level_visited) {
+			levels_spawn_items(g, Ox, Oy, tile);
+			levels_spawn_enemies(g, Ox, Oy, player_object, tile);
+		}
+	} else if (tile == LEVEL_TILE_RESIDENTIAL_NW) {
+		decorative_level_base_create(g, Ox, Oy);
+		
+		decorative_rectangle_create(g, Ox, Oy + 1130, 1370, 240, "#999999",
+			"#999999");
+		
+		decorative_rectangle_create(g, Ox + 1130, Oy, 240, 1370, "#999999",
+			"#999999");
+		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
+		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+		
+		
+		decorative_house_v2(g, Ox + 150, Oy + 150, 850, 850, "down", "#d2b48c",
+			"#8b4513");
+		
+		decorative_house_v2(g, Ox + 150, Oy + 1500, 850, 850, "up", "#c2b280",
+			"#4a2c2a");
+		
+		
+		decorative_house_v2(g, Ox + 1500, Oy + 150, 850, 850, "left", "#e3dac9",
+			"#5d2e0c");
+		
+		decorative_grass_create(g, Ox + 1200, Oy + 1000, 1295, 1450, true);
+		
+		decorative_rectangle_create(g, Ox + 1355, Oy + 500, 145, 150, "#999999",
+			"#999999");
+		decorative_rectangle_create(g, Ox + 500, Oy + 1000, 150, 145, "#999999",
+			"#999999");
+		decorative_rectangle_create(g, Ox + 500, Oy + 1355, 150, 145, "#999999",
+			"#999999");
+		base_color = DECORATIVE_COLOR_GRASS;
+		if (!level_visited) {
+			levels_spawn_items(g, Ox, Oy, tile);
+			levels_spawn_enemies(g, Ox, Oy, player_object, tile);
+		}
+	} else if (tile == LEVEL_TILE_RESIDENTIAL_NE) {
 		decorative_level_base_create(g, Ox, Oy);
 		decorative_rectangle_create(g, Ox + 1130, Oy + 1130, 1370, 240,
 			"#999999", "#999999");

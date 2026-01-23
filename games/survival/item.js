@@ -229,7 +229,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_fuel = 120;
 			available_food = ITEMS_FOODS;
 			available_drinks = ITEMS_DRINKS;
-		} else if (tile === LEVEL_TILE_RESIDENTIAL_L) {
+		} else if (LEVEL_TILES_SUBURBAN_ZONE.includes(tile)) {
 			chance_food = 20;
 			chance_drink = 20;
 			chance_ammo = 5;
