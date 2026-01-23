@@ -587,6 +587,10 @@ function inventory_draw(inventory_element, ctx) {
 		if (item_id > 0 && (game.mobile || inv.imove === -1)) {
 			let tooltipX = inv.last_active_mx + 20;
 			let tooltipY = inv.last_active_my + 20;
+			if (game.mobile) {
+				tooltipX += 80;
+				tooltipY += 80;
+			}
 			inventory_draw_item_popup(ctx, game, item_id, tooltipX, tooltipY);
 		}
 	}

@@ -106,6 +106,198 @@ ITEMS_DRINKS = [
 	ITEM_MILK
 ];
 
+function item_spawn(g, x, y, enemy_type = null, tile = null) {
+
+	let available_guns = [ITEM_GUN];
+	let available_ammos = [ITEM_AMMO];
+	let available_health = [ITEM_HEALTH];
+	let available_shields = [ITEM_HEALTH];
+	let available_food = [ITEM_CANNED_MEAT];
+	let available_drinks = [ITEM_WATER];
+
+	if (enemy_type == "shooting" || enemy_type == null && g.enemies["shooting"]) {
+		available_guns.push(ITEM_SHOTGUN);
+		if (enemy_type != null) {
+			available_ammos.push(ITEM_PLASMA);
+			available_shields.push(ITEM_SHIELD);
+		}
+	}
+
+	if (enemy_type == "shooting red" || enemy_type == null && g.enemies["shooting red"]) {
+		available_ammos.push(ITEM_PLASMA);
+		available_guns.push(ITEM_PLASMA_LAUNCHER);
+		available_shields.push(ITEM_SHIELD);
+		if (enemy_type != null)
+			available_ammos.push(ITEM_RED_PLASMA);
+	}
+
+	if (enemy_type == "sword" || enemy_type == null && g.enemies["sword"]) {
+		available_guns.push(ITEM_RED_PISTOLS);
+		available_ammos.push(ITEM_RED_PLASMA);
+		if (enemy_type != null) {
+			available_health = [ITEM_HEALTH_GREEN];
+			available_shields = [ITEM_SHIELD_GREEN];
+		}
+	}
+
+	if (enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
+		available_guns.push(ITEM_SWORD);
+		available_health.push(ITEM_SHIELD_GREEN);
+		available_health.push(ITEM_HEALTH_GREEN);
+		if (enemy_type != null)
+			available_ammos = [ITEM_ROCKET];
+	}
+
+	if (enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
+		available_guns.push(ITEM_ROCKET_LAUNCHER);
+		available_ammos.push(ITEM_ROCKET);
+		if (enemy_type != null) {
+			available_ammos = [ITEM_ROCKET, ITEM_RAINBOW_AMMO];
+			available_shields = [ITEM_SHIELD_RAINBOW];
+		}
+	}
+
+	let chance_ammo = 1;
+	let chance_health = 1;
+	let chance_shield = 1;
+	let chance_gun = 1;
+	let chance_food = 1;
+	let chance_drink = 1;
+	let chance_fuel = 1;
+
+	if (enemy_type != null) {
+		chance_fuel = 10;
+		chance_ammo = 50;
+		chance_health = 1;
+		chance_shield = 25;
+		chance_food = 10;
+		chance_drink = 10;
+		if (enemy_type == "sword") {
+			chance_health = 50;
+			chance_shield = 50;
+		}
+	} else {
+		if (tile === LEVEL_TILE_CITY_POLICE) {
+			chance_food = 1;
+			chance_drink = 1;
+			chance_ammo = 70;
+			chance_gun = 40;
+			chance_health = 1;
+			chance_shield = 10;
+			chance_fuel = 5;
+			available_drinks = ITEMS_DRINKS;
+		} else if (tile === LEVEL_TILE_CITY_HOSPITAL) {
+			chance_food = 5;
+			chance_drink = 30;
+			chance_ammo = 1;
+			chance_gun = 1;
+			chance_health = 70;
+			chance_shield = 10;
+			chance_fuel = 0;
+			available_food = [ITEM_APPLE, ITEM_ORANGE, ITEM_CHERRIES, ITEM_CANNED_MEAT];
+		} else if (tile === LEVEL_TILE_CITY_FIRE_STATION) {
+			chance_food = 5;
+			chance_drink = 1;
+			chance_ammo = 1;
+			chance_gun = 1;
+			chance_health = 1;
+			chance_shield = 10;
+			chance_fuel = 40;
+			available_food = ITEMS_FOODS;
+		} else if (tile === LEVEL_TILE_RESIDENTIAL_L) {
+			chance_food = 50;
+			chance_drink = 50;
+			chance_ammo = 1;
+			chance_gun = 1;
+			chance_health = 1;
+			chance_shield = 10;
+			chance_fuel = 1;
+			available_food = ITEMS_FOODS;
+			available_drinks = ITEMS_DRINKS;
+		} else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
+			chance_food = 70;
+			chance_drink = 10;
+			chance_gun = 2;
+			chance_ammo = 2;
+			chance_health = 2;
+			chance_shield = 2;
+			chance_fuel = 0;
+			available_food = [ITEM_APPLE];
+		}
+	}
+
+	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
+	if (player_closest) {
+		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst / player_closest.data.max_thirst);
+		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger / player_closest.data.max_hunger);
+		if (player_closest.data.car_object)
+			chance_fuel = 2 * (1 - player_closest.data.car_object.data.fuel / player_closest.data.car_object.data.max_fuel);
+	}
+
+	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_shield + chance_health;
+
+	chance_gun = chance_gun / chance_sum;
+	chance_ammo = chance_ammo / chance_sum;
+	chance_fuel = chance_fuel / chance_sum;
+	chance_food = chance_food / chance_sum;
+	chance_drink = chance_drink / chance_sum;
+	chance_health = chance_health / chance_sum;
+	chance_shield = chance_shield / chance_sum;
+
+	let item = 0;
+	let r = Math.random();
+	let a = 0;
+
+	if (a < r && r < a + chance_health)
+		item = available_health[Math.floor(Math.random() * available_health.length)];
+	a += chance_health;
+
+	if (a < r && r < a + chance_shield)
+		item = available_shields[Math.floor(Math.random() * available_shields.length)];
+	a += chance_shield;
+
+	if (a < r && r < a + chance_gun)
+		item = available_guns[Math.floor(Math.random() * available_guns.length)];
+	a += chance_gun;
+
+	if (a < r && r < a + chance_fuel)
+		item = ITEM_FUEL;
+	a += chance_fuel;
+
+	if (a < r && r < a + chance_food)
+		item = available_food[Math.floor(Math.random() * available_food.length)];
+	a += chance_food;
+
+	if (a < r && r < a + chance_drink)
+		item = available_drinks[Math.floor(Math.random() * available_drinks.length)];
+	a += chance_drink;
+
+	if (a < r && r < a + chance_ammo)
+		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
+	a += chance_ammo;
+
+	g.debug_console.unshift(
+		"item_spawn" +
+		" i:" + item +
+		" r:" + Math.round(100 * r) + "%" +
+		" H:" + Math.round(100 * chance_health) + "%" +
+		" S:" + Math.round(100 * chance_shield) + "%" +
+		" W:" + Math.round(100 * chance_gun) + "%" +
+		" G:" + Math.round(100 * chance_fuel) + "%" +
+		" F:" + Math.round(100 * chance_food) + "%" +
+		" D:" + Math.round(100 * chance_drink) + "%" +
+		" A:" + Math.round(100 * chance_ammo) + "%"
+	);
+
+	if (enemy_type == "deer")
+		item = ITEM_CANNED_MEAT;
+
+	if (enemy_type == "raccoon")
+		item = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
+
+	item_create(g, item, x, y);
+}
+
 // TODO fix item limit
 function item_create(g, id_, x_, y_, dropped = false, despawn = true) {
 	let items = g.objects.filter((obj) => obj.name == "item" && obj.data.despawn && !obj.data.dropped);
@@ -245,11 +437,6 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 
 				const segY = startY + wave + (t * 5); // Наклон вниз
 				ctx.lineTo(segX, segY);
-
-				if (i === segments) {
-					ctx.fillStyle = acidGreen;
-					ctx.fillRect(segX - 1, segY - 1, 3, 3);
-				}
 			}
 			ctx.stroke();
 		};
@@ -271,9 +458,7 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillStyle = darkGreen;
 		ctx.fillRect(x + w * 0.88, y + h * 0.4, w * 0.06, h * 0.16);
 
-
-
-
+		ctx.lineCap = "butt";
 	} else if (id == ITEM_GUN) {
 		// Пистолет: Г-образная форма
 		ctx.fillStyle = "#333";
@@ -611,6 +796,33 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		// Рукоятка
 		ctx.fillStyle = "#222222";
 		ctx.fillRect(x + 0.2 * w, y + 0.7 * h, 0.1 * w, 0.15 * h);
+	} else if (id == ITEM_APPLE) {
+		// Основное тело яблока (теперь идеальный круг)
+		ctx.fillStyle = "#ff4422";
+		ctx.beginPath();
+		// Уравниваем радиусы (0.24 * w и 0.24 * h), чтобы форма была круглой
+		ctx.ellipse(x + 0.5 * w, y + 0.55 * h, 0.24 * w, 0.24 * h, 0, 0, Math.PI * 2);
+		ctx.fill();
+
+		// Обводка
+		ctx.strokeStyle = "#440000";
+		ctx.lineWidth = 0.03 * w;
+		ctx.stroke();
+
+		// Черешок (коричневая палочка) - чуть сдвинул вниз к центру нового круга
+		drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y + 0.15 * h, "#442200", 0.04 * w);
+
+		// Листик
+		ctx.fillStyle = "#33aa11";
+		ctx.beginPath();
+		ctx.ellipse(x + 0.6 * w, y + 0.22 * h, 0.1 * w, 0.05 * w, -Math.PI / 4, 0, Math.PI * 2);
+		ctx.fill();
+
+		// Блик (сделал его тоже чуть более аккуратным)
+		ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+		ctx.beginPath();
+		ctx.ellipse(x + 0.4 * w, y + 0.45 * h, 0.07 * w, 0.07 * w, 0, 0, Math.PI * 2);
+		ctx.fill();
 	} else if (id == ITEM_APPLE) {
 		// Основное тело яблока (один большой эллипс)
 		ctx.fillStyle = "#ff4422"; // Цвет яблока
@@ -1142,131 +1354,4 @@ function item_name_translate(language, text) {
 			return "плазменная пушка";
 	}
 	return text;
-}
-
-function item_spawn(g, x, y, enemy_type = null) {
-
-	let available_guns = [ITEM_GUN];
-	let available_ammos = [ITEM_AMMO];
-	let available_misc = [ITEM_HEALTH];
-
-	if (enemy_type == "shooting" || enemy_type == null && g.enemies["shooting"]) {
-		available_guns.push(ITEM_SHOTGUN);
-		if (enemy_type != null) {
-			available_ammos.push(ITEM_PLASMA);
-			available_misc.push(ITEM_SHIELD);
-		}
-	}
-
-	if (enemy_type == "shooting red" || enemy_type == null && g.enemies["shooting red"]) {
-		available_ammos.push(ITEM_PLASMA);
-		available_guns.push(ITEM_PLASMA_LAUNCHER);
-		available_misc.push(ITEM_SHIELD);
-		if (enemy_type != null)
-			available_ammos.push(ITEM_RED_PLASMA);
-	}
-
-	if (enemy_type == "sword" || enemy_type == null && g.enemies["sword"]) {
-		available_guns.push(ITEM_RED_PISTOLS);
-		available_ammos.push(ITEM_RED_PLASMA);
-		if (enemy_type != null)
-			available_misc = [ITEM_HEALTH_GREEN, ITEM_SHIELD_GREEN]
-	}
-
-	if (enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
-		available_guns.push(ITEM_SWORD);
-		available_misc.push(ITEM_SHIELD_GREEN);
-		available_misc.push(ITEM_HEALTH_GREEN);
-		if (enemy_type != null)
-			available_ammos = [ITEM_ROCKET];
-	}
-
-	if (enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
-		available_guns.push(ITEM_ROCKET_LAUNCHER);
-		available_ammos.push(ITEM_ROCKET);
-		if (enemy_type != null) {
-			available_ammos = [ITEM_ROCKET, ITEM_RAINBOW_AMMO];
-			available_misc = [ITEM_SHIELD_RAINBOW];
-		}
-	}
-
-	let chance_ammo = 0.2;
-	let chance_misc = 0.2;
-	let chance_gun = 0.1;
-	let chance_food = 0.2;
-	let chance_drink = 0.2;
-	let chance_fuel = 0;
-
-	if (enemy_type != null) {
-		chance_fuel = 0.1;
-		chance_ammo = 0.5;
-		chance_misc = 0.4;
-		if (enemy_type == "sword")
-			chance_misc = 0.7;
-	}
-
-	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
-	if (player_closest) {
-		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst / player_closest.data.max_thirst);
-		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger / player_closest.data.max_hunger);
-		if (player_closest.data.car_object)
-			chance_fuel = Math.max(chance_fuel, 0.6 - player_closest.data.car_object.data.fuel / player_closest.data.car_object.data.max_fuel);
-	}
-
-	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_misc;
-
-	chance_gun = chance_gun / chance_sum;
-	chance_ammo = chance_ammo / chance_sum;
-	chance_fuel = chance_fuel / chance_sum;
-	chance_food = chance_food / chance_sum;
-	chance_drink = chance_drink / chance_sum;
-	chance_misc = chance_misc / chance_sum;
-
-	let item = 0;
-	let r = Math.random();
-	let a = 0;
-
-	if (a < r && r < a + chance_misc)
-		item = available_misc[Math.floor(Math.random() * available_misc.length)];
-	a += chance_misc;
-
-	if (a < r && r < a + chance_gun)
-		item = available_guns[Math.floor(Math.random() * available_guns.length)];
-	a += chance_gun;
-
-	if (a < r && r < a + chance_fuel)
-		item = ITEM_FUEL;
-	a += chance_fuel;
-
-	if (a < r && r < a + chance_food)
-		item = ITEMS_FOODS[Math.floor(Math.random() * ITEMS_FOODS.length)];
-	a += chance_food;
-
-	if (a < r && r < a + chance_drink)
-		item = ITEMS_DRINKS[Math.floor(Math.random() * ITEMS_DRINKS.length)];
-	a += chance_drink;
-
-	if (a < r && r < a + chance_ammo)
-		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
-	a += chance_ammo;
-
-	g.debug_console.unshift(
-		"item_spawn" +
-		" i:" + item +
-		" r:" + Math.round(100 * r) + "%" +
-		" M:" + Math.round(100 * chance_misc) + "%" +
-		" W:" + Math.round(100 * chance_gun) + "%" +
-		" G:" + Math.round(100 * chance_fuel) + "%" +
-		" F:" + Math.round(100 * chance_food) + "%" +
-		" D:" + Math.round(100 * chance_drink) + "%" +
-		" A:" + Math.round(100 * chance_ammo) + "%"
-	);
-
-	if (enemy_type == "deer")
-		item = ITEM_CANNED_MEAT;
-
-	if (enemy_type == "raccoon")
-		item = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
-
-	item_create(g, item, x, y);
 }
