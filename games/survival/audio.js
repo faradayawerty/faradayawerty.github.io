@@ -1,19 +1,20 @@
 var GLOBAL_VOLUME = 80;
 const AUDIO_CACHE = {};
-
+const AUDIO_CHANNELS = {}; 
 function audio_create(path, volume = 0.75) {
 	return new Promise((resolve) => {
 		const a = new Audio();
+		
+		a.src = path;
+		a.preload = 'auto';
+		a.dataset.baseVolume = volume;
 		a.oncanplaythrough = () => resolve(a);
 		a.onerror = () => {
 			console.error(
 				`[Audio Error]: Не удалось загрузить файл: ${path}`
-			);
+				);
 			resolve(null);
 		};
-		a.src = path;
-		a.preload = 'auto';
-		a.dataset.baseVolume = volume;
 		a.load();
 	});
 }
@@ -103,31 +104,47 @@ async function audio_init() {
 	await Promise.all(promises);
 	console.log("Загрузка аудио завершена. Кэш готов.");
 }
-
 function audio_play(path, volume = null) {
-	const master = AUDIO_CACHE[path];
-	if (master) {
-		try {
-			let clone = master.cloneNode();
-			let v = (volume !== null) ? volume : parseFloat(master.dataset
-				.baseVolume);
-			clone.volume = v * (GLOBAL_VOLUME / 100);
-			const playPromise = clone.play();
-			if (playPromise !== undefined) {
-				playPromise.catch(() => {});
-			}
-		} catch (err) {
-			console.error(`[Audio Runtime Error]: ${path}`, err);
-		}
-	} else {
-		console.warn(`[Audio Missing]: ${path}. Загружаю экстренно...`);
+	let master = AUDIO_CACHE[path];
+	
+	if (!master) {
+		console.warn(`[Audio Missing]: ${path}. Экстренная загрузка...`);
 		audio_create(path, volume || 0.75).then(audioObj => {
 			if (audioObj) {
 				AUDIO_CACHE[path] = audioObj;
-				let v = (volume !== null) ? volume : 0.75;
-				audioObj.volume = v * (GLOBAL_VOLUME / 100);
-				audioObj.play().catch(() => {});
+				audio_play(path,
+				volume); 
 			}
 		});
+		return;
+	}
+	
+	if (!AUDIO_CHANNELS[path]) {
+		AUDIO_CHANNELS[path] = {
+			nodes: Array.from({
+				length: 5
+			}, () => master.cloneNode()),
+			index: 0
+		};
+	}
+	const pool = AUDIO_CHANNELS[path];
+	const channel = pool.nodes[pool.index];
+	try {
+		
+		let baseVol = volume !== null ? volume : parseFloat(master.dataset
+			.baseVolume);
+		channel.volume = baseVol * (GLOBAL_VOLUME / 100);
+		
+		channel.currentTime = 0;
+		const playPromise = channel.play();
+		if (playPromise !== undefined) {
+			playPromise.catch(() => {
+				
+			});
+		}
+		
+		pool.index = (pool.index + 1) % pool.nodes.length;
+	} catch (err) {
+		console.error(`[Audio Runtime Error]: ${path}`, err);
 	}
 }

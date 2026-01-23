@@ -428,10 +428,10 @@ function player_update(player_object, dt) {
 		let targetY = shootDir.y;
 		if (player_object.game.settings.auto_aim) {
 			let nearest_enemy = game_object_find_closest(player_object.game, p
-				.body.position.x, p.body.position.y, "enemy", 800);
+				.body.position.x, p.body.position.y, "rocket", 800);
 			if (!nearest_enemy) {
 				nearest_enemy = game_object_find_closest(player_object.game, p
-					.body.position.x, p.body.position.y, "rocket", 800);
+					.body.position.x, p.body.position.y, "enemy", 800);
 			}
 			if (nearest_enemy) {
 				let dx = nearest_enemy.data.body.position.x - p.body.position.x;
@@ -938,11 +938,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		p.minigun_cooldown = 60;
 		if (Math.random() > 0.995)
 			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		if (enable_audio && Date.now() - player_object.game.audio
-			.minigun_last_played > 90) {
+		if (enable_audio)
 			audio_play("data/sfx/gunshot_1.mp3", 0.25);
-			player_object.game.audio.minigun_last_played = Date.now();
-		}
 	}
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER &&
 		true &&
