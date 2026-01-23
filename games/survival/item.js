@@ -151,7 +151,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 	if (enemy_type != null) {
 		chance_fuel = 10;
 		chance_ammo = 50;
-		chance_health = 1;
+		chance_health = 0;
 		chance_shield = 25;
 		chance_food = 10;
 		chance_drink = 10;
@@ -165,9 +165,9 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 			chance_drink = 1;
 			chance_ammo = 70;
 			chance_gun = 40;
-			chance_health = 1;
+			chance_health = 0;
 			chance_shield = 10;
-			chance_fuel = 5;
+			chance_fuel = 0;
 			available_drinks = ITEMS_DRINKS;
 		} else if (tile === LEVEL_TILE_CITY_HOSPITAL) {
 			chance_food = 5;
@@ -187,16 +187,16 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 			chance_gun = 1;
 			chance_health = 1;
 			chance_shield = 10;
-			chance_fuel = 1;
+			chance_fuel = 0;
 			available_food = ITEMS_FOODS;
 		} else if (tile === LEVEL_TILE_CITY_GAS_STATION) {
 			chance_food = 30;
 			chance_drink = 20;
 			chance_ammo = 5;
 			chance_gun = 2.5;
-			chance_health = 1;
+			chance_health = 0;
 			chance_shield = 10;
-			chance_fuel = 80;
+			chance_fuel = 120;
 			available_food = ITEMS_FOODS;
 			available_drinks = ITEMS_DRINKS;
 		} else if (tile === LEVEL_TILE_RESIDENTIAL_L) {
@@ -204,17 +204,17 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 			chance_drink = 20;
 			chance_ammo = 5;
 			chance_gun = 2.5;
-			chance_health = 1;
+			chance_health = 0;
 			chance_shield = 10;
-			chance_fuel = 1;
+			chance_fuel = 0;
 			available_food = ITEMS_FOODS;
 			available_drinks = ITEMS_DRINKS;
 		} else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
 			chance_food = 20;
-			chance_drink = 5;
-			chance_gun = 2;
+			chance_drink = 0;
+			chance_gun = 0.5;
 			chance_ammo = 2;
-			chance_health = 2;
+			chance_health = 0;
 			chance_shield = 2;
 			chance_fuel = 0;
 			available_food = [ITEM_APPLE];
