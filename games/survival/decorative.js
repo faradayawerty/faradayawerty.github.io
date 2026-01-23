@@ -156,7 +156,7 @@ function decorative_grass_create(g, x, y, w, h, trees = true) {
 			for (let j = 0.75; j < M - 1; j++) {
 				decorative_tree_create(g, x + (i + 0.5 * (Math.random() -
 						0.5)) * w / N, y + (j + 0.5 * (Math.random() -
-					0.5)) *
+						0.5)) *
 					h / M);
 			}
 		}

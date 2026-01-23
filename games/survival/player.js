@@ -429,8 +429,8 @@ function player_update(player_object, dt) {
 		if (player_object.game.settings.auto_aim) {
 			let nearest_enemy = game_object_find_closest(player_object.game, p
 				.body.position.x, p.body.position.y, "enemy", 800);
-			if (!nearest_target) {
-				nearest_target = game_object_find_closest(player_object.game, p
+			if (!nearest_enemy) {
+				nearest_enemy = game_object_find_closest(player_object.game, p
 					.body.position.x, p.body.position.y, "rocket", 800);
 			}
 			if (nearest_enemy) {

@@ -93,7 +93,7 @@ ITEMS_DRINKS = [
 	ITEM_MILK
 ];
 
-function item_spawn(g, x, y, enemy_type = null, tile = null) {
+function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 	let available_guns = [ITEM_GUN];
 	let available_ammos = [ITEM_AMMO];
 	let available_health = [ITEM_HEALTH];
@@ -158,6 +158,36 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 		if (enemy_type == "sword") {
 			chance_health = 50;
 			chance_shield = 50;
+		}
+	} else if (car_type !== null) {
+		chance_ammo = 0;
+		chance_gun = 0;
+		chance_fuel = 20;
+		chance_health = 0;
+		chance_shield = 0;
+		chance_food = 0;
+		chance_drink = 0;
+		switch (car_type) {
+			case "tank":
+				chance_ammo = 80;
+				chance_gun = 10;
+				chance_fuel = 40;
+				break;
+			case "police":
+				chance_ammo = 50;
+				chance_gun = 15;
+				break;
+			case "fireman":
+				chance_drink = 80;
+				available_drinks = [ITEM_WATER];
+				break;
+			case "ambulance":
+				chance_health = 100;
+				chance_drink = 20;
+				chance_food = 5;
+				break;
+			case "default":
+				break;
 		}
 	} else {
 		if (tile === LEVEL_TILE_CITY_POLICE) {

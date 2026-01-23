@@ -171,7 +171,8 @@ function car_update(car_object, dt) {
 		for (let i = 0; i < N; i++) {
 			let theta = 2 * Math.PI * Math.random();
 			item_spawn(car_object.game, p.body.position.x + 50 * Math.cos(
-				theta), p.body.position.y + 50 * Math.sin(theta));
+					theta), p.body.position.y + 50 * Math.sin(theta),
+				null, null, car_object.data.type);
 		}
 		car_destroy(car_object);
 	}
