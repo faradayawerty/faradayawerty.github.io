@@ -97,7 +97,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 	let available_guns = [ITEM_GUN];
 	let available_ammos = [ITEM_AMMO];
 	let available_health = [ITEM_HEALTH];
-	let available_shields = [ITEM_HEALTH];
+	let available_shields = [];
 	let available_food = [ITEM_CANNED_MEAT];
 	let available_drinks = [ITEM_WATER];
 	if (enemy_type == "shooting" || enemy_type == null && g.enemies[
@@ -220,16 +220,12 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 			available_food = [ITEM_APPLE];
 		}
 	}
-	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
-	if (player_closest) {
-		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst /
-			player_closest.data.max_thirst);
-		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger /
-			player_closest.data.max_hunger);
-		if (player_closest.data.car_object)
-			chance_fuel = 2 * (1 - player_closest.data.car_object.data.fuel /
-				player_closest.data.car_object.data.max_fuel);
-	}
+	chance_gun = chance_gun * Math.min(1, available_guns.length);
+	chance_ammo = chance_ammo * Math.min(1, available_ammos.length);
+	chance_food = chance_food * Math.min(1, available_food.length);
+	chance_drink = chance_drink * Math.min(1, available_drinks.length);
+	chance_ammo = chance_ammo * Math.min(1, available_ammos.length);
+	chance_shield = chance_shield * Math.min(1, available_shields.length);
 	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food +
 		chance_drink + chance_shield + chance_health;
 	chance_gun = chance_gun / chance_sum;
@@ -239,7 +235,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 	chance_drink = chance_drink / chance_sum;
 	chance_health = chance_health / chance_sum;
 	chance_shield = chance_shield / chance_sum;
-	let item = 0;
+	let item = ITEM_MONEY;
 	let r = Math.random();
 	let a = 0;
 	if (a < r && r < a + chance_health)
