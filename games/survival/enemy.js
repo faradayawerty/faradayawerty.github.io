@@ -1,4 +1,4 @@
-// TODO fix enemy limit
+
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type = "random") {
 	if (!g.settings.enemies_spawn)
 		return -1;
@@ -37,7 +37,7 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type = "r
 		}
 		if (Math.random() > 1 - 0.25 * m) {
 			boss = true;
-			//g.enemy_kills[type == "random" ? "regular" : type] = 0;
+			
 		}
 	}
 	if (type == "shooting laser") {
@@ -307,30 +307,30 @@ function enemy_update(enemy_object, dt) {
 					let ty = target_object.data.body.position.y - e.body.position.y;
 					let dist_val = Math.sqrt(tx * tx + ty * ty);
 
-					// Направление (нормализованный вектор)
+					
 					let dx = tx / dist_val;
 					let dy = ty / dist_val;
 
-					// Константы для поворота на 22.5 градуса
+					
 					let cosA = 0.9238;
 					let sinA = 0.3826;
 
-					// Параметры мусора
+					
 					let bullet_speed = 24;
 					let bullet_damage = e.damage;
-					let bullet_size = e.w * 0.25; // Сделаем мусор чуть крупнее обычных пуль
+					let bullet_size = e.w * 0.25; 
 
-					// 1. Мусор прямо
+					
 					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
 						dx, dy, bullet_speed, bullet_damage, true, bullet_size);
 
-					// 2. Мусор влево (-22.5 градуса)
+					
 					let vx_left = dx * cosA - dy * (-sinA);
 					let vy_left = dx * (-sinA) + dy * cosA;
 					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
 						vx_left, vy_left, bullet_speed, bullet_damage, true, bullet_size);
 
-					// 3. Мусор вправо (+22.5 градуса)
+					
 					let vx_right = dx * cosA - dy * sinA;
 					let vy_right = dx * sinA + dy * cosA;
 					trash_bullet_create(enemy_object.game, e.body.position.x, e.body.position.y,
@@ -389,7 +389,7 @@ function enemy_update(enemy_object, dt) {
 		if (e.type == "shooting laser" && e.is_minion) {
 			if (v < e.shooting_range) {
 				if (e.shooting_delay >= 300) {
-					//let colors = ["blue", "red", "yellow", "lime", "purple", "cyan"];
+					
 					let colors = ["red", "orange", "yellow", "lime", "cyan", "blue", "purple"];
 					N = 7;
 					for (let i = 0; i < N; i++) {
@@ -788,47 +788,47 @@ function enemy_draw(enemy_object, ctx) {
 }
 
 function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
-	// 1. Ушки (более острые и рваные)
+	
 	ctx.fillStyle = "#333333";
-	// Левое ухо со шрамом
+	
 	ctx.beginPath();
 	ctx.moveTo(x - w * 0.4, y - h * 0.5);
-	ctx.lineTo(x - w * 0.6, y - h * 0.9); // Длиннее
+	ctx.lineTo(x - w * 0.6, y - h * 0.9); 
 	ctx.lineTo(x - w * 0.1, y - h * 0.5);
 	ctx.fill();
 
-	// Правое ухо (чуть короче или со своим изгибом)
+	
 	ctx.beginPath();
 	ctx.moveTo(x + w * 0.4, y - h * 0.5);
-	ctx.lineTo(x + w * 0.6, y - h * 0.85); // Немного другая высота для асимметрии
+	ctx.lineTo(x + w * 0.6, y - h * 0.85); 
 	ctx.lineTo(x + w * 0.1, y - h * 0.5);
 	ctx.fill();
 
-	// 2. Тело
+	
 	fillMatterBody(ctx, e.body, "#555555");
 	drawMatterBody(ctx, e.body, e.color_outline, 2);
 
-	// 3. Маска (черная, с подтеками)
+	
 	ctx.fillStyle = "#111111";
 	ctx.fillRect(x - w * 0.5, y - h * 0.25, w, h * 0.4);
 
-	// 4. Злые глаза (светятся красным)
+	
 	let eyeSize = w * 0.12;
 	ctx.fillStyle = "#ff0000";
-	ctx.shadowBlur = 15; // Эффект свечения
+	ctx.shadowBlur = 15; 
 	ctx.shadowColor = "red";
 	ctx.beginPath();
 	ctx.arc(x - w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
 	ctx.arc(x + w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.shadowBlur = 0; // Сбрасываем тени
+	ctx.shadowBlur = 0; 
 
-	// Зрачки (узкие вертикальные)
+	
 	ctx.fillStyle = "black";
 	ctx.fillRect(x - w * 0.26, y - h * 0.15, w * 0.02, h * 0.2);
 	ctx.fillRect(x + w * 0.24, y - h * 0.15, w * 0.02, h * 0.2);
 
-	// 5. Оскал (зубы)
+	
 	ctx.strokeStyle = "white";
 	ctx.lineWidth = 2;
 	ctx.beginPath();
@@ -839,7 +839,7 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	ctx.lineTo(x + w * 0.2, y + h * 0.2);
 	ctx.stroke();
 
-	// 6. Хвост (грязный и облезлый)
+	
 	let tailX = x - w * 0.5;
 	let tailY = y + h * 0.3;
 	for (let i = 0; i < 6; i++) {

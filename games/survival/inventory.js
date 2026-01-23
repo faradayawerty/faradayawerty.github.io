@@ -84,7 +84,7 @@ let ITEM_DATA = {
 		desc_rus: "Превращает мусор в смертоносные снаряды."
 	},
 
-	// Ближний бой (ITEMS_MELEE)
+	
 	[ITEM_SWORD]: {
 		name: "Sword",
 		desc: "A blade for honorable combat.",
@@ -98,7 +98,7 @@ let ITEM_DATA = {
 		desc_rus: "Острый и прочный. Не спрашивай, откуда он."
 	},
 
-	// Боеприпасы (ITEMS_AMMOS)
+	
 	[ITEM_AMMO]: {
 		name: "Ammo",
 		desc: "Standard bullets.",
@@ -136,7 +136,7 @@ let ITEM_DATA = {
 		desc_rus: "Непредсказуемо меняет стихии."
 	},
 
-	// Ресурсы и выживание
+	
 	[ITEM_HEALTH]: {
 		name: "Health Kit",
 		desc: "Restores a portion of HP.",
@@ -180,7 +180,7 @@ let ITEM_DATA = {
 		desc_rus: "Раскрывает скрытый потенциал. Использовать осторожно."
 	},
 
-	// Еда (ITEMS_FOODS)
+	
 	[ITEM_CANNED_MEAT]: {
 		name: "Canned Meat",
 		desc: "Nutritious and long-lasting.",
@@ -218,7 +218,7 @@ let ITEM_DATA = {
 		desc_rus: "Быстрый заряд энергии."
 	},
 
-	// Напитки (ITEMS_DRINKS)
+	
 	[ITEM_WATER]: {
 		name: "Water",
 		desc: "Essential for survival.",
@@ -238,7 +238,7 @@ let ITEM_DATA = {
 		desc_rus: "Полезно для костей."
 	},
 
-	// Мусор (ITEMS_JUNK)
+	
 	[ITEM_APPLE_CORE]: {
 		name: "Apple Core",
 		desc: "Someone already ate the good part.",
@@ -292,7 +292,7 @@ let ITEM_DATA = {
 function inventory_create(g, attached_to_object = null) {
 	let inv = {
 		slot_size: 80,
-		cross_size: 40, // Размер кнопки закрытия
+		cross_size: 40, 
 		iselected: -1,
 		jselected: -1,
 		items: [
@@ -308,7 +308,7 @@ function inventory_create(g, attached_to_object = null) {
 		jmove: -1,
 		attached_to_object: attached_to_object,
 		animation_state: 0,
-		_touch_lock: false // Вспомогательный флаг для фиксации одного клика по тачу
+		_touch_lock: false 
 	};
 	return game_gui_element_create(g, "inventory", inv, inventory_update, inventory_draw, inventory_destroy);
 }
@@ -319,7 +319,7 @@ function inventory_destroy(inventory_element) {
 }
 
 function inventory_update(inventory_element, dt) {
-	// 0. ПРОВЕРКИ СОСТОЯНИЯ
+	
 	if (inventory_element.data.attached_to_object.data.ai_controlled)
 		inventory_element.shown = false;
 
@@ -331,7 +331,7 @@ function inventory_update(inventory_element, dt) {
 	let scale = get_scale();
 	let player_object = inv.attached_to_object;
 
-	// Инициализация переменных памяти, если их еще нет в объекте
+	
 	if (inv.was_left_down === undefined) inv.was_left_down = false;
 	if (inv.was_right_down === undefined) inv.was_right_down = false;
 
@@ -341,9 +341,9 @@ function inventory_update(inventory_element, dt) {
 	let is_clicked = false;
 	let is_clicked_right = false;
 
-	// 1. ОПРЕДЕЛЕНИЕ КЛИКА (БЕЗ ОБНУЛЕНИЯ ГЛОБАЛЬНОГО INPUT)
+	
 	if (game.mobile) {
-		// Логика для мобильных устройств (через ID тача)
+		
 		let freeTouch = input.touch.find(t => t.id !== input.joystick.left.id && t.id !== input.joystick.right.id);
 		if (freeTouch) {
 			mx = freeTouch.x / scale;
@@ -356,14 +356,14 @@ function inventory_update(inventory_element, dt) {
 			inv.active_touch_id = null;
 		}
 	} else {
-		// Логика для ПК: сравниваем текущее состояние с предыдущим кадром
+		
 		let current_left = input.mouse.leftButtonPressed;
 		let current_right = input.mouse.rightButtonPressed;
 
 		if (current_left && !inv.was_left_down) is_clicked = true;
 		if (current_right && !inv.was_right_down) is_clicked_right = true;
 
-		// Сохраняем состояние для следующего кадра
+		
 		inv.was_left_down = current_left;
 		inv.was_right_down = current_right;
 	}
@@ -372,26 +372,26 @@ function inventory_update(inventory_element, dt) {
 	inv.last_active_my = my;
 	inv.animation_state += 0.02 * dt;
 
-	// Параметры мобильных кнопок действий
+	
 	let btnW = 120,
 		btnH = 50,
 		gap = 20;
 	let startY = 60 + (inv.slot_size * 1.05) * inv.items.length;
 	let startX = 40;
 
-	// 2. ПКМ НА ПК: Быстрый выброс выбранного ("висящего на курсоре") предмета
+	
 	if (!game.mobile && is_clicked_right) {
 		if (inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 			inv.imove = -1;
 			inv.jmove = -1;
-			return; // Прерываем, так как действие выполнено
+			return; 
 		}
 	}
 
-	// 3. МОБИЛЬНЫЕ КНОПКИ ДЕЙСТВИЯ (USE / DROP)
+	
 	if (game.mobile && inv.imove !== -1 && is_clicked) {
-		// Кнопка USE
+		
 		if (doRectsCollide(mx, my, 0, 0, startX, startY, btnW, btnH)) {
 			let id = inv.items[inv.imove][inv.jmove];
 			if (id > 0) {
@@ -403,7 +403,7 @@ function inventory_update(inventory_element, dt) {
 			}
 			return;
 		}
-		// Кнопка DROP
+		
 		if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY, btnW, btnH)) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 			inv.imove = -1;
@@ -412,7 +412,7 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 
-	// 4. КНОПКА ЗАКРЫТИЯ (Крестик)
+	
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
 	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, 40, inv.cross_size, inv.cross_size)) {
 		inventory_element.shown = false;
@@ -421,7 +421,7 @@ function inventory_update(inventory_element, dt) {
 		return;
 	}
 
-	// 5. ЛОГИКА СЛОТОВ
+	
 	let slot_hit = false;
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
@@ -433,22 +433,22 @@ function inventory_update(inventory_element, dt) {
 				inv.iselected = i;
 				inv.jselected = j;
 
-				// ЛКМ (или основной тач) по слоту
+				
 				if (is_clicked) {
 					if (inv.imove === -1) {
-						// Если ничего не несем — берем предмет
+						
 						if (inv.items[i][j] > 0) {
 							inv.imove = i;
 							inv.jmove = j;
 						}
 					} else {
-						// Если предмет в руках
+						
 						if (inv.imove === i && inv.jmove === j) {
-							// Клик по тому же слоту — отмена выбора
+							
 							inv.imove = -1;
 							inv.jmove = -1;
 						} else {
-							// Обмен предметами между слотами
+							
 							let temp = inv.items[i][j];
 							inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 							inv.items[inv.imove][inv.jmove] = temp;
@@ -458,10 +458,10 @@ function inventory_update(inventory_element, dt) {
 					}
 				}
 
-				// ПКМ по слоту на ПК — мгновенный выброс
+				
 				if (!game.mobile && is_clicked_right && inv.items[i][j] > 0) {
 					inventory_drop_item(inventory_element, i, j);
-					// Если выбрасываем тот предмет, который «несли», сбрасываем выделение
+					
 					if (inv.imove === i && inv.jmove === j) {
 						inv.imove = -1;
 						inv.jmove = -1;
@@ -476,7 +476,7 @@ function inventory_update(inventory_element, dt) {
 		inv.jselected = -1;
 	}
 
-	// 6. ГОРЯЧАЯ КЛАВИША Q (Выбросить)
+	
 	if (isKeyDown(input, 'q', true) || isKeyDown(input, 'й', true)) {
 		let dI = (inv.imove !== -1) ? inv.imove : inv.iselected;
 		let dJ = (inv.jmove !== -1) ? inv.jmove : inv.jselected;
@@ -498,7 +498,7 @@ function inventory_draw(inventory_element, ctx) {
 	let inv = inventory_element.data;
 	let game = inventory_element.game;
 
-	// 1. Отрисовка слотов
+	
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
@@ -506,24 +506,24 @@ function inventory_draw(inventory_element, ctx) {
 
 			ctx.globalAlpha = 0.9;
 			if (inv.imove === i && inv.jmove === j)
-				ctx.fillStyle = "orange"; // Выбранный предмет
+				ctx.fillStyle = "orange"; 
 			else if (inv.iselected === i && inv.jselected === j)
-				ctx.fillStyle = "cyan"; // Наведенная мышь/палец
+				ctx.fillStyle = "cyan"; 
 			else
 				ctx.fillStyle = "blue";
 
 			ctx.fillRect(sx, sy, inv.slot_size, inv.slot_size);
 			ctx.globalAlpha = 1.0;
 
-			// На ПК не рисуем иконку в слоте, если мы её "тащим" (она рисуется у мыши)
-			// На мобилках imove — это просто выбор, поэтому иконка остается в слоте
+			
+			
 			if (game.mobile || !(inv.imove === i && inv.jmove === j)) {
 				item_icon_draw(ctx, inv.items[i][j], sx, sy, inv.slot_size, inv.slot_size, inv.animation_state);
 			}
 		}
 	}
 
-	// 2. Отрисовка кнопок USE/DROP для мобилок
+	
 	if (game.mobile && inv.imove !== -1) {
 		let btnW = 120,
 			btnH = 50,
@@ -551,7 +551,7 @@ function inventory_draw(inventory_element, ctx) {
 		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, "DROP", "#882222");
 	}
 
-	// 3. Кнопка закрытия
+	
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
 	let cross_y = 40;
 	let cs = inv.cross_size;
@@ -568,7 +568,7 @@ function inventory_draw(inventory_element, ctx) {
 	ctx.lineTo(cross_x + cs * 0.25, cross_y + cs * 0.75);
 	ctx.stroke();
 
-	// 4. Предмет в руках (только для ПК при Drag-and-Drop)
+	
 	if (!game.mobile && inv.imove > -1 && inv.jmove > -1) {
 		let curX = inv.last_active_mx || 0;
 		let curY = inv.last_active_my || 0;
@@ -578,12 +578,12 @@ function inventory_draw(inventory_element, ctx) {
 		ctx.globalAlpha = 1.0;
 	}
 
-	// 5. Отрисовка подсказки (Tooltip)
-	// Рисуем в самом конце, чтобы подсказка была ПОВЕРХ всего инвентаря
+	
+	
 	if (inv.iselected !== -1 && inv.jselected !== -1) {
 		let item_id = inv.items[inv.iselected][inv.jselected];
 
-		// Показываем только если в слоте есть предмет и мы его сейчас не тащим (на ПК)
+		
 		if (item_id > 0 && (game.mobile || inv.imove === -1)) {
 			let tooltipX = inv.last_active_mx + 20;
 			let tooltipY = inv.last_active_my + 20;
@@ -617,7 +617,7 @@ function inventory_drop_all_items(inventory_element) {
 			inventory_drop_item(inventory_element, i, j, true);
 }
 
-// --- ХОТБАР ---
+
 
 function hotbar_create(g, inv, attached_to_object = null) {
 	let hb = {
@@ -647,7 +647,7 @@ function hotbar_update(hotbar_element, dt) {
 	if (hb.attached_to_object.data.ai_controlled)
 		hotbar_element.shown = false;
 
-	// Клавиши 1-9 (оставляем как есть)
+	
 	for (let i = 0; i < 9; i++) {
 		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
 	}
@@ -657,8 +657,8 @@ function hotbar_update(hotbar_element, dt) {
 
 	hb.mouse_over = false;
 
-	// --- ИСПРАВЛЕНИЕ МУЛЬТИТАЧА ---
-	// Создаем список координат для проверки (мышь + все пальцы)
+	
+	
 	let pointsToCheck = [];
 	if (!isScreenTouched(input)) {
 		pointsToCheck.push({
@@ -674,23 +674,23 @@ function hotbar_update(hotbar_element, dt) {
 		}
 	}
 
-	// Проверяем каждую точку (палец или мышь) на попадание в слоты
+	
 	for (let pt of pointsToCheck) {
 		for (let i = 0; i < hb.row.length; i++) {
 			let sx = 40 + (hb.slot_size * 1.05) * i;
 			let sy = 40;
 			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) && doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
 				hb.mouse_over = true;
-				hb.iselected = i; // Выбираем слот
+				hb.iselected = i; 
 			}
 		}
 
-		// Проверка мобильных кнопок (Инвентарь, Ачивки, Меню)
+		
 		if (hotbar_element.game.mobile) {
 			let step = hb.slot_size * 1.05;
 			let x_inv = 60 + step * hb.row.length;
 
-			// Проверка кнопки сумки
+			
 			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
 				let inv_el = hb.attached_to_object.data.inventory_element;
 				if (inv_el && !inv_el._mob_toggle_lock) {
@@ -701,7 +701,7 @@ function hotbar_update(hotbar_element, dt) {
 		}
 	}
 
-	// Сброс лока переключения, если ни один палец не касается кнопок
+	
 	let inv_el = hb.attached_to_object.data.inventory_element;
 	if (inv_el && inv_el._mob_toggle_lock) {
 		let stillTouching = false;
@@ -729,7 +729,7 @@ function hotbar_draw(hotbar_object, ctx) {
 		let step = s * 1.05;
 		let y = 40;
 
-		// Функция-помощник для отрисовки фона кнопки (внутри hotbar_draw)
+		
 		const drawButtonBg = (x) => {
 			ctx.fillStyle = "#4477ff";
 			ctx.globalAlpha = 0.9;
@@ -737,7 +737,7 @@ function hotbar_draw(hotbar_object, ctx) {
 			ctx.globalAlpha = 1.0;
 		};
 
-		// --- 1. КНОПКА ИНВЕНТАРЯ (Портфель) ---
+		
 		let x_inv = 60 + step * hb.row.length;
 		drawButtonBg(x_inv);
 
@@ -763,7 +763,7 @@ function hotbar_draw(hotbar_object, ctx) {
 		ctx.lineWidth = s * 0.02;
 		ctx.strokeRect(bx, by + bh * 0.2, bw, bh * 0.8);
 
-		// --- 2. КНОПКА АЧИВОК (Кубок) ---
+		
 		let x_ach = x_inv + step;
 		drawButtonBg(x_ach);
 
@@ -790,30 +790,30 @@ function hotbar_draw(hotbar_object, ctx) {
 		ctx.arc(ax + aw, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
 		ctx.stroke();
 
-		// --- 3. КНОПКА МЕНЮ (Три полоски / Бургер) ---
+		
 		let x_menu = x_ach + step;
 		drawButtonBg(x_menu);
 
 		ctx.fillStyle = "white";
-		let barW = s * 0.5; // Длина полоски
-		let barH = s * 0.08; // Толщина полоски
-		let barX = x_menu + (s - barW) / 2; // Центрируем по горизонтали
+		let barW = s * 0.5; 
+		let barH = s * 0.08; 
+		let barX = x_menu + (s - barW) / 2; 
 
-		// Рисуем три полоски
+		
 		ctx.fillRect(barX, y + s * 0.3, barW, barH);
 		ctx.fillRect(barX, y + s * 0.48, barW, barH);
 		ctx.fillRect(barX, y + s * 0.66, barW, barH);
 
-		// Добавим легкую тень для объема
+		
 		ctx.fillStyle = "rgba(0,0,0,0.3)";
 		ctx.fillRect(barX, y + s * 0.3 + barH, barW, barH * 0.3);
 	}
 }
 
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+
 
 function hotbar_get_selected_item(hotbar_element) {
-	// На телефоне если инвентарь открыт, мы НЕ должны использовать предметы из хотбара кликом в мире
+	
 	let inv_el = hotbar_element.data.attached_to_object.data.inventory_element;
 	if (inv_el.game.mobile && inv_el && inv_el.shown) return 0;
 
@@ -894,7 +894,7 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	let H = 150;
 	let fontsize = 16;
 
-	// Чтобы окно не уходило за край экрана
+	
 	let scale = get_scale();
 	if (x + W > window.innerWidth / scale) x -= W;
 	if (y + H > window.innerHeight / scale) y -= H;
@@ -905,18 +905,18 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	ctx.strokeStyle = "gray";
 	ctx.lineWidth = 2;
 
-	// Рисуем рамку
+	
 	ctx.fillRect(x, y, W, H);
 	ctx.strokeRect(x, y, W, H);
 
-	// Заголовок
+	
 	ctx.globalAlpha = 1.0;
 	ctx.fillStyle = "yellow";
 	ctx.font = `bold ${fontsize + 2}px Arial`;
 	ctx.textAlign = "left";
 	ctx.fillText(name, x + 10, y + 25);
 
-	// Описание с простейшим переносом
+	
 	ctx.fillStyle = "white";
 	ctx.font = `${fontsize}px Arial`;
 

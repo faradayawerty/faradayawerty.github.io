@@ -14,7 +14,7 @@ let LEVEL_TILE_CITY_POLICE = 10;
 let LEVEL_TILE_CITY_HOSPITAL = 11;
 let LEVEL_TILE_CITY_FIRE_STATION = 12;
 let LEVEL_TILE_RESIDENTIAL_L = 13;
-let LEVEL_TILE_CITY_GAS_STATION = 14; // Новый ID
+let LEVEL_TILE_CITY_GAS_STATION = 14; 
 
 let LEVEL_TILES_FOREST_ZONE = [
 	LEVEL_TILE_DEFAULT,
@@ -38,7 +38,7 @@ let LEVEL_TILES_CITY_ZONE = [
 let TILES = {
 
 	[LEVEL_TILE_CITY_GAS_STATION]: {
-		weight: 25, // Вероятность появления
+		weight: 25, 
 		connections: {
 			N: 0,
 			E: 1,
@@ -55,7 +55,7 @@ let TILES = {
 			S: 0,
 			W: 1
 		}
-	}, // На горизонтальной дороге
+	}, 
 	[LEVEL_TILE_CITY_HOSPITAL]: {
 		weight: 25,
 		connections: {
@@ -64,7 +64,7 @@ let TILES = {
 			S: 1,
 			W: 1
 		}
-	}, // На перекрестке
+	}, 
 	[LEVEL_TILE_CITY_FIRE_STATION]: {
 		weight: 25,
 		connections: {
@@ -73,7 +73,7 @@ let TILES = {
 			S: 1,
 			W: 0
 		}
-	}, // На вертикальной дороге
+	}, 
 	[LEVEL_TILE_RESIDENTIAL_L]: {
 		weight: 50,
 		connections: {
@@ -242,7 +242,7 @@ function levels_set(g, level, old_level = null) {
 
 	let level_visited = true;
 
-	// ---------- ГЕНЕРАЦИЯ ТАЙЛА ----------
+	
 	if (!g.visited_levels.includes(level)) {
 
 		level_visited = false;
@@ -276,24 +276,24 @@ function levels_set(g, level, old_level = null) {
 		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
 
 	} else if (tile == LEVEL_TILE_CITY_GAS_STATION) {
-		// База уровня
+		
 		decorative_level_base_create(g, Ox, Oy, "gray");
 
-		// 1. Основная дорога, проходящая через тайл
+		
 		decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
 
-		// 2. Сама заправка (ставим её чуть выше дороги)
-		// Ox + 250 (отступ слева), Oy + 150 (отступ сверху)
-		// Ширина 2000, Высота 900
+		
+		
+		
 		decorative_gas_station_create(g, Ox + 250, Oy + 150, 2000, 900, level_visited);
 
-		// 3. Парковка (под дорогой для заезжающих машин)
+		
 		decorative_parkinglot_create(g, Ox + 250, Oy + 1400, 2000, 500, level_visited, ["default", "pickup"]);
 		decorative_parkinglot_create(g, Ox + 250, Oy + 1950, 2000, 500, level_visited, ["default", "pickup"]);
 
-		// 4. Трава по краям для красоты
-		decorative_grass_create(g, Ox, Oy, 200, 2500, true); // Левая полоса
-		decorative_grass_create(g, Ox + 2300, Oy, 200, 2500, true); // Правая полоса
+		
+		decorative_grass_create(g, Ox, Oy, 200, 2500, true); 
+		decorative_grass_create(g, Ox + 2300, Oy, 200, 2500, true); 
 
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
@@ -333,8 +333,8 @@ function levels_set(g, level, old_level = null) {
 		decorative_level_base_create(g, Ox, Oy);
 		decorative_rectangle_create(g, Ox + 1130, Oy + 1130, 1370, 240, "#999999", "#999999");
 		decorative_rectangle_create(g, Ox + 1130, Oy, 240, 1370, "#999999", "#999999");
-		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200); // Горизонтальная часть
-		decorative_road_create(g, Ox + 1150, Oy, 200, 1350); // Вертикальная часть
+		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200); 
+		decorative_road_create(g, Ox + 1150, Oy, 200, 1350); 
 		decorative_house_v2(g, Ox + 150, Oy + 150, 850, 850, "right", "#d2b48c", "#8b4513");
 		decorative_house_v2(g, Ox + 1500, Oy + 150, 850, 850, "down", "#e3dac9", "#5d2e0c");
 		decorative_house_v2(g, Ox + 1500, Oy + 1500, 850, 850, "up", "#c2b280", "#4a2c2a");
@@ -536,7 +536,7 @@ function getAvailableTiles(g, level) {
 		S: level_tile_get_neighbour_south(g, level)
 	};
 
-	// Определяем, является ли этот уровень стартовым (например, "0x0")
+	
 	const isStartingPosition = (level === "0x0");
 
 	return Object.keys(TILES)
@@ -555,9 +555,9 @@ function getAvailableTiles(g, level) {
 function getRandomTileByWeight(availableTiles) {
 	if (availableTiles.length === 0) return LEVEL_TILE_DEFAULT;
 
-	// Считаем общую сумму весов доступных тайлов
+	
 	let totalWeight = availableTiles.reduce((sum, tileId) => {
-		return sum + (TILES[tileId].weight || 1); // 1 - вес по умолчанию
+		return sum + (TILES[tileId].weight || 1); 
 	}, 0);
 
 	let random = Math.random() * totalWeight;

@@ -32,7 +32,7 @@ function input_create() {
 	};
 }
 
-// Вспомогательная функция для определения зон кнопок (чтобы джойстики их игнорировали)
+
 function getButtonRegions(ctx) {
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
@@ -97,7 +97,7 @@ function getWishDir(input) {
 	return vel;
 }
 
-// --- ВОССТАНОВЛЕННЫЕ ФУНКЦИИ МЫШИ ---
+
 function isMouseWheelUp(input) {
 	let val = input.mouse.wheelUp;
 	input.mouse.wheelUp = false;
@@ -213,16 +213,16 @@ function initializeTouchInput(touch, joystick, ctx) {
 			let tx = (t.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
 			let ty = (t.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
 
-			// 1. ИГНОРИРОВАТЬ, если нажатие в верхних 25% экрана
+			
 			if (ty < deadZoneHeight) continue;
 
-			// 2. ИГНОРИРОВАТЬ, если нажатие попало в кнопки действий
+			
 			let hitButton = (tx > regions.use.x1 && tx < regions.use.x2 && ty > regions.use.y1 && ty < regions.use.y2) ||
 				(tx > regions.pick.x1 && tx < regions.pick.x2 && ty > regions.pick.y1 && ty < regions.pick.y2);
 
 			if (hitButton) continue;
 
-			// 3. Активация джойстиков
+			
 			if (tx < ctx.canvas.width / 2 && joystick.left.id === -1) joystick.left.id = t.identifier;
 			else if (tx >= ctx.canvas.width / 2 && joystick.right.id === -1) joystick.right.id = t.identifier;
 		}
@@ -319,7 +319,7 @@ function drawMobileActionButtons(ctx, input) {
 	let p = 2.2;
 	let th = p * 5;
 
-	// USE
+	
 	drawFlatBase(ux, uy, w_use, h_btn, isUsePressed);
 	ctx.fillStyle = "white";
 	const renderLet = (data, ox, oy) => {
@@ -333,7 +333,7 @@ function drawMobileActionButtons(ctx, input) {
 	renderLet(["###", "#  ", "###", "  #", "###"], ux - p * 1.5, uy - th / 2);
 	renderLet(["###", "#  ", "###", "#  ", "###"], ux + p * 2.5, uy - th / 2);
 
-	// PICK UP / CAR
+	
 	drawFlatBase(fx, fy, w_pick, h_btn, isPickPressed);
 	ctx.fillStyle = "white";
 	let curX = fx - (p * 34) / 2;

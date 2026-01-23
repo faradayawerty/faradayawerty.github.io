@@ -1,9 +1,9 @@
 function rocket_create(g, x, y, dx, dy, w, target_object, damage, health, enemy = true, speed = 10, lifetime = 4800) {
 	let rockets = g.objects.filter((obj) => obj.name == "rocket");
-	// TODO fix limit
-	//if(rockets.length > 100)
-	//	for(let i = 0; i < rockets.length - 200; i++)
-	//		rockets[i].destroy(rockets[i]);
+	
+	
+	
+	
 	let r = {
 		lifetime: lifetime,
 		health: health,
@@ -69,7 +69,7 @@ function rocket_update(rocket_object, dt) {
 			r.target_object.name == "car" && r.target_object.data.is_tank) {
 			r.target_object = null;
 		} else {
-			//rocket_object.game.debug_console.unshift("rocket object found " + r.target_object.name);
+			
 			if (r.target_object.name == "player" && r.target_object.data.car_object) {
 				r.target_object = r.target_object.data.car_object;
 			}

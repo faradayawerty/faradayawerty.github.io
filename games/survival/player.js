@@ -51,7 +51,7 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 	p.achievements_shower_element = g.gui_elements[achievements_shower_create(g, p.achievements_element)];
 	if (!p.ai_controlled) {
 		p.achievements_shower_element.shown = true;
-		for (let i = 0; i < g.saved_achievements.length; i++) // TODO исправить необходимость располагать ачивки в нужном порядке
+		for (let i = 0; i < g.saved_achievements.length; i++) 
 			achievement_do(p.achievements_element.data.achievements, g.saved_achievements[i].name, p.achievements_shower_element, true);
 		g.saved_achievements = [];
 	}
@@ -141,7 +141,7 @@ function player_update(player_object, dt) {
 
 	let p = player_object.data;
 
-	// Инициализация и расчет задержки ввода
+	
 	if (p.mobile_delay === undefined) p.mobile_delay = 0;
 	if (p.mobile_delay > 0) p.mobile_delay -= dt;
 
@@ -158,7 +158,7 @@ function player_update(player_object, dt) {
 
 	let max_levels = 600;
 
-	// Бесшовный мир (телепортация по краям)
+	
 	if (p.body.position.x < -max_levels * 2500) Matter.Body.setPosition(p.body, {
 		x: max_levels * 2500,
 		y: p.body.position.y
@@ -186,7 +186,7 @@ function player_update(player_object, dt) {
 	if (p.shield_green_health > 0) p.shield_green_health -= 0.01 * dt;
 	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.01 * dt;
 
-	// Дебаг здоровья
+	
 	if (p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(p.health) + ", change " + Math.round(p.saved_health - p.health) +
 			": hunger: " + Math.round(p.hunger) + ", thirst: " + Math.round(p.thirst) +
@@ -210,7 +210,7 @@ function player_update(player_object, dt) {
 		p.thirst = p.max_thirst;
 	}
 
-	// Голод и жажда
+	
 	if (p.thirst > 0 && achievement_get(p.achievements_element.data.achievements, "first steps").done) {
 		if (p.shield_green_health > 0) p.thirst = Math.max(0, p.thirst - 0.0005 * dt);
 		else if (p.shield_rainbow_health > 0) p.thirst = Math.max(0, p.thirst - 0.00000025 * dt);
@@ -231,7 +231,7 @@ function player_update(player_object, dt) {
 	if (p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
 
-	// Уровни
+	
 	if (p.want_level == null) {
 		if (!level_visible(player_object.game, "0x0", player_object)) levels_set(player_object.game, "0x0");
 		p.want_level = "0x0";
@@ -248,7 +248,7 @@ function player_update(player_object, dt) {
 
 	if (p.ai_controlled) return;
 
-	// --- УПРАВЛЕНИЕ ВИДИМОСТЬЮ UI ---
+	
 	if (p.inventory_element.shown) p.achievements_element.shown = false;
 
 	if (p.inventory_element.shown || p.achievements_element.shown) {
@@ -270,7 +270,7 @@ function player_update(player_object, dt) {
 		player_object.game.want_hide_inventory = false;
 	}
 
-	// --- ОБРАБОТКА НАЖАТИЙ НА КНОПКИ ХОТБАРА ---
+	
 	if (p.mobile_delay <= 0 && player_object.game.input.mouse.leftButtonPressed && p.hotbar_element.shown) {
 		let mx = player_object.game.input.mouse.x / get_scale();
 		let my = player_object.game.input.mouse.y / get_scale();
@@ -302,7 +302,7 @@ function player_update(player_object, dt) {
 		}
 	}
 
-	// Клавиатура: Инвентарь и Достижения
+	
 	if (isKeyDown(player_object.game.input, 'e', true) || isKeyDown(player_object.game.input, 'i', true) || isKeyDown(player_object.game.input, 'у', true) || isKeyDown(player_object.game.input, 'ш', true)) {
 		achievement_do(p.achievements_element.data.achievements, "discovering inventory", p.achievements_shower_element);
 		p.inventory_element.shown = !p.inventory_element.shown;
@@ -323,32 +323,32 @@ function player_update(player_object, dt) {
 		p.mobile_delay = 300;
 	}
 
-	// 1. Получаем координаты и данные
+	
 	let scale = get_scale();
 	let mx = player_object.game.input.mouse.x / scale;
 	let my = player_object.game.input.mouse.y / scale;
 	let hb = p.hotbar_element.data;
 
-	// 2. Считаем область хотбара
-	// Базовая ширина всех слотов (1-9)
+	
+	
 	let hb_total_width = (hb.slot_size * 1.05) * hb.row.length;
 
-	// Если мобилка, добавляем к ширине пространство, занимаемое доп. кнопками (портфель, кубок, меню)
+	
 	if (player_object.game.mobile) {
-		// 3 кнопки по размеру слота + зазор 20px от основного ряда
+		
 		hb_total_width += (hb.slot_size * 1.05) * 3 + 20;
 	}
 
-	// Проверка: находится ли курсор/палец в зоне хотбара
+	
 	let is_clicking_hotbar = doRectsCollide(mx, my, 0, 0, 40, 40, hb_total_width, hb.slot_size);
 
-	// 3. Основная логика использования
+	
 	let use_triggered = player_object.game.mobile ?
 		isKeyDown(player_object.game.input, 'c', true) :
 		player_object.game.input.mouse.leftButtonPressed;
 
 	if (use_triggered) {
-		// Если хотбар скрыт ИЛИ клик за пределами его области
+		
 		if (!p.hotbar_element.shown || !is_clicking_hotbar) {
 			let item = hotbar_get_selected_item(p.hotbar_element);
 			if (item > 0) {
@@ -359,7 +359,7 @@ function player_update(player_object, dt) {
 	}
 
 	if (!p.car_object) {
-		// --- РЕЖИМ ПЕШКОМ ---
+		
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
 
@@ -387,7 +387,7 @@ function player_update(player_object, dt) {
 				}
 			}
 		} else if (f_down && p.mobile_delay <= 0) {
-			// ВХОД В МАШИНУ
+			
 			let found_car = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "car", 200);
 			if (found_car) {
 				p.car_object = found_car;
@@ -397,7 +397,7 @@ function player_update(player_object, dt) {
 			}
 		}
 
-		// Рассчитываем попадание по хотбару для блокировки стрельбы
+		
 		let scale = get_scale();
 		let hb = p.hotbar_element.data;
 		let hb_w = (hb.slot_size * 1.05) * hb.row.length;
@@ -409,16 +409,16 @@ function player_update(player_object, dt) {
 			0, 0, 40, 40, hb_w, hb.slot_size
 		);
 
-		// Условие стрельбы: на мобилках джойстик, на ПК — ЛКМ (но не по хотбару)
+		
 		let shooting = (!player_object.game.mobile && player_object.game.input.mouse.leftButtonPressed && !is_clicking_hotbar) ||
 			(player_object.game.mobile && (player_object.game.input.joystick.left.dx ** 2 + player_object.game.input.joystick.left.dy ** 2 > 0.01));
 
-		// Находим направление стрельбы
+		
 		let shootDir = getShootDir(player_object.game.input);
 		let targetX = shootDir.x;
 		let targetY = shootDir.y;
 
-		// --- ЛОГИКА AUTOMATIC AIM ---
+		
 		if (player_object.game.settings.auto_aim) {
 			let nearest_enemy = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 800);
 			if (nearest_enemy) {
@@ -458,7 +458,7 @@ function player_update(player_object, dt) {
 		Matter.Body.setVelocity(p.body, vel);
 
 	} else {
-		// --- РЕЖИМ В МАШИНЕ ---
+		
 		if (player_object.game.settings.auto_pickup["automatically pickup fuel"]) {
 			let cl_item = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "item", 200);
 			if (cl_item && cl_item.data.id == ITEM_FUEL) item_pickup(p.inventory_element, cl_item);
@@ -497,7 +497,7 @@ function player_update(player_object, dt) {
 				y: moveMag * Math.sin(carBody.angle)
 			});
 		} else {
-			// Плавное торможение
+			
 			Matter.Body.setVelocity(carBody, {
 				x: carBody.velocity.x * 0.96,
 				y: carBody.velocity.y * 0.96
@@ -506,7 +506,7 @@ function player_update(player_object, dt) {
 
 		Matter.Body.setPosition(p.body, carBody.position);
 
-		// ВЫХОД ИЗ МАШИНЫ
+		
 		let exit_key = isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		if (exit_key && p.mobile_delay <= 0) {
 			let sideAngle = carBody.angle + Math.PI / 2;
@@ -529,7 +529,7 @@ function player_draw(player_object, ctx) {
 		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
 		drawMatterBody(ctx, p.body, "white");
 
-		// --- ИНДИКАТОРЫ ХАРАКТЕРИСТИК ---
+		
 		if (player_object.game.settings.indicators["show player health"]) {
 			ctx.fillStyle = "red";
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 * p.h, p.w, p.h * 0.05);
@@ -549,7 +549,7 @@ function player_draw(player_object, ctx) {
 			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 * p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
 		}
 
-		// --- ЛАЗЕРНЫЙ ЛУЧ ---
+		
 		if (p.shooting_laser) {
 			let r = Math.cos(0.1 * p.item_animstate) * 15;
 			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p.item_animstate)) * 15;
@@ -578,7 +578,7 @@ function player_draw(player_object, ctx) {
 			p.shooting_laser = false;
 		}
 
-		// --- ОРУЖИЕ ---
+		
 		let selected_item = hotbar_get_selected_item(p.hotbar_element);
 		if (player_object.game.settings.player_draw_gun && ITEMS_GUNS.includes(selected_item)) {
 			let px = p.body.position.x - 0.45 * p.w;
@@ -614,21 +614,21 @@ function player_draw(player_object, ctx) {
 			let lw = 0.25 * p.w;
 			let gl = 0.8;
 
-			// --- ПРИМЕНЕНИЕ ТВОИХ ПРАВОК ---
+			
 			if (selected_item == ITEM_GREEN_GUN) {
 				ctx.strokeStyle = "#117733";
-				gl = 1.6; // В два раза длиннее обычного (0.8 * 2)
+				gl = 1.6; 
 			}
 			if (selected_item == ITEM_LASER_GUN) {
 				ctx.strokeStyle = "purple";
-				lw *= 2.0; // Было 2.25, уменьшили на ~10%
+				lw *= 2.0; 
 				gl = 1.8;
 				px = p.body.position.x;
 				py = p.body.position.y;
 			}
-			// ДРОБОВИКИ И ПУЛЕМЕТ (сделали более узкими)
+			
 			if (selected_item == ITEM_SHOTGUN || selected_item == ITEM_ROCKET_SHOTGUN || selected_item == ITEM_RED_SHOTGUN || selected_item == ITEM_MINIGUN) {
-				lw *= 1.25; // Сузили (вместо lw * 1.8 теперь lw * 0.9, что на 50% меньше от прошлого варианта)
+				lw *= 1.25; 
 				gl = 1.3;
 				if (selected_item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
 				if (selected_item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle = "#111133";
@@ -651,20 +651,20 @@ function player_draw(player_object, ctx) {
 			}
 			if (selected_item == ITEM_PLASMA_PISTOL) ctx.strokeStyle = "#331133";
 
-			// Отрисовка ПАРНЫХ ПИСТОЛЕТОВ (Одинаковый размер)
+			
 			if (selected_item == ITEM_RED_PISTOLS || selected_item == ITEM_RAINBOW_PISTOLS) {
 				let hue = (p.item_animstate * 24) % 360;
 				ctx.strokeStyle = (selected_item == ITEM_RED_PISTOLS) ? "#551111" : `hsl(${hue}, 80%, 50%)`;
 				let p2x = p.body.position.x + 0.55 * p.w;
 				let p2y = p.body.position.y - 0.45 * p.h;
 				ctx.beginPath();
-				ctx.lineWidth = lw; // Размер как у основного
+				ctx.lineWidth = lw; 
 				ctx.moveTo(p2x, p2y);
 				ctx.lineTo(p2x + gl * p.w * gx / dist, p2y + gl * p.h * gy / dist);
 				ctx.stroke();
 			}
 
-			// Основной ствол
+			
 			ctx.beginPath();
 			ctx.lineWidth = lw;
 			ctx.moveTo(px, py);
@@ -672,14 +672,14 @@ function player_draw(player_object, ctx) {
 			ctx.stroke();
 
 			if (selected_item == ITEM_JUNK_CANNON) {
-				ctx.strokeStyle = "#0033aa"; // Изолента
+				ctx.strokeStyle = "#0033aa"; 
 				ctx.lineWidth = lw * 1.1;
 				let tapePos = 0.4;
 				ctx.beginPath();
 				ctx.moveTo(px + (gl * tapePos * p.w) * gx / dist, py + (gl * tapePos * p.h) * gy / dist);
 				ctx.lineTo(px + (gl * (tapePos + 0.1) * p.w) * gx / dist, py + (gl * (tapePos + 0.1) * p.h) * gy / dist);
 				ctx.stroke();
-				ctx.strokeStyle = "#333333"; // Раструб
+				ctx.strokeStyle = "#333333"; 
 				ctx.lineWidth = lw * 1.3;
 				ctx.beginPath();
 				ctx.moveTo(px + (gl * 0.95 * p.w) * gx / dist, py + (gl * 0.95 * p.h) * gy / dist);
@@ -688,7 +688,7 @@ function player_draw(player_object, ctx) {
 			}
 			ctx.lineWidth = 2;
 		} else if (p.sword_visible) {
-			// --- ХОЛОДНОЕ ОРУЖИЕ ---
+			
 			let px = p.body.position.x - p.w * 0.45;
 			let py = p.body.position.y - p.h * 0.45;
 			let sword_length = 100;
@@ -712,7 +712,7 @@ function player_draw(player_object, ctx) {
 			item_icon_draw(ctx, selected_item, px, py, 0.5 * p.w, 0.5 * p.h, p.item_animstate);
 		}
 
-		// --- ЩИТЫ ---
+		
 		const drawShield = (health, maxHealth, fill, stroke) => {
 			if (health <= 0) return;
 			ctx.fillStyle = "gray";
@@ -796,7 +796,7 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 	}
 
 
-	// --- МУСОРНАЯ ПУШКА (ФИНАЛЬНОЕ ОРУЖИЕ) ---
+	
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_JUNK_CANNON && p.shot_cooldown <= 0) {
 
 		let junk_id = -1;
@@ -811,8 +811,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 			let theta = Math.atan2(ty - sy, tx - sx);
 			let angles = [0, Math.PI / 8, -Math.PI / 8];
 
-			// Расстояние от центра игрока до точки появления снаряда
-			// p.w * 1.5 — это примерно край пушки в руках игрока
+			
+			
 			let offset = p.w * 1.5;
 
 			angles.forEach(angleOffset => {
@@ -820,7 +820,7 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 				let dx = Math.cos(finalAngle);
 				let dy = Math.sin(finalAngle);
 
-				// Вычисляем координаты появления со смещением
+				
 				let spawnX = p.body.position.x + Math.cos(theta) * offset;
 				let spawnY = p.body.position.y + Math.sin(theta) * offset;
 
@@ -1057,7 +1057,7 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 			audio_play("data/sfx/red_pistols_1.mp3", 0.125);
 	}
 
-	// TODO balance damage
+	
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_SWORD && true) {
 		if (Math.cos(p.sword_direction) < -0.985)
 			audio_play("data/sfx/sword_1.mp3");
@@ -1320,7 +1320,7 @@ function player_item_consume(player_object, id, anywhere = false) {
 		if (c) {
 			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data.max_fuel * (Math.random() * 0.1 + 0.1));
 			c.data.health += Math.min(c.data.max_health - c.data.health, c.data.max_health * (Math.random() * 0.1 + 0.1));
-			//p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			
 			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 			achievement_do(p.achievements_element.data.achievements, "fuel up", p.achievements_shower_element);
 		}
@@ -1332,7 +1332,7 @@ function player_item_consume(player_object, id, anywhere = false) {
 		if (ao) {
 			enemy_create(ao.game, ao.data.body.position.x, ao.data.body.position.y, true, false, ao.data.type);
 			animal_destroy(ao, false);
-			//p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			
 			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		} else {
 			eo = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "enemy", 500);
@@ -1340,7 +1340,7 @@ function player_item_consume(player_object, id, anywhere = false) {
 		if (eo) {
 			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position.y, true, false, eo.data.type);
 			enemy_destroy(eo);
-			//p.hotbar_element.data.row[p.hotbar_element.data.iselected] = 0;
+			
 			inventory_clear_item(player_object.data.inventory_element, id, 1, item_i, item_j);
 		}
 	}

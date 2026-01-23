@@ -17,7 +17,7 @@ function game_create(input_, engine_, audios_) {
 		engine: engine_,
 		settings: {
 			language: "english",
-			auto_aim: false, // Добавлено
+			auto_aim: false, 
 			player_color: "red",
 			player_draw_gun: true,
 			enemies_spawn: true,
@@ -41,8 +41,8 @@ function game_create(input_, engine_, audios_) {
 				"automatically pickup fuel": false,
 				"automatically pickup health": false,
 				"automatically pickup ammo": false,
-				"automatically pickup weapons": false, // Добавлено
-				"automatically pickup shields": false // Добавлено
+				"automatically pickup weapons": false, 
+				"automatically pickup shields": false 
 			},
 			ammo_pickup_last: true,
 			respawn_on_current_level: true
@@ -64,7 +64,7 @@ function game_create(input_, engine_, audios_) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
 		saved_achievements: [],
-		enemies: { // should have been integer constants but too lazy to change now
+		enemies: { 
 			"regular": true,
 			"shooting": false,
 			"shooting red": false,
@@ -163,7 +163,7 @@ function game_update(g, dt) {
 	g.level_set_delay += dt;
 	if (!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
-		//g.scale *= 0.5;
+		
 	}
 	if (isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
@@ -238,11 +238,11 @@ function game_draw(g, ctx) {
 
 	ctx.save()
 	ctx.scale(get_scale(), get_scale());
-	//drawText(ctx, 50, 110, game_translate(g.settings.language, "killed")
-	//	+ ": " + Math.round(g.kills) + " " + game_translate(g.settings.language, "enemies"));
-	//drawText(ctx, 50, 140, game_translate(g.settings.language, "killed")
-	//	+ ": " + Math.round(g.boss_kills) + " " + game_translate(g.settings.language, "bosses"));
-	//drawText(ctx, 50, 170, game_translate(g.settings.language, "player deaths") + ": " + Math.round(g.deaths));
+	
+	
+	
+	
+	
 	for (let i = 0; i < g.gui_elements.length; i++) {
 		if (!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
 			g.gui_elements[i].draw(g.gui_elements[i], ctx);
@@ -470,19 +470,19 @@ function game_object_make_savable(obj) {
 	return null;
 }
 
-//function game_element_make_savable(elem) {
-//	let elem1 = {
-//		name: elem.name,
-//		data: elem.data,
-//		update: elem.update,  
-//		draw: elem.draw,      
-//		destroy: elem.destroy,
-//		shown: elem.show
-//	};
-//	return elem1;
-//}
 
-// https://stackoverflow.com/questions/19721439/download-json-object-as-a-file-from-browser
+
+
+
+
+
+
+
+
+
+
+
+
 function game_save(g) {
 
 	let objs = [];
@@ -520,8 +520,8 @@ function game_save(g) {
 	dlAnchorElem.click();
 }
 
-// TODO убрать костыли
-// https://stackoverflow.com/questions/16215771/how-to-open-select-file-dialog-via-js
+
+
 function game_load(g) {
 	let input = document.getElementById('file-input');
 	input.onchange = e => {
@@ -559,7 +559,7 @@ function game_load(g) {
 						for (let j = 0; j < plr.data.inventory_element.data.items[i].length; j++)
 							plr.data.inventory_element.data.items[i][j] = obj.data.items[i][j];
 					}
-					try { // without try can break a lot of saves
+					try { 
 						for (let i = 0; i < obj.data.achievements.length; i++)
 							achievement_do(plr.data.achievements_element.data.achievements, obj.data.achievements[i].name, plr.data.achievements_shower_element, true);
 					} catch (e) {
@@ -577,7 +577,7 @@ function game_load(g) {
 					car_create(g, obj.data.x, obj.data.y, obj.data.color, obj.data.is_tank, true);
 			}
 		}
-		// https://stackoverflow.com/questions/1703228/how-can-i-clear-an-html-file-input-with-javascript
+		
 		try {
 			input.value = '';
 			if (input.value) {

@@ -33,8 +33,8 @@ function menu_create() {
 			"automatically pickup fuel": false,
 			"automatically pickup health": false,
 			"automatically pickup ammo": false,
-			"automatically pickup weapons": false, // Добавлено
-			"automatically pickup shields": false // Добавлено
+			"automatically pickup weapons": false, 
+			"automatically pickup shields": false 
 		},
 		iselected: 0,
 		language_selection_buttons: [
@@ -46,25 +46,25 @@ function menu_create() {
 			"back to settings"
 		],
 		main_menu_buttons: [
-			//"~MAIN MENU",
+			
 			"continue game",
 			"settings",
 			"save game",
 			"load game",
 		],
 		menu_respawn_buttons: [
-			//"~YOU DIED",
+			
 			"respawn and continue game",
-			//"settings"
+			
 		],
 		settings_buttons: [
-			//"~SETTINGS",
+			
 			"player color",
 			"player draw gun",
-			"automatic aim", // Добавлено
+			"automatic aim", 
 			"enemies spawn",
 			"automatic respawn",
-			//"show hints",
+			
 			"language",
 			"ammo pickup in last slot",
 			"lose items on death",
@@ -100,8 +100,8 @@ function menu_create() {
 			"automatically pickup fuel",
 			"automatically pickup health",
 			"automatically pickup ammo",
-			"automatically pickup weapons", // Добавлено
-			"automatically pickup shields", // Добавлено
+			"automatically pickup weapons", 
+			"automatically pickup shields", 
 			"back to settings"
 		],
 		buttons: null,

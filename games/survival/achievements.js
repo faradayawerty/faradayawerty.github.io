@@ -353,7 +353,7 @@ function achievements_draw(ae, ctx) {
 
 	ctx.globalAlpha = 0.75;
 
-	//ctx.fillStyle = "#000810";
+	
 	ctx.fillStyle = "black";
 	ctx.fillRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data.height);
 	ctx.strokeStyle = "white";
@@ -690,8 +690,8 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx = 50
 		ctx.fillRect(x + 0.3 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
 		ctx.strokeStyle = c8;
 		ctx.strokeRect(x + 0.3 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		//drawText(ctx, x + 0.3 * w, y + 0.45 * h, "WA", 10);
-		//drawText(ctx, x + 0.325 * w, y + 0.65 * h, "SD", 10);
+		
+		
 	} else if (name == "get a ride") {
 		ctx.fillStyle = c5;
 		ctx.fillRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
@@ -802,7 +802,7 @@ function achievements_shower_draw(ashe, ctx) {
 		ctx.strokeRect(x, y, w, h);
 		ctx.globalAlpha *= 2;
 
-		// Проверка флага мобильного устройства прямо в кадре отрисовки
+		
 		let isMob = ashe.game.mobile;
 		let helpText = isMob ? "tap the gold cup" : "press R or J";
 		let helpTextRus = isMob ? "нажмите на кубок" : "нажмите R или J";
@@ -849,7 +849,7 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh = 1000
 	lines.push("** " + name + " **");
 	lines.push("");
 
-	// Динамический выбор описания
+	
 	let descRaw = (ae.game.settings.language == "русский") ? achData.desc_rus : achData.desc;
 	let desc = "";
 
