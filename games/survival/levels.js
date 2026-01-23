@@ -68,7 +68,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_RESIDENTIAL_L]: {
-		weight: 50,
+		weight: 25,
 		connections: {
 			N: 1,
 			E: 1,
