@@ -507,7 +507,7 @@ function player_update(player_object, dt) {
 		Matter.Body.setPosition(p.body, carBody.position);
 
 		// ВЫХОД ИЗ МАШИНЫ
-		let exit_key = isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
+		let exit_key = isKeyDown(player_object.game.input, 'а', true) || isKeyDown(player_object.game.input, 'f', true) || isKeyDown(player_object.game.input, ' ', true);
 		if (exit_key && p.mobile_delay <= 0) {
 			let sideAngle = carBody.angle + Math.PI / 2;
 			Matter.Body.setPosition(p.body, {
