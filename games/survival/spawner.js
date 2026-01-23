@@ -1,4 +1,5 @@
-function spawner_create(g, x_, y_, w_, h_, func_spawn, limit, overall_limit, delay, color = 'orange') {
+function spawner_create(g, x_, y_, w_, h_, func_spawn, limit, overall_limit,
+	delay, color = 'orange') {
 	let s = {
 		spawn: func_spawn,
 		x: x_,
@@ -34,5 +35,6 @@ function spawner_update(spawner_object, dt) {
 
 function spawner_draw(spawner_object, ctx) {
 	ctx.strokeColor = spawner_object.data.color;
-	ctx.strokeRect(spawner_object.data.x, spawner_object.data.y, spawner_object.data.w, spawner_object.data.h);
+	ctx.strokeRect(spawner_object.data.x, spawner_object.data.y, spawner_object
+		.data.w, spawner_object.data.h);
 }

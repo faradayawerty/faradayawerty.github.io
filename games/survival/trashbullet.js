@@ -1,4 +1,5 @@
-function trash_bullet_create(g, x, y, dx, dy, speed = 15, damage = 0.5, enemy = true, size = 20) {
+function trash_bullet_create(g, x, y, dx, dy, speed = 15, damage = 0.5, enemy =
+	true, size = 20) {
 	let trash_bullets = g.objects.filter((obj) => obj.name == "trash_bullet");
 	if (trash_bullets.length > 150) {
 		for (let i = 0; i < trash_bullets.length - 150; i++)
@@ -16,7 +17,8 @@ function trash_bullet_create(g, x, y, dx, dy, speed = 15, damage = 0.5, enemy = 
 		id: trash_id,
 		angle: Math.random() * Math.PI * 2,
 		rotation_speed: (Math.random() - 0.5) * 0.2,
-		body: Matter.Bodies.rectangle(x + 30 * dx / d, y + 30 * dy / d, size, size),
+		body: Matter.Bodies.rectangle(x + 30 * dx / d, y + 30 * dy / d,
+			size, size),
 		enemy: enemy
 	};
 	if (b.enemy) {
@@ -27,12 +29,14 @@ function trash_bullet_create(g, x, y, dx, dy, speed = 15, damage = 0.5, enemy = 
 	Matter.Composite.add(g.engine.world, b.body);
 	let vel = Matter.Vector.create(speed * dx / d, speed * dy / d);
 	Matter.Body.setVelocity(b.body, vel);
-	return game_object_create(g, "trashbullet", b, trash_bullet_update, trash_bullet_draw, trash_bullet_destroy);
+	return game_object_create(g, "trashbullet", b, trash_bullet_update,
+		trash_bullet_draw, trash_bullet_destroy);
 }
 
 function trash_bullet_destroy(bullet_object) {
 	if (bullet_object.destroyed) return;
-	Matter.Composite.remove(bullet_object.game.engine.world, bullet_object.data.body);
+	Matter.Composite.remove(bullet_object.game.engine.world, bullet_object.data
+		.body);
 	bullet_object.data.body = null;
 	bullet_object.destroyed = true;
 }
@@ -50,7 +54,8 @@ function trash_bullet_update(bullet_object, dt) {
 	for (let i = 0; i < g.objects.length; i++) {
 		let target = g.objects[i];
 		if (!target.data.body || target.destroyed) continue;
-		if ((target.name == "enemy" || target.name == "car" || target.name == "animal") &&
+		if ((target.name == "enemy" || target.name == "car" || target.name ==
+				"animal") &&
 			Matter.Collision.collides(b.body, target.data.body) != null) {
 			if (target.name == "enemy" && !b.enemy) {
 				target.data.health -= b.damage * dt;
@@ -61,8 +66,10 @@ function trash_bullet_update(bullet_object, dt) {
 		}
 	}
 	if (b.enemy) {
-		let player = game_object_find_closest(g, b.body.position.x, b.body.position.y, "player", 100);
-		if (player && Matter.Collision.collides(b.body, player.data.body) != null) {
+		let player = game_object_find_closest(g, b.body.position.x, b.body
+			.position.y, "player", 100);
+		if (player && Matter.Collision.collides(b.body, player.data.body) !=
+			null) {
 			let pd = player.data;
 			if (pd.shield_blue_health > 0) {
 				pd.shield_blue_health -= 0.95 * b.damage * dt;
@@ -74,7 +81,8 @@ function trash_bullet_update(bullet_object, dt) {
 				let k = 1.0;
 				if (pd.sword_protection) {
 					k = 0.05;
-					if (hotbar_get_selected_item(pd.hotbar_element) == ITEM_HORN)
+					if (hotbar_get_selected_item(pd.hotbar_element) ==
+						ITEM_HORN)
 						k = 0.001;
 				}
 				pd.health -= k * b.damage * dt;

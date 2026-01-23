@@ -6,7 +6,8 @@ function infobox_create(g, x_, y_, max_lines_, attached_to_object = null) {
 		max_lines: max_lines_,
 		attached_to_object: attached_to_object
 	};
-	return game_gui_element_create(g, "infobox", ib, infobox_update, infobox_draw, infobox_destroy);
+	return game_gui_element_create(g, "infobox", ib, infobox_update,
+		infobox_draw, infobox_destroy);
 }
 
 function infobox_destroy(infobox_element) {

@@ -176,7 +176,8 @@ function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	}
 }
 
-function levels_spawn_enemies(g, Ox, Oy, player_object, tile = LEVEL_TILE_DEFAULT) {
+function levels_spawn_enemies(g, Ox, Oy, player_object, tile =
+	LEVEL_TILE_DEFAULT) {
 	if (player_object) {
 		let m = 0.33 * (
 			player_object.data.health / player_object.data.max_health +
@@ -199,11 +200,13 @@ function levels_spawn_items(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	if (LEVEL_TILES_CITY_ZONE.includes(tile))
 		N = Math.random() * 7 + 3;
 	for (let i = 0; i < N; i++)
-		item_spawn(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500, enemy_type = null, tile = tile);
+		item_spawn(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500,
+			enemy_type = null, tile = tile);
 }
 
 function levels_set(g, level, old_level = null) {
-	g.debug_console.unshift("time from previous level creation " + g.level_set_delay);
+	g.debug_console.unshift("time from previous level creation " + g
+		.level_set_delay);
 	g.level_set_delay = 0;
 	let [level_x, level_y] = level.split("x").map(Number);
 	let Ox = 2500 * level_x;
@@ -236,14 +239,19 @@ function levels_set(g, level, old_level = null) {
 		decorative_grass_create(g, Ox + 1410, Oy, 1090, 1090);
 		decorative_grass_create(g, Ox, Oy + 1410, 1090, 1090);
 		decorative_grass_create(g, Ox, Oy, 1090, 1090, false);
-		decorative_rectangle_create(g, Ox, Oy + 1150, 2500, 200, "#222222", "#222222");
-		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222", "#222222");
+		decorative_rectangle_create(g, Ox, Oy + 1150, 2500, 200, "#222222",
+			"#222222");
+		decorative_rectangle_create(g, Ox + 1150, Oy, 200, 2500, "#222222",
+			"#222222");
 	} else if (tile == LEVEL_TILE_CITY_GAS_STATION) {
 		decorative_level_base_create(g, Ox, Oy, "gray");
 		decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
-		decorative_gas_station_create(g, Ox + 250, Oy + 150, 2000, 900, level_visited);
-		decorative_parkinglot_create(g, Ox + 250, Oy + 1400, 2000, 500, level_visited, ["default", "pickup"]);
-		decorative_parkinglot_create(g, Ox + 250, Oy + 1950, 2000, 500, level_visited, ["default", "pickup"]);
+		decorative_gas_station_create(g, Ox + 250, Oy + 150, 2000, 900,
+			level_visited);
+		decorative_parkinglot_create(g, Ox + 250, Oy + 1400, 2000, 500,
+			level_visited, ["default", "pickup"]);
+		decorative_parkinglot_create(g, Ox + 250, Oy + 1950, 2000, 500,
+			level_visited, ["default", "pickup"]);
 		decorative_grass_create(g, Ox, Oy, 200, 2500, true);
 		decorative_grass_create(g, Ox + 2300, Oy, 200, 2500, true);
 		if (!level_visited) {
@@ -254,8 +262,12 @@ function levels_set(g, level, old_level = null) {
 		decorative_level_base_create(g, Ox, Oy);
 		decorative_police_station_v3(g, Ox + 250, Oy + 50, 2000, 900);
 		decorative_road_create(g, Ox, Oy + 1050, 2500, 200);
-		decorative_parkinglot_create(g, Ox + 100, Oy + 1860, 2300, 625, level_visited = level_visited, car_types = ["default", "police"]);
-		decorative_parkinglot_create(g, Ox + 100, Oy + 1310, 2300, 525, level_visited = level_visited, car_types = ["default", "police"]);
+		decorative_parkinglot_create(g, Ox + 100, Oy + 1860, 2300, 625,
+			level_visited = level_visited, car_types = ["default", "police"]
+		);
+		decorative_parkinglot_create(g, Ox + 100, Oy + 1310, 2300, 525,
+			level_visited = level_visited, car_types = ["default", "police"]
+		);
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
 			levels_spawn_enemies(g, Ox, Oy, player_object, tile = tile);
@@ -265,7 +277,10 @@ function levels_set(g, level, old_level = null) {
 		decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 1050, true);
 		decorative_grass_create(g, Ox + 40, Oy + 1410, 1050, 1050, true);
-		decorative_parkinglot_create(g, Ox + 1410, Oy + 1410, 1050, 1050, level_visited = level_visited, car_types = ["default", "ambulance"]);
+		decorative_parkinglot_create(g, Ox + 1410, Oy + 1410, 1050, 1050,
+			level_visited = level_visited, car_types = ["default",
+				"ambulance"
+			]);
 		decorative_hospital_v3(g, Ox + 1440, Oy + 150, 950, 850);
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
@@ -275,24 +290,35 @@ function levels_set(g, level, old_level = null) {
 		decorative_grass_create(g, Ox + 40, Oy + 40, 1050, 2420);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
 		decorative_fire_station_v3(g, Ox + 1400, Oy + 40, 1050, 1150);
-		decorative_parkinglot_create(g, Ox + 1400, Oy + 1250, 1050, 1200, level_visited = level_visited, car_types = ["default", "fireman"]);
+		decorative_parkinglot_create(g, Ox + 1400, Oy + 1250, 1050, 1200,
+			level_visited = level_visited, car_types = ["default",
+				"fireman"
+			]);
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
 			levels_spawn_enemies(g, Ox, Oy, player_object, tile = tile);
 		}
 	} else if (tile == LEVEL_TILE_RESIDENTIAL_L) {
 		decorative_level_base_create(g, Ox, Oy);
-		decorative_rectangle_create(g, Ox + 1130, Oy + 1130, 1370, 240, "#999999", "#999999");
-		decorative_rectangle_create(g, Ox + 1130, Oy, 240, 1370, "#999999", "#999999");
+		decorative_rectangle_create(g, Ox + 1130, Oy + 1130, 1370, 240,
+			"#999999", "#999999");
+		decorative_rectangle_create(g, Ox + 1130, Oy, 240, 1370, "#999999",
+			"#999999");
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
-		decorative_house_v2(g, Ox + 150, Oy + 150, 850, 850, "right", "#d2b48c", "#8b4513");
-		decorative_house_v2(g, Ox + 1500, Oy + 150, 850, 850, "down", "#e3dac9", "#5d2e0c");
-		decorative_house_v2(g, Ox + 1500, Oy + 1500, 850, 850, "up", "#c2b280", "#4a2c2a");
+		decorative_house_v2(g, Ox + 150, Oy + 150, 850, 850, "right", "#d2b48c",
+			"#8b4513");
+		decorative_house_v2(g, Ox + 1500, Oy + 150, 850, 850, "down", "#e3dac9",
+			"#5d2e0c");
+		decorative_house_v2(g, Ox + 1500, Oy + 1500, 850, 850, "up", "#c2b280",
+			"#4a2c2a");
 		decorative_grass_create(g, Ox, Oy + 1000, 1400, 1450, true);
-		decorative_rectangle_create(g, Ox + 1000, Oy + 500, 145, 150, "#999999", "#999999");
-		decorative_rectangle_create(g, Ox + 1850, Oy + 1000, 150, 145, "#999999", "#999999");
-		decorative_rectangle_create(g, Ox + 1850, Oy + 1355, 150, 145, "#999999", "#999999");
+		decorative_rectangle_create(g, Ox + 1000, Oy + 500, 145, 150, "#999999",
+			"#999999");
+		decorative_rectangle_create(g, Ox + 1850, Oy + 1000, 150, 145,
+			"#999999", "#999999");
+		decorative_rectangle_create(g, Ox + 1850, Oy + 1355, 150, 145,
+			"#999999", "#999999");
 		base_color = DECORATIVE_COLOR_GRASS;
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
@@ -316,7 +342,8 @@ function levels_set(g, level, old_level = null) {
 		decorative_grass_create(g, Ox, Oy + 1410, 1410, 1090);
 		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
-		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
+			"#222222", "#222222");
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
 			levels_spawn_animals(g, Ox, Oy, tile = tile);
@@ -328,7 +355,8 @@ function levels_set(g, level, old_level = null) {
 		decorative_grass_create(g, Ox + 1410, Oy + 1090, 1090, 1410);
 		decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
-		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
+			"#222222", "#222222");
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
 			levels_spawn_animals(g, Ox, Oy, tile = tile);
@@ -340,7 +368,8 @@ function levels_set(g, level, old_level = null) {
 		decorative_grass_create(g, Ox + 1410, Oy + 1410, 1090, 1090);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
-		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
+			"#222222", "#222222");
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
 			levels_spawn_animals(g, Ox, Oy, tile = tile);
@@ -352,7 +381,8 @@ function levels_set(g, level, old_level = null) {
 		decorative_grass_create(g, Ox, Oy + 1410, 2500, 1090);
 		decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 		decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
-		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200, "#222222", "#222222");
+		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
+			"#222222", "#222222");
 		if (!level_visited) {
 			levels_spawn_items(g, Ox, Oy, tile = tile);
 			levels_spawn_animals(g, Ox, Oy, tile = tile);
@@ -390,7 +420,9 @@ function levels_set(g, level, old_level = null) {
 
 function level_visible(g, level, exclude_player_object = null) {
 	for (let i = 0; i < g.objects.length; i++) {
-		if (g.objects[i].name == "player" && !g.objects[i].destroyed && g.objects[i].data.want_level == level && g.objects[i] != exclude_player_object) {
+		if (g.objects[i].name == "player" && !g.objects[i].destroyed && g
+			.objects[i].data.want_level == level && g.objects[i] !=
+			exclude_player_object) {
 			return true;
 		}
 	}

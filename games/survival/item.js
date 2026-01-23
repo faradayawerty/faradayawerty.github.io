@@ -100,14 +100,16 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 	let available_shields = [ITEM_HEALTH];
 	let available_food = [ITEM_CANNED_MEAT];
 	let available_drinks = [ITEM_WATER];
-	if (enemy_type == "shooting" || enemy_type == null && g.enemies["shooting"]) {
+	if (enemy_type == "shooting" || enemy_type == null && g.enemies[
+			"shooting"]) {
 		available_guns.push(ITEM_SHOTGUN);
 		if (enemy_type != null) {
 			available_ammos.push(ITEM_PLASMA);
 			available_shields.push(ITEM_SHIELD);
 		}
 	}
-	if (enemy_type == "shooting red" || enemy_type == null && g.enemies["shooting red"]) {
+	if (enemy_type == "shooting red" || enemy_type == null && g.enemies[
+			"shooting red"]) {
 		available_ammos.push(ITEM_PLASMA);
 		available_guns.push(ITEM_PLASMA_LAUNCHER);
 		available_shields.push(ITEM_SHIELD);
@@ -122,14 +124,16 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 			available_shields = [ITEM_SHIELD_GREEN];
 		}
 	}
-	if (enemy_type == "shooting rocket" || enemy_type == null && g.enemies["shooting rocket"]) {
+	if (enemy_type == "shooting rocket" || enemy_type == null && g.enemies[
+			"shooting rocket"]) {
 		available_guns.push(ITEM_SWORD);
 		available_health.push(ITEM_SHIELD_GREEN);
 		available_health.push(ITEM_HEALTH_GREEN);
 		if (enemy_type != null)
 			available_ammos = [ITEM_ROCKET];
 	}
-	if (enemy_type == "shooting laser" || enemy_type == null && g.enemies["shooting laser"]) {
+	if (enemy_type == "shooting laser" || enemy_type == null && g.enemies[
+			"shooting laser"]) {
 		available_guns.push(ITEM_ROCKET_LAUNCHER);
 		available_ammos.push(ITEM_ROCKET);
 		if (enemy_type != null) {
@@ -173,7 +177,9 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 			chance_health = 70;
 			chance_shield = 10;
 			chance_fuel = 0;
-			available_food = [ITEM_APPLE, ITEM_ORANGE, ITEM_CHERRIES, ITEM_CANNED_MEAT];
+			available_food = [ITEM_APPLE, ITEM_ORANGE, ITEM_CHERRIES,
+				ITEM_CANNED_MEAT
+			];
 		} else if (tile === LEVEL_TILE_CITY_FIRE_STATION) {
 			chance_food = 10;
 			chance_drink = 60;
@@ -216,12 +222,16 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 	}
 	let player_closest = game_object_find_closest(g, x, y, "player", 5000);
 	if (player_closest) {
-		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst / player_closest.data.max_thirst);
-		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger / player_closest.data.max_hunger);
+		chance_drink = Math.max(chance_drink, 0.8 - player_closest.data.thirst /
+			player_closest.data.max_thirst);
+		chance_food = Math.max(chance_food, 0.8 - player_closest.data.hunger /
+			player_closest.data.max_hunger);
 		if (player_closest.data.car_object)
-			chance_fuel = 2 * (1 - player_closest.data.car_object.data.fuel / player_closest.data.car_object.data.max_fuel);
+			chance_fuel = 2 * (1 - player_closest.data.car_object.data.fuel /
+				player_closest.data.car_object.data.max_fuel);
 	}
-	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food + chance_drink + chance_shield + chance_health;
+	let chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food +
+		chance_drink + chance_shield + chance_health;
 	chance_gun = chance_gun / chance_sum;
 	chance_ammo = chance_ammo / chance_sum;
 	chance_fuel = chance_fuel / chance_sum;
@@ -233,25 +243,31 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 	let r = Math.random();
 	let a = 0;
 	if (a < r && r < a + chance_health)
-		item = available_health[Math.floor(Math.random() * available_health.length)];
+		item = available_health[Math.floor(Math.random() * available_health
+			.length)];
 	a += chance_health;
 	if (a < r && r < a + chance_shield)
-		item = available_shields[Math.floor(Math.random() * available_shields.length)];
+		item = available_shields[Math.floor(Math.random() * available_shields
+			.length)];
 	a += chance_shield;
 	if (a < r && r < a + chance_gun)
-		item = available_guns[Math.floor(Math.random() * available_guns.length)];
+		item = available_guns[Math.floor(Math.random() * available_guns
+			.length)];
 	a += chance_gun;
 	if (a < r && r < a + chance_fuel)
 		item = ITEM_FUEL;
 	a += chance_fuel;
 	if (a < r && r < a + chance_food)
-		item = available_food[Math.floor(Math.random() * available_food.length)];
+		item = available_food[Math.floor(Math.random() * available_food
+			.length)];
 	a += chance_food;
 	if (a < r && r < a + chance_drink)
-		item = available_drinks[Math.floor(Math.random() * available_drinks.length)];
+		item = available_drinks[Math.floor(Math.random() * available_drinks
+			.length)];
 	a += chance_drink;
 	if (a < r && r < a + chance_ammo)
-		item = available_ammos[Math.floor(Math.random() * available_ammos.length)];
+		item = available_ammos[Math.floor(Math.random() * available_ammos
+			.length)];
 	a += chance_ammo;
 	g.debug_console.unshift(
 		"item_spawn" +
@@ -273,7 +289,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null) {
 }
 
 function item_create(g, id_, x_, y_, dropped = false, despawn = true) {
-	let items = g.objects.filter((obj) => obj.name == "item" && obj.data.despawn && !obj.data.dropped);
+	let items = g.objects.filter((obj) => obj.name == "item" && obj.data
+		.despawn && !obj.data.dropped);
 	if (items.length > 50) {
 		for (let i = 0; i < items.length - 50; i++)
 			items[i].destroy(items[i]);
@@ -317,7 +334,8 @@ function item_update(item_object, dt) {
 
 function item_draw(item_object, ctx) {
 	let item = item_object.data;
-	item_icon_draw(ctx, item.id, item.body.position.x - 20, item.body.position.y - 20, 40, 40, item_object.data.animation_state);
+	item_icon_draw(ctx, item.id, item.body.position.x - 20, item.body.position
+		.y - 20, 40, 40, item_object.data.animation_state);
 	if (item_object.game.settings.show_hints) {
 		let name = "item";
 		if (item.id == ITEM_AMMO)
@@ -356,7 +374,8 @@ function item_draw(item_object, ctx) {
 			name = "cola";
 		if (item.id == ITEM_MILK)
 			name = "milk";
-		drawHint(ctx, item.body.position.x - 20, item.body.position.y - 20, item_name_translate(item_object.game.settings.language, name));
+		drawHint(ctx, item.body.position.x - 20, item.body.position.y - 20,
+			item_name_translate(item_object.game.settings.language, name));
 	}
 }
 
@@ -364,8 +383,10 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 	if (id == 0) {
 		return
 	} else if (id == ITEM_ORANGE) {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "#ff8800", "#773311", 0.05 * w);
-		drawCircle(ctx, x + 0.4 * w, y + 0.4 * h, 0.05 * w, "#ffaa44", "#ffaa44", 0);
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "#ff8800",
+			"#773311", 0.05 * w);
+		drawCircle(ctx, x + 0.4 * w, y + 0.4 * h, 0.05 * w, "#ffaa44",
+			"#ffaa44", 0);
 		ctx.fillStyle = "#442200";
 		ctx.fillRect(x + 0.48 * w, y + 0.25 * h, 0.04 * w, 0.04 * h);
 	} else if (id == ITEM_GREEN_GUN) {
@@ -390,7 +411,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 				const t = i / segments;
 				const segX = startX + (length * t);
 				const damping = 1 - Math.exp(-6 * t * t);
-				const wave = Math.sin(t_anim * freq + t * Math.PI * phase) * maxAmp * damping;
+				const wave = Math.sin(t_anim * freq + t * Math.PI * phase) *
+					maxAmp * damping;
 				const segY = startY + wave + (t * 5);
 				ctx.lineTo(segX, segY);
 			}
@@ -402,7 +424,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.15, h * 0.25);
 		ctx.fillStyle = acidGreen;
 		let slosh = Math.sin(t_anim * 0.01) * 1.5;
-		ctx.fillRect(x + w * 0.42, y + h * 0.55 + slosh, w * 0.11, h * 0.15 - slosh);
+		ctx.fillRect(x + w * 0.42, y + h * 0.55 + slosh, w * 0.11, h * 0.15 -
+			slosh);
 		ctx.fillStyle = darkGreen;
 		ctx.fillRect(x + w * 0.88, y + h * 0.4, w * 0.06, h * 0.16);
 		ctx.lineCap = "butt";
@@ -431,7 +454,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.strokeStyle = "rgba(0,0,0,0.25)";
 		for (let i = 1; i < 4; i++) {
 			let nodeY = (guardY - bH) + (i * bH * 0.25);
-			drawLine(ctx, -bW / 2, nodeY, bW / 2, nodeY, "rgba(0,0,0,0.25)", 1.5);
+			drawLine(ctx, -bW / 2, nodeY, bW / 2, nodeY, "rgba(0,0,0,0.25)",
+				1.5);
 		}
 		ctx.fillStyle = "rgba(255,255,255,0.2)";
 		ctx.fillRect(-bW * 0.2, guardY - bH * 0.9, bW * 0.25, bH * 0.8);
@@ -449,9 +473,11 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		let drawSinglePistol = (px, py, scale, color) => {
 			ctx.fillStyle = color;
 			ctx.fillRect(px, py, w * 0.35 * scale, h * 0.12 * scale);
-			ctx.fillRect(px, py + h * 0.05 * scale, w * 0.1 * scale, h * 0.18 * scale);
+			ctx.fillRect(px, py + h * 0.05 * scale, w * 0.1 * scale, h *
+				0.18 * scale);
 			ctx.fillStyle = "rgba(255,255,255,0.2)";
-			ctx.fillRect(px + w * 0.05 * scale, py, w * 0.25 * scale, h * 0.04 * scale);
+			ctx.fillRect(px + w * 0.05 * scale, py, w * 0.25 * scale, h *
+				0.04 * scale);
 		};
 		let mainColor = "#dd1111";
 		if (id == ITEM_RAINBOW_PISTOLS && animstate != null) {
@@ -493,7 +519,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		const gunH = h * 0.2;
 		ctx.fillStyle = "#0a3311";
 		ctx.fillRect(x + w * 0.1, gunY, w * 0.3, gunH * 1.2);
-		let barrelGrad = ctx.createLinearGradient(x + w * 0.4, 0, x + w * 0.9, 0);
+		let barrelGrad = ctx.createLinearGradient(x + w * 0.4, 0, x + w * 0.9,
+			0);
 		barrelGrad.addColorStop(0, "#117733");
 		barrelGrad.addColorStop(1, "#33ff66");
 		ctx.fillStyle = barrelGrad;
@@ -515,8 +542,10 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.15);
 		ctx.fillStyle = "#0a441e";
 		ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.1, h * 0.3);
-	} else if (id == ITEM_RED_SHOTGUN || id == ITEM_SHOTGUN || id == ITEM_ROCKET_SHOTGUN) {
-		let col = id == ITEM_RED_SHOTGUN ? "#dd1111" : (id == ITEM_ROCKET_SHOTGUN ? "#111133" : "#773311");
+	} else if (id == ITEM_RED_SHOTGUN || id == ITEM_SHOTGUN || id ==
+		ITEM_ROCKET_SHOTGUN) {
+		let col = id == ITEM_RED_SHOTGUN ? "#dd1111" : (id ==
+			ITEM_ROCKET_SHOTGUN ? "#111133" : "#773311");
 		ctx.fillStyle = col;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.25);
 		ctx.fillStyle = "#333";
@@ -579,9 +608,12 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 	} else if (id == ITEM_BENT_FORK) {
 		ctx.strokeStyle = "#aaa";
 		ctx.lineWidth = 2;
-		drawLine(ctx, x + 0.5 * w, y + 0.8 * h, x + 0.5 * w, y + 0.4 * h, "#aaa");
-		drawLine(ctx, x + 0.4 * w, y + 0.2 * h, x + 0.4 * w, y + 0.4 * h, "#aaa");
-		drawLine(ctx, x + 0.6 * w, y + 0.1 * h, x + 0.6 * w, y + 0.4 * h, "#aaa");
+		drawLine(ctx, x + 0.5 * w, y + 0.8 * h, x + 0.5 * w, y + 0.4 * h,
+			"#aaa");
+		drawLine(ctx, x + 0.4 * w, y + 0.2 * h, x + 0.4 * w, y + 0.4 * h,
+			"#aaa");
+		drawLine(ctx, x + 0.6 * w, y + 0.1 * h, x + 0.6 * w, y + 0.4 * h,
+			"#aaa");
 	} else if (id == ITEM_JUNK_CANNON) {
 		ctx.fillStyle = "#444";
 		ctx.fillRect(x + 0.1 * w, y + 0.4 * h, 0.8 * w, 0.25 * h);
@@ -593,7 +625,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fill();
 		ctx.strokeStyle = "blue";
 		ctx.lineWidth = 3;
-		drawLine(ctx, x + 0.4 * w, y + 0.3 * h, x + 0.4 * w, y + 0.65 * h, "blue");
+		drawLine(ctx, x + 0.4 * w, y + 0.3 * h, x + 0.4 * w, y + 0.65 * h,
+			"blue");
 	} else if (id == ITEM_CRUMPLED_PAPER) {
 		ctx.fillStyle = "#ffffff";
 		ctx.strokeStyle = "#cccccc";
@@ -608,7 +641,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.closePath();
 		ctx.fill();
 		ctx.stroke();
-		drawLine(ctx, x + 0.4 * w, y + 0.4 * h, x + 0.6 * w, y + 0.5 * h, "#dddddd", 1);
+		drawLine(ctx, x + 0.4 * w, y + 0.4 * h, x + 0.6 * w, y + 0.5 * h,
+			"#dddddd", 1);
 	} else if (id == ITEM_DEAD_BATTERY) {
 		ctx.fillStyle = "#444444";
 		ctx.fillRect(x + 0.35 * w, y + 0.3 * h, 0.3 * w, 0.5 * h);
@@ -616,7 +650,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillRect(x + 0.35 * w, y + 0.7 * h, 0.3 * w, 0.1 * h);
 		ctx.fillStyle = "#777777";
 		ctx.fillRect(x + 0.45 * w, y + 0.22 * h, 0.1 * w, 0.08 * h);
-		drawLine(ctx, x + 0.42 * w, y + 0.55 * h, x + 0.58 * w, y + 0.55 * h, "#333333", 2);
+		drawLine(ctx, x + 0.42 * w, y + 0.55 * h, x + 0.58 * w, y + 0.55 * h,
+			"#333333", 2);
 	} else if (id == ITEM_JUNK_CANNON) {
 		ctx.fillStyle = "#555555";
 		ctx.fillRect(x + 0.1 * w, y + 0.4 * h, 0.7 * w, 0.3 * h);
@@ -639,52 +674,64 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 	} else if (id == ITEM_APPLE) {
 		ctx.fillStyle = "#ff4422";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.5 * w, y + 0.55 * h, 0.24 * w, 0.24 * h, 0, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.5 * w, y + 0.55 * h, 0.24 * w, 0.24 * h, 0, 0, Math
+			.PI * 2);
 		ctx.fill();
 		ctx.strokeStyle = "#440000";
 		ctx.lineWidth = 0.03 * w;
 		ctx.stroke();
-		drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y + 0.15 * h, "#442200", 0.04 * w);
+		drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y + 0.15 * h,
+			"#442200", 0.04 * w);
 		ctx.fillStyle = "#33aa11";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.6 * w, y + 0.22 * h, 0.1 * w, 0.05 * w, -Math.PI / 4, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.6 * w, y + 0.22 * h, 0.1 * w, 0.05 * w, -Math.PI / 4,
+			0, Math.PI * 2);
 		ctx.fill();
 		ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.4 * w, y + 0.45 * h, 0.07 * w, 0.07 * w, 0, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.4 * w, y + 0.45 * h, 0.07 * w, 0.07 * w, 0, 0, Math
+			.PI * 2);
 		ctx.fill();
 	} else if (id == ITEM_APPLE) {
 		ctx.fillStyle = "#ff4422";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.5 * w, y + 0.6 * h, 0.22 * w, 0.25 * h, 0, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.5 * w, y + 0.6 * h, 0.22 * w, 0.25 * h, 0, 0, Math
+			.PI * 2);
 		ctx.fill();
 		ctx.strokeStyle = "#440000";
 		ctx.lineWidth = 0.03 * w;
 		ctx.stroke();
-		drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y + 0.2 * h, "#442200", 0.04 * w);
+		drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y + 0.2 * h,
+			"#442200", 0.04 * w);
 		ctx.fillStyle = "#33aa11";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.58 * w, y + 0.25 * h, 0.1 * w, 0.05 * w, -Math.PI / 4, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.58 * w, y + 0.25 * h, 0.1 * w, 0.05 * w, -Math.PI / 4,
+			0, Math.PI * 2);
 		ctx.fill();
 		ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.42 * w, y + 0.5 * h, 0.06 * w, 0.09 * w, Math.PI / 6, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.42 * w, y + 0.5 * h, 0.06 * w, 0.09 * w, Math.PI / 6,
+			0, Math.PI * 2);
 		ctx.fill();
 	} else if (id == ITEM_APPLE_CORE) {
 		ctx.fillStyle = "#eeeecc";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.5 * w, y + 0.5 * h, 0.08 * w, 0.2 * h, 0, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.5 * w, y + 0.5 * h, 0.08 * w, 0.2 * h, 0, 0, Math.PI *
+			2);
 		ctx.fill();
 		ctx.fillStyle = "#ff4422";
 		ctx.fillRect(x + 0.4 * w, y + 0.3 * h, 0.2 * w, 0.05 * h);
 		ctx.fillRect(x + 0.4 * w, y + 0.65 * h, 0.2 * w, 0.05 * h);
-		drawLine(ctx, x + 0.5 * w, y + 0.3 * h, x + 0.5 * w, y + 0.15 * h, "#442200", 0.03 * w);
+		drawLine(ctx, x + 0.5 * w, y + 0.3 * h, x + 0.5 * w, y + 0.15 * h,
+			"#442200", 0.03 * w);
 	} else if (id == ITEM_FISH_BONE) {
 		ctx.strokeStyle = "#dddddd";
 		ctx.lineWidth = 0.05 * w;
-		drawLine(ctx, x + 0.2 * w, y + 0.5 * h, x + 0.8 * w, y + 0.5 * h, "#dddddd");
+		drawLine(ctx, x + 0.2 * w, y + 0.5 * h, x + 0.8 * w, y + 0.5 * h,
+			"#dddddd");
 		for (let i = 0; i < 4; i++) {
-			drawLine(ctx, x + (0.3 + i * 0.15) * w, y + 0.35 * h, x + (0.3 + i * 0.15) * w, y + 0.65 * h, "#dddddd");
+			drawLine(ctx, x + (0.3 + i * 0.15) * w, y + 0.35 * h, x + (0.3 + i *
+				0.15) * w, y + 0.65 * h, "#dddddd");
 		}
 		ctx.fillStyle = "#dddddd";
 		ctx.beginPath();
@@ -706,9 +753,12 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.fillRect(x + 0.3 * w, y + 0.35 * h, 0.4 * w, 0.4 * h);
 		ctx.strokeStyle = "#777777";
 		ctx.lineWidth = 1;
-		drawLine(ctx, x + 0.3 * w, y + 0.45 * h, x + 0.7 * w, y + 0.45 * h, "#777777");
-		drawLine(ctx, x + 0.3 * w, y + 0.55 * h, x + 0.7 * w, y + 0.55 * h, "#777777");
-		drawLine(ctx, x + 0.3 * w, y + 0.65 * h, x + 0.7 * w, y + 0.65 * h, "#777777");
+		drawLine(ctx, x + 0.3 * w, y + 0.45 * h, x + 0.7 * w, y + 0.45 * h,
+			"#777777");
+		drawLine(ctx, x + 0.3 * w, y + 0.55 * h, x + 0.7 * w, y + 0.55 * h,
+			"#777777");
+		drawLine(ctx, x + 0.3 * w, y + 0.65 * h, x + 0.7 * w, y + 0.65 * h,
+			"#777777");
 		ctx.fillStyle = "#999999";
 		ctx.beginPath();
 		ctx.ellipse(cx, y + 0.75 * h, 0.2 * w, 0.05 * h, 0, 0, Math.PI * 2);
@@ -722,27 +772,39 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.stroke();
 		ctx.fillStyle = "#888888";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.35 * w, y + 0.25 * h, 0.15 * w, 0.04 * h, -Math.PI / 4, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.35 * w, y + 0.25 * h, 0.15 * w, 0.04 * h, -Math.PI /
+			4, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.stroke();
 	} else if (id == ITEM_CHERRIES) {
-		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.35 * w, y + 0.65 * h, "#224400", 0.04 * w);
-		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.65 * w, y + 0.65 * h, "#224400", 0.04 * w);
-		drawCircle(ctx, x + 0.35 * w, y + 0.7 * h, 0.12 * w, "#cc0000", "#660000", 0.02 * w);
-		drawCircle(ctx, x + 0.65 * w, y + 0.7 * h, 0.12 * w, "#ee0000", "#660000", 0.02 * w);
-		drawCircle(ctx, x + 0.32 * w, y + 0.65 * h, 0.03 * w, "white", "none", 0);
-		drawCircle(ctx, x + 0.62 * w, y + 0.65 * h, 0.03 * w, "white", "none", 0);
+		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.35 * w, y + 0.65 * h,
+			"#224400", 0.04 * w);
+		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.65 * w, y + 0.65 * h,
+			"#224400", 0.04 * w);
+		drawCircle(ctx, x + 0.35 * w, y + 0.7 * h, 0.12 * w, "#cc0000",
+			"#660000", 0.02 * w);
+		drawCircle(ctx, x + 0.65 * w, y + 0.7 * h, 0.12 * w, "#ee0000",
+			"#660000", 0.02 * w);
+		drawCircle(ctx, x + 0.32 * w, y + 0.65 * h, 0.03 * w, "white", "none",
+			0);
+		drawCircle(ctx, x + 0.62 * w, y + 0.65 * h, 0.03 * w, "white", "none",
+			0);
 	} else if (id == ITEM_CHICKEN_LEG) {
-		drawLine(ctx, x + 0.5 * w, y + 0.6 * h, x + 0.5 * w, y + 0.85 * h, "#eeeeee", 0.08 * w);
-		drawCircle(ctx, x + 0.45 * w, y + 0.85 * h, 0.05 * w, "#eeeeee", "#cccccc", 0.01 * w);
-		drawCircle(ctx, x + 0.55 * w, y + 0.85 * h, 0.05 * w, "#eeeeee", "#cccccc", 0.01 * w);
+		drawLine(ctx, x + 0.5 * w, y + 0.6 * h, x + 0.5 * w, y + 0.85 * h,
+			"#eeeeee", 0.08 * w);
+		drawCircle(ctx, x + 0.45 * w, y + 0.85 * h, 0.05 * w, "#eeeeee",
+			"#cccccc", 0.01 * w);
+		drawCircle(ctx, x + 0.55 * w, y + 0.85 * h, 0.05 * w, "#eeeeee",
+			"#cccccc", 0.01 * w);
 		ctx.fillStyle = "#884411";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.5 * w, y + 0.4 * h, 0.2 * w, 0.28 * h, 0, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.5 * w, y + 0.4 * h, 0.2 * w, 0.28 * h, 0, 0, Math.PI *
+			2);
 		ctx.fill();
 		ctx.fillStyle = "#aa6622";
 		ctx.beginPath();
-		ctx.ellipse(x + 0.45 * w, y + 0.35 * h, 0.12 * w, 0.18 * h, 0, 0, Math.PI * 2);
+		ctx.ellipse(x + 0.45 * w, y + 0.35 * h, 0.12 * w, 0.18 * h, 0, 0, Math
+			.PI * 2);
 		ctx.fill();
 	} else if (id == ITEM_CHOCOLATE) {
 		ctx.fillStyle = "#331100";
@@ -793,8 +855,10 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 	} else if (id == ITEM_HORN) {
 		ctx.fillStyle = "brown";
 		ctx.fillRect(x + w * 0.1, y + h * 0.425, w * 0.8, h * 0.15);
-		drawLine(ctx, x + w * 0.5, y + h * 0.5, x + w * 0.8, y + h * 0.8, "brown", w * 0.1);
-		drawLine(ctx, x + w * 0.4, y + h * 0.5, x + w * 0.7, y + h * 0.2, "brown", w * 0.1);
+		drawLine(ctx, x + w * 0.5, y + h * 0.5, x + w * 0.8, y + h * 0.8,
+			"brown", w * 0.1);
+		drawLine(ctx, x + w * 0.4, y + h * 0.5, x + w * 0.7, y + h * 0.2,
+			"brown", w * 0.1);
 	} else if (id == ITEM_RED_SHOTGUN) {
 		ctx.fillStyle = "#dd1111";
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
@@ -868,22 +932,28 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		let N = 4;
 		for (let i = 0; i < N; i++) {
 			ctx.fillStyle = "yellow";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.5 * h);
 			ctx.fillStyle = "orange";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.125 * h);
 			ctx.strokeStyle = "orange";
 			ctx.lineWidth = 0.01 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
+				0.5 * w / N, 0.5 * h);
 		}
 	} else if (id == ITEM_SHIELD_RAINBOW && animstate != null) {
 		let r = Math.cos(0.1 * animstate) * 15;
-		let g = 0.7 * (Math.cos(0.1 * animstate) + Math.sin(0.1 * animstate)) * 15;
+		let g = 0.7 * (Math.cos(0.1 * animstate) + Math.sin(0.1 * animstate)) *
+			15;
 		let b = Math.sin(0.1 * animstate) * 15;
 		r = Math.floor(r * r);
 		g = Math.floor(g * g);
 		b = Math.floor(b * b);
-		let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16).padStart(2, '0') + (b).toString(16).padStart(2, '0');
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, color, "white", 0.05 * w);
+		let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16)
+			.padStart(2, '0') + (b).toString(16).padStart(2, '0');
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, color, "white",
+			0.05 * w);
 	} else if (id == ITEM_RAINBOW_AMMO && animstate != null) {
 		let colors = ["pink", "yellow", "lime", "cyan"];
 		let colors1 = ["red", "orange", "green", "blue"];
@@ -891,45 +961,57 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		let N = 4;
 		for (let i = 0; i < N; i++) {
 			ctx.fillStyle = colors[(i + Math.floor(animstate)) % 4];
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.5 * h);
 			ctx.fillStyle = colors1[(i + Math.floor(animstate)) % 4];
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.125 * h);
 			ctx.strokeStyle = colors2[(i + Math.floor(animstate)) % 4];
 			ctx.lineWidth = 0.01 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
+				0.5 * w / N, 0.5 * h);
 		}
 	} else if (id == ITEM_GREEN_AMMO) {
 		let N = 4;
 		for (let i = 0; i < N; i++) {
 			ctx.fillStyle = "lime";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.5 * h);
 			ctx.fillStyle = "green";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.125 * h);
 			ctx.strokeStyle = "green";
 			ctx.lineWidth = 0.01 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
+				0.5 * w / N, 0.5 * h);
 		}
 	} else if (id == ITEM_PLASMA) {
 		let N = 3;
 		for (let i = 0; i < N; i++) {
 			ctx.fillStyle = "cyan";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.5 * h);
 			ctx.fillStyle = "blue";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.125 * h);
 			ctx.strokeStyle = "white";
 			ctx.lineWidth = 0.025 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
+				0.5 * w / N, 0.5 * h);
 		}
 	} else if (id == ITEM_RED_PLASMA) {
 		let N = 4;
 		for (let i = 0; i < N; i++) {
 			ctx.fillStyle = "pink";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.5 * h);
 			ctx.fillStyle = "red";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.125 * h);
 			ctx.strokeStyle = "red";
 			ctx.lineWidth = 0.01 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
+				0.5 * w / N, 0.5 * h);
 		}
 	} else if (id == ITEM_HEALTH) {
 		ctx.fillStyle = "white";
@@ -943,17 +1025,22 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 	} else if (id == ITEM_BOSSIFIER && animstate != null) {
 		let rate = 0.05;
 		let r = Math.cos(rate * animstate) * 15;
-		let g = 0.7 * (Math.cos(rate * animstate) + Math.sin(rate * animstate)) * 15;
+		let g = 0.7 * (Math.cos(rate * animstate) + Math.sin(rate *
+			animstate)) * 15;
 		let b = Math.sin(rate * animstate) * 15;
 		r = Math.floor(r * r);
 		g = Math.floor(g * g);
 		b = Math.floor(b * b);
-		let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16).padStart(2, '0') + (b).toString(16).padStart(2, '0');
+		let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16)
+			.padStart(2, '0') + (b).toString(16).padStart(2, '0');
 		ctx.fillStyle = "black";
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		drawLine(ctx, x + w * 0.5, y + h * 0.7, x + w * 0.5, y + h * 0.28375, color, w * 0.05);
-		drawLine(ctx, x + w * 0.5, y + h * 0.3, x + w * 0.65, y + h * 0.5, color, w * 0.05);
-		drawLine(ctx, x + w * 0.5, y + h * 0.3, x + w * 0.35, y + h * 0.5, color, w * 0.05);
+		drawLine(ctx, x + w * 0.5, y + h * 0.7, x + w * 0.5, y + h * 0.28375,
+			color, w * 0.05);
+		drawLine(ctx, x + w * 0.5, y + h * 0.3, x + w * 0.65, y + h * 0.5,
+			color, w * 0.05);
+		drawLine(ctx, x + w * 0.5, y + h * 0.3, x + w * 0.35, y + h * 0.5,
+			color, w * 0.05);
 		ctx.strokeStyle = color;
 		ctx.lineWidth = h * 0.025;
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
@@ -977,8 +1064,10 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 		ctx.fillStyle = "yellow";
 		ctx.fillRect(x + w * 0.55, y + h * 0.15, w * 0.2, h * 0.05);
-		drawLine(ctx, x + w * 0.3, y + h * 0.3, x + w * 0.7, y + h * 0.7, "#cc1111", 0.05 * w);
-		drawLine(ctx, x + w * 0.7, y + h * 0.3, x + w * 0.3, y + h * 0.7, "#cc1111", 0.05 * w);
+		drawLine(ctx, x + w * 0.3, y + h * 0.3, x + w * 0.7, y + h * 0.7,
+			"#cc1111", 0.05 * w);
+		drawLine(ctx, x + w * 0.7, y + h * 0.3, x + w * 0.3, y + h * 0.7,
+			"#cc1111", 0.05 * w);
 		ctx.fillStyle = "#dd1111";
 		ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
 	} else if (id == ITEM_MONEY) {
@@ -987,7 +1076,8 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.strokeStyle = "#007733";
 		ctx.lineWidth = 0.05 * w;
 		ctx.strokeRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
-		drawCircle(ctx, x + w * 0.5, y + h * 0.5, w * 0.1, "#007733", "#007733", w * 0.025);
+		drawCircle(ctx, x + w * 0.5, y + h * 0.5, w * 0.1, "#007733", "#007733",
+			w * 0.025);
 	} else if (id == ITEM_WATER) {
 		ctx.fillStyle = "#777777";
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
@@ -1014,12 +1104,15 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		let N = 3;
 		for (let i = 0; i < N; i++) {
 			ctx.fillStyle = "#666666";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.5 * h);
 			ctx.fillStyle = "#bb3311";
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.125 * h);
+			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
+				w / N, 0.125 * h);
 			ctx.strokeStyle = "#111111";
 			ctx.lineWidth = 0.01 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 * w / N, 0.5 * h);
+			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
+				0.5 * w / N, 0.5 * h);
 		}
 	} else if (id == ITEM_MILK) {
 		ctx.fillStyle = "#113377";
@@ -1030,22 +1123,31 @@ function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 		ctx.strokeStyle = "black";
 		ctx.strokeRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
 	} else if (id == ITEM_ORANGE) {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "orange", "#773311", 0.05 * w);
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "orange", "#773311",
+			0.05 * w);
 	} else if (id == ITEM_SHIELD) {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "cyan", "white", 0.05 * w);
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "cyan", "white",
+			0.05 * w);
 	} else if (id == ITEM_SHIELD_GREEN) {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "lime", "white", 0.05 * w);
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "lime", "white",
+			0.05 * w);
 	} else if (id == ITEM_APPLE) {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "lime", "green", 0.05 * w);
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "lime", "green",
+			0.05 * w);
 	} else if (id == ITEM_CHICKEN_LEG) {
-		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.5 * w, y + 0.9 * h, "gray", 0.075 * w)
+		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.5 * w, y + 0.9 * h,
+			"gray", 0.075 * w)
 		ctx.fillStyle = "#aa7711";
 		ctx.fillRect(x + w * 0.3, y + h * 0.1, w * 0.4, h * 0.6);
 	} else if (id == ITEM_CHERRIES) {
-		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.35 * w, y + 0.75 * h, "#555511", 0.05 * w)
-		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.65 * w, y + 0.75 * h, "#555511", 0.05 * w)
-		drawCircle(ctx, x + 0.65 * w, y + 0.75 * h, 0.125 * w, "red", "black", 0.025 * w);
-		drawCircle(ctx, x + 0.35 * w, y + 0.75 * h, 0.125 * w, "red", "black", 0.025 * w);
+		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.35 * w, y + 0.75 * h,
+			"#555511", 0.05 * w)
+		drawLine(ctx, x + w * 0.5, y + 0.25 * h, x + 0.65 * w, y + 0.75 * h,
+			"#555511", 0.05 * w)
+		drawCircle(ctx, x + 0.65 * w, y + 0.75 * h, 0.125 * w, "red", "black",
+			0.025 * w);
+		drawCircle(ctx, x + 0.35 * w, y + 0.75 * h, 0.125 * w, "red", "black",
+			0.025 * w);
 	} else {
 		ctx.fillStyle = "#000000";
 		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
@@ -1060,7 +1162,8 @@ function item_pickup(inventory_element, item_object, force = false) {
 		return false;
 	let inv = inventory_element.data;
 	let item = item_object.data;
-	if (item_object.game.settings.ammo_pickup_last && ITEMS_AMMOS.includes(item_object.data.id) || force) {
+	if (item_object.game.settings.ammo_pickup_last && ITEMS_AMMOS.includes(
+			item_object.data.id) || force) {
 		for (let i = inv.items.length - 1; i >= 0; i--)
 			for (let j = inv.items[i].length - 1; j >= 0; j--)
 				if (inv.items[i][j] == 0 || force) {

@@ -2,7 +2,8 @@ let DECORATIVE_COLOR_GRASS = "#117711";
 
 function roof_apply_transparency(g, bx, by, bw, bh) {
 	let p = g.player_object;
-	if (!p) p = g.objects.find(o => o.name === "player" && !o.data.ai_controlled);
+	if (!p) p = g.objects.find(o => o.name === "player" && !o.data
+		.ai_controlled);
 	if (p && p.data.body) {
 		let px = p.data.body.position.x;
 		let py = p.data.body.position.y;
@@ -38,7 +39,8 @@ function decorative_rectangle_draw(self, ctx) {
 
 function decorative_roof_draw(self, ctx) {
 	let d = self.data;
-	ctx.globalAlpha = roof_apply_transparency(self.game, d.bx, d.by, d.bw, d.bh);
+	ctx.globalAlpha = roof_apply_transparency(self.game, d.bx, d.by, d.bw, d
+		.bh);
 	if (d.text) {
 		ctx.font = "bold " + d.size + "px verdana";
 		ctx.fillStyle = d.color;
@@ -56,7 +58,8 @@ function decorative_roof_draw(self, ctx) {
 	ctx.globalAlpha = 1.0;
 }
 
-function decorative_rectangle_create(g, x, y, w, h, fill, outline = "transparent") {
+function decorative_rectangle_create(g, x, y, w, h, fill, outline =
+	"transparent") {
 	let i = game_object_create(g, "decorative", {
 			x,
 			y,
@@ -73,7 +76,8 @@ function decorative_rectangle_create(g, x, y, w, h, fill, outline = "transparent
 	return i;
 }
 
-function roof_rect_create(g, x, y, w, h, bx, by, bw, bh, fill, outline = "transparent") {
+function roof_rect_create(g, x, y, w, h, bx, by, bw, bh, fill, outline =
+	"transparent") {
 	let i = game_object_create(g, "decorative_roof", {
 			x,
 			y,
@@ -137,17 +141,23 @@ function decorative_text_create(g, text, x, y, size, color) {
 }
 
 function decorative_level_base_create(g, x, y, color = "gray") {
-	game_object_change_name(g, decorative_rectangle_create(g, x, y, 2500, 2500, color, "white"), "decorative_level_base");
+	game_object_change_name(g, decorative_rectangle_create(g, x, y, 2500, 2500,
+		color, "white"), "decorative_level_base");
 }
 
 function decorative_grass_create(g, x, y, w, h, trees = true) {
-	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h, DECORATIVE_COLOR_GRASS, DECORATIVE_COLOR_GRASS), "decorative_grass");
+	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h,
+			DECORATIVE_COLOR_GRASS, DECORATIVE_COLOR_GRASS),
+		"decorative_grass");
 	if (trees) {
 		let N = w / 300.0;
 		let M = h / 300.0;
 		for (let i = 1; i < N - 1; i++) {
 			for (let j = 0.75; j < M - 1; j++) {
-				decorative_tree_create(g, x + (i + 0.5 * (Math.random() - 0.5)) * w / N, y + (j + 0.5 * (Math.random() - 0.5)) * h / M);
+				decorative_tree_create(g, x + (i + 0.5 * (Math.random() -
+						0.5)) * w / N, y + (j + 0.5 * (Math.random() -
+					0.5)) *
+					h / M);
 			}
 		}
 	}
@@ -156,22 +166,27 @@ function decorative_grass_create(g, x, y, w, h, trees = true) {
 function decorative_tree_create(g, x, y) {
 	if (!g.settings.trees) return;
 	bound_create(g, x, y + 145, 30, 30);
-	game_object_change_name(g, decorative_rectangle_create(g, x - 65, y, 160, 75, "lime", "#224400"), "decorative_leaves");
-	game_object_change_name(g, decorative_rectangle_create(g, x, y + 75, 30, 100, "brown", "#442200"), "decorative_trunk");
+	game_object_change_name(g, decorative_rectangle_create(g, x - 65, y, 160,
+		75, "lime", "#224400"), "decorative_leaves");
+	game_object_change_name(g, decorative_rectangle_create(g, x, y + 75, 30,
+		100, "brown", "#442200"), "decorative_trunk");
 }
 
 function decorative_road_create(g, x, y, w, h) {
 	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 	let N = 8.0;
 	for (let i = 0; i < N && w > h; i++)
-		decorative_rectangle_create(g, x + (i + 0.25) * w / N, y + h / 2 - 0.05 * h, 0.5 * w / N, 0.1 * h, "#ffffff", "#ffffff");
+		decorative_rectangle_create(g, x + (i + 0.25) * w / N, y + h / 2 -
+			0.05 * h, 0.5 * w / N, 0.1 * h, "#ffffff", "#ffffff");
 	for (let i = 0; i < N && h > w; i++)
-		decorative_rectangle_create(g, x + w / 2 - 0.05 * w, y + (i + 0.25) * h / N, 0.1 * w, 0.5 * h / N, "#ffffff", "#ffffff");
+		decorative_rectangle_create(g, x + w / 2 - 0.05 * w, y + (i + 0.25) *
+			h / N, 0.1 * w, 0.5 * h / N, "#ffffff", "#ffffff");
 }
 
 function decorative_wall_v2(g, x, y, w, h, color) {
 	bound_create(g, x, y, w, h);
-	return game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h, color, "#222222"), "decorative_wall");
+	return game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h,
+		color, "#222222"), "decorative_wall");
 }
 
 function decorative_wall_create(g, x, y, w, h) {
@@ -185,7 +200,8 @@ function decorative_building_create(g, x, y, w, h) {
 	decorative_wall_create(g, x + 0.95 * w, y, w * 0.05, 0.4 * h);
 	decorative_wall_create(g, x + 0.95 * w, y + 0.55 * h, w * 0.05, 0.4 * h);
 	decorative_rectangle_create(g, x, y, w, h, "#555555", "#333333");
-	roof_rect_create(g, x + 0.01 * w, y + 0.01 * h, w * 0.98, h * 0.98, x, y, w, h, "#555555", "#333333");
+	roof_rect_create(g, x + 0.01 * w, y + 0.01 * h, w * 0.98, h * 0.98, x, y, w,
+		h, "#555555", "#333333");
 }
 
 function decorative_house_v2(g, x, y, w, h, door_side, wall_color, roof_color) {
@@ -195,10 +211,12 @@ function decorative_house_v2(g, x, y, w, h, door_side, wall_color, roof_color) {
 	let draw_wall_with_door = (sx, sy, sw_, sh_, horizontal) => {
 		if (horizontal) {
 			decorative_wall_v2(g, sx, sy, (sw_ - dw) / 2, sh_, wall_color);
-			decorative_wall_v2(g, sx + (sw_ + dw) / 2, sy, (sw_ - dw) / 2, sh_, wall_color);
+			decorative_wall_v2(g, sx + (sw_ + dw) / 2, sy, (sw_ - dw) / 2,
+				sh_, wall_color);
 		} else {
 			decorative_wall_v2(g, sx, sy, sw_, (sh_ - dw) / 2, wall_color);
-			decorative_wall_v2(g, sx, sy + (sh_ + dw) / 2, sw_, (sh_ - dw) / 2, wall_color);
+			decorative_wall_v2(g, sx, sy + (sh_ + dw) / 2, sw_, (sh_ - dw) /
+				2, wall_color);
 		}
 	};
 	if (door_side === "up") draw_wall_with_door(x, y, w, sw, true);
@@ -209,7 +227,8 @@ function decorative_house_v2(g, x, y, w, h, door_side, wall_color, roof_color) {
 	else decorative_wall_v2(g, x, y, sw, h, wall_color);
 	if (door_side === "right") draw_wall_with_door(x + w - sw, y, sw, h, false);
 	else decorative_wall_v2(g, x + w - sw, y, sw, h, wall_color);
-	roof_rect_create(g, x + 2, y + 2, w - 4, h - 4, x, y, w, h, roof_color, "#000000");
+	roof_rect_create(g, x + 2, y + 2, w - 4, h - 4, x, y, w, h, roof_color,
+		"#000000");
 }
 
 function decorative_hospital_v3(g, x, y, w, h) {
@@ -220,12 +239,16 @@ function decorative_hospital_v3(g, x, y, w, h) {
 	decorative_wall_v2(g, x + w - sw, y, sw, h, "#ffffff");
 	decorative_wall_v2(g, x, y + h - sw, w * 0.4, sw, "#ffffff");
 	decorative_wall_v2(g, x + w * 0.6, y + h - sw, w * 0.4, sw, "#ffffff");
-	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#eeeeee", "#bbbbbb");
+	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#eeeeee",
+		"#bbbbbb");
 	let cx = x + w / 2;
 	let cy = y + h / 2;
-	roof_rect_create(g, cx - 80, cy - 20, 160, 40, x, y, w, h, "#1177ff", "#1177ff");
-	roof_rect_create(g, cx - 20, cy - 80, 40, 160, x, y, w, h, "#1177ff", "#1177ff");
-	roof_text_create(g, "CITY HOSPITAL", x + (w / 2) - 200, y + h - 100, 50, x, y, w, h, "#1177ff");
+	roof_rect_create(g, cx - 80, cy - 20, 160, 40, x, y, w, h, "#1177ff",
+		"#1177ff");
+	roof_rect_create(g, cx - 20, cy - 80, 40, 160, x, y, w, h, "#1177ff",
+		"#1177ff");
+	roof_text_create(g, "CITY HOSPITAL", x + (w / 2) - 200, y + h - 100, 50, x,
+		y, w, h, "#1177ff");
 }
 
 function decorative_police_station_v3(g, x, y, w, h) {
@@ -234,8 +257,10 @@ function decorative_police_station_v3(g, x, y, w, h) {
 	decorative_wall_v2(g, x, y, w, sw, "#222266");
 	decorative_wall_v2(g, x, y, sw, h, "#222266");
 	decorative_wall_v2(g, x + w - sw, y, sw, h, "#222266");
-	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#111144", "#000022");
-	roof_text_create(g, "POLICE", x + (w / 2) - 110, y + (h / 2) - 30, 60, x, y, w, h, "white");
+	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#111144",
+		"#000022");
+	roof_text_create(g, "POLICE", x + (w / 2) - 110, y + (h / 2) - 30, 60, x, y,
+		w, h, "white");
 }
 
 function decorative_fire_station_v3(g, x, y, w, h) {
@@ -244,8 +269,10 @@ function decorative_fire_station_v3(g, x, y, w, h) {
 	decorative_wall_v2(g, x, y, w, sw, "#992222");
 	decorative_wall_v2(g, x, y, sw, h, "#992222");
 	decorative_wall_v2(g, x + w - sw, y, sw, h, "#992222");
-	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#771111", "#440000");
-	roof_text_create(g, "FIRE DEPT", x + (w / 2) - 140, y + (h / 2) - 25, 50, x, y, w, h, "white");
+	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#771111",
+		"#440000");
+	roof_text_create(g, "FIRE DEPT", x + (w / 2) - 140, y + (h / 2) - 25, 50, x,
+		y, w, h, "white");
 }
 
 function decorative_fuel_pump_draw(self, ctx) {
@@ -301,7 +328,8 @@ function decorative_gas_station_create(g, x, y, w, h, level_visited = true) {
 	let canopy_h = h * 0.85;
 	let canopy_x = gas_x + (gas_w - canopy_w) / 2;
 	let canopy_y = y + (h - canopy_h) / 2;
-	decorative_rectangle_create(g, canopy_x, canopy_y, canopy_w, canopy_h, "#444444", "#222222");
+	decorative_rectangle_create(g, canopy_x, canopy_y, canopy_w, canopy_h,
+		"#444444", "#222222");
 	let rows = 2;
 	let cols = 3;
 	let pump_w = 45;
@@ -311,7 +339,8 @@ function decorative_gas_station_create(g, x, y, w, h, level_visited = true) {
 	for (let r = 0; r < rows; r++) {
 		let iy = canopy_y + (canopy_h / (rows + 1)) * (r + 1) - (island_h / 2);
 		let ix = canopy_x + (canopy_w - island_w) / 2;
-		decorative_rectangle_create(g, ix, iy, island_w, island_h, "#888888", "#555555");
+		decorative_rectangle_create(g, ix, iy, island_w, island_h, "#888888",
+			"#555555");
 		for (let c = 0; c < cols; c++) {
 			let px = ix + (island_w / (cols + 1)) * (c + 1) - (pump_w / 2);
 			let py = iy - (pump_h * 0.7);
@@ -321,7 +350,8 @@ function decorative_gas_station_create(g, x, y, w, h, level_visited = true) {
 	}
 }
 
-function decorative_parkinglot_create(g, x, y, w, h, level_visited = true, car_types = ["default"]) {
+function decorative_parkinglot_create(g, x, y, w, h, level_visited = true,
+	car_types = ["default"]) {
 	decorative_rectangle_create(g, x, y, w, h, "#222222", "#222222");
 	const TARGET_R = 205;
 	const padding = w * 0.02;
@@ -332,13 +362,16 @@ function decorative_parkinglot_create(g, x, y, w, h, level_visited = true, car_t
 	for (let i = 0; i < count; i++) {
 		let spotX = x + padding + (i * actualR);
 		let spotY = y;
-		decorative_rectangle_create(g, spotX, spotY + h * 0.1, 4, h * 0.8, "white", "white");
+		decorative_rectangle_create(g, spotX, spotY + h * 0.1, 4, h * 0.8,
+			"white", "white");
 		if (i === count - 1) {
-			decorative_rectangle_create(g, spotX + actualR, spotY + h * 0.1, 4, h * 0.8, "white", "white");
+			decorative_rectangle_create(g, spotX + actualR, spotY + h * 0.1, 4,
+				h * 0.8, "white", "white");
 		}
 		let fontSize = Math.floor(actualR * 0.2);
 		let textVal = Math.floor(50 + Math.random() * 50);
-		decorative_text_create(g, textVal, spotX + (actualR / 2) - (fontSize / 2), spotY + h * 0.15, fontSize, "white");
+		decorative_text_create(g, textVal, spotX + (actualR / 2) - (fontSize /
+			2), spotY + h * 0.15, fontSize, "white");
 		let car_chance = 0.01;
 		if (car_types.includes("fireman"))
 			car_chance = 0.1;

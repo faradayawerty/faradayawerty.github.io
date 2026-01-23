@@ -119,35 +119,52 @@ function menu_draw(ctx, m) {
 	for (let i = 0; i < m.buttons.length; i++) {
 		let text = m.buttons[i];
 		if (m.buttons[i] == "player color")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_color);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_player_color);
 		else if (m.buttons[i] == "player draw gun")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_player_draw_gun);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_player_draw_gun);
 		else if (m.buttons[i] == "automatic aim")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_auto_aim);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_auto_aim);
 		else if (m.buttons[i] == "ammo pickup in last slot")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_ammo_pickup_last);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_ammo_pickup_last);
 		else if (m.buttons[i] == "show hints")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_hints);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_hints);
 		else if (m.buttons[i] == "lose items on death")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_lose_items);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_lose_items);
 		else if (m.buttons[i] == "respawn on current level")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_respawn_here);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_respawn_here);
 		else if (m.buttons[i] == "enemies spawn")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_enemies_spawn);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_enemies_spawn);
 		else if (m.buttons[i] == "debug")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_debug);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_debug);
 		else if (m.buttons[i] == "enable trees")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_trees);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_trees);
 		else if (m.buttons[i] == "automatic respawn")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_autorespawn);
-		else if (m.buttons[i] != "back to settings" && m.indicators_settings.includes(m.buttons[i]))
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_indicators[m.buttons[i]]);
-		else if (m.buttons[i] != "back to settings" && m.auto_pickup_settings.includes(m.buttons[i]))
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_auto_pickup[m.buttons[i]]);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_autorespawn);
+		else if (m.buttons[i] != "back to settings" && m.indicators_settings
+			.includes(m.buttons[i]))
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_indicators[m.buttons[i]]);
+		else if (m.buttons[i] != "back to settings" && m.auto_pickup_settings
+			.includes(m.buttons[i]))
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_auto_pickup[m.buttons[i]]);
 		else if (m.buttons[i] == "language")
-			text = menu_translate(m.want_language, text) + ": " + menu_translate(m.want_language, m.want_language);
+			text = menu_translate(m.want_language, text) + ": " +
+			menu_translate(m.want_language, m.want_language);
 		else if (m.buttons[i] == "volume")
-			text = menu_translate(m.want_language, text) + ": " + GLOBAL_VOLUME + "%";
+			text = menu_translate(m.want_language, text) + ": " +
+			GLOBAL_VOLUME + "%";
 		else
 			text = menu_translate(m.want_language, text);
 		if (text.length > 0 && text[0] == "~")
@@ -165,10 +182,15 @@ function menu_update(m, dt, input) {
 		m.mobile = true;
 	let would_be_able_to_touch_button = false;
 	for (let i = 0; i < m.buttons.length; i++)
-		if ((!m.mobile && doRectsCollide(input.mouse.x / get_scale(), input.mouse.y / get_scale(), 0, 0,
-				80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60)) ||
-			(input.touch && input.touch.length > 0 && doRectsCollide(input.touch[0].x / get_scale(), input.touch[0].y / get_scale(), 0, 0,
-				80, 40 + 60 * i, 80 + 30 * menu_translate(m.want_language, m.buttons[i]).length, 60))
+		if ((!m.mobile && doRectsCollide(input.mouse.x / get_scale(), input
+				.mouse.y / get_scale(), 0, 0,
+				80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language,
+					m.buttons[i]).length, 60)) ||
+			(input.touch && input.touch.length > 0 && doRectsCollide(input
+				.touch[0].x / get_scale(), input.touch[0].y / get_scale(),
+				0, 0,
+				80, 40 + 60 * i, 80 + 30 * menu_translate(m.want_language, m
+					.buttons[i]).length, 60))
 		) {
 			m.iselected = i;
 			would_be_able_to_touch_button = true;
@@ -179,15 +201,20 @@ function menu_update(m, dt, input) {
 		m.want_player_respawn = true;
 		menu1.buttons = menu1.main_menu_buttons;
 	}
-	if ((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) && m.iselected < m.buttons.length - 1) {
+	if ((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) &&
+		m.iselected < m.buttons.length - 1) {
 		m.iselected += 1;
-	} else if ((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp', true)) && m.iselected > 0) {
+	} else if ((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp',
+			true)) && m.iselected > 0) {
 		m.iselected -= 1;
-	} else if (isMouseRightButtonPressed(input) && m.buttons[m.iselected] == "volume") {
+	} else if (isMouseRightButtonPressed(input) && m.buttons[m.iselected] ==
+		"volume") {
 		GLOBAL_VOLUME = GLOBAL_VOLUME - 10;
 		if (GLOBAL_VOLUME < 0)
 			GLOBAL_VOLUME = 100;
-	} else if ((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter', true) || isMouseLeftButtonPressed(input) || (isScreenTouched(input) && m.can_touch_button))) {
+	} else if ((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter',
+			true) || isMouseLeftButtonPressed(input) || (isScreenTouched(
+			input) && m.can_touch_button))) {
 		if (m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
 		} else if (m.buttons[m.iselected] == "respawn and continue game") {
@@ -200,7 +227,8 @@ function menu_update(m, dt, input) {
 			m.want_new_game = true;
 			menu1.main_menu_buttons[0] = "continue game";
 			menu1.buttons = menu1.main_menu_buttons;
-		} else if (m.buttons[m.iselected] == "settings" || m.buttons[m.iselected] == "back to settings") {
+		} else if (m.buttons[m.iselected] == "settings" || m.buttons[m
+				.iselected] == "back to settings") {
 			m.buttons = m.settings_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
@@ -239,9 +267,11 @@ function menu_update(m, dt, input) {
 			if (!isScreenTouched(input))
 				m.iselected = 0;
 		} else if (m.indicators_settings.includes(m.buttons[m.iselected])) {
-			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m.buttons[m.iselected]];
+			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m
+				.buttons[m.iselected]];
 		} else if (m.auto_pickup_settings.includes(m.buttons[m.iselected])) {
-			m.want_auto_pickup[m.buttons[m.iselected]] = !m.want_auto_pickup[m.buttons[m.iselected]];
+			m.want_auto_pickup[m.buttons[m.iselected]] = !m.want_auto_pickup[m
+				.buttons[m.iselected]];
 		} else if (m.buttons[m.iselected] == "player draw gun") {
 			m.want_player_draw_gun = !m.want_player_draw_gun;
 		} else if (m.buttons[m.iselected] == "ammo pickup in last slot") {

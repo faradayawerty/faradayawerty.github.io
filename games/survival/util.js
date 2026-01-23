@@ -42,7 +42,8 @@ function dist(v1, v2) {
 }
 
 function doRectsCollide(x1, y1, w1, h1, x2, y2, w2, h2) {
-	return Math.abs(x1 + 0.5 * w1 - x2 - 0.5 * w2) < 0.5 * (w1 + w2) && Math.abs(y1 + 0.5 * h1 - y2 - 0.5 * h2) < 0.5 * (h1 + h2);
+	return Math.abs(x1 + 0.5 * w1 - x2 - 0.5 * w2) < 0.5 * (w1 + w2) && Math
+		.abs(y1 + 0.5 * h1 - y2 - 0.5 * h2) < 0.5 * (h1 + h2);
 }
 
 function drawLine(ctx, x1, y1, x2, y2, color, width) {

@@ -86,10 +86,14 @@ function getWishDir(input) {
 			y: Math.sqrt(Math.sqrt(2)) * input.joystick.right.dy
 		}
 	let vel = Matter.Vector.create(0, 0);
-	if (input.keys.down['d'] || input.keys.down['в']) vel = Matter.Vector.add(vel, Matter.Vector.create(1, 0));
-	if (input.keys.down['a'] || input.keys.down['ф']) vel = Matter.Vector.add(vel, Matter.Vector.create(-1, 0));
-	if (input.keys.down['s'] || input.keys.down['ы']) vel = Matter.Vector.add(vel, Matter.Vector.create(0, 1));
-	if (input.keys.down['w'] || input.keys.down['ц']) vel = Matter.Vector.add(vel, Matter.Vector.create(0, -1));
+	if (input.keys.down['d'] || input.keys.down['в']) vel = Matter.Vector.add(
+		vel, Matter.Vector.create(1, 0));
+	if (input.keys.down['a'] || input.keys.down['ф']) vel = Matter.Vector.add(
+		vel, Matter.Vector.create(-1, 0));
+	if (input.keys.down['s'] || input.keys.down['ы']) vel = Matter.Vector.add(
+		vel, Matter.Vector.create(0, 1));
+	if (input.keys.down['w'] || input.keys.down['ц']) vel = Matter.Vector.add(
+		vel, Matter.Vector.create(0, -1));
 	return vel;
 }
 
@@ -138,14 +142,18 @@ function initializeKeyboardInput(keys) {
 }
 
 function mouseMoveHandler(mouse, ctx, e) {
-	mouse.x = (e.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
-	mouse.y = (e.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
+	mouse.x = (e.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx
+		.canvas.clientWidth;
+	mouse.y = (e.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx
+		.canvas.clientHeight;
 }
 
 function mouseHandler(mouse, ctx, e) {
 	if (e.type === 'mousedown' || e.type === 'mouseup') {
-		mouse.leftButtonPressed = (e.buttons === 1 || (e.type === 'mousedown' && e.button === 0));
-		mouse.rightButtonPressed = (e.buttons === 2 || (e.type === 'mousedown' && e.button === 2));
+		mouse.leftButtonPressed = (e.buttons === 1 || (e.type === 'mousedown' &&
+			e.button === 0));
+		mouse.rightButtonPressed = (e.buttons === 2 || (e.type ===
+			'mousedown' && e.button === 2));
 	}
 	if (e.deltaY) {
 		mouse.wheelUp = e.deltaY < 0;
@@ -167,8 +175,10 @@ function touchHandler(touch, joystick, ctx, e) {
 		let et = e.touches[i];
 		touch.push({
 			id: et.identifier,
-			x: (et.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth,
-			y: (et.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight
+			x: (et.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width /
+				ctx.canvas.clientWidth,
+			y: (et.clientY - ctx.canvas.offsetTop) * ctx.canvas.height /
+				ctx.canvas.clientHeight
 		});
 	}
 	let w = ctx.canvas.width;
@@ -202,20 +212,28 @@ function initializeTouchInput(touch, joystick, ctx) {
 		let deadZoneHeight = ctx.canvas.height * 0.5;
 		for (let i = 0; i < e.changedTouches.length; i++) {
 			let t = e.changedTouches[i];
-			let tx = (t.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx.canvas.clientWidth;
-			let ty = (t.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx.canvas.clientHeight;
+			let tx = (t.clientX - ctx.canvas.offsetLeft) * ctx.canvas
+				.width / ctx.canvas.clientWidth;
+			let ty = (t.clientY - ctx.canvas.offsetTop) * ctx.canvas
+				.height / ctx.canvas.clientHeight;
 			if (ty < deadZoneHeight) continue;
-			let hitButton = (tx > regions.use.x1 && tx < regions.use.x2 && ty > regions.use.y1 && ty < regions.use.y2) ||
-				(tx > regions.pick.x1 && tx < regions.pick.x2 && ty > regions.pick.y1 && ty < regions.pick.y2);
+			let hitButton = (tx > regions.use.x1 && tx < regions.use
+					.x2 && ty > regions.use.y1 && ty < regions.use.y2
+				) ||
+				(tx > regions.pick.x1 && tx < regions.pick.x2 && ty >
+					regions.pick.y1 && ty < regions.pick.y2);
 			if (hitButton) continue;
-			if (tx < ctx.canvas.width / 2 && joystick.left.id === -1) joystick.left.id = t.identifier;
-			else if (tx >= ctx.canvas.width / 2 && joystick.right.id === -1) joystick.right.id = t.identifier;
+			if (tx < ctx.canvas.width / 2 && joystick.left.id === -1)
+				joystick.left.id = t.identifier;
+			else if (tx >= ctx.canvas.width / 2 && joystick.right.id ===
+				-1) joystick.right.id = t.identifier;
 		}
 		touchHandler(touch, joystick, ctx, e);
 	}, {
 		passive: false
 	});
-	window.addEventListener('touchmove', e => touchHandler(touch, joystick, ctx, e), {
+	window.addEventListener('touchmove', e => touchHandler(touch, joystick, ctx,
+		e), {
 		passive: false
 	});
 	const stopTouch = (e) => {
@@ -252,15 +270,21 @@ function touch_drawCircle(ctx, x, y, r, fill_color, stroke_color) {
 function drawJoysticks(ctx, joystick) {
 	if (joystick.left && joystick.left.id !== -1) {
 		ctx.globalAlpha = 0.5;
-		touch_drawCircle(ctx, joystick.left.x, joystick.left.y, joystick.radius, 'gray', 'black');
+		touch_drawCircle(ctx, joystick.left.x, joystick.left.y, joystick.radius,
+			'gray', 'black');
 		ctx.globalAlpha = 1.0;
-		touch_drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left.dx, joystick.left.y + joystick.radius * joystick.left.dy, joystick.radius / 4, 'black', 'white');
+		touch_drawCircle(ctx, joystick.left.x + joystick.radius * joystick.left
+			.dx, joystick.left.y + joystick.radius * joystick.left.dy,
+			joystick.radius / 4, 'black', 'white');
 	}
 	if (joystick.right && joystick.right.id !== -1) {
 		ctx.globalAlpha = 0.5;
-		touch_drawCircle(ctx, joystick.right.x, joystick.right.y, joystick.radius, 'gray', 'black');
+		touch_drawCircle(ctx, joystick.right.x, joystick.right.y, joystick
+			.radius, 'gray', 'black');
 		ctx.globalAlpha = 1.0;
-		touch_drawCircle(ctx, joystick.right.x + joystick.radius * joystick.right.dx, joystick.right.y + joystick.radius * joystick.right.dy, joystick.radius / 4, 'black', 'white');
+		touch_drawCircle(ctx, joystick.right.x + joystick.radius * joystick
+			.right.dx, joystick.right.y + joystick.radius * joystick.right
+			.dy, joystick.radius / 4, 'black', 'white');
 	}
 }
 
@@ -277,8 +301,10 @@ function drawMobileActionButtons(ctx, input) {
 	let isUsePressed = false;
 	let isPickPressed = false;
 	for (let t of input.touch) {
-		if (t.x > regions.use.x1 && t.x < regions.use.x2 && t.y > regions.use.y1 && t.y < regions.use.y2) isUsePressed = true;
-		if (t.x > regions.pick.x1 && t.x < regions.pick.x2 && t.y > regions.pick.y1 && t.y < regions.pick.y2) isPickPressed = true;
+		if (t.x > regions.use.x1 && t.x < regions.use.x2 && t.y > regions.use
+			.y1 && t.y < regions.use.y2) isUsePressed = true;
+		if (t.x > regions.pick.x1 && t.x < regions.pick.x2 && t.y > regions.pick
+			.y1 && t.y < regions.pick.y2) isPickPressed = true;
 	}
 	input.keys.down['c'] = isUsePressed;
 	input.keys.down['f'] = isPickPressed;
@@ -300,7 +326,8 @@ function drawMobileActionButtons(ctx, input) {
 	const renderLet = (data, ox, oy) => {
 		data.forEach((row, i) => {
 			row.split('').forEach((col, j) => {
-				if (col === '#') ctx.fillRect(ox + j * p, oy + i * p, p, p);
+				if (col === '#') ctx.fillRect(ox + j * p,
+					oy + i * p, p, p);
 			});
 		});
 	};

@@ -298,7 +298,8 @@ function inventory_create(g, attached_to_object = null) {
 		animation_state: 0,
 		_touch_lock: false
 	};
-	return game_gui_element_create(g, "inventory", inv, inventory_update, inventory_draw, inventory_destroy);
+	return game_gui_element_create(g, "inventory", inv, inventory_update,
+		inventory_draw, inventory_destroy);
 }
 
 function inventory_destroy(inventory_element) {
@@ -322,7 +323,8 @@ function inventory_update(inventory_element, dt) {
 	let is_clicked = false;
 	let is_clicked_right = false;
 	if (game.mobile) {
-		let freeTouch = input.touch.find(t => t.id !== input.joystick.left.id && t.id !== input.joystick.right.id);
+		let freeTouch = input.touch.find(t => t.id !== input.joystick.left.id &&
+			t.id !== input.joystick.right.id);
 		if (freeTouch) {
 			mx = freeTouch.x / scale;
 			my = freeTouch.y / scale;
@@ -369,7 +371,8 @@ function inventory_update(inventory_element, dt) {
 			}
 			return;
 		}
-		if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY, btnW, btnH)) {
+		if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY, btnW,
+				btnH)) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 			inv.imove = -1;
 			inv.jmove = -1;
@@ -377,7 +380,8 @@ function inventory_update(inventory_element, dt) {
 		}
 	}
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
-	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, 40, inv.cross_size, inv.cross_size)) {
+	if (is_clicked && doRectsCollide(mx, my, 0, 0, cross_x, 40, inv.cross_size,
+			inv.cross_size)) {
 		inventory_element.shown = false;
 		inv.imove = -1;
 		inv.jmove = -1;
@@ -388,7 +392,8 @@ function inventory_update(inventory_element, dt) {
 		for (let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
 			let sy = 40 + (inv.slot_size * 1.05) * i;
-			if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv.slot_size)) {
+			if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv
+					.slot_size)) {
 				slot_hit = true;
 				inv.iselected = i;
 				inv.jselected = j;
@@ -457,7 +462,8 @@ function inventory_draw(inventory_element, ctx) {
 			ctx.fillRect(sx, sy, inv.slot_size, inv.slot_size);
 			ctx.globalAlpha = 1.0;
 			if (game.mobile || !(inv.imove === i && inv.jmove === j)) {
-				item_icon_draw(ctx, inv.items[i][j], sx, sy, inv.slot_size, inv.slot_size, inv.animation_state);
+				item_icon_draw(ctx, inv.items[i][j], sx, sy, inv.slot_size, inv
+					.slot_size, inv.animation_state);
 			}
 		}
 	}
@@ -481,7 +487,8 @@ function inventory_draw(inventory_element, ctx) {
 			ctx.fillText(text, x + w / 2, y + h / 2 + 6);
 		};
 		drawStyledBtn(startX, startY, btnW, btnH, "USE", "#228822");
-		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, "DROP", "#882222");
+		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, "DROP",
+			"#882222");
 	}
 	let cross_x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
 	let cross_y = 40;
@@ -502,7 +509,9 @@ function inventory_draw(inventory_element, ctx) {
 		let curY = inv.last_active_my || 0;
 		let drag_size = inv.slot_size * 0.8;
 		ctx.globalAlpha = 0.8;
-		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size / 2, curY - drag_size / 2, drag_size, drag_size, inv.animation_state);
+		item_icon_draw(ctx, inv.items[inv.imove][inv.jmove], curX - drag_size /
+			2, curY - drag_size / 2, drag_size, drag_size, inv
+			.animation_state);
 		ctx.globalAlpha = 1.0;
 	}
 	if (inv.iselected !== -1 && inv.jselected !== -1) {
@@ -520,15 +529,18 @@ function inventory_draw(inventory_element, ctx) {
 }
 
 function inventory_drop_item(inventory_element, i, j, death = false) {
-	if (!inventory_element.data.attached_to_object || !inventory_element.data.attached_to_object.data.body)
+	if (!inventory_element.data.attached_to_object || !inventory_element.data
+		.attached_to_object.data.body)
 		return;
 	if (i < 0 || j < 0)
 		return;
 	if (inventory_element.data.items[i][j] == 0)
 		return;
 	item_create(inventory_element.game, inventory_element.data.items[i][j],
-		inventory_element.data.attached_to_object.data.body.position.x + 100 * Math.cos(2 * Math.PI * Math.random()),
-		inventory_element.data.attached_to_object.data.body.position.y + 100 * Math.sin(2 * Math.PI * Math.random()), !death, !death);
+		inventory_element.data.attached_to_object.data.body.position.x +
+		100 * Math.cos(2 * Math.PI * Math.random()),
+		inventory_element.data.attached_to_object.data.body.position.y +
+		100 * Math.sin(2 * Math.PI * Math.random()), !death, !death);
 	inventory_element.data.items[i][j] = 0;
 }
 
@@ -547,7 +559,8 @@ function hotbar_create(g, inv, attached_to_object = null) {
 		animation_state: 0,
 		mouse_over: false
 	};
-	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update, hotbar_draw, hotbar_destroy);
+	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update,
+		hotbar_draw, hotbar_destroy);
 	g.gui_elements[ihotbar].shown = true;
 	return ihotbar;
 }
@@ -588,7 +601,9 @@ function hotbar_update(hotbar_element, dt) {
 		for (let i = 0; i < hb.row.length; i++) {
 			let sx = 40 + (hb.slot_size * 1.05) * i;
 			let sy = 40;
-			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) && doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
+			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) &&
+				doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb
+					.slot_size)) {
 				hb.mouse_over = true;
 				hb.iselected = i;
 			}
@@ -596,7 +611,8 @@ function hotbar_update(hotbar_element, dt) {
 		if (hotbar_element.game.mobile) {
 			let step = hb.slot_size * 1.05;
 			let x_inv = 60 + step * hb.row.length;
-			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
+					.slot_size)) {
 				let inv_el = hb.attached_to_object.data.inventory_element;
 				if (inv_el && !inv_el._mob_toggle_lock) {
 					inv_el.shown = !inv_el.shown;
@@ -611,7 +627,8 @@ function hotbar_update(hotbar_element, dt) {
 		let step = hb.slot_size * 1.05;
 		let x_inv = 60 + step * hb.row.length;
 		for (let pt of pointsToCheck) {
-			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) stillTouching = true;
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
+					.slot_size)) stillTouching = true;
 		}
 		if (!stillTouching) inv_el._mob_toggle_lock = false;
 	}
@@ -622,9 +639,11 @@ function hotbar_draw(hotbar_object, ctx) {
 	for (let i = 0; i < hb.row.length; i++) {
 		ctx.globalAlpha = 0.9;
 		ctx.fillStyle = (hb.iselected == i) ? "cyan" : "blue";
-		ctx.fillRect(40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size);
+		ctx.fillRect(40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb
+			.slot_size);
 		ctx.globalAlpha = 1.0;
-		item_icon_draw(ctx, hb.row[i], 40 + (hb.slot_size * 1.05) * i, 40, hb.slot_size, hb.slot_size, hb.animation_state);
+		item_icon_draw(ctx, hb.row[i], 40 + (hb.slot_size * 1.05) * i, 40, hb
+			.slot_size, hb.slot_size, hb.animation_state);
 	}
 	if (hotbar_object.game.mobile) {
 		let s = hb.slot_size;
@@ -699,8 +718,10 @@ function hotbar_get_selected_item(hotbar_element) {
 	let inv_el = hotbar_element.data.attached_to_object.data.inventory_element;
 	if (inv_el.game.mobile && inv_el && inv_el.shown) return 0;
 	if (!hotbar_element.shown) {
-		if (hotbar_element.data.attached_to_object.name == "player" && !hotbar_element.data.attached_to_object.destroyed) {
-			let inv = hotbar_element.data.attached_to_object.data.inventory_element.data;
+		if (hotbar_element.data.attached_to_object.name == "player" && !
+			hotbar_element.data.attached_to_object.destroyed) {
+			let inv = hotbar_element.data.attached_to_object.data
+				.inventory_element.data;
 			if (inv.jmove > -1 && inv.imove > -1) {
 				if (inv.iselected == -1 && inv.jselected == -1)
 					return inv.items[inv.imove][inv.jmove];
@@ -740,17 +761,22 @@ function inventory_count_item(inventory_element, id) {
 	return ans;
 }
 
-function inventory_clear_item(inventory_element, id, count, item_i = -1, item_j = -1) {
-	if (item_i == inventory_element.data.imove && item_j == inventory_element.data.jmove) {
+function inventory_clear_item(inventory_element, id, count, item_i = -1,
+	item_j = -1) {
+	if (item_i == inventory_element.data.imove && item_j == inventory_element
+		.data.jmove) {
 		inventory_element.data.imove = -1;
 		inventory_element.data.jmove = -1;
 	}
-	if (item_i > -1 && item_j > -1 && inventory_element.data.items[item_i][item_j] == id) {
+	if (item_i > -1 && item_j > -1 && inventory_element.data.items[item_i][
+			item_j
+		] == id) {
 		inventory_element.data.items[item_i][item_j] = 0;
 		count--;
 	}
 	for (let i = 0; i < inventory_element.data.items.length && count > 0; i++)
-		for (let j = 0; j < inventory_element.data.items[i].length && count > 0; j++)
+		for (let j = 0; j < inventory_element.data.items[i].length && count >
+			0; j++)
 			if (inventory_element.data.items[i][j] == id) {
 				inventory_element.data.items[i][j] = 0;
 				count--;

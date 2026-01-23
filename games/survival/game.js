@@ -118,13 +118,16 @@ function game_new(g) {
 	g.kills_for_boss = 10;
 }
 
-function game_object_create(g, name_, data_, func_update, func_draw, func_destroy, unique_name_ = null) {
+function game_object_create(g, name_, data_, func_update, func_draw,
+	func_destroy, unique_name_ = null) {
 	let debug_line = "creating " + name_;
-	if (name_ != "item" && name_ != "bound" && name_ != "decorative" && name_ != "bullet" && name_ != "rocket")
+	if (name_ != "item" && name_ != "bound" && name_ != "decorative" && name_ !=
+		"bullet" && name_ != "rocket")
 		g.debug_console.unshift(debug_line);
 	if (g.debug_console.length > 50)
 		g.debug_console.pop();
-	if (unique_name_ && g.objects.find((obj) => obj.unique_name == unique_name_))
+	if (unique_name_ && g.objects.find((obj) => obj.unique_name ==
+			unique_name_))
 		return -1;
 	let obj = {
 		game: g,
@@ -143,7 +146,8 @@ function game_object_create(g, name_, data_, func_update, func_draw, func_destro
 	return iobj;
 }
 
-function game_gui_element_create(g, name_, data_, func_update, func_draw, func_destroy) {
+function game_gui_element_create(g, name_, data_, func_update, func_draw,
+	func_destroy) {
 	let elem = {
 		game: g,
 		name: name_,
@@ -164,9 +168,11 @@ function game_update(g, dt) {
 	}
 	if (isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
-	if (isKeyDown(g.input, '-', true) && (g.scale > 0.5 || !g.camera_target_body))
+	if (isKeyDown(g.input, '-', true) && (g.scale > 0.5 || !g
+			.camera_target_body))
 		g.scale = g.scale * 0.9375;
-	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data.ai_controlled);
+	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data
+		.ai_controlled);
 	if (plr) {
 		if (isKeyDown(g.input, ']', true)) {
 			plr.data.ai_controlled = true;
@@ -174,7 +180,8 @@ function game_update(g, dt) {
 		}
 	} else {
 		if (isKeyDown(g.input, ']', true)) {
-			let plr = g.objects.find((obj) => obj.name == "player" && obj.data.ai_controlled);
+			let plr = g.objects.find((obj) => obj.name == "player" && obj.data
+				.ai_controlled);
 			if (plr)
 				plr.data.ai_controlled = false;
 		}
@@ -216,7 +223,8 @@ function game_draw(g, ctx) {
 		g.offset_y = g.camera_target_body.position.y;
 	}
 	ctx.scale(g.scale, g.scale);
-	ctx.translate(0.5 * ctx.canvas.width / g.scale - g.offset_x, 0.5 * ctx.canvas.height / g.scale - g.offset_y);
+	ctx.translate(0.5 * ctx.canvas.width / g.scale - g.offset_x, 0.5 * ctx
+		.canvas.height / g.scale - g.offset_y);
 	for (let i = 0; i < g.objects.length; i++)
 		if (!g.objects[i].destroyed)
 			g.objects[i].draw(g.objects[i], ctx);
@@ -275,15 +283,19 @@ function game_destroy_level(g, old_level = null) {
 						"decorative_grass",
 						"decorative_level_base"
 					].includes(g.objects[i].name)) {
-					if (g.objects[i].data.x < Ox || Ox + 2500 <= g.objects[i].data.x ||
-						g.objects[i].data.y < Oy || Oy + 2500 <= g.objects[i].data.y)
+					if (g.objects[i].data.x < Ox || Ox + 2500 <= g.objects[i]
+						.data.x ||
+						g.objects[i].data.y < Oy || Oy + 2500 <= g.objects[i]
+						.data.y)
 						continue;
 				}
 				if (["bound"].includes(g.objects[i].name)) {
 					if (!g.objects[i].data.body)
 						continue;
-					if (g.objects[i].data.body.position.x < Ox || Ox + 2500 < g.objects[i].data.body.position.x ||
-						g.objects[i].data.body.position.y < Oy || Oy + 2500 < g.objects[i].data.body.position.y)
+					if (g.objects[i].data.body.position.x < Ox || Ox + 2500 < g
+						.objects[i].data.body.position.x ||
+						g.objects[i].data.body.position.y < Oy || Oy + 2500 < g
+						.objects[i].data.body.position.y)
 						continue;
 				}
 			}
@@ -302,9 +314,11 @@ function game_object_find_closest(g, x, y, name, radius) {
 			obj = g.objects[i];
 		else
 			continue;
-		if (radius >= 0 && !closest && dist(obj.data.body.position, pos) < radius)
+		if (radius >= 0 && !closest && dist(obj.data.body.position, pos) <
+			radius)
 			closest = obj;
-		if (closest && dist(obj.data.body.position, pos) < dist(closest.data.body.position, pos))
+		if (closest && dist(obj.data.body.position, pos) < dist(closest.data
+				.body.position, pos))
 			closest = obj;
 	}
 	return closest;
@@ -334,7 +348,8 @@ function game_objects_arrange(g) {
 	let objects_new = [];
 	let leftover = g.objects.filter((obj) => !arrangement.includes(obj.name));
 	for (let i = 0; i < arrangement.length; i++)
-		objects_new = g.objects.filter((obj) => obj.name == arrangement[i]).concat(objects_new);
+		objects_new = g.objects.filter((obj) => obj.name == arrangement[i])
+		.concat(objects_new);
 	objects_new = leftover.concat(objects_new);
 	g.objects = objects_new;
 }
@@ -441,10 +456,13 @@ function game_object_make_savable(obj) {
 			}
 		};
 		for (let i = 0; i < obj.data.inventory_element.data.items.length; i++) {
-			for (let j = 0; j < obj.data.inventory_element.data.items[i].length; j++)
-				saved_obj.data.items[i][j] = obj.data.inventory_element.data.items[i][j];
+			for (let j = 0; j < obj.data.inventory_element.data.items[i]
+				.length; j++)
+				saved_obj.data.items[i][j] = obj.data.inventory_element.data
+				.items[i][j];
 		}
-		saved_obj.data.achievements = obj.data.achievements_element.data.achievements.filter((ach) => ach.done);
+		saved_obj.data.achievements = obj.data.achievements_element.data
+			.achievements.filter((ach) => ach.done);
 		return saved_obj;
 	}
 	return null;
@@ -474,8 +492,10 @@ function game_save(g) {
 		if (obj)
 			objs.push(obj);
 	}
-	let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(objs));
-	let filename = "faw_survival_save_" + Math.floor(Math.random() * 1000) + ".json";
+	let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON
+		.stringify(objs));
+	let filename = "faw_survival_save_" + Math.floor(Math.random() * 1000) +
+		".json";
 	let dlAnchorElem = document.getElementById('downloadAnchorElem');
 	dlAnchorElem.setAttribute("href", dataStr);
 	dlAnchorElem.setAttribute("download", filename);
@@ -498,10 +518,13 @@ function game_load(g) {
 				if (obj.name == "state") {
 					g.enemies["regular"] = obj.enemies["regular"];
 					g.enemies["shooting"] = obj.enemies["shooting"];
-					g.enemies["shooting red"] = obj.enemies["shooting red"];
+					g.enemies["shooting red"] = obj.enemies[
+						"shooting red"];
 					g.enemies["sword"] = obj.enemies["sword"];
-					g.enemies["shooting rocket"] = obj.enemies["shooting rocket"];
-					g.enemies["shooting laser"] = obj.enemies["shooting laser"];
+					g.enemies["shooting rocket"] = obj.enemies[
+						"shooting rocket"];
+					g.enemies["shooting laser"] = obj.enemies[
+						"shooting laser"];
 					g.kills = obj.kills;
 					g.boss_kills = obj.boss_kills;
 					g.deaths = obj.deaths;
@@ -509,25 +532,37 @@ function game_load(g) {
 					g.assigned_tiles = obj.assigned_tiles;
 				}
 				if (obj.name == "player") {
-					let iplayer = player_create(g, obj.data.x, obj.data.y, false, obj.data.ai_controlled);
+					let iplayer = player_create(g, obj.data.x, obj.data
+						.y, false, obj.data.ai_controlled);
 					let plr = g.objects[iplayer];
-					for (let i = 0; i < plr.data.inventory_element.data.items.length; i++) {
-						for (let j = 0; j < plr.data.inventory_element.data.items[i].length; j++)
-							plr.data.inventory_element.data.items[i][j] = obj.data.items[i][j];
+					for (let i = 0; i < plr.data.inventory_element.data
+						.items.length; i++) {
+						for (let j = 0; j < plr.data.inventory_element
+							.data.items[i].length; j++)
+							plr.data.inventory_element.data.items[i][
+								j
+							] = obj.data.items[i][j];
 					}
 					try {
-						for (let i = 0; i < obj.data.achievements.length; i++)
-							achievement_do(plr.data.achievements_element.data.achievements, obj.data.achievements[i].name, plr.data.achievements_shower_element, true);
+						for (let i = 0; i < obj.data.achievements
+							.length; i++)
+							achievement_do(plr.data.achievements_element
+								.data.achievements, obj.data
+								.achievements[i].name, plr.data
+								.achievements_shower_element, true);
 					} catch (e) {
 						g.debug_console.unshift(e);
 					}
 				}
 				if (obj.name == "enemy")
-					enemy_create(g, obj.data.x, obj.data.y, obj.data.boss, obj.data.is_minion, obj.data.type);
+					enemy_create(g, obj.data.x, obj.data.y, obj.data
+						.boss, obj.data.is_minion, obj.data.type);
 				if (obj.name == "item")
-					item_create(g, obj.data.id, obj.data.x, obj.data.y, obj.data.dropped, obj.data.despawn);
+					item_create(g, obj.data.id, obj.data.x, obj.data.y,
+						obj.data.dropped, obj.data.despawn);
 				if (obj.name == "car")
-					car_create(g, obj.data.x, obj.data.y, obj.data.color, obj.data.is_tank, true);
+					car_create(g, obj.data.x, obj.data.y, obj.data
+						.color, obj.data.is_tank, true);
 			}
 		}
 		try {

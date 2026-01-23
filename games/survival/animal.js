@@ -18,7 +18,8 @@ function animal_create(g, x, y, type = "deer") {
 		moving_duration: 0
 	};
 	Matter.Composite.add(g.engine.world, a.body);
-	return game_object_create(g, "animal", a, animal_update, animal_draw, animal_destroy);
+	return game_object_create(g, "animal", a, animal_update, animal_draw,
+		animal_destroy);
 }
 
 function animal_destroy(ao) {
@@ -34,25 +35,33 @@ function animal_update(ao, dt) {
 	if (a.health <= 0) {
 		if (a.type === "raccoon") {
 			if (Math.random() < 0.75) {
-				let junk_id = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
-				item_create(ao.game, junk_id, a.body.position.x, a.body.position.y);
+				let junk_id = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK
+					.length)];
+				item_create(ao.game, junk_id, a.body.position.x, a.body.position
+					.y);
 			}
 			audio_play("data/sfx/raccoon_dies.mp3", 1.0);
 		} else {
-			if (Math.random() < 0.75) item_create(ao.game, ITEM_CANNED_MEAT, a.body.position.x, a.body.position.y);
+			if (Math.random() < 0.75) item_create(ao.game, ITEM_CANNED_MEAT, a
+				.body.position.x, a.body.position.y);
 			audio_play("data/sfx/deer_dies_1.mp3");
 		}
-		if (Math.random() < 0.0025) item_create(ao.game, ITEM_AMMO, a.body.position.x, a.body.position.y);
+		if (Math.random() < 0.0025) item_create(ao.game, ITEM_AMMO, a.body
+			.position.x, a.body.position.y);
 		animal_destroy(ao);
 		return;
 	}
 	if (a.moving_duration > 0) a.moving_duration -= dt;
-	if (a.movement_change_delay > 0) a.movement_change_delay -= Math.random() * dt;
+	if (a.movement_change_delay > 0) a.movement_change_delay -= Math.random() *
+		dt;
 	let dx = 0,
 		dy = 0;
-	let ho = game_object_find_closest(ao.game, a.body.position.x, a.body.position.y, "rocket", 500);
-	if (!ho) ho = game_object_find_closest(ao.game, a.body.position.x, a.body.position.y, "enemy", 400);
-	if (!ho) ho = game_object_find_closest(ao.game, a.body.position.x, a.body.position.y, "player", 300);
+	let ho = game_object_find_closest(ao.game, a.body.position.x, a.body
+		.position.y, "rocket", 500);
+	if (!ho) ho = game_object_find_closest(ao.game, a.body.position.x, a.body
+		.position.y, "enemy", 400);
+	if (!ho) ho = game_object_find_closest(ao.game, a.body.position.x, a.body
+		.position.y, "player", 300);
 	if (ho) {
 		dx = a.body.position.x - ho.data.body.position.x;
 		dy = a.body.position.y - ho.data.body.position.y;
@@ -70,7 +79,8 @@ function animal_update(ao, dt) {
 	}
 	if (dx !== 0 || dy !== 0) {
 		Matter.Body.setVelocity(a.body, Matter.Vector.create(dx, dy));
-		a.moving_duration = Math.random() * (a.type === "raccoon" ? 3000 : 10000);
+		a.moving_duration = Math.random() * (a.type === "raccoon" ? 3000 :
+			10000);
 		a.movement_change_delay = (a.type === "raccoon" ? 400 : 1000);
 	}
 }
@@ -91,19 +101,26 @@ function animal_draw(ao, ctx) {
 		ctx.fillStyle = "red";
 		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w, a.h * 0.05);
 		ctx.fillStyle = "lime";
-		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w * Math.max(0, a.health) / a.max_health, a.h * 0.05);
+		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w * Math.max(0, a.health) /
+			a.max_health, a.h * 0.05);
 	}
 }
 
 function animal_deer_draw_horns(ctx, x, y, w) {
 	ctx.strokeStyle = "brown";
 	ctx.lineWidth = 0.1 * w;
-	drawLine(ctx, x - 0.5 * w, y - 0.5 * w, x - 0.525 * w, y - 0.75 * w, "brown", 0.1 * w);
-	drawLine(ctx, x - 0.525 * w, y - 0.75 * w, x - 0.95 * w, y - 1 * w, "brown", 0.1 * w);
-	drawLine(ctx, x - 0.525 * w, y - 0.75 * w, x - 0.475 * w, y - 1.05 * w, "brown", 0.1 * w);
-	drawLine(ctx, x + 0.5 * w, y - 0.5 * w, x + 0.525 * w, y - 0.75 * w, "brown", 0.1 * w);
-	drawLine(ctx, x + 0.525 * w, y - 0.75 * w, x + 0.95 * w, y - 1 * w, "brown", 0.1 * w);
-	drawLine(ctx, x + 0.525 * w, y - 0.75 * w, x + 0.475 * w, y - 1.05 * w, "brown", 0.1 * w);
+	drawLine(ctx, x - 0.5 * w, y - 0.5 * w, x - 0.525 * w, y - 0.75 * w,
+		"brown", 0.1 * w);
+	drawLine(ctx, x - 0.525 * w, y - 0.75 * w, x - 0.95 * w, y - 1 * w, "brown",
+		0.1 * w);
+	drawLine(ctx, x - 0.525 * w, y - 0.75 * w, x - 0.475 * w, y - 1.05 * w,
+		"brown", 0.1 * w);
+	drawLine(ctx, x + 0.5 * w, y - 0.5 * w, x + 0.525 * w, y - 0.75 * w,
+		"brown", 0.1 * w);
+	drawLine(ctx, x + 0.525 * w, y - 0.75 * w, x + 0.95 * w, y - 1 * w, "brown",
+		0.1 * w);
+	drawLine(ctx, x + 0.525 * w, y - 0.75 * w, x + 0.475 * w, y - 1.05 * w,
+		"brown", 0.1 * w);
 }
 
 function animal_raccoon_draw(ctx, x, y, w, h, a) {
