@@ -72,7 +72,8 @@ function decorative_rectangle_create(g, x, y, w, h, fill, outline =
 		function(o) {
 			o.destroyed = true
 		});
-	if (i !== -1) g.objects[i].persistent = false;
+	if (i !== -1)
+		g.objects[i].persistent = false;
 	return i;
 }
 
@@ -94,7 +95,8 @@ function roof_rect_create(g, x, y, w, h, bx, by, bw, bh, fill, outline =
 		function(o) {
 			o.destroyed = true
 		});
-	if (i !== -1) g.objects[i].persistent = false;
+	if (i !== -1)
+		g.objects[i].persistent = false;
 	return i;
 }
 
@@ -114,7 +116,8 @@ function roof_text_create(g, text, x, y, size, bx, by, bw, bh, color) {
 		function(o) {
 			o.destroyed = true
 		});
-	if (i !== -1) g.objects[i].persistent = false;
+	if (i !== -1)
+		g.objects[i].persistent = false;
 	return i;
 }
 
@@ -136,7 +139,8 @@ function decorative_text_create(g, text, x, y, size, color) {
 		function(o) {
 			o.destroyed = true
 		});
-	if (i !== -1) g.objects[i].persistent = false;
+	if (i !== -1)
+		g.objects[i].persistent = false;
 	return i;
 }
 
@@ -304,9 +308,7 @@ function decorative_fuel_pump_create(g, x, y, w = 45, h = 65, label = "95") {
 	let accent = "#00FF00";
 	if (label === "98") accent = "#0088FF";
 	if (label === "DT") accent = "#FFCC00";
-	
 	bound_create(g, x, y + h * 0.5, w, h * 0.5);
-	
 	let i = game_object_create(g, "decorative_fuel_pump", {
 		x,
 		y,
@@ -318,8 +320,8 @@ function decorative_fuel_pump_create(g, x, y, w = 45, h = 65, label = "95") {
 	}, function() {}, decorative_fuel_pump_draw, function(o) {
 		o.destroyed = true;
 	});
-	
-	if (i !== -1) g.objects[i].persistent = false;
+	if (i !== -1)
+		g.objects[i].persistent = false;
 	return i;
 }
 

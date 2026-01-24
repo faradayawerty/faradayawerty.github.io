@@ -203,7 +203,8 @@ function levels_spawn_enemies(g, Ox, Oy, player_object, tile =
 
 function levels_spawn_items(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	let N = Math.random() * 5;
-	if (LEVEL_TILES_CITY_ZONE.includes(tile) || LEVEL_TILES_SUBURBAN_ZONE.includes(tile))
+	if (LEVEL_TILES_CITY_ZONE.includes(tile) || LEVEL_TILES_SUBURBAN_ZONE
+		.includes(tile))
 		N = Math.random() * 7 + 3;
 	for (let i = 0; i < N; i++)
 		item_spawn(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500,
