@@ -152,12 +152,16 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		chance_fuel = 10;
 		chance_ammo = 50;
 		chance_health = 0;
-		chance_shield = 25;
+		chance_shield = 5;
 		chance_food = 10;
 		chance_drink = 10;
+		if (enemy_type == "shooting") {
+			chance_health = 25;
+			chance_shield = 10;
+		}
 		if (enemy_type == "sword") {
-			chance_health = 50;
-			chance_shield = 50;
+			chance_health = 25;
+			chance_shield = 10;
 		}
 	} else if (car_type !== null) {
 		chance_ammo = 0;
