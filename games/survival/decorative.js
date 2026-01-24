@@ -304,8 +304,10 @@ function decorative_fuel_pump_create(g, x, y, w = 45, h = 65, label = "95") {
 	let accent = "#00FF00";
 	if (label === "98") accent = "#0088FF";
 	if (label === "DT") accent = "#FFCC00";
+	
 	bound_create(g, x, y + h * 0.5, w, h * 0.5);
-	return game_object_create(g, "decorative_fuel_pump", {
+	
+	let i = game_object_create(g, "decorative_fuel_pump", {
 		x,
 		y,
 		w,
@@ -316,6 +318,9 @@ function decorative_fuel_pump_create(g, x, y, w = 45, h = 65, label = "95") {
 	}, function() {}, decorative_fuel_pump_draw, function(o) {
 		o.destroyed = true;
 	});
+	
+	if (i !== -1) g.objects[i].persistent = false;
+	return i;
 }
 
 function decorative_gas_station_create(g, x, y, w, h, level_visited = true) {

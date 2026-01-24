@@ -172,7 +172,7 @@ function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	let N = Math.random() * 80 - 77;
 	if (tile === LEVEL_TILE_DEFAULT)
 		N = Math.max(0, Math.random() * 20 - 18) + 1;
-	else if (LEVEL_TILES_FOREST_ZONE.includes())
+	else if (LEVEL_TILES_FOREST_ZONE.includes(tile))
 		N = Math.random() * 20 - 17;
 	for (let i = 0; i < N; i++) {
 		let animals = ["deer", "raccoon"];
@@ -210,7 +210,7 @@ function levels_spawn_items(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 		N = Math.random() * 7 + 3;
 	for (let i = 0; i < N; i++)
 		item_spawn(g, Ox + Math.random() * 2500, Oy + Math.random() * 2500,
-			enemy_type = null, tile = tile);
+			null, tile);
 }
 
 function levels_set(g, level, old_level = null) {
@@ -225,7 +225,6 @@ function levels_set(g, level, old_level = null) {
 	);
 	if (player_object && !player_object.data.ai_controlled)
 		g.respawn_level = level;
-	level = level
 	let level_visited = true;
 	if (!g.visited_levels.includes(level)) {
 		level_visited = false;
@@ -356,7 +355,6 @@ function levels_set(g, level, old_level = null) {
 		decorative_house_v2(g, Ox + 1500, Oy + 150, 850, 850, "left", "#e3dac9",
 			"#5d2e0c");
 		decorative_grass_create(g, Ox + 1200, Oy + 1000, 1295, 1450, true);
-		
 		decorative_rectangle_create(g, Ox + 1355, Oy + 500, 145, 150, "#999999",
 			"#999999");
 		decorative_rectangle_create(g, Ox + 500, Oy + 1000, 150, 145, "#999999",
