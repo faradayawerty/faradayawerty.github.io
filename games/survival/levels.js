@@ -310,10 +310,8 @@ function levels_set(g, level, old_level = null) {
 			"#999999");
 		decorative_rectangle_create(g, Ox + 1130, Oy + 1130, 240, 1370,
 			"#999999", "#999999");
-		decorative_road_create(g, Ox, Oy + 1150, 2500,
-			200);
-		decorative_road_create(g, Ox + 1150, Oy + 1150, 200,
-			1350);
+		decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+		decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
 		decorative_house_v2(g, Ox + 150, Oy + 150, 850, 850, "down", "#d2b48c",
 			"#8b4513");
 		decorative_rectangle_create(g, Ox + 500, Oy + 1000, 150, 145, "#999999",
@@ -327,7 +325,7 @@ function levels_set(g, level, old_level = null) {
 		decorative_rectangle_create(g, Ox + 1000, Oy + 1850, 145, 150,
 			"#999999", "#999999");
 		decorative_house_v2(g, Ox + 1500, Oy + 1500, 850, 850, "left",
-			"#d2b48c", "#5d2e0c");
+			"#9fa9a3", "#4e5754");
 		decorative_rectangle_create(g, Ox + 1355, Oy + 1850, 145, 150,
 			"#999999", "#999999");
 		decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200, 200,
