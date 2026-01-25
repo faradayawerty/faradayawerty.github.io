@@ -46,7 +46,6 @@ function hotbar_update(hotbar_element, dt) {
 		}
 	}
 	for (let pt of pointsToCheck) {
-		
 		for (let i = 0; i < hb.row.length; i++) {
 			let sx = 40 + (hb.slot_size * 1.05) * i;
 			let sy = 40;
@@ -57,30 +56,35 @@ function hotbar_update(hotbar_element, dt) {
 				hb.iselected = i;
 			}
 		}
-		
 		if (hotbar_element.game.mobile) {
 			let step = hb.slot_size * 1.05;
 			let x_inv = 60 + step * hb.row.length;
 			let x_ach = x_inv + step;
 			let x_menu = x_ach + step;
-			
 			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
 					.slot_size)) {
 				let inv_el = hb.attached_to_object.data.inventory_element;
 				if (inv_el && !inv_el._mob_toggle_lock) {
+					let ash = hotbar_element.game.gui_elements.find(e => e
+						.name == "achievements shower");
+					achievement_do(hb.attached_to_object.data
+						.achievements_element.data.achievements,
+						"discovering inventory", ash);
 					inv_el.shown = !inv_el.shown;
 					inv_el._mob_toggle_lock = true;
 				}
 			}
-			
 			if (doRectsCollide(pt.x, pt.y, 0, 0, x_ach, 40, hb.slot_size, hb
 					.slot_size)) {
 				let ach_el = hb.attached_to_object.data.achievements_element;
 				if (ach_el) {
+					let ash = hotbar_element.game.gui_elements.find(e => e
+						.name == "achievements shower");
+					achievement_do(ach_el.data.achievements, "achievements",
+						ash);
 					ach_el.shown = true;
 				}
 			}
-			
 			if (doRectsCollide(pt.x, pt.y, 0, 0, x_menu, 40, hb.slot_size, hb
 					.slot_size)) {
 				hotbar_element.game.want_menu = true;

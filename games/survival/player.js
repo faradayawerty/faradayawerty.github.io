@@ -296,7 +296,7 @@ function player_update(player_object, dt) {
 			} else if (mx >= x_start_buttons + step && mx <= x_start_buttons +
 				step + s) {
 				achievement_do(p.achievements_element.data.achievements,
-					"achievements", p.achievements_shower_element);
+					"what an achievement!", p.achievements_shower_element);
 				p.achievements_element.shown = !p.achievements_element.shown;
 				p.inventory_element.shown = false;
 				p.hotbar_element.shown = !p.achievements_element.shown;
@@ -526,960 +526,305 @@ function player_update(player_object, dt) {
 
 function player_draw(player_object, ctx) {
 	let p = player_object.data;
-	if (p.immunity % 350 > 175)
-		return;
-	if (!p.car_object) {
-		fillMatterBody(ctx, p.body, player_object.game.settings.player_color);
-		drawMatterBody(ctx, p.body, "white");
-		if (player_object.game.settings.indicators["show player health"]) {
-			ctx.fillStyle = "red";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 *
-				p.h, p.w, p.h * 0.05);
-			ctx.fillStyle = "lime";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.9 *
-				p.h, p.w * Math.max(p.health, 0) / p.max_health, p.h * 0.05);
-		}
-		if (player_object.game.settings.indicators["show player thirst"]) {
-			ctx.fillStyle = "red";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 *
-				p.h, p.w, p.h * 0.05);
-			ctx.fillStyle = "cyan";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.8 *
-				p.h, p.w * p.thirst / p.max_thirst, p.h * 0.05);
-		}
-		if (player_object.game.settings.indicators["show player hunger"]) {
-			ctx.fillStyle = "red";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 *
-				p.h, p.w, p.h * 0.05);
-			ctx.fillStyle = "orange";
-			ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y - 0.7 *
-				p.h, p.w * p.hunger / p.max_hunger, p.h * 0.05);
-		}
-		if (p.shooting_laser) {
-			let r = Math.cos(0.1 * p.item_animstate) * 15;
-			let g = 0.7 * (Math.cos(0.1 * p.item_animstate) + Math.sin(0.1 * p
-				.item_animstate)) * 15;
-			let b = Math.sin(0.1 * p.item_animstate) * 15;
-			r = Math.floor(r * r);
-			g = Math.floor(g * g);
-			b = Math.floor(b * b);
-			let color = "#" + (r).toString(16).padStart(2, '0') + (g).toString(
-				16).padStart(2, '0') + (b).toString(16).padStart(2, '0');
-			const drawLaserLine = (width, strokeCol) => {
-				ctx.beginPath();
-				ctx.lineWidth = width;
-				ctx.strokeStyle = strokeCol;
-				let gx = p.w * 60 * Math.cos(p.laser_direction);
-				let gy = p.w * 60 * Math.sin(p.laser_direction);
-				let gLen = Math.sqrt(gx * gx + gy * gy) || 1;
-				let px = p.body.position.x + 1.7 * p.w * (gx / gLen);
-				let py = p.body.position.y + 1.7 * p.w * (gy / gLen);
-				ctx.moveTo(px, py);
-				ctx.lineTo(px + gx, py + gy);
-				ctx.stroke();
-			};
-			drawLaserLine(p.w * 0.65, color);
-			drawLaserLine(p.w * 0.45, "white");
-			p.shooting_laser = false;
-		}
-		let selected_item = hotbar_get_selected_item(p.hotbar_element);
-		if (player_object.game.settings.player_draw_gun && ITEMS_GUNS.includes(
-				selected_item)) {
-			let px = p.body.position.x - 0.45 * p.w;
-			let py = p.body.position.y - 0.45 * p.h;
-			let mx = 1,
-				my = 0,
-				cx = 0,
-				cy = 0;
-			if (p.ai_controlled) {
-				let target = game_object_find_closest(player_object.game, p.body
-					.position.x, p.body.position.y, "enemy", 1000);
-				mx = target ? target.data.body.position.x : p.body.position.x +
-					1;
-				my = target ? target.data.body.position.y : p.body.position.y;
-				cx = p.body.position.x;
-				cy = p.body.position.y;
-			} else if (player_object.game.mobile) {
-				mx = player_object.game.input.joystick.left.dx || player_object
-					.game.input.joystick.right.dx || -1;
-				my = player_object.game.input.joystick.left.dy || player_object
-					.game.input.joystick.right.dy || 1;
-				cx = 0;
-				cy = 0;
-			} else {
-				mx = player_object.game.input.mouse.x;
-				my = player_object.game.input.mouse.y;
-				cx = 0.5 * ctx.canvas.width;
-				cy = 0.5 * ctx.canvas.height;
-			}
-			let gx = mx - cx;
-			let gy = my - cy;
-			let dist = Math.sqrt(gx * gx + gy * gy) || 1;
-			ctx.strokeStyle = "black";
-			let lw = 0.25 * p.w;
-			let gl = 0.8;
-			if (selected_item == ITEM_DESERT_EAGLE) {
-				ctx.strokeStyle = "#888888";
-			}
-			if (selected_item == ITEM_GREEN_GUN) {
-				ctx.strokeStyle = "#117733";
-				gl = 1.6;
-			}
-			if (selected_item == ITEM_LASER_GUN) {
-				ctx.strokeStyle = "purple";
-				lw *= 2.0;
-				gl = 1.8;
-				px = p.body.position.x;
-				py = p.body.position.y;
-			}
-			if (selected_item == ITEM_SHOTGUN || selected_item ==
-				ITEM_ROCKET_SHOTGUN || selected_item == ITEM_RED_SHOTGUN ||
-				selected_item == ITEM_MINIGUN) {
-				lw *= 1.25;
-				gl = 1.3;
-				if (selected_item == ITEM_SHOTGUN) ctx.strokeStyle = "#773311";
-				if (selected_item == ITEM_ROCKET_SHOTGUN) ctx.strokeStyle =
-					"#111133";
-				if (selected_item == ITEM_RED_SHOTGUN) ctx.strokeStyle =
-					"#551111";
-				if (selected_item == ITEM_MINIGUN) {
-					ctx.strokeStyle = "#113377";
-					gl = 1.5;
-					lw *= 1.125;
-				}
-			}
-			if (selected_item == ITEM_JUNK_CANNON) {
-				ctx.strokeStyle = "#444444";
-				lw *= 2.8;
-				gl = 1.6;
-			}
-			if (selected_item == ITEM_PLASMA_LAUNCHER || selected_item ==
-				ITEM_ROCKET_LAUNCHER) {
-				ctx.strokeStyle = (selected_item == ITEM_PLASMA_LAUNCHER) ?
-					"#331133" : "#111133";
-				lw *= 2.25;
-				gl = 1.3;
-			}
-			if (selected_item == ITEM_PLASMA_PISTOL) ctx.strokeStyle =
-				"#331133";
-			if (selected_item == ITEM_RED_PISTOLS || selected_item ==
-				ITEM_RAINBOW_PISTOLS) {
-				let hue = (p.item_animstate * 24) % 360;
-				ctx.strokeStyle = (selected_item == ITEM_RED_PISTOLS) ?
-					"#551111" : `hsl(${hue}, 80%, 50%)`;
-				let p2x = p.body.position.x + 0.55 * p.w;
-				let p2y = p.body.position.y - 0.45 * p.h;
-				ctx.beginPath();
-				ctx.lineWidth = lw;
-				ctx.moveTo(p2x, p2y);
-				ctx.lineTo(p2x + gl * p.w * gx / dist, p2y + gl * p.h * gy /
-					dist);
-				ctx.stroke();
-			}
+	if (p.immunity % 350 > 175) return;
+	if (p.car_object) return;
+	let g = player_object.game;
+	let selected_item = hotbar_get_selected_item(p.hotbar_element);
+	let cfg = WEAPON_DEFS[selected_item];
+	fillMatterBody(ctx, p.body, g.settings.player_color);
+	drawMatterBody(ctx, p.body, "white");
+	const drawStatBar = (val, max, offset, color) => {
+		ctx.fillStyle = "red";
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y -
+			offset * p.h, p.w, p.h * 0.05);
+		ctx.fillStyle = color;
+		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y -
+			offset * p.h, p.w * Math.max(val, 0) / max, p.h * 0.05);
+	};
+	if (g.settings.indicators["show player health"]) drawStatBar(p.health, p
+		.max_health, 0.9, "lime");
+	if (g.settings.indicators["show player thirst"]) drawStatBar(p.thirst, p
+		.max_thirst, 0.8, "cyan");
+	if (g.settings.indicators["show player hunger"]) drawStatBar(p.hunger, p
+		.max_hunger, 0.7, "orange");
+	if (p.shooting_laser) {
+		let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15, 2));
+		let gre = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) +
+			Math.sin(0.1 * p.item_animstate)) * 15, 2));
+		let b = Math.floor(Math.pow(Math.sin(0.1 * p.item_animstate) * 15, 2));
+		let laserColor = "#" + r.toString(16).padStart(2, '0') + gre.toString(
+			16).padStart(2, '0') + b.toString(16).padStart(2, '0');
+		const drawLaserLine = (width, strokeCol) => {
 			ctx.beginPath();
-			ctx.lineWidth = lw;
+			ctx.lineWidth = width;
+			ctx.strokeStyle = strokeCol;
+			let gx = p.w * 60 * Math.cos(p.laser_direction);
+			let gy = p.w * 60 * Math.sin(p.laser_direction);
+			let gLen = Math.sqrt(gx * gx + gy * gy) || 1;
+			let px = p.body.position.x + 1.7 * p.w * (gx / gLen);
+			let py = p.body.position.y + 1.7 * p.w * (gy / gLen);
 			ctx.moveTo(px, py);
-			ctx.lineTo(px + gl * p.w * gx / dist, py + gl * p.h * gy / dist);
+			ctx.lineTo(px + gx, py + gy);
 			ctx.stroke();
-			if (selected_item == ITEM_JUNK_CANNON) {
-				ctx.strokeStyle = "#0033aa";
-				ctx.lineWidth = lw * 1.1;
-				let tapePos = 0.4;
-				ctx.beginPath();
-				ctx.moveTo(px + (gl * tapePos * p.w) * gx / dist, py + (gl *
-					tapePos * p.h) * gy / dist);
-				ctx.lineTo(px + (gl * (tapePos + 0.1) * p.w) * gx / dist, py + (
-					gl * (tapePos + 0.1) * p.h) * gy / dist);
-				ctx.stroke();
-				ctx.strokeStyle = "#333333";
-				ctx.lineWidth = lw * 1.3;
-				ctx.beginPath();
-				ctx.moveTo(px + (gl * 0.95 * p.w) * gx / dist, py + (gl * 0.95 *
-					p.h) * gy / dist);
-				ctx.lineTo(px + (gl * 1.05 * p.w) * gx / dist, py + (gl * 1.05 *
-					p.h) * gy / dist);
-				ctx.stroke();
-			}
-			ctx.lineWidth = 2;
-		} else if (p.sword_visible) {
-			let px = p.body.position.x - p.w * 0.45;
-			let py = p.body.position.y - p.h * 0.45;
-			let sword_length = 100;
-			let col = (hotbar_get_selected_item(p.hotbar_element) ==
-				ITEM_HORN) ? "brown" : "#55aa11";
-			ctx.beginPath();
-			ctx.strokeStyle = col;
-			ctx.lineWidth = 0.25 * p.w;
-			ctx.moveTo(px, py);
-			ctx.lineTo(px + Math.cos(p.sword_direction) * sword_length, py +
-				Math.sin(p.sword_direction) * sword_length);
-			ctx.stroke();
-			if (hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN) {
-				let dx = Math.cos(p.sword_direction) * sword_length;
-				let dy = Math.sin(p.sword_direction) * sword_length;
-				drawLine(ctx, px + 0.4 * dx, py + 0.4 * dy, px + 0.95 * dx -
-					0.25 * dy, py + 0.95 * dy + 0.25 * dx, "brown", p.w *
-					0.2);
-				drawLine(ctx, px + 0.3 * dx, py + 0.3 * dy, px + 0.85 * dx +
-					0.25 * dy, py + 0.85 * dy - 0.25 * dx, "brown", p.w *
-					0.2);
-			}
-			p.sword_visible = false;
-		} else if (selected_item > 0) {
-			let px = p.body.position.x - 0.25 * p.w,
-				py = p.body.position.y - 0.25 * p.h;
-			item_icon_draw(ctx, selected_item, px, py, 0.5 * p.w, 0.5 * p.h, p
-				.item_animstate);
-		}
-		const drawShield = (health, maxHealth, fill, stroke) => {
-			if (health <= 0) return;
-			ctx.fillStyle = "gray";
-			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position
-				.y - 1.85 * p.h, 2.5 * p.w, p.h * 0.05);
-			ctx.fillStyle = fill;
-			ctx.fillRect(p.body.position.x - 2.5 * p.w / 2, p.body.position
-				.y - 1.85 * p.h, 2.5 * p.w * health / maxHealth, p.h *
-				0.05);
-			ctx.globalAlpha = 0.25;
-			drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5,
-				fill, stroke, 0.05 * p.w);
-			ctx.globalAlpha = 1.0;
 		};
-		drawShield(p.shield_blue_health, p.shield_blue_health_max, "#115577",
-			"#113377");
-		drawShield(p.shield_green_health, p.shield_green_health_max, "lime",
-			"#117733");
-		if (p.shield_rainbow_health > 0) {
-			let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15,
-				2));
-			let g = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p
-				.item_animstate) + Math.sin(0.1 * p
-				.item_animstate)) * 15, 2));
-			let b = Math.floor(Math.pow(Math.sin(0.1 * p.item_animstate) * 15,
-				2));
-			let color = "#" + r.toString(16).padStart(2, '0') + g.toString(16)
-				.padStart(2, '0') + b.toString(16).padStart(2, '0');
-			drawShield(p.shield_rainbow_health, p.shield_rainbow_health_max,
-				color, "white");
+		drawLaserLine(p.w * 0.65, laserColor);
+		drawLaserLine(p.w * 0.45, "white");
+		p.shooting_laser = false;
+	}
+	if (g.settings.player_draw_gun && cfg && !cfg.isMelee) {
+		let mx, my, cx = 0,
+			cy = 0;
+		if (p.ai_controlled) {
+			let target = game_object_find_closest(g, p.body.position.x, p.body
+				.position.y, "enemy", 1000);
+			mx = target ? target.data.body.position.x : p.body.position.x + 1;
+			my = target ? target.data.body.position.y : p.body.position.y;
+			cx = p.body.position.x;
+			cy = p.body.position.y;
+		} else if (g.mobile) {
+			mx = g.input.joystick.left.dx || g.input.joystick.right.dx || -1;
+			my = g.input.joystick.left.dy || g.input.joystick.right.dy || 1;
+		} else {
+			mx = g.input.mouse.x;
+			my = g.input.mouse.y;
+			cx = 0.5 * ctx.canvas.width;
+			cy = 0.5 * ctx.canvas.height;
 		}
+		let gx = mx - cx,
+			gy = my - cy,
+			dist = Math.sqrt(gx * gx + gy * gy) || 1;
+		let lw = (cfg.width || 1) * 0.25 * p.w;
+		let gl = cfg.length || 0.8;
+		let strokeColor = cfg.dynamicColor ? cfg.dynamicColor(p) : (cfg.color ||
+			"black");
+		const renderGunPath = (startX, startY) => {
+			ctx.strokeStyle = strokeColor;
+			ctx.lineWidth = lw;
+			ctx.beginPath();
+			ctx.moveTo(startX, startY);
+			ctx.lineTo(startX + gl * p.w * gx / dist, startY + gl * p.h *
+				gy / dist);
+			ctx.stroke();
+		};
+		let px = (selected_item === ITEM_LASER_GUN) ? p.body.position.x : p.body
+			.position.x - 0.45 * p.w;
+		let py = (selected_item === ITEM_LASER_GUN) ? p.body.position.y : p.body
+			.position.y - 0.45 * p.h;
+		if (cfg.hasSecondary) {
+			renderGunPath(p.body.position.x + 0.55 * p.w, p.body.position.y -
+				0.45 * p.h);
+		}
+		renderGunPath(px, py);
+		if (cfg.renderExtra) cfg.renderExtra(ctx, p, {
+			gx,
+			gy,
+			dist
+		}, {
+			px,
+			py
+		}, lw, gl);
+		ctx.lineWidth = 2;
+	} else if (p.sword_visible) {
+		let px = p.body.position.x - p.w * 0.45;
+		let py = p.body.position.y - p.h * 0.45;
+		let swLen = 100;
+		let col = (selected_item === ITEM_HORN) ? "brown" : "#55aa11";
+		ctx.beginPath();
+		ctx.strokeStyle = col;
+		ctx.lineWidth = 0.25 * p.w;
+		ctx.moveTo(px, py);
+		let dx = Math.cos(p.sword_direction) * swLen;
+		let dy = Math.sin(p.sword_direction) * swLen;
+		ctx.lineTo(px + dx, py + dy);
+		ctx.stroke();
+		if (selected_item === ITEM_HORN) {
+			drawLine(ctx, px + 0.4 * dx, py + 0.4 * dy, px + 0.95 * dx - 0.25 *
+				dy, py + 0.95 * dy + 0.25 * dx, "brown", p.w * 0.2);
+			drawLine(ctx, px + 0.3 * dx, py + 0.3 * dy, px + 0.85 * dx + 0.25 *
+				dy, py + 0.85 * dy - 0.25 * dx, "brown", p.w * 0.2);
+		}
+		p.sword_visible = false;
+	} else if (selected_item > 0) {
+		item_icon_draw(ctx, selected_item, p.body.position.x - 0.25 * p.w, p
+			.body.position.y - 0.25 * p.h, 0.5 * p.w, 0.5 * p.h, p
+			.item_animstate);
+	}
+	const renderShield = (health, max, fill, stroke) => {
+		if (health <= 0) return;
+		ctx.fillStyle = "gray";
+		ctx.fillRect(p.body.position.x - 1.25 * p.w, p.body.position.y -
+			1.85 * p.h, 2.5 * p.w, p.h * 0.05);
+		ctx.fillStyle = fill;
+		ctx.fillRect(p.body.position.x - 1.25 * p.w, p.body.position.y -
+			1.85 * p.h, 2.5 * p.w * health / max, p.h * 0.05);
+		ctx.globalAlpha = 0.25;
+		drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, fill,
+			stroke, 0.05 * p.w);
+		ctx.globalAlpha = 1.0;
+	};
+	renderShield(p.shield_blue_health, p.shield_blue_health_max, "#115577",
+		"#113377");
+	renderShield(p.shield_green_health, p.shield_green_health_max, "lime",
+		"#117733");
+	if (p.shield_rainbow_health > 0) {
+		let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15, 2));
+		let gre = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) +
+			Math.sin(0.1 * p.item_animstate)) * 15, 2));
+		let b = Math.floor(Math.pow(Math.sin(0.1 * p.item_animstate) * 15, 2));
+		let rColor = "#" + r.toString(16).padStart(2, '0') + gre.toString(16)
+			.padStart(2, '0') + b.toString(16).padStart(2, '0');
+		renderShield(p.shield_rainbow_health, p.shield_rainbow_health_max,
+			rColor, "white");
 	}
 }
 
 function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 	shoot_dir_y = null) {
-	if (player_object.data.immunity > 0)
-		return;
-	let base_damage = 0.5;
 	let p = player_object.data;
-	let sx = 0;
-	let sy = 0;
-	let tx = 1;
-	let ty = 1;
-	let enable_audio = !p.ai_controlled;
-	if (!p.ai_controlled) {
-		sx = 0.5 * window.innerWidth;
-		sy = 0.5 * window.innerHeight;
-		tx = player_object.game.input.mouse.x
-		ty = player_object.game.input.mouse.y
-		if (shoot_dir_x)
-			tx = shoot_dir_x + sx;
-		if (shoot_dir_y)
-			ty = shoot_dir_y + sy;
-	}
+	if (p.immunity > 0) return;
+	let g = player_object.game;
+	let item_id = hotbar_get_selected_item(p.hotbar_element);
+	let cfg = WEAPON_DEFS[item_id];
+	if (!cfg) return;
+	let sx = 0,
+		sy = 0,
+		tx = 1,
+		ty = 1;
 	if (target_body) {
 		sx = p.body.position.x;
 		sy = p.body.position.y;
-		tx = target_body.position.x;
-		ty = target_body.position.y;
-		tx = (tx - sx) * 10 + sx;
-		ty = (ty - sy) * 10 + sy;
+		tx = (target_body.position.x - sx) * 10 + sx;
+		ty = (target_body.position.y - sy) * 10 + sy;
+	} else if (!p.ai_controlled) {
+		sx = 0.5 * window.innerWidth;
+		sy = 0.5 * window.innerHeight;
+		tx = (shoot_dir_x !== null) ? shoot_dir_x + sx : g.input.mouse.x;
+		ty = (shoot_dir_y !== null) ? shoot_dir_y + sy : g.input.mouse.y;
 	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_LASER_GUN &&
-		true &&
-		inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
-		if (!p.laser_sound_has_played) {
-			audio_play("data/sfx/beam_of_laser_fires_1.mp3", 0.25);
-			p.laser_sound_has_played = true;
-		}
-		p.laser_direction = Math.atan2(ty - sy, tx - sx);
-		p.shooting_laser = true;
-		let g = player_object.game;
-		for (let i = 0; i < g.objects.length; i++) {
-			let obj = g.objects[i];
-			if (!obj.destroyed && (obj.name == "animal" || obj.name ==
-					"enemy" || obj.name == "trashcan" || obj.name == "car" && !
-					obj.data.is_tank || obj
-					.name == "rocket")) {
-				if (player_laser_hits_point(player_object, obj.data.body
-						.position.x, obj.data.body.position.y, 1.5 * p.w, 60 * p
-						.w, p.laser_direction)) {
-					obj.data.health -= 15625 * dt;
-					obj.data.hit_by_player = true;
-				}
-			}
-		}
-		if (Math.random() < 0.00005 * dt)
-			inventory_clear_item(p.inventory_element, ITEM_RAINBOW_AMMO, 1);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_JUNK_CANNON && p
-		.shot_cooldown <= 0) {
-		let junk_id = -1;
-		for (let i = 0; i < ITEMS_JUNK.length; i++) {
-			if (inventory_has_item(p.inventory_element, ITEMS_JUNK[i])) {
-				junk_id = ITEMS_JUNK[i];
-				break;
-			}
-		}
-		if (junk_id != -1) {
-			let theta = Math.atan2(ty - sy, tx - sx);
-			let angles = [0, Math.PI / 8, -Math.PI / 8];
-			let offset = p.w * 1.5;
-			angles.forEach(angleOffset => {
-				let finalAngle = theta + angleOffset;
-				let dx = Math.cos(finalAngle);
-				let dy = Math.sin(finalAngle);
-				let spawnX = p.body.position.x + Math.cos(theta) *
-					offset;
-				let spawnY = p.body.position.y + Math.sin(theta) *
-					offset;
-				trash_bullet_create(
-					player_object.game,
-					spawnX,
-					spawnY,
-					dx,
-					dy,
-					25,
-					150 * 15625 * base_damage * (1 + Math.random()),
-					false,
-					45
-				);
-			});
-			p.shot_cooldown = 250;
-			if (Math.random() < 0.25) {
-				inventory_clear_item(p.inventory_element, junk_id, 1);
-			}
-			if (enable_audio) {
-				audio_play("data/sfx/shotgun_1.mp3", 0.5);
+	const vectors = {
+		sx,
+		sy,
+		tx,
+		ty
+	};
+	const cd_field = cfg.cd_prop || 'shot_cooldown';
+	if (!cfg.isMelee) {
+		if (p[cd_field] > 0) return;
+		if (cfg.ammo) {
+			if (Array.isArray(cfg.ammo)) {
+				const hasAnyJunk = cfg.ammo.some(id => inventory_has_item(p
+					.inventory_element, id));
+				if (!hasAnyJunk) return;
+			} else {
+				if (!inventory_has_item(p.inventory_element, cfg.ammo)) return;
 			}
 		}
 	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			tx - sx,
-			ty - sy,
-			20,
-			base_damage
-		);
-		p.shot_cooldown = 200;
-		if (Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		if (enable_audio)
-			audio_play("data/sfx/gunshot_1.mp3", 0.25);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_PISTOL &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			tx - sx,
-			ty - sy,
-			20,
-			(25 + 25 * Math.random()) * base_damage,
-			false,
-			6,
-			1500,
-			"cyan",
-			"blue"
-		);
-		p.shot_cooldown = 200;
-		if (Math.random() > 0.995)
-			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
-		if (enable_audio)
-			audio_play("data/sfx/red_pistols_1.mp3", 0.25);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_SHOTGUN &&
-		true &&
-		p.shotgun_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-		for (let i = 0; i < Math.random() * 7 + 7; i++)
-			bullet_create(
-				player_object.game,
-				p.body.position.x,
-				p.body.position.y,
-				(0.95 + 0.1 * Math.random()) * tx - sx,
-				(0.95 + 0.1 * Math.random()) * ty - sy,
-				Math.random() * 10 + 10,
-				5 * base_damage * (0.5 + 1.0 * Math.random())
-			);
-		p.shotgun_cooldown = 750;
-		if (Math.random() > 0.985)
-			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		if (enable_audio)
-			audio_play("data/sfx/shotgun_1.mp3", 0.25);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_MINIGUN &&
-		true &&
-		p.minigun_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			(0.95 + 0.1 * Math.random()) * tx - sx,
-			(0.95 + 0.1 * Math.random()) * ty - sy,
-			Math.random() * 10 + 10,
-			0.66 * 10 * base_damage * Math.random()
-		);
-		p.minigun_cooldown = 60;
-		if (Math.random() > 0.995)
-			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		if (enable_audio)
-			audio_play("data/sfx/gunshot_1.mp3", 0.25);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_PLASMA_LAUNCHER &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			tx - sx,
-			ty - sy,
-			17.5,
-			4.25 * 25 * base_damage * (0.25 + 2 * 0.75 * Math.random()),
-			false,
-			12.5,
-			1500,
-			"cyan",
-			"blue"
-		);
-		p.shot_cooldown = 400;
-		if (Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
-		if (enable_audio)
-			audio_play("data/sfx/plasmagun_1.mp3", 0.125);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_PISTOLS &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
-		let theta = Math.atan2(ty - sy, tx - sx);
-		bullet_create(
-			player_object.game,
-			p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
-			p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
-			tx - sx,
-			ty - sy,
-			30,
-			1.5 * 125 * base_damage * 2.5 * Math.random(),
-			false,
-			6,
-			1500,
-			"pink",
-			"red"
-		);
-		bullet_create(
-			player_object.game,
-			p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
-			p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
-			tx - sx,
-			ty - sy,
-			30,
-			1.5 * 125 * base_damage * 2.5 * Math.random(),
-			false,
-			6,
-			1500,
-			"pink",
-			"red"
-		);
-		p.shot_cooldown = 100;
-		if (Math.random() > 0.999)
-			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
-		audio_play("data/sfx/red_pistols_1.mp3", 0.125);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_SHOTGUN &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
-		let theta = Math.atan2(ty - sy, tx - sx);
-		N = Math.floor(Math.random() * 4 + 3);
-		for (let i = 0; i <= N; i++)
-			rocket_create(
-				player_object.game,
-				p.body.position.x + 2 * p.w * Math.cos(theta - (0.5 * N - i) *
-					Math.PI / N),
-				p.body.position.y + 2 * p.w * Math.sin(theta - (0.5 * N - i) *
-					Math.PI / N),
-				tx - sx,
-				ty - sy,
-				6,
-				null,
-				0.11 * 3125 * base_damage * (0.1 + 0.9 * Math.random()),
-				p.max_health,
-				false,
-				20,
-				1500
-			);
-		p.shot_cooldown = 500;
-		if (Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
-		if (enable_audio)
-			audio_play("data/sfx/rocketlauncher_1.mp3", 0.125);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_RED_SHOTGUN &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
-		let theta = Math.atan2(ty - sy, tx - sx);
-		N = Math.floor(Math.random() * 7 + 5);
-		for (let i = 0; i <= N; i++)
-			bullet_create(
-				player_object.game,
-				p.body.position.x + 2 * p.w * Math.cos(theta - (0.5 * N - i) *
-					Math.PI / N),
-				p.body.position.y + 2 * p.w * Math.sin(theta - (0.5 * N - i) *
-					Math.PI / N),
-				tx - sx,
-				ty - sy,
-				30,
-				4.0 * 125 * base_damage * (0.75 + 0.25 * Math.random()),
-				false,
-				6,
-				1500,
-				"pink",
-				"red"
-			);
-		p.shot_cooldown = 500;
-		if (Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
-		if (enable_audio)
-			audio_play("data/sfx/red_pistols_1.mp3", 0.125);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_DESERT_EAGLE &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			tx - sx,
-			ty - sy,
-			32,
-			55 * base_damage
-		);
-		p.shot_cooldown = 600;
-		if (Math.random() > 0.90)
-			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-		if (enable_audio)
-			audio_play("data/sfx/shotgun_1.mp3", 0.35);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_SWORD && true) {
-		if (Math.cos(p.sword_direction) < -0.985)
-			audio_play("data/sfx/sword_1.mp3");
-		if (tx > sx)
-			p.sword_direction += 0.02 * dt
-		else
-			p.sword_direction -= 0.02 * dt
-		p.sword_direction = p.sword_direction % (2 * Math.PI);
-		let closest_target = game_object_find_closest(player_object.game, p.body
-			.position.x, p.body.position.y, "enemy", 200);
-		if (!closest_target)
-			closest_target = game_object_find_closest(player_object.game, p.body
-				.position.x, p.body.position.y, "animal", 200);
-		if (!closest_target)
-			closest_target = game_object_find_closest(player_object.game, p.body
-				.position.x, p.body.position.y, "car", 300);
-		if (!closest_target)
-			closest_target = game_object_find_closest(player_object.game, p.body
-				.position.x, p.body.position.y, "trashcan", 200);
-		if (closest_target && closest_target.name == "car" && closest_target
-			.data.is_tank)
-			closest_target = null;
-		if (closest_target) {
-			target_direction = Math.atan2(closest_target.data.body.position.y -
-				p.body.position.y, closest_target.data.body.position.x - p
-				.body.position.x);
-			if (Math.abs(target_direction - p.sword_direction) % (2 * Math.PI) <
-				Math.PI / 8) {
-				closest_target.data.health -= (Math.random() * 3000 + 2000) *
-					dt;
-				if (closest_target.name == "enemy")
-					closest_target.data.hit_by_player = true;
+	cfg.action(g, p, vectors, dt);
+	if (!cfg.isMelee) {
+		p[cd_field] = cfg.cooldown;
+		if (cfg.ammo && Math.random() < (cfg.chance || 0)) {
+			if (Array.isArray(cfg.ammo)) {
+				const itemToClear = cfg.ammo.find(id => inventory_has_item(p
+					.inventory_element, id));
+				if (itemToClear) inventory_clear_item(p.inventory_element,
+					itemToClear, 1);
+			} else {
+				inventory_clear_item(p.inventory_element, cfg.ammo, 1);
 			}
 		}
-		let closest_bullet = game_object_find_closest(player_object.game, p.body
-			.position.x, p.body.position.y, "bullet", 200);
-		if (closest_bullet) {
-			let vx = closest_bullet.data.body.position.x - player_object.data
-				.body.position.x;
-			let vy = closest_bullet.data.body.position.y - player_object.data
-				.body.position.y;
-			let v = Math.sqrt(vx * vx + vy * vy);
-			Matter.Body.setVelocity(closest_bullet.data.body, {
-				x: 5 * vx / v,
-				y: 5 * vy / v
-			});
-		}
-		let closest_rocket = game_object_find_closest(player_object.game, p.body
-			.position.x, p.body.position.y, "rocket", 200);
-		if (closest_rocket) {
-			rocket_direction = Math.atan2(closest_rocket.data.body.position.y -
-				p.body.position.y, closest_rocket.data.body.position.x - p
-				.body.position.x);
-			if (Math.abs(rocket_direction - p.sword_direction) % (2 * Math.PI) <
-				Math.PI / 8) {
-				closest_rocket.data.health -= (Math.random() * 1500 + 500) * dt;
-				closest_rocket.data.hit_by_player = true;
-			}
-		}
-		p.sword_visible = true;
-		p.sword_protection = true;
 	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN && true) {
-		if (Math.cos(p.sword_direction) < -0.955)
-			audio_play("data/sfx/sword_1.mp3");
-		if (tx > sx)
-			p.sword_direction += 0.04 * dt
-		else
-			p.sword_direction -= 0.04 * dt
-		p.sword_direction = p.sword_direction % (2 * Math.PI);
-		let closest_target = game_object_find_closest(player_object.game, p.body
-			.position.x, p.body.position.y, "enemy", 200);
-		if (!closest_target)
-			closest_target = game_object_find_closest(player_object.game, p.body
-				.position.x, p.body.position.y, "animal", 200);
-		if (!closest_target)
-			closest_target = game_object_find_closest(player_object.game, p.body
-				.position.x, p.body.position.y, "car", 300);
-		if (!closest_target)
-			closest_target = game_object_find_closest(player_object.game, p.body
-				.position.x, p.body.position.y, "trashcan", 200);
-		if (closest_target && closest_target.name == "car" && closest_target
-			.data.is_tank)
-			closest_target = null;
-		if (closest_target) {
-			target_direction = Math.atan2(closest_target.data.body.position.y -
-				p.body.position.y, closest_target.data.body.position.x - p
-				.body.position.x);
-			if (Math.abs(target_direction - p.sword_direction) % (2 * Math.PI) <
-				Math.PI / 4) {
-				closest_target.data.health -= (Math.random() * 300000 +
-					200000) * dt;
-				if (closest_target.name == "enemy")
-					closest_target.data.hit_by_player = true;
-			}
-		}
-		let closest_bullet = game_object_find_closest(player_object.game, p.body
-			.position.x, p.body.position.y, "bullet", 200);
-		if (closest_bullet) {
-			let vx = closest_bullet.data.body.position.x - player_object.data
-				.body.position.x;
-			let vy = closest_bullet.data.body.position.y - player_object.data
-				.body.position.y;
-			let v = Math.sqrt(vx * vx + vy * vy);
-			Matter.Body.setVelocity(closest_bullet.data.body, {
-				x: 5 * vx / v,
-				y: 5 * vy / v
-			});
-		}
-		let closest_rocket = game_object_find_closest(player_object.game, p.body
-			.position.x, p.body.position.y, "rocket", 200);
-		if (closest_rocket) {
-			rocket_direction = Math.atan2(closest_rocket.data.body.position.y -
-				p.body.position.y, closest_rocket.data.body.position.x - p
-				.body.position.x);
-			if (Math.abs(rocket_direction - p.sword_direction) % (2 * Math.PI) <
-				Math.PI / 8) {
-				closest_rocket.data.health -= (Math.random() * 15000 + 5000) *
-					dt;
-				closest_rocket.data.hit_by_player = true;
-			}
-		}
-		p.sword_visible = true;
-		p.sword_protection = true;
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_GREEN_GUN &&
-		true &&
-		p.minigun_cooldown <= 0) {
-		bullet_create(
-			player_object.game,
-			p.body.position.x,
-			p.body.position.y,
-			(1 - 0.05 / 2 + 0.05 * Math.random()) * tx - sx,
-			(1 - 0.05 / 2 + 0.05 * Math.random()) * ty - sy,
-			Math.random() * 10 + 20,
-			625 * base_damage * 2 * Math.random(),
-			false,
-			6,
-			1500,
-			"lime",
-			"green"
-		);
-		p.minigun_cooldown = 90;
-		p.health -= 0.0255 * dt
-		p.hunger -= 0.0125 * dt
-		p.thirst -= 0.0125 * dt
-		audio_play("data/sfx/red_pistols_1.mp3", 0.125);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_ROCKET_LAUNCHER &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
-		let theta = Math.atan2(ty - sy, tx - sx);
-		rocket_create(
-			player_object.game,
-			p.body.position.x + Math.cos(theta) * p.w * 1.75,
-			p.body.position.y + Math.sin(theta) * p.h * 1.75,
-			tx - sx,
-			ty - sy,
-			Math.min(0.25 * p.w, 10),
-			null,
-			0.33 * 3125 * base_damage * (0.75 + 0.5 * Math.random()),
-			p.max_health,
-			false,
-			20
-		);
-		p.shot_cooldown = 400;
-		if (Math.random() > 0.99)
-			inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
-		audio_play("data/sfx/rocketlauncher_1.mp3", 0.125);
-	}
-	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_RAINBOW_PISTOLS &&
-		true &&
-		p.shot_cooldown <= 0 &&
-		inventory_has_item_from_list(p.inventory_element, [ITEM_AMMO,
-			ITEM_RED_PLASMA, ITEM_PLASMA, ITEM_RAINBOW_AMMO, ITEM_ROCKET
-		]) > -1) {
-		let theta = Math.atan2(ty - sy, tx - sx);
-		let colors = ["red", "orange", "yellow", "lime", "cyan", "blue",
-			"purple"
-		];
-		let color1 = null;
-		let color2 = null;
-		p.gradient += 0.01 * dt;
-		let shot_sound = "red_pistols_1";
-		if (inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
-			color1 = colors[Math.floor(p.gradient) % 7];
-			color2 = "white";
-			if (Math.random() > 0.999)
-				inventory_clear_item(p.inventory_element, ITEM_RAINBOW_AMMO, 1);
-		} else if (inventory_has_item(p.inventory_element, ITEM_RED_PLASMA)) {
-			color1 = "red";
-			color2 = "pink";
-			if (Math.random() > 0.99)
-				inventory_clear_item(p.inventory_element, ITEM_RED_PLASMA, 1);
-		} else if (inventory_has_item(p.inventory_element, ITEM_PLASMA)) {
-			color1 = "cyan";
-			color2 = "blue";
-			if (Math.random() > 0.99)
-				inventory_clear_item(p.inventory_element, ITEM_PLASMA, 1);
-		} else if (inventory_has_item(p.inventory_element, ITEM_AMMO)) {
-			color1 = "yellow";
-			color2 = "orange";
-			if (Math.random() > 0.99)
-				inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
-			shot_sound = "gunshot_1"
-		}
-		if (!inventory_has_item(p.inventory_element, ITEM_ROCKET) ||
-			inventory_has_item(p.inventory_element, ITEM_RAINBOW_AMMO)) {
-			bullet_create(
-				player_object.game,
-				p.body.position.x + p.w * Math.cos(theta - Math.PI / 4),
-				p.body.position.y + p.w * Math.sin(theta - Math.PI / 4),
-				tx - sx,
-				ty - sy,
-				30,
-				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
-				false,
-				6,
-				1500,
-				color1,
-				color2
-			);
-			bullet_create(
-				player_object.game,
-				p.body.position.x + p.w * Math.cos(theta + Math.PI / 4),
-				p.body.position.y + p.w * Math.sin(theta + Math.PI / 4),
-				tx - sx,
-				ty - sy,
-				30,
-				3 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
-				false,
-				6,
-				1500,
-				color1,
-				color2
-			);
-			audio_play("data/sfx/" + shot_sound + ".mp3", 0.25);
-		} else if (inventory_has_item(p.inventory_element, ITEM_ROCKET)) {
-			rocket_create(
-				player_object.game,
-				p.body.position.x + Math.cos(theta - Math.PI / 4) * p.w *
-				1.75,
-				p.body.position.y + Math.sin(theta - Math.PI / 4) * p.h *
-				1.75,
-				tx - sx,
-				ty - sy,
-				0.15 * p.w,
-				null,
-				0.5 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
-				p.max_health,
-				false,
-				20
-			);
-			rocket_create(
-				player_object.game,
-				p.body.position.x + Math.cos(theta + Math.PI / 4) * p.w *
-				1.75,
-				p.body.position.y + Math.sin(theta + Math.PI / 4) * p.h *
-				1.75,
-				tx - sx,
-				ty - sy,
-				0.15 * p.w,
-				null,
-				0.5 * 15625 * base_damage * (0.25 + 1.5 * Math.random()),
-				p.max_health,
-				false,
-				20
-			);
-			if (Math.random() > 0.99)
-				inventory_clear_item(p.inventory_element, ITEM_ROCKET, 1);
-			audio_play("data/sfx/rocketlauncher_1.mp3", 0.125);
-		}
-		p.shot_cooldown = 100;
+	if (cfg.sound && (!p.ai_controlled || cfg.isMelee)) {
+		if (cfg.isMelee && Math.cos(p.sword_direction) < -0.985) audio_play(cfg
+			.sound);
+		else if (!cfg.isMelee) audio_play(cfg.sound, cfg.vol || 0.25);
 	}
 }
 
-function player_item_consume(player_object, id, anywhere = false) {
-	let p = player_object.data;
-	let item_i = -1;
-	let item_j = -1;
-	if (!anywhere && p.hotbar_element.shown) {
-		item_i = 0;
-		item_j = player_object.data.hotbar_element.data.iselected;
-	}
-	if (!anywhere && p.inventory_element.shown) {
-		item_i = p.inventory_element.data.imove;
-		item_j = p.inventory_element.data.jmove;
-	}
-	if (id == ITEM_FUEL && true) {
-		let c = game_object_find_closest(player_object.game, p.body.position.x,
-			p.body.position.y, "car", 200);
-		if (c) {
-			c.data.fuel += Math.min(c.data.max_fuel - c.data.fuel, c.data
-				.max_fuel * (Math.random() * 0.1 + 0.1));
-			c.data.health += Math.min(c.data.max_health - c.data.health, c.data
-				.max_health * (Math.random() * 0.1 + 0.1));
-			inventory_clear_item(player_object.data.inventory_element, id, 1,
-				item_i, item_j);
-			achievement_do(p.achievements_element.data.achievements, "fuel up",
-				p.achievements_shower_element);
-		}
-	}
-	if (id == ITEM_BOSSIFIER && true) {
-		let eo = null;
-		let ao = game_object_find_closest(player_object.game, p.body.position.x,
-			p.body.position.y, "animal", 500);
-		if (ao) {
-			enemy_create(ao.game, ao.data.body.position.x, ao.data.body.position
-				.y, true, false, ao.data.type);
-			animal_destroy(ao, false);
-			inventory_clear_item(player_object.data.inventory_element, id, 1,
-				item_i, item_j);
-		} else {
-			eo = game_object_find_closest(player_object.game, p.body.position.x,
-				p.body.position.y, "enemy", 500);
-		}
-		if (eo) {
-			enemy_create(eo.game, eo.data.body.position.x, eo.data.body.position
-				.y, true, false, eo.data.type);
-			enemy_destroy(eo);
-			inventory_clear_item(player_object.data.inventory_element, id, 1,
-				item_i, item_j);
-		}
-	}
-	if (id == ITEM_SHIELD && true) {
-		p.shield_blue_health = p.shield_blue_health_max;
-		p.shield_green_health = 0;
-		p.shield_rainbow_health = 0;
-		inventory_clear_item(player_object.data.inventory_element, id, 1,
-			item_i, item_j);
-		audio_play("data/sfx/shield_1.mp3");
-	}
-	if (id == ITEM_SHIELD_GREEN && true) {
-		p.shield_blue_health = 0;
-		p.shield_green_health = p.shield_green_health_max;
-		p.shield_rainbow_health = 0;
-		inventory_clear_item(player_object.data.inventory_element, id, 1,
-			item_i, item_j);
-		audio_play("data/sfx/shield_1.mp3");
-	}
-	if (id == ITEM_SHIELD_RAINBOW && true) {
-		p.shield_blue_health = 0;
-		p.shield_green_health = 0;
-		p.shield_rainbow_health = p.shield_rainbow_health_max;
-		inventory_clear_item(player_object.data.inventory_element, id, 1,
-			item_i, item_j);
-		audio_play("data/sfx/shield_1.mp3");
-	}
-	if (id == ITEM_HEALTH && true) {
-		achievement_do(p.achievements_element.data.achievements,
-			"healthy lifestyle", p.achievements_shower_element);
-		p.health += Math.min(p.max_health - p.health, (Math.random() * 0.125 +
-			0.125) * p.max_health);
-		inventory_clear_item(player_object.data.inventory_element, id, 1,
-			item_i, item_j);
-		audio_play("data/sfx/healing_1.mp3");
-	}
-	if (id == ITEM_HEALTH_GREEN && true) {
-		p.health = Math.min(p.max_health, p.health + p.max_health * (Math
-			.random() * 0.125 + 0.375));
-		p.hunger = Math.min(p.max_hunger, p.hunger + p.max_hunger * (Math
-			.random() * 0.125 + 0.375));
-		p.thirst = Math.min(p.max_thirst, p.thirst + p.max_thirst * (Math
-			.random() * 0.125 + 0.375));
-		inventory_clear_item(player_object.data.inventory_element, id, 1,
-			item_i, item_j);
-		audio_play("data/sfx/healing_1.mp3");
-	}
-	if (ITEMS_DRINKS.includes(id) && true) {
-		achievement_do(p.achievements_element.data.achievements,
-			"stay hydrated", p.achievements_shower_element);
-		p.thirst += Math.min(p.max_thirst - p.thirst, (Math.random() * 0.125 +
-			0.125) * p.max_thirst);
-		inventory_clear_item(player_object.data.inventory_element, id, 1,
-			item_i, item_j);
-		audio_play("data/sfx/water_1.mp3");
-	}
-	if (ITEMS_FOODS.includes(id) && true) {
-		achievement_do(p.achievements_element.data.achievements, "yummy", p
-			.achievements_shower_element);
-		p.hunger += Math.min(p.max_hunger - p.hunger, (Math.random() * 0.125 +
-			0.125) * p.max_hunger);
-		p.thirst += Math.min(p.max_thirst - p.thirst, (Math.random() * 0.03125 +
-			0.03125) * p.max_thirst);
-		inventory_clear_item(player_object.data.inventory_element, id, 1,
-			item_i, item_j);
-		audio_play("data/sfx/eating_1.mp3");
-	}
-}
-
-function player_laser_hits_point(player_object, x, y, w, l, alpha) {
-	let px = player_object.data.body.position.x;
-	let py = player_object.data.body.position.y;
+function player_laser_hits_point(px, py, x, y, w, l, alpha) {
 	x = x - px;
 	y = y - py;
 	let X = x * Math.cos(alpha) + y * Math.sin(alpha);
 	let Y = -x * Math.sin(alpha) + y * Math.cos(alpha);
 	return Math.pow(Math.abs(X / l - 1), 4) + Math.pow(Math.abs(Y / w), 4) < 1;
+}
+
+function player_handle_melee(g, p, v, dt, rotSpeed, dmgMax, dmgMin, angleLimit,
+	rocketDmgMax, rocketDmgMin) {
+	if (Math.cos(p.sword_direction) < -0.985) audio_play(
+		"data/sfx/sword_1.mp3");
+	p.sword_direction += (v.tx > v.sx ? rotSpeed : -rotSpeed) * dt;
+	p.sword_direction %= (2 * Math.PI);
+	let target = ["enemy", "animal", "car", "trashcan"].reduce((found, name) =>
+		found || game_object_find_closest(g, p.body.position.x, p.body
+			.position.y, name, name === "car" ? 300 : 200), null);
+	if (target && !(target.name === "car" && target.data.is_tank)) {
+		let dir = Math.atan2(target.data.body.position.y - p.body.position.y,
+			target.data.body.position.x - p.body.position.x);
+		if (Math.abs(dir - p.sword_direction) % (2 * Math.PI) < angleLimit) {
+			target.data.health -= (Math.random() * dmgMax + dmgMin) * dt;
+			if (target.name === "enemy") target.data.hit_by_player = true;
+		}
+	}
+	let bullet = game_object_find_closest(g, p.body.position.x, p.body.position
+		.y, "bullet", 200);
+	if (bullet) {
+		let vx = bullet.data.body.position.x - p.body.position.x,
+			vy = bullet.data.body.position.y - p.body.position.y;
+		let dist = Math.sqrt(vx * vx + vy * vy);
+		Matter.Body.setVelocity(bullet.data.body, {
+			x: 5 * vx / dist,
+			y: 5 * vy / dist
+		});
+	}
+	let rocket = game_object_find_closest(g, p.body.position.x, p.body.position
+		.y, "rocket", 200);
+	if (rocket) {
+		let rDir = Math.atan2(rocket.data.body.position.y - p.body.position.y,
+			rocket.data.body.position.x - p.body.position.x);
+		if (Math.abs(rDir - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
+			rocket.data.health -= (Math.random() * rocketDmgMax +
+				rocketDmgMin) * dt;
+			rocket.data.hit_by_player = true;
+		}
+	}
+	p.sword_visible = p.sword_protection = true;
+}
+
+function player_item_consume(player_object, id, anywhere = false) {
+	const p = player_object.data;
+	const behavior = ITEM_BEHAVIORS[id];
+	
+	if (!behavior) return;
+	
+	let item_i = -1;
+	let item_j = -1;
+	if (!anywhere) {
+		if (p.hotbar_element.shown) {
+			item_i = 0;
+			item_j = p.hotbar_element.data.iselected;
+		} else if (p.inventory_element.shown) {
+			item_i = p.inventory_element.data.imove;
+			item_j = p.inventory_element.data.jmove;
+		}
+	}
+	
+	const success = behavior.action(p, player_object);
+	
+	if (success) {
+		
+		inventory_clear_item(p.inventory_element, id, 1, item_i, item_j);
+		
+		if (behavior.sfx) {
+			audio_play(behavior.sfx);
+		}
+		
+		if (behavior.achievement) {
+			achievement_do(
+				p.achievements_element.data.achievements,
+				behavior.achievement,
+				p.achievements_shower_element
+			);
+		}
+	}
 }

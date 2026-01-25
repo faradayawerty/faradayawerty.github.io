@@ -304,7 +304,6 @@ function achievements_update(ae, dt) {
 	ae.data.animstate += 0.0075 * dt;
 	let input = ae.game.input;
 	let scale = get_scale();
-	
 	if (!ae.game.mobile && input.mouse.leftButtonPressed) {
 		let mx = input.mouse.x / scale;
 		let my = input.mouse.y / scale;
@@ -323,7 +322,6 @@ function achievements_update(ae, dt) {
 	} else {
 		ae.data.clicked = false;
 	}
-	
 	let points = [];
 	if (ae.game.mobile) {
 		for (let t of input.touch) {
@@ -338,18 +336,16 @@ function achievements_update(ae, dt) {
 			y: input.mouse.y / scale
 		});
 	}
-	
 	for (let pt of points) {
 		let crossX = ae.data.offset_x + ae.data.width - ae.data.cross_width;
 		let crossY = ae.data.offset_y;
 		if (doRectsCollide(pt.x, pt.y, 0, 0, crossX, crossY, ae.data
 				.cross_width, ae.data.cross_width)) {
 			ae.shown = false;
-			
 			if (ae.game.debug_console) {
 				ae.game.debug_console.unshift('hide achievements', pt.x, pt.y);
 			}
-			break; 
+			break;
 		}
 	}
 }
