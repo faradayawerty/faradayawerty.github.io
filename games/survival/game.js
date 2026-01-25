@@ -329,9 +329,9 @@ function game_objects_arrange(g) {
 	let arrangement = [
 		"bound",
 		"decorative_roof",
-		"decorative_hotdogs",
 		"decorative_leaves",
 		"decorative_trunk",
+		"decorative_hotdogs",
 		"decorative_fuel_pump",
 		"shield",
 		"rocket",

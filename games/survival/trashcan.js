@@ -6,22 +6,19 @@ function trashcan_create(g, x, y) {
 		max_health: 100,
 		w: width,
 		h: height,
-		
 		body: Matter.Bodies.rectangle(x, y, width, height, {
-			mass: 5, 
+			mass: 5,
 			friction: 0.5,
 			restitution: 0.1,
 			collisionFilter: {
-				"category": 2 
+				"category": 2
 			}
 		})
 	};
-	
 	let itrash = game_object_create(g, "trashcan", t, trashcan_update,
 		trashcan_draw, trashcan_destroy);
 	if (itrash > -1) {
 		g.objects[itrash].persistent = true;
-		
 		Matter.Composite.add(g.engine.world, t.body);
 	}
 	return itrash;
@@ -29,18 +26,12 @@ function trashcan_create(g, x, y) {
 
 function trashcan_update(self, dt) {
 	let p = self.data;
-	
 	if (p.health <= 0) {
-		
 		let count = Math.floor(Math.random() * 4);
 		for (let i = 0; i < count; i++) {
-			
-			
-			
 			if (Math.random() < 0.75) {
 				let junk_id = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK
 					.length)];
-				
 				let offsetX = (Math.random() - 0.5) * 20;
 				let offsetY = (Math.random() - 0.5) * 20;
 				item_create(self.game, junk_id, p.body.position.x + offsetX, p
@@ -48,7 +39,8 @@ function trashcan_update(self, dt) {
 			}
 		}
 		if (Math.random() < 0.01)
-			item_create(self.game, ITEM_DESERT_EAGLE, p.body.position.x, p.body.position.y);
+			item_create(self.game, ITEM_DESERT_EAGLE, p.body.position.x, p.body
+				.position.y);
 		trashcan_destroy(self);
 	}
 }
@@ -58,13 +50,10 @@ function trashcan_draw(self, ctx) {
 	ctx.save();
 	ctx.translate(p.body.position.x, p.body.position.y);
 	ctx.rotate(p.body.angle);
-	
-	ctx.fillStyle = "#555555"; 
+	ctx.fillStyle = "#555555";
 	ctx.strokeStyle = "#333333";
 	ctx.lineWidth = 2;
-	
 	roundRect(ctx, -p.w / 2, -p.h / 2, p.w, p.h, 5, true, true);
-	
 	ctx.beginPath();
 	for (let i = -15; i <= 15; i += 10) {
 		ctx.moveTo(i, -p.h / 2 + 10);

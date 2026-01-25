@@ -50,7 +50,7 @@ let TILES = {
 		base_color: "gray",
 		spawn_enemies: false,
 		spawn_animals: false,
-		spawn_items: false, 
+		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_building_create(g, Ox + 40, Oy + 40, 900, 900);
 			decorative_parkinglot_create(g, Ox + 1410, Oy + 1960, 1050,
@@ -287,7 +287,7 @@ let TILES = {
 			decorative_grass_create(g, Ox + 1410, Oy, 1090, 1090);
 			decorative_grass_create(g, Ox, Oy + 1410, 1090, 1090);
 			decorative_grass_create(g, Ox + 1410, Oy + 1410, 1090,
-			1090);
+				1090);
 			decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
 			decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
 		}
@@ -330,7 +330,7 @@ let TILES = {
 			decorative_grass_create(g, Ox, Oy, 2500, 1090);
 			decorative_grass_create(g, Ox, Oy + 1410, 1090, 1090);
 			decorative_grass_create(g, Ox + 1410, Oy + 1090, 1090,
-			1410);
+				1410);
 			decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
 			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
 			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
@@ -353,7 +353,7 @@ let TILES = {
 			decorative_grass_create(g, Ox, Oy, 2500, 1090);
 			decorative_grass_create(g, Ox, Oy + 1090, 1090, 1410);
 			decorative_grass_create(g, Ox + 1410, Oy + 1410, 1090,
-			1090);
+				1090);
 			decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
 			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
 			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
@@ -429,13 +429,13 @@ let TILES = {
 		base_color: DECORATIVE_COLOR_GRASS,
 		spawn_enemies: true,
 		spawn_animals: true,
-		spawn_items: true, 
+		spawn_items: true,
 		populate: (g, Ox, Oy) => {
 			decorative_grass_create(g, Ox, Oy, 2420, 2420);
 		}
 	},
 	[LEVEL_TILE_CITY_PARK]: {
-		weight: 10,
+		weight: 25,
 		connections: {
 			N: 1,
 			E: 1,
@@ -478,13 +478,13 @@ let TILES = {
 			decorative_bench_create(g, Ox + 1380, Oy + 200, "vertical");
 			decorative_bench_create(g, Ox + 1380, Oy + 600, "vertical");
 			decorative_bench_create(g, Ox + 1090, Oy + 1700,
-			"vertical");
+				"vertical");
 			decorative_bench_create(g, Ox + 1090, Oy + 2100,
-			"vertical");
+				"vertical");
 			decorative_bench_create(g, Ox + 1380, Oy + 1700,
-			"vertical");
+				"vertical");
 			decorative_bench_create(g, Ox + 1380, Oy + 2100,
-			"vertical");
+				"vertical");
 			if (!visited) {
 				trashcan_create(g, Ox + 460, Oy + 1095);
 				trashcan_create(g, Ox + 460, Oy + 1385);
@@ -503,7 +503,7 @@ let TILES = {
 			else if (r < 0.75) decorative_hotdog_stand_create(g, Ox +
 				850, Oy + 1530);
 			else decorative_hotdog_stand_create(g, Ox + 1470, Oy +
-			1530);
+				1530);
 		}
 	}
 };

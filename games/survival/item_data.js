@@ -1000,20 +1000,15 @@ let ITEM_RENDERERS = {
 		const silver = "#aaa";
 		const darkSilver = "#777";
 		const grip = "#222";
-		
 		ctx.fillStyle = silver;
 		ctx.fillRect(x + w * 0.15, y + h * 0.35, w * 0.7, h * 0.22);
-		
 		ctx.fillStyle = "#ccc";
 		ctx.fillRect(x + w * 0.15, y + h * 0.35, w * 0.7, h * 0.05);
-		
 		ctx.fillStyle = grip;
 		ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.2, h * 0.35);
-		
 		ctx.strokeStyle = darkSilver;
 		ctx.lineWidth = w * 0.03;
 		ctx.strokeRect(x + w * 0.35, y + h * 0.55, w * 0.15, h * 0.1);
-		
 		ctx.fillStyle = darkSilver;
 		ctx.fillRect(x + w * 0.75, y + h * 0.3, w * 0.05, h * 0.05);
 	},
