@@ -277,6 +277,7 @@ function game_destroy_level(g, old_level = null) {
 				if (["decorative_roof",
 						"decorative_leaves",
 						"decorative_trunk",
+						"decorative_hotdogs",
 						"decorative_fuel_pump",
 						"decorative_wall",
 						"decorative",
@@ -328,6 +329,7 @@ function game_objects_arrange(g) {
 	let arrangement = [
 		"bound",
 		"decorative_roof",
+		"decorative_hotdogs",
 		"decorative_leaves",
 		"decorative_trunk",
 		"decorative_fuel_pump",
@@ -338,6 +340,7 @@ function game_objects_arrange(g) {
 		"enemy",
 		"item",
 		"car",
+		"trashcan",
 		"bullet",
 		"trashbullet",
 		"decorative_wall",

@@ -618,6 +618,9 @@ function player_draw(player_object, ctx) {
 			ctx.strokeStyle = "black";
 			let lw = 0.25 * p.w;
 			let gl = 0.8;
+			if (selected_item == ITEM_DESERT_EAGLE) {
+				ctx.strokeStyle = "#888888"; 
+			}
 			if (selected_item == ITEM_GREEN_GUN) {
 				ctx.strokeStyle = "#117733";
 				gl = 1.6;
@@ -803,8 +806,7 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		let g = player_object.game;
 		for (let i = 0; i < g.objects.length; i++) {
 			let obj = g.objects[i];
-			if (!obj.destroyed && (obj.name == "animal" || obj.name ==
-					"enemy" || obj.name == "car" && !obj.data.is_tank || obj
+			if (!obj.destroyed && (obj.name == "animal" || obj.name == "enemy" || obj.name == "trashcan" || obj.name == "car" && !obj.data.is_tank || obj
 					.name == "rocket")) {
 				if (player_laser_hits_point(player_object, obj.data.body
 						.position.x, obj.data.body.position.y, 1.5 * p.w, 60 * p
@@ -1061,6 +1063,25 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (enable_audio)
 			audio_play("data/sfx/red_pistols_1.mp3", 0.125);
 	}
+	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_DESERT_EAGLE &&
+		p.shot_cooldown <= 0 &&
+		inventory_has_item(p.inventory_element, ITEM_AMMO)) {
+		bullet_create(
+			player_object.game,
+			p.body.position.x,
+			p.body.position.y,
+			tx - sx,
+			ty - sy,
+			32, 
+			55 * base_damage 
+		);
+		p.shot_cooldown = 600; 
+		
+		if (Math.random() > 0.90)
+			inventory_clear_item(p.inventory_element, ITEM_AMMO, 1);
+		if (enable_audio)
+			audio_play("data/sfx/shotgun_1.mp3", 0.35);
+	}
 	if (hotbar_get_selected_item(p.hotbar_element) == ITEM_SWORD && true) {
 		if (Math.cos(p.sword_direction) < -0.985)
 			audio_play("data/sfx/sword_1.mp3");
@@ -1077,6 +1098,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (!closest_target)
 			closest_target = game_object_find_closest(player_object.game, p.body
 				.position.x, p.body.position.y, "car", 300);
+		if (!closest_target)
+		    closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "trashcan", 200);
 		if (closest_target && closest_target.name == "car" && closest_target
 			.data.is_tank)
 			closest_target = null;
@@ -1136,6 +1159,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		if (!closest_target)
 			closest_target = game_object_find_closest(player_object.game, p.body
 				.position.x, p.body.position.y, "car", 300);
+		if (!closest_target)
+		    closest_target = game_object_find_closest(player_object.game, p.body.position.x, p.body.position.y, "trashcan", 200);
 		if (closest_target && closest_target.name == "car" && closest_target
 			.data.is_tank)
 			closest_target = null;

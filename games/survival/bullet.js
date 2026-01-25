@@ -55,6 +55,7 @@ function bullet_update(bullet_object, dt) {
 			continue;
 		if ((bullet_object.game.objects[i].name == "enemy" ||
 				bullet_object.game.objects[i].name == "car" ||
+				bullet_object.game.objects[i].name == "trashcan" ||
 				bullet_object.game.objects[i].name == "animal" ||
 				(bullet_object.game.objects[i].name == "rocket" && bullet_object
 					.game.objects[i].data.enemy)) &&

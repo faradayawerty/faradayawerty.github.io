@@ -26,7 +26,7 @@ function roof_apply_transparency(g, bx, by, bw, bh) {
 
 function decorative_rectangle_draw(self, ctx) {
 	let d = self.data;
-	ctx.globalAlpha = d.transparency || 1.0;
+	ctx.globalAlpha = d.alpha || 1.0;
 	ctx.fillStyle = d.color_fill;
 	ctx.fillRect(d.x, d.y, d.w, d.h);
 	if (d.color_outline && d.color_outline !== "transparent") {
@@ -59,14 +59,15 @@ function decorative_roof_draw(self, ctx) {
 }
 
 function decorative_rectangle_create(g, x, y, w, h, fill, outline =
-	"transparent") {
+	"transparent", alpha_ = 1.0) {
 	let i = game_object_create(g, "decorative", {
 			x,
 			y,
 			w,
 			h,
 			color_fill: fill,
-			color_outline: outline
+			color_outline: outline,
+			alpha: alpha_
 		},
 		function() {}, decorative_rectangle_draw,
 		function(o) {
@@ -395,4 +396,50 @@ function decorative_parkinglot_create(g, x, y, w, h, level_visited = true,
 			car_create(g, carX, carY, randomColor, false, false, type);
 		}
 	}
+}
+
+function decorative_fountain_create(g, x, y, size = 200) {
+	decorative_rectangle_create(g, x, y, size, size, "#777777", "#444444");
+	decorative_rectangle_create(g, x + size * 0.1, y + size * 0.1, size * 0.8,
+		size * 0.8, "#3366ff", "#111111");
+	decorative_rectangle_create(g, x + size * 0.4, y + size * 0.4, size * 0.2,
+		size * 0.2, "white", "transparent");
+	bound_create(g, x, y, size, size);
+}
+
+function decorative_bench_create(g, x, y, rotation = "horizontal") {
+	let w = rotation === "horizontal" ? 120 : 30;
+	let h = rotation === "horizontal" ? 30 : 120;
+	const colors = [
+		"SaddleBrown",
+		"Sienna",
+		"RosyBrown",
+		"FireBrick",
+		"Peru",
+		"Chocolate",
+		"Maroon"
+	];
+	const randomColor = colors[Math.floor(Math.random() * colors.length)];
+	let i = decorative_rectangle_create(g, x, y, w, h, randomColor, "#111111");
+	game_object_change_name(g, i, "decorative");
+	bound_create(g, x, y, w, h);
+	return i;
+}
+
+function decorative_hotdog_stand_create(g, x, y) {
+	let w = 180;
+	let h = 120;
+	bound_create(g, x, y + 0.75 * h, w, h * 0.25);
+	let window = decorative_rectangle_create(g, x + 20, y + 30, w - 40, 40,
+		"red", "transparent", 0.25);
+	game_object_change_name(g, window, "decorative_hotdogs");
+	let body = decorative_rectangle_create(g, x, y, w, h, "#ffcc00", "#333333");
+	game_object_change_name(g, body, "decorative_hotdogs");
+	for (let i = 0; i < 6; i++) {
+		let color = i % 2 === 0 ? "#ff0000" : "#ffffff";
+		let stripe = decorative_rectangle_create(g, x + (i * w / 6), y - 20, w /
+			6, 25, color, "transparent");
+		game_object_change_name(g, stripe, "decorative_hotdogs");
+	}
+	return body;
 }

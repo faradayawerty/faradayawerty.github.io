@@ -1,5 +1,6 @@
 function cheat_all_weapons() {
 	item_create(game1, ITEM_GUN, 1250, 1250, false, false);
+	item_create(game1, ITEM_DESERT_EAGLE, 1250, 1250, false, false);
 	item_create(game1, ITEM_SHOTGUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_MINIGUN, 1250, 1250, false, false);
 	item_create(game1, ITEM_PLASMA_LAUNCHER, 1250, 1250, false, false);
