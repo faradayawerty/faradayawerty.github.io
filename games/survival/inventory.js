@@ -195,17 +195,30 @@ function inventory_draw(inventory_element, ctx) {
 		let startY = 60 + (inv.slot_size * 1.05) * inv.items.length;
 		let startX = 40;
 		const drawStyledBtn = (x, y, w, h, text, color) => {
+			ctx
+		.save(); 
+			
 			ctx.fillStyle = color;
 			ctx.beginPath();
-			if (ctx.roundRect) ctx.roundRect(x, y, w, h, 8);
-			else ctx.fillRect(x, y, w, h);
+			if (ctx.roundRect) {
+				ctx.roundRect(x, y, w, h, 8);
+			} else {
+				ctx.fillRect(x, y, w, h);
+			}
 			ctx.fill();
+			
 			ctx.strokeStyle = "white";
 			ctx.lineWidth = 2;
 			ctx.stroke();
+			
 			ctx.fillStyle = "white";
 			ctx.font = "bold 18px Arial";
-			ctx.fillText(text, x + w / 2, y + h / 2 + 6);
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			
+			ctx.fillText(text, x + w / 2, y + h / 2);
+			ctx
+		.restore(); 
 		};
 		drawStyledBtn(startX, startY, btnW, btnH, "USE", "#228822");
 		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, "DROP",
