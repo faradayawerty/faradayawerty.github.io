@@ -302,10 +302,12 @@ function achievements_destroy(ae) {
 
 function achievements_update(ae, dt) {
 	ae.data.animstate += 0.0075 * dt;
-	let as = ae.data.achievements;
-	if (ae.game.input.mouse.leftButtonPressed && !ae.game.mobile) {
-		let mx = ae.game.input.mouse.x / get_scale();
-		let my = ae.game.input.mouse.y / get_scale();
+	let input = ae.game.input;
+	let scale = get_scale();
+	
+	if (!ae.game.mobile && input.mouse.leftButtonPressed) {
+		let mx = input.mouse.x / scale;
+		let my = input.mouse.y / scale;
 		if (ae.data.offset_x < mx && mx < ae.data.offset_x + ae.data.width &&
 			ae.data.offset_y < my && my < ae.data.offset_y + ae.data.height) {
 			if (!ae.data.clicked) {
@@ -314,33 +316,41 @@ function achievements_update(ae, dt) {
 				ae.data.mxx = mx;
 				ae.data.myy = my;
 			}
-			let dx = mx - ae.data.mxx;
-			let dy = my - ae.data.myy;
-			ae.data.x = ae.data.xx + dx;
-			ae.data.y = ae.data.yy + dy;
+			ae.data.x = ae.data.xx + (mx - ae.data.mxx);
+			ae.data.y = ae.data.yy + (my - ae.data.myy);
 			ae.data.clicked = true;
 		}
-	} else if (ae.data.clicked && !ae.game.mobile) {
-		ae.data.xx = ae.game.input.mouse.x / get_scale();
-		ae.data.yy = ae.game.input.mouse.y / get_scale();
+	} else {
 		ae.data.clicked = false;
 	}
-	let mx = ae.game.input.mouse.x;
-	let my = ae.game.input.mouse.y;
-	if (ae.game.mobile && ae.game.input.touch.length > 0) {
-		let mx = ae.game.input.touch[0].x;
-		let my = ae.game.input.touch[0].y;
+	
+	let points = [];
+	if (ae.game.mobile) {
+		for (let t of input.touch) {
+			points.push({
+				x: t.x / scale,
+				y: t.y / scale
+			});
+		}
+	} else if (input.mouse.leftButtonPressed) {
+		points.push({
+			x: input.mouse.x / scale,
+			y: input.mouse.y / scale
+		});
 	}
-	if ((ae.game.input.mouse.leftButtonPressed || isScreenTouched(ae.game
-			.input)) &&
-		(false || doRectsCollide(mx / get_scale(), my / get_scale(), 0, 0, ae
-			.data.offset_x + ae.data.width - ae.data.cross_width, ae.data
-			.offset_y, ae.data.cross_width, ae.data.cross_width))) {
-		ae.shown = false;
-		ae.game.debug_console.unshift('hide achievements', mx / get_scale(),
-			my / get_scale(), 0, 0, ae.data.offset_x + ae.data.width - ae
-			.data.cross_width, ae.data.offset_y, ae.data.cross_width, ae
-			.data.cross_width)
+	
+	for (let pt of points) {
+		let crossX = ae.data.offset_x + ae.data.width - ae.data.cross_width;
+		let crossY = ae.data.offset_y;
+		if (doRectsCollide(pt.x, pt.y, 0, 0, crossX, crossY, ae.data
+				.cross_width, ae.data.cross_width)) {
+			ae.shown = false;
+			
+			if (ae.game.debug_console) {
+				ae.game.debug_console.unshift('hide achievements', pt.x, pt.y);
+			}
+			break; 
+		}
 	}
 }
 

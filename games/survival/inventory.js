@@ -1,4 +1,3 @@
-
 function inventory_create(g, attached_to_object = null) {
 	let inv = {
 		slot_size: 80,
@@ -197,8 +196,7 @@ function inventory_draw(inventory_element, ctx) {
 		let startX = 40;
 		const drawStyledBtn = (x, y, w, h, text, color) => {
 			ctx
-		.save(); 
-			
+				.save();
 			ctx.fillStyle = color;
 			ctx.beginPath();
 			if (ctx.roundRect) {
@@ -207,19 +205,16 @@ function inventory_draw(inventory_element, ctx) {
 				ctx.fillRect(x, y, w, h);
 			}
 			ctx.fill();
-			
 			ctx.strokeStyle = "white";
 			ctx.lineWidth = 2;
 			ctx.stroke();
-			
 			ctx.fillStyle = "white";
 			ctx.font = "bold 18px Arial";
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
-			
 			ctx.fillText(text, x + w / 2, y + h / 2);
 			ctx
-		.restore(); 
+				.restore();
 		};
 		drawStyledBtn(startX, startY, btnW, btnH, "USE", "#228822");
 		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, "DROP",
@@ -379,4 +374,3 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	ctx.fillText(line, x + 10, lineY);
 	ctx.restore();
 }
-

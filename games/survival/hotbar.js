@@ -1,4 +1,3 @@
-
 function hotbar_create(g, inv, attached_to_object = null) {
 	let hb = {
 		iselected: 0,
@@ -46,50 +45,48 @@ function hotbar_update(hotbar_element, dt) {
 			});
 		}
 	}
-
 	for (let pt of pointsToCheck) {
-    // 1. Логика выбора ячеек хотбара (оставляем почти как было)
-    for (let i = 0; i < hb.row.length; i++) {
-        let sx = 40 + (hb.slot_size * 1.05) * i;
-        let sy = 40;
-        if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) &&
-            doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb.slot_size)) {
-            hb.mouse_over = true;
-            hb.iselected = i;
-        }
-    }
-
-    // 2. Логика кнопок (Инвентарь, Ачивки, Меню)
-    if (hotbar_element.game.mobile) {
-        let step = hb.slot_size * 1.05;
-        let x_inv = 60 + step * hb.row.length;
-        let x_ach = x_inv + step;
-        let x_menu = x_ach + step;
-
-        // Кнопка ИНВЕНТАРЯ
-        if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb.slot_size)) {
-            let inv_el = hb.attached_to_object.data.inventory_element;
-            if (inv_el && !inv_el._mob_toggle_lock) {
-                inv_el.shown = !inv_el.shown;
-                inv_el._mob_toggle_lock = true;
-            }
-        }
-
-        // Кнопка АЧИВОК (Добавляем проверку!)
-        if (doRectsCollide(pt.x, pt.y, 0, 0, x_ach, 40, hb.slot_size, hb.slot_size)) {
-            let ach_el = hb.attached_to_object.data.achievements_element;
-            if (ach_el) {
-                ach_el.shown = true;
-            }
-        }
-
-        // Кнопка МЕНЮ (Добавляем проверку!)
-        if (doRectsCollide(pt.x, pt.y, 0, 0, x_menu, 40, hb.slot_size, hb.slot_size)) {
-            hotbar_element.game.want_menu = true;
-        }
-    }
-}
-
+		
+		for (let i = 0; i < hb.row.length; i++) {
+			let sx = 40 + (hb.slot_size * 1.05) * i;
+			let sy = 40;
+			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) &&
+				doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb
+					.slot_size)) {
+				hb.mouse_over = true;
+				hb.iselected = i;
+			}
+		}
+		
+		if (hotbar_element.game.mobile) {
+			let step = hb.slot_size * 1.05;
+			let x_inv = 60 + step * hb.row.length;
+			let x_ach = x_inv + step;
+			let x_menu = x_ach + step;
+			
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
+					.slot_size)) {
+				let inv_el = hb.attached_to_object.data.inventory_element;
+				if (inv_el && !inv_el._mob_toggle_lock) {
+					inv_el.shown = !inv_el.shown;
+					inv_el._mob_toggle_lock = true;
+				}
+			}
+			
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_ach, 40, hb.slot_size, hb
+					.slot_size)) {
+				let ach_el = hb.attached_to_object.data.achievements_element;
+				if (ach_el) {
+					ach_el.shown = true;
+				}
+			}
+			
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_menu, 40, hb.slot_size, hb
+					.slot_size)) {
+				hotbar_element.game.want_menu = true;
+			}
+		}
+	}
 	let inv_el = hb.attached_to_object.data.inventory_element;
 	if (inv_el && inv_el._mob_toggle_lock) {
 		let stillTouching = false;
@@ -202,4 +199,3 @@ function hotbar_get_selected_item(hotbar_element) {
 	}
 	return hotbar_element.data.row[hotbar_element.data.iselected];
 }
-
