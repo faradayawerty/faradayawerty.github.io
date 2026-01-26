@@ -216,7 +216,8 @@ function player_update(player_object, dt) {
 		p.hunger = p.max_hunger;
 		p.thirst = p.max_thirst;
 	}
-	if (p.thirst > 0 && achievement_get(p.achievements_element.data
+	if (p.thirst > 0 && !p.car_object && achievement_get(p.achievements_element
+			.data
 			.achievements, "first steps").done) {
 		if (p.shield_green_health > 0) p.thirst = Math.max(0, p.thirst -
 			0.0005 * dt);
@@ -225,7 +226,8 @@ function player_update(player_object, dt) {
 		else p.thirst = Math.max(0, p.thirst - 0.001 * dt);
 	}
 	if (p.thirst <= 0) p.health -= 0.01 * dt;
-	if (p.hunger > 0 && achievement_get(p.achievements_element.data
+	if (p.hunger > 0 && !p.car_object && achievement_get(p.achievements_element
+			.data
 			.achievements, "first steps").done) {
 		if (p.shield_green_health > 0) p.hunger = Math.max(0, p.hunger -
 			0.0005 * dt);
@@ -794,9 +796,7 @@ function player_handle_melee(g, p, v, dt, rotSpeed, dmgMax, dmgMin, angleLimit,
 function player_item_consume(player_object, id, anywhere = false) {
 	const p = player_object.data;
 	const behavior = ITEM_BEHAVIORS[id];
-	
 	if (!behavior) return;
-	
 	let item_i = -1;
 	let item_j = -1;
 	if (!anywhere) {
@@ -808,17 +808,12 @@ function player_item_consume(player_object, id, anywhere = false) {
 			item_j = p.inventory_element.data.jmove;
 		}
 	}
-	
 	const success = behavior.action(p, player_object);
-	
 	if (success) {
-		
 		inventory_clear_item(p.inventory_element, id, 1, item_i, item_j);
-		
 		if (behavior.sfx) {
 			audio_play(behavior.sfx);
 		}
-		
 		if (behavior.achievement) {
 			achievement_do(
 				p.achievements_element.data.achievements,

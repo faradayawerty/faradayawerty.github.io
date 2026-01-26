@@ -2,7 +2,7 @@ function hotbar_create(g, inv, attached_to_object = null) {
 	let hb = {
 		iselected: 0,
 		row: inv.items[0],
-		slot_size: 50,
+		slot_size: 68.5,
 		attached_to_object: attached_to_object,
 		animation_state: 0,
 		mouse_over: false
@@ -18,90 +18,24 @@ function hotbar_destroy(hotbar_element) {
 	hotbar_element.destroyed = true;
 }
 
-function hotbar_update(hotbar_element, dt) {
-	let hb = hotbar_element.data;
-	let input = hotbar_element.game.input;
-	let scale = get_scale();
-	hb.animation_state += 0.02 * dt;
-	if (hb.attached_to_object.data.ai_controlled)
-		hotbar_element.shown = false;
-	for (let i = 0; i < 9; i++) {
-		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
-	}
-	if (isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
-	if (isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
-	hb.mouse_over = false;
-	let pointsToCheck = [];
-	if (!isScreenTouched(input)) {
-		pointsToCheck.push({
-			x: input.mouse.x / scale,
-			y: input.mouse.y / scale
-		});
-	} else {
-		for (let t of input.touch) {
-			pointsToCheck.push({
-				x: t.x / scale,
-				y: t.y / scale
-			});
-		}
-	}
-	for (let pt of pointsToCheck) {
-		for (let i = 0; i < hb.row.length; i++) {
-			let sx = 40 + (hb.slot_size * 1.05) * i;
-			let sy = 40;
-			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) &&
-				doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb
-					.slot_size)) {
-				hb.mouse_over = true;
-				hb.iselected = i;
+function hotbar_get_selected_item(hotbar_element) {
+	let inv_el = hotbar_element.data.attached_to_object.data.inventory_element;
+	if (inv_el.game.mobile && inv_el && inv_el.shown) return 0;
+	if (!hotbar_element.shown) {
+		if (hotbar_element.data.attached_to_object.name == "player" && !
+			hotbar_element.data.attached_to_object.destroyed) {
+			let inv = hotbar_element.data.attached_to_object.data
+				.inventory_element.data;
+			if (inv.jmove > -1 && inv.imove > -1) {
+				if (inv.iselected == -1 && inv.jselected == -1)
+					return inv.items[inv.imove][inv.jmove];
 			}
 		}
-		if (hotbar_element.game.mobile) {
-			let step = hb.slot_size * 1.05;
-			let x_inv = 60 + step * hb.row.length;
-			let x_ach = x_inv + step;
-			let x_menu = x_ach + step;
-			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
-					.slot_size)) {
-				let inv_el = hb.attached_to_object.data.inventory_element;
-				if (inv_el && !inv_el._mob_toggle_lock) {
-					let ash = hotbar_element.game.gui_elements.find(e => e
-						.name == "achievements shower");
-					achievement_do(hb.attached_to_object.data
-						.achievements_element.data.achievements,
-						"discovering inventory", ash);
-					inv_el.shown = !inv_el.shown;
-					inv_el._mob_toggle_lock = true;
-				}
-			}
-			if (doRectsCollide(pt.x, pt.y, 0, 0, x_ach, 40, hb.slot_size, hb
-					.slot_size)) {
-				let ach_el = hb.attached_to_object.data.achievements_element;
-				if (ach_el) {
-					let ash = hotbar_element.game.gui_elements.find(e => e
-						.name == "achievements shower");
-					achievement_do(ach_el.data.achievements, "achievements",
-						ash);
-					ach_el.shown = true;
-				}
-			}
-			if (doRectsCollide(pt.x, pt.y, 0, 0, x_menu, 40, hb.slot_size, hb
-					.slot_size)) {
-				hotbar_element.game.want_menu = true;
-			}
-		}
+		return 0;
+	} else if (hotbar_element.data.mouse_over) {
+		return 0;
 	}
-	let inv_el = hb.attached_to_object.data.inventory_element;
-	if (inv_el && inv_el._mob_toggle_lock) {
-		let stillTouching = false;
-		let step = hb.slot_size * 1.05;
-		let x_inv = 60 + step * hb.row.length;
-		for (let pt of pointsToCheck) {
-			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
-					.slot_size)) stillTouching = true;
-		}
-		if (!stillTouching) inv_el._mob_toggle_lock = false;
-	}
+	return hotbar_element.data.row[hotbar_element.data.iselected];
 }
 
 function hotbar_draw(hotbar_object, ctx) {
@@ -121,7 +55,7 @@ function hotbar_draw(hotbar_object, ctx) {
 		let y = 40;
 		const drawButtonBg = (x) => {
 			ctx.fillStyle = "#4477ff";
-			ctx.globalAlpha = 0.9;
+			ctx.globalAlpha = 0.8;
 			ctx.fillRect(x, y, s, s);
 			ctx.globalAlpha = 1.0;
 		};
@@ -181,25 +115,156 @@ function hotbar_draw(hotbar_object, ctx) {
 		ctx.fillRect(barX, y + s * 0.66, barW, barH);
 		ctx.fillStyle = "rgba(0,0,0,0.3)";
 		ctx.fillRect(barX, y + s * 0.3 + barH, barW, barH * 0.3);
+		let p = hb.attached_to_object.data;
+		let x_start = x_menu + step + 20;
+		const drawIndicator = (x, val, max, colorEmpty, colorFull, itemKey) => {
+			ctx.save();
+			ctx.globalAlpha = 0.6;
+			ctx.fillStyle = colorEmpty;
+			ctx.fillRect(x, y, s, s);
+			let ratio = Math.max(0, Math.min(1, val / max));
+			ctx.fillStyle = colorFull;
+			let fillH = s * ratio;
+			ctx.fillRect(x, y + (s - fillH), s, fillH);
+			ctx.strokeStyle = "rgba(255,255,255,0.4)";
+			ctx.lineWidth = 2;
+			ctx.strokeRect(x, y, s, s);
+			let iconPadding = s * 0.2;
+			let iconSize = s - iconPadding * 2;
+			if (ITEM_RENDERERS[itemKey]) {
+				ctx.globalAlpha = 0.85;
+				ITEM_RENDERERS[itemKey](ctx, x + iconPadding, y +
+					iconPadding, iconSize, iconSize, hb.animation_state);
+			}
+			ctx.restore();
+		};
+		drawIndicator(x_start, p.health, p.max_health, "#880000", "#22ff22",
+			ITEM_HEALTH);
+		drawIndicator(x_start + step, p.thirst, p.max_thirst, "#001144",
+			"#1177dd", ITEM_WATER);
+		drawIndicator(x_start + step * 2, p.hunger, p.max_hunger, "#331100",
+			"#ff8800", ITEM_APPLE);
 	}
 }
 
-function hotbar_get_selected_item(hotbar_element) {
-	let inv_el = hotbar_element.data.attached_to_object.data.inventory_element;
-	if (inv_el.game.mobile && inv_el && inv_el.shown) return 0;
-	if (!hotbar_element.shown) {
-		if (hotbar_element.data.attached_to_object.name == "player" && !
-			hotbar_element.data.attached_to_object.destroyed) {
-			let inv = hotbar_element.data.attached_to_object.data
-				.inventory_element.data;
-			if (inv.jmove > -1 && inv.imove > -1) {
-				if (inv.iselected == -1 && inv.jselected == -1)
-					return inv.items[inv.imove][inv.jmove];
+function hotbar_update(hotbar_element, dt) {
+	let hb = hotbar_element.data;
+	let input = hotbar_element.game.input;
+	let scale = get_scale();
+	hb.animation_state += 0.02 * dt;
+	if (hb.attached_to_object.data.ai_controlled)
+		hotbar_element.shown = false;
+	for (let i = 0; i < 9; i++) {
+		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
+	}
+	if (isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
+	if (isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
+	hb.mouse_over = false;
+	let pointsToCheck = [];
+	if (!isScreenTouched(input)) {
+		pointsToCheck.push({
+			x: input.mouse.x / scale,
+			y: input.mouse.y / scale
+		});
+	} else {
+		for (let t of input.touch) {
+			pointsToCheck.push({
+				x: t.x / scale,
+				y: t.y / scale
+			});
+		}
+	}
+	let inv_el = hb.attached_to_object.data.inventory_element;
+	let anyPointOverConsumeButtons = false;
+	for (let pt of pointsToCheck) {
+		for (let i = 0; i < hb.row.length; i++) {
+			let sx = 40 + (hb.slot_size * 1.05) * i;
+			let sy = 40;
+			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) &&
+				doRectsCollide(pt.x, pt.y, 0, 0, sx, sy, hb.slot_size, hb
+					.slot_size)) {
+				hb.mouse_over = true;
+				hb.iselected = i;
 			}
 		}
-		return 0;
-	} else if (hotbar_element.data.mouse_over) {
-		return 0;
+		if (hotbar_element.game.mobile) {
+			let step = hb.slot_size * 1.05;
+			let x_inv = 60 + step * hb.row.length;
+			let x_ach = x_inv + step;
+			let x_menu = x_ach + step;
+			let x_health = x_menu + step + 20;
+			let x_water = x_health + step;
+			let x_food = x_water + step;
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
+					.slot_size)) {
+				if (inv_el && !inv_el._mob_toggle_lock) {
+					let ash = hotbar_element.game.gui_elements.find(e => e
+						.name == "achievements shower");
+					achievement_do(hb.attached_to_object.data
+						.achievements_element.data.achievements,
+						"discovering inventory", ash);
+					inv_el.shown = !inv_el.shown;
+					inv_el._mob_toggle_lock = true;
+				}
+			}
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_ach, 40, hb.slot_size, hb
+					.slot_size)) {
+				let ach_el = hb.attached_to_object.data.achievements_element;
+				if (ach_el) {
+					let ash = hotbar_element.game.gui_elements.find(e => e
+						.name == "achievements shower");
+					achievement_do(ach_el.data.achievements, "achievements",
+						ash);
+					ach_el.shown = true;
+				}
+			}
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_menu, 40, hb.slot_size, hb
+					.slot_size)) {
+				hotbar_element.game.want_menu = true;
+			}
+			let player = hb.attached_to_object;
+			let overHealth = doRectsCollide(pt.x, pt.y, 0, 0, x_health, 40, hb
+				.slot_size, hb.slot_size);
+			let overWater = doRectsCollide(pt.x, pt.y, 0, 0, x_water, 40, hb
+				.slot_size, hb.slot_size);
+			let overFood = doRectsCollide(pt.x, pt.y, 0, 0, x_food, 40, hb
+				.slot_size, hb.slot_size);
+			if (overHealth || overWater || overFood) {
+				anyPointOverConsumeButtons = true;
+				if (!hb._consume_lock) {
+					if (overHealth) {
+						let item = inventory_has_item_from_list(inv_el, [
+							ITEM_HEALTH_GREEN, ITEM_HEALTH
+						]);
+						if (item !== -1) player_item_consume(player, item,
+							true);
+					} else if (overWater) {
+						let item = inventory_has_item_from_list(inv_el,
+							ITEMS_DRINKS);
+						if (item !== -1) player_item_consume(player, item,
+							true);
+					} else if (overFood) {
+						let item = inventory_has_item_from_list(inv_el,
+							ITEMS_FOODS);
+						if (item !== -1) player_item_consume(player, item,
+							true);
+					}
+					hb._consume_lock = true;
+				}
+			}
+		}
 	}
-	return hotbar_element.data.row[hotbar_element.data.iselected];
+	if (inv_el && inv_el._mob_toggle_lock) {
+		let stillTouchingInv = false;
+		let step = hb.slot_size * 1.05;
+		let x_inv = 60 + step * hb.row.length;
+		for (let pt of pointsToCheck) {
+			if (doRectsCollide(pt.x, pt.y, 0, 0, x_inv, 40, hb.slot_size, hb
+					.slot_size)) stillTouchingInv = true;
+		}
+		if (!stillTouchingInv) inv_el._mob_toggle_lock = false;
+	}
+	if (!anyPointOverConsumeButtons) {
+		hb._consume_lock = false;
+	}
 }

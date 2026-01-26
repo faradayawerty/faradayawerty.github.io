@@ -766,15 +766,16 @@ let ITEM_RENDERERS = {
 		ctx.fill();
 	},
 	[ITEM_CHOCOLATE]: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#553311";
-		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.85);
-		for (let j = 0; j < 4; j++) {
-			ctx.fillStyle = "#664422";
-			ctx.fillRect(x + w * 0.225, y + h * (0.15 + j * 0.2), w *
-				0.25, h * 0.15);
-			ctx.fillRect(x + w * 0.525, y + h * (0.15 + j * 0.2), w *
-				0.25, h * 0.15);
-		}
+		ctx.fillStyle = "#331100";
+		ctx.fillRect(x + w * 0.2, y + h * 0.15, w * 0.6, h * 0.7);
+		ctx.fillStyle = "#aa0000";
+		ctx.fillRect(x + w * 0.2, y + h * 0.45, w * 0.6, h * 0.45);
+		ctx.strokeStyle = "#220800";
+		ctx.lineWidth = 1;
+		ctx.strokeRect(x + w * 0.25, y + h * 0.2, w * 0.2, h * 0.2);
+		ctx.strokeRect(x + w * 0.55, y + h * 0.2, w * 0.2, h * 0.2);
+		ctx.fillStyle = "#d4af37";
+		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.6, h * 0.05);
 	},
 	[ITEM_HORN]: (ctx, x, y, w, h) => {
 		ctx.save();

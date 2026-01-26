@@ -1,294 +1,46 @@
 function achievements_create(g) {
+	const achievementsList = Object.keys(ACHIEVEMENT_REGISTRY).map(key => {
+		const entry = ACHIEVEMENT_REGISTRY[key];
+		let description = entry.desc;
+		let descriptionRus = entry.desc;
+		if (typeof entry.desc === 'object' && entry.desc.pc) {
+			description = {
+				mobile: entry.desc.mobile.en,
+				pc: entry.desc.pc.en
+			};
+			descriptionRus = {
+				mobile: entry.desc.mobile.ru,
+				pc: entry.desc.pc.ru
+			};
+		} else {
+			description = entry.desc.en;
+			descriptionRus = entry.desc.ru;
+		}
+		return {
+			name: key,
+			name_rus: entry.name.ru,
+			desc: description,
+			desc_rus: descriptionRus,
+			req: entry.req,
+			done: false
+		};
+	});
 	let ach = {
 		width: 1000,
 		height: 1000,
 		offset_x: 50,
 		offset_y: 50,
-		x: 50 + 100,
-		y: 50 + 100,
-		xx: 50 + 500,
-		yy: 50 + 500,
+		x: 150,
+		y: 150,
+		xx: 550,
+		yy: 550,
 		mxx: 0,
 		myy: 0,
 		clicked: false,
 		icon_size: 60,
 		animstate: 0,
 		cross_width: 0,
-		achievements: [{
-				name: "joining in",
-				desc: "launch the game",
-				name_rus: "к бою",
-				desc_rus: "зайти в игру",
-				req: null,
-				done: false
-			},
-			{
-				name: "discovering inventory",
-				desc: {
-					mobile: "open inventory by tapping the backpack icon",
-					pc: "discover inventory by pressing E or I"
-				},
-				name_rus: "открытие инвентаря",
-				desc_rus: {
-					mobile: "откройте инвентарь, нажав на иконку рюкзака",
-					pc: "откройте инвентарь, нажав E или I"
-				},
-				req: "joining in",
-				done: false
-			},
-			{
-				name: "full inventory",
-				desc: {
-					mobile: "fill up the inventory with items fully; hint: drag an item to the drop zone to remove it",
-					pc: "fill up the inventory with items fully; hint: use Q to drop an item from the inventory"
-				},
-				name_rus: "полный инвентарь",
-				desc_rus: {
-					mobile: "полностью заполните инвентарь; подсказка: перетащите предмет вне инвентаря, чтобы выкинуть его",
-					pc: "полностью заполните инвентарь предметами; подсказка: используйте Q, чтобы выбросить предмет из инвентаря"
-				},
-				req: "discovering inventory",
-				done: false
-			},
-			{
-				name: "achievements",
-				desc: {
-					mobile: "open achievements menu using the gold cup button",
-					pc: "open achievements menu using J or R"
-				},
-				name_rus: "достижения",
-				desc_rus: {
-					mobile: "откройте меню достижений, нажав на кнопку с кубком",
-					pc: "откройте меню достижений, нажав J или R"
-				},
-				req: "joining in",
-				done: false
-			},
-			{
-				name: "first steps",
-				desc: {
-					mobile: "make first steps using the left joystick",
-					pc: "make first steps using WASD"
-				},
-				name_rus: "первые шаги",
-				desc_rus: {
-					mobile: "совершите первые шаги, используя левый джойстик",
-					pc: "совершите первые шаги, используя WASD"
-				},
-				req: "joining in",
-				done: false
-			},
-			{
-				name: "outside the box",
-				desc: "leave the current level",
-				name_rus: "по ту сторону",
-				desc_rus: "покиньте текущий уровень, выйдя за его пределы",
-				req: "first steps",
-				done: false
-			},
-			{
-				name: "get a ride",
-				desc: {
-					mobile: "get a ride in the car by standing close to it and pressing PICK UP / CAR",
-					pc: "get a ride in the car by standing close to it and pressing F or SPACE"
-				},
-				name_rus: "поехали",
-				desc_rus: {
-					mobile: "сядьте в автомобиль, подойдя к нему близко и нажав кнопку PICK UP / CAR",
-					pc: "сядьте в автомобиль, подойдя к нему близко и нажав F или SPACE"
-				},
-				req: "first steps",
-				done: false
-			},
-			{
-				name: "pick an item",
-				desc: {
-					mobile: "pick up an item by standing close to it and pressing PICK UP",
-					pc: "pick up an item by standing close to it and pressing F or SPACE"
-				},
-				name_rus: "подобрать предмет",
-				desc_rus: {
-					mobile: "подберите предмет, подойдя к нему близко и нажав кнопку PICK UP",
-					pc: "подберите предмет, подойдя к нему близко и нажав F или SPACE"
-				},
-				req: "outside the box",
-				done: false
-			},
-			{
-				name: "yummy",
-				desc: {
-					mobile: "eat canned meat: select it in hotbar, close inventory and press USE",
-					pc: "eat canned meat: select it in inventory and left-click on your character"
-				},
-				name_rus: "вкусняшка",
-				desc_rus: {
-					mobile: "съешьте тушенку: выберите её в хотбаре, закройте инвентарь и нажмите USE",
-					pc: "съешьте тушенку: выберите её в инвентаре и нажмите ЛКМ по игроку"
-				},
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "stay hydrated",
-				desc: {
-					mobile: "drink water: select it in hotbar, close inventory and press USE",
-					pc: "drink water: select it in inventory and left-click on your character"
-				},
-				name_rus: "поддержка водного баланса",
-				desc_rus: {
-					mobile: "выпейте воду: выберите её в хотбаре, закройте инвентарь и нажмите USE",
-					pc: "выпейте воду: выберите её в инвентаре и нажмите ЛКМ по игроку"
-				},
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "healthy lifestyle",
-				desc: {
-					mobile: "use health pack: select it in hotbar, close inventory and press USE",
-					pc: "use health pack: select it in inventory and left-click on your character"
-				},
-				name_rus: "здоровый образ жизни",
-				desc_rus: {
-					mobile: "используйте аптечку: выберите её в хотбаре, закройте инвентарь и нажмите USE",
-					pc: "используйте аптечку: выберите её в инвентаре и нажмите ЛКМ по игроку"
-				},
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "fuel up",
-				desc: {
-					mobile: "use gasoline to refuel a car by standing close to it pressing USE",
-					pc: "use gasoline to refuel a car by standing close to it and pressing left mouse button"
-				},
-				name_rus: "заправка",
-				desc_rus: {
-					mobile: "используйте бензин, чтобы заправить авто через кнопку USE, подойдя близко к автомобилю и взяв бензин в руки в хотбаре",
-					pc: "воспользуйтесь бензином, чтобы заправить автомобиль, для этого встаньте к нему близко с бензином в руках и нажмите лкм"
-				},
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "get a gun",
-				desc: "find a gun and pick it up",
-				name_rus: "получить оружие",
-				desc_rus: "найдите и подберите оружие",
-				req: "pick an item",
-				done: false
-			},
-			{
-				name: "need for ammo",
-				desc: {
-					mobile: "try shooting with the right joystick without having any ammo",
-					pc: "try shooting a gun without having any ammo for it"
-				},
-				name_rus: "нужны патроны",
-				desc_rus: {
-					mobile: "попробуйте выстрелить правым джойстиком, не имея подходящих патронов",
-					pc: "попробуйте выстрелить из оружия, не имея подходящих патронов"
-				},
-				req: "get a gun",
-				done: false
-			},
-			{
-				name: "shoot 'em up",
-				desc: "kill an enemy by shooting at it",
-				name_rus: "зомби шутер",
-				desc_rus: "убейте врага, выстрелив по нему",
-				req: "get a gun",
-				done: false
-			},
-			{
-				name: "big guy",
-				desc: "kill the boss; it is able to spawn when enough enemies are killed",
-				name_rus: "большой парень",
-				desc_rus: "убейте босса; босс появляется, если игрок убивает достаточное количество врагов",
-				req: "shoot 'em up",
-				done: false
-			},
-			{
-				name: "they can shoot?",
-				desc: "kill the first shooting enemy",
-				name_rus: "они умеют стрелять?",
-				desc_rus: "убейте первого стрелка",
-				req: "big guy",
-				done: false
-			},
-			{
-				name: "big shooting guy",
-				desc: "kill a shooting boss; it is able to spawn when enough shooting enemies are killed",
-				name_rus: "большой стрелок",
-				desc_rus: "убейте босса стрелка; стреляющий босс появляется, если игрок убивает достаточное количество стрелков",
-				req: "big guy",
-				done: false
-			},
-			{
-				name: "red shooter",
-				desc: "kill one red shooter",
-				name_rus: "красный стрелок",
-				desc_rus: "убейте одного красного стрелка",
-				req: "big shooting guy",
-				done: false
-			},
-			{
-				name: "big red guy",
-				desc: "kill red boss; it is able to spawn when enough red shooting enemies are killed",
-				name_rus: "большой красный парень",
-				desc_rus: "убейте красного босса; красный босс появляется, если игрок убивает достаточное количество красных стрелков",
-				req: "big shooting guy",
-				done: false
-			},
-			{
-				name: "he has a sword?",
-				desc: "kill one yellow enemy",
-				name_rus: "у него меч?",
-				desc_rus: "убейте одного желтого врага",
-				req: "big red guy",
-				done: false
-			},
-			{
-				name: "big guy with a sword",
-				desc: "kill yellow boss; it is able to spawn when enough yellow enemies are killed",
-				name_rus: "большой парень с мечом",
-				desc_rus: "убейте желтого босса; желтый босс появляется, если игрок убивает достаточное количество желтых врагов",
-				req: "big red guy",
-				done: false
-			},
-			{
-				name: "rocket shooter",
-				desc: "kill one rocket shooting enemy",
-				name_rus: "стрелок с ракетницей",
-				desc_rus: "убейте одного стрелка с ракетницей",
-				req: "big guy with a sword",
-				done: false
-			},
-			{
-				name: "big military guy",
-				desc: "kill the boss with a rocket launcher; it is able to spawn when enough rocket shooting enemies are killed",
-				name_rus: "большой военный парень",
-				desc_rus: "убейте босса с ракетницей; босс с ракетницей появляется, если игрок убивает достаточное количество противников с ракетницей",
-				req: "big guy with a sword",
-				done: false
-			},
-			{
-				name: "rainbow",
-				desc: "kill one rainbow enemy",
-				name_rus: "радуга",
-				desc_rus: "убейте одного радужного противника",
-				req: "big military guy",
-				done: false
-			},
-			{
-				name: "huge rainbow guy",
-				desc: "kill the rainbow boss; it is able to spawn when enough rainbow enemies are killed",
-				name_rus: "гигантский радужный парень",
-				desc_rus: "убейте радужного босса; радужный босс появляется, если игрок убивает достаточное количество радужных врагов",
-				req: "big military guy",
-				done: false
-			},
-		]
+		achievements: achievementsList
 	};
 	return game_gui_element_create(g, "achievements", ach, achievements_update,
 		achievements_draw, achievements_destroy);
@@ -304,9 +56,19 @@ function achievements_update(ae, dt) {
 	ae.data.animstate += 0.0075 * dt;
 	let input = ae.game.input;
 	let scale = get_scale();
+	if (ae.data._cross_held === undefined) ae.data._cross_held = false;
+	let mx = input.mouse.x / scale;
+	let my = input.mouse.y / scale;
+	let freeTouch = null;
+	if (ae.game.mobile) {
+		freeTouch = input.touch.find(t => t.id !== input.joystick.left.id &&
+			t.id !== input.joystick.right.id);
+		if (freeTouch) {
+			mx = freeTouch.x / scale;
+			my = freeTouch.y / scale;
+		}
+	}
 	if (!ae.game.mobile && input.mouse.leftButtonPressed) {
-		let mx = input.mouse.x / scale;
-		let my = input.mouse.y / scale;
 		if (ae.data.offset_x < mx && mx < ae.data.offset_x + ae.data.width &&
 			ae.data.offset_y < my && my < ae.data.offset_y + ae.data.height) {
 			if (!ae.data.clicked) {
@@ -324,431 +86,106 @@ function achievements_update(ae, dt) {
 	}
 	let points = [];
 	if (ae.game.mobile) {
-		for (let t of input.touch) {
+		if (freeTouch) {
 			points.push({
-				x: t.x / scale,
-				y: t.y / scale
+				x: mx,
+				y: my
 			});
 		}
 	} else if (input.mouse.leftButtonPressed) {
 		points.push({
-			x: input.mouse.x / scale,
-			y: input.mouse.y / scale
+			x: mx,
+			y: my
 		});
 	}
+	let crossX = ae.data.offset_x + ae.data.width - ae.data.cross_width;
+	let crossY = ae.data.offset_y;
+	let is_over_cross = false;
 	for (let pt of points) {
-		let crossX = ae.data.offset_x + ae.data.width - ae.data.cross_width;
-		let crossY = ae.data.offset_y;
 		if (doRectsCollide(pt.x, pt.y, 0, 0, crossX, crossY, ae.data
 				.cross_width, ae.data.cross_width)) {
-			ae.shown = false;
-			if (ae.game.debug_console) {
-				ae.game.debug_console.unshift('hide achievements', pt.x, pt.y);
-			}
+			is_over_cross = true;
 			break;
 		}
 	}
+	if (ae.game.mobile) {
+		if (is_over_cross) {
+			ae.data._cross_held = true;
+			ae.data.clicked = false;
+		} else if (freeTouch && !is_over_cross) {
+			ae.data._cross_held = false;
+		} else if (!freeTouch && ae.data._cross_held) {
+			ae.data._cross_held = false;
+			ae.shown = false;
+			if (ae.game.debug_console) {
+				ae.game.debug_console.unshift('hide achievements via release');
+			}
+			return;
+		}
+	} else {
+		if (is_over_cross && !ae.data.was_left_down && input.mouse
+			.leftButtonPressed) {
+			ae.shown = false;
+			return;
+		}
+	}
+	ae.data.was_left_down = input.mouse.leftButtonPressed;
 }
 
 function achievements_draw(ae, ctx) {
 	let as = ae.data.achievements;
+	let scale = get_scale();
 	ctx.globalAlpha = 0.75;
 	ctx.fillStyle = "black";
 	ctx.fillRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data
 		.height);
 	ctx.strokeStyle = "white";
+	ctx.lineWidth = 2;
 	ctx.strokeRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data
 		.height);
 	ctx.globalAlpha = 1.0;
 	let cross_width = ae.data.width * 0.025;
 	ae.data.cross_width = cross_width;
+	let cx = ae.data.offset_x + ae.data.width - cross_width;
+	let cy = ae.data.offset_y;
 	ctx.fillStyle = "#444444";
-	ctx.fillRect(ae.data.offset_x + ae.data.width - cross_width, ae.data
-		.offset_y, cross_width, cross_width);
+	ctx.fillRect(cx, cy, cross_width, cross_width);
 	ctx.strokeStyle = "white";
-	ctx.strokeRect(ae.data.offset_x + ae.data.width - cross_width, ae.data
-		.offset_y, cross_width, cross_width);
-	drawLine(ctx, ae.data.offset_x + ae.data.width - cross_width, ae.data
-		.offset_y, ae.data.offset_x + ae.data.width, ae.data.offset_y +
-		cross_width, "white", 0.1 * cross_width);
-	drawLine(ctx, ae.data.offset_x + ae.data.width - cross_width, ae.data
-		.offset_y + cross_width, ae.data.offset_x + ae.data.width, ae.data
-		.offset_y, "white", 0.1 * cross_width);
-	let x = ae.data.x;
-	let y = ae.data.y;
+	ctx.strokeRect(cx, cy, cross_width, cross_width);
+	drawLine(ctx, cx, cy, cx + cross_width, cy + cross_width, "white", 0.1 *
+		cross_width);
+	drawLine(ctx, cx, cy + cross_width, cx + cross_width, cy, "white", 0.1 *
+		cross_width);
+	let startX = ae.data.x;
+	let startY = ae.data.y;
 	let w = ae.data.icon_size;
 	let h = ae.data.icon_size;
-	let achs = [
-		[
-			"joining in",
-			"achievements",
-			"discovering inventory",
-			"full inventory",
-		],
-		[
-			"first steps",
-			"outside the box",
-			"get a ride",
-			"fuel up",
-		],
-		[
-			"pick an item",
-			"yummy",
-			"stay hydrated",
-			"healthy lifestyle",
-		],
-		[
-			"get a gun",
-			"need for ammo",
-		],
-		[
-			"shoot 'em up",
-			"they can shoot?",
-			"red shooter",
-			"he has a sword?",
-			"rocket shooter",
-			"rainbow",
-		],
-		[
-			"big guy",
-			"big shooting guy",
-			"big red guy",
-			"big guy with a sword",
-			"big military guy",
-			"huge rainbow guy",
-		],
-	]
-	let mx = ae.game.input.mouse.x / get_scale();
-	let my = ae.game.input.mouse.y / get_scale();
-	for (let i = 0; i < achs.length; i++) {
-		for (let j = 0; j < achs[i].length; j++)
-			achievement_icon_draw(ctx, as, achs[i][j], x + 2 * i * w, y + 2 *
-				j * h, w, h,
-				false, 50, 50, 1000, 1000, ae.data.animstate);
-	}
-	for (let i = 0; i < achs.length; i++) {
-		for (let j = 0; j < achs[i].length; j++)
-			if (x + 2 * i * w < mx && mx < x + 2 * i * w + w && y + 2 * j * h <
-				my && my < y + 2 * j * h + h && achs[i][j]) {
-				if (!achievement_get(as, achs[i][j]).req || achievement_get(as,
-						achievement_get(as, achs[i][j]).req).done)
-					achievement_draw_popup(ctx, ae, achs[i][j], mx, my, w, h);
+	let spacing = 2.0;
+	let mx = ae.game.input.mouse.x / scale;
+	let my = ae.game.input.mouse.y / scale;
+	let hoveredAchKey = null;
+	for (let key in ACHIEVEMENT_REGISTRY) {
+		let config = ACHIEVEMENT_REGISTRY[key];
+		let ix = startX + config.grid.x * (w * spacing);
+		let iy = startY + config.grid.y * (h * spacing);
+		achievement_icon_draw(ctx, as, key, ix, iy, w, h,
+			false, ae.data.offset_x, ae.data.offset_y,
+			ae.data.offset_x + ae.data.width,
+			ae.data.offset_y + ae.data.height,
+			ae.data.animstate);
+		if (mx > ix && mx < ix + w && my > iy && my < iy + h) {
+			let canSee = true;
+			if (config.req) {
+				let reqAch = achievement_get(as, config.req);
+				if (!reqAch || !reqAch.done) canSee = false;
 			}
-	}
-}
-
-function achievements_translate(lang, text) {
-	return text;
-}
-
-function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
-	50, bby = 50, bbw = 1000, bbh = 1000, animstate = null, back = true) {
-	if (x < bbx || x > bbw - 0.2 * w || y < bby || y > bbh - 0.2 * h || !name)
-		return;
-	let ach = achievement_get(as, name);
-	if (achievement_get(as, name).req && !achievement_get(as, achievement_get(
-			as, name).req).done)
-		return;
-	if (!done) {
-		if (ach)
-			done = ach.done;
-	}
-	let c0 = "red";
-	let c1 = "yellow";
-	let c2 = "lime";
-	let c3 = "blue";
-	let c4 = "cyan";
-	let c5 = "purple";
-	let c6 = "orange";
-	let c7 = "green";
-	let c8 = "white";
-	let c9 = "black";
-	let c10 = "gray";
-	let c11 = "#771111";
-	let c12 = "#1177dd";
-	let c13 = "#1177ff";
-	let c14 = "#335544";
-	let c16 = "#cc1111";
-	if (!done) {
-		c0 = "black";
-		c1 = "white";
-		c2 = "white";
-		c3 = "black";
-		c4 = "gray";
-		c5 = "gray";
-		c6 = "gray";
-		c7 = "black";
-		c8 = "white";
-		c9 = "black";
-		c10 = "white";
-		c11 = "#111111";
-		c12 = "#777777";
-		c13 = "#777777";
-		c14 = "#333333";
-		c16 = "#111111";
-	}
-	let c15 = "black";
-	if (animstate != null) {
-		let r = Math.cos(0.1 * animstate) * 15;
-		let g = 0.7 * (Math.cos(0.1 * animstate) + Math.sin(0.1 * animstate)) *
-			15;
-		let b = Math.sin(0.1 * animstate) * 15;
-		let avg = Math.floor(0.11 * (r + g + b) * (r + g + b));
-		r = Math.floor(r * r);
-		g = Math.floor(g * g);
-		b = Math.floor(b * b);
-		if (done)
-			c15 = "#" + (r).toString(16).padStart(2, '0') + (g).toString(16)
-			.padStart(2, '0') + (b).toString(16).padStart(2, '0');
-		if (!done)
-			c15 = "#" + (avg).toString(16).padStart(2, '0') + (avg).toString(16)
-			.padStart(2, '0') + (avg).toString(16).padStart(2, '0');
-	}
-	ctx.lineWidth = 0.025 * w;
-	if (back || true) {
-		ctx.globalAlpha *= 0.25;
-		ctx.fillStyle = done ? "green" : "red";
-		ctx.fillRect(x, y, w, h);
-		ctx.strokeStyle = "white";
-		ctx.strokeRect(x, y, w, h);
-		ctx.globalAlpha *= 4;
-	}
-	if (name == "joining in") {
-		ctx.fillStyle = c0;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "huge rainbow guy") {
-		ctx.fillStyle = c15;
-		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-	} else if (name == "rainbow") {
-		ctx.fillStyle = c15;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "rainbow boss") {
-		ctx.fillStyle = c15;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
-	} else if (name == "big military guy") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-		ctx.strokeStyle = c3;
-		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-	} else if (name == "rocket shooter") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c3;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "boss with a rocket launcher") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c3;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
-	} else if (name == "big shooting guy") {
-		ctx.fillStyle = c14;
-		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-	} else if (name == "they can shoot?") {
-		ctx.fillStyle = c14;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "time to boss, round II") {
-		ctx.fillStyle = c14;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
-	} else if (name == "big guy with a sword") {
-		ctx.fillStyle = c1;
-		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-		ctx.strokeStyle = c2;
-		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-	} else if (name == "he has a sword?") {
-		ctx.fillStyle = c1;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c2;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "boss with a sword") {
-		ctx.fillStyle = c1;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c2;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
-	} else if (name == "big red guy") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-		ctx.strokeStyle = c0;
-		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-	} else if (name == "red shooter") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c0;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "red boss") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c0;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
-	} else if (name == "big guy") {
-		ctx.fillStyle = c7;
-		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-	} else if (name == "shoot 'em up") {
-		ctx.fillStyle = c7;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "time to boss") {
-		ctx.fillStyle = c7;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		drawText(ctx, x + 0.3 * w, y + 0.45 * h, "16", Math.floor(0.2 * w));
-	} else if (name == "get a gun") {
-		ctx.fillStyle = c9;
-		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-		ctx.strokeStyle = c10;
-		ctx.lineWidth = 0.05 * w;
-		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-	} else if (name == "fuel up") {
-		ctx.fillStyle = c0;
-		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.05, h * 0.2);
-		ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.05, h * 0.2);
-		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.2, h * 0.05);
-		ctx.lineWidth = 0.01 * w;
-		ctx.strokeStyle = c9;
-		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		ctx.fillStyle = c1;
-		ctx.fillRect(x + w * 0.55, y + h * 0.15, w * 0.2, h * 0.05);
-		drawLine(ctx, x + w * 0.3, y + h * 0.3, x + w * 0.7, y + h * 0.7, c16,
-			0.05 * w);
-		drawLine(ctx, x + w * 0.7, y + h * 0.3, x + w * 0.3, y + h * 0.7, c16,
-			0.05 * w);
-		ctx.fillStyle = c16;
-		ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
-	} else if (name == "yummy") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
-		ctx.fillStyle = c11;
-		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-	} else if (name == "stay hydrated") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
-		ctx.fillStyle = c12;
-		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-	} else if (name == "healthy lifestyle") {
-		ctx.fillStyle = c8;
-		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		ctx.fillStyle = c13;
-		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
-		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
-		ctx.strokeStyle = c13;
-		ctx.lineWidth = h * 0.01;
-		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-	} else if (name == "need for ammo") {
-		let N = 4;
-		for (let i = 0; i < N; i++) {
-			ctx.fillStyle = c1;
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
-				w / N, 0.5 * h);
-			ctx.fillStyle = c6;
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
-				w / N, 0.125 * h);
-			ctx.strokeStyle = c6;
-			ctx.lineWidth = 0.01 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
-				0.5 * w / N, 0.5 * h);
-		}
-		ctx.fillStyle = "black";
-		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-		ctx.strokeStyle = "gray";
-		ctx.lineWidth = 0.05 * w;
-		ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-	} else if (name == "pick an item") {
-		let N = 4;
-		for (let i = 0; i < N; i++) {
-			ctx.fillStyle = c1;
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
-				w / N, 0.5 * h);
-			ctx.fillStyle = c6;
-			ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h, 0.5 *
-				w / N, 0.125 * h);
-			ctx.strokeStyle = c6;
-			ctx.lineWidth = 0.01 * w;
-			ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y + 0.25 * h,
-				0.5 * w / N, 0.5 * h);
-		}
-	} else if (name == "first steps") {
-		drawLine(ctx, x + w * 0.05, y + h * 0.35, x + w * 0.5, y + h * 0.35, c4,
-			w * 0.05);
-		drawLine(ctx, x + w * 0.05, y + h * 0.5, x + w * 0.5, y + h * 0.5, c4,
-			w * 0.05);
-		drawLine(ctx, x + w * 0.05, y + h * 0.65, x + w * 0.5, y + h * 0.65, c4,
-			w * 0.05);
-		ctx.fillStyle = c0;
-		ctx.fillRect(x + 0.3 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.3 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-	} else if (name == "get a ride") {
-		ctx.fillStyle = c5;
-		ctx.fillRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
-	} else if (name == "outside the box") {
-		ctx.fillStyle = c10;
-		ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-		ctx.fillStyle = c0;
-		ctx.fillRect(x + 0.7 * w, y + 0.3 * h, 0.2 * w, 0.2 * h);
-		ctx.strokeStyle = c8;
-		ctx.strokeRect(x + 0.7 * w, y + 0.3 * h, 0.2 * w, 0.2 * h);
-	} else if (name == "discovering inventory") {
-		for (let i = 0; i < 5; i++) {
-			for (let j = 0; j < 4; j++) {
-				ctx.fillStyle = c3;
-				ctx.fillRect(x + 0.15 * w * i + 0.1 * w, y + 0.15 * h * j +
-					0.1 * h, 0.1 * w, 0.1 * h);
+			if (canSee) {
+				hoveredAchKey = key;
 			}
 		}
-	} else if (name == "full inventory") {
-		let cols = [c9, c8, c14, c11, c1];
-		for (let i = 0; i < 5; i++) {
-			for (let j = 0; j < 4; j++) {
-				ctx.fillStyle = c3;
-				ctx.fillRect(x + 0.15 * w * i + 0.1 * w, y + 0.15 * h * j +
-					0.1 * h, 0.1 * w, 0.1 * h);
-				ctx.fillStyle = cols[(3 * i + 2 * j + i * j) % cols.length];
-				ctx.fillRect(x + 0.15 * w * i + 0.1 * w, y + 0.15 * h * j +
-					0.1 * h, 0.075 * w, 0.075 * h);
-			}
-		}
-	} else if (name == "achievements") {
-		let cols = [c0, c1, c2, c3, c7];
-		for (let i = 0; i < 5; i++) {
-			for (let j = 0; j < 5; j++) {
-				ctx.fillStyle = cols[(2 * i + j) % cols.length];
-				ctx.fillRect(x + 0.15 * w * i + 0.05 * w, y + 0.15 * h * j +
-					0.05 * h, 0.1 * w, 0.1 * h);
-			}
-		}
-	} else {
-		ctx.fillStyle = "#000000";
-		ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-		ctx.fillStyle = c5;
-		ctx.fillRect(x + 0.5 * w, y + 0.1 * h, 0.4 * w, 0.4 * h);
-		ctx.fillRect(x + 0.1 * w, y + 0.5 * h, 0.4 * w, 0.4 * h);
+	}
+	if (hoveredAchKey) {
+		achievement_draw_popup(ctx, ae, hoveredAchKey, mx, my, w, h);
 	}
 }
 
@@ -760,23 +197,25 @@ function achievement_get(as, name) {
 }
 
 function achievement_do(as, name, ash = null, silent = false) {
-	for (let i = 0; i < as.length; i++) {
-		if (as[i].name == name && !as[i].done && !(achievement_get(as, name)
-				.req && !achievement_get(as, achievement_get(as, name).req).done
-			)) {
-			if (ash && !silent) {
-				audio_play("data/sfx/achievement_get_1.mp3", 0.1875);
-				ash.data.achievements.unshift(name);
-			}
-			as[i].done = true;
-		}
+	let achData = achievement_get(as, name);
+	if (!achData || achData.done) return;
+	const config = ACHIEVEMENT_REGISTRY[name];
+	if (config && config.req) {
+		achievement_do(as, config.req, ash, silent);
+		let reqAch = achievement_get(as, config.req);
+		if (reqAch && !reqAch.done) return;
 	}
+	if (ash && !silent) {
+		audio_play("data/sfx/achievement_get_1.mp3", 0.1875);
+		ash.data.achievements.unshift(name);
+	}
+	achData.done = true;
 }
 
 function achievements_shower_create(g, ae = null) {
 	let ash = {
 		x: 50,
-		y: 120,
+		y: 135,
 		w: 800,
 		h: 50,
 		achievements: [],
@@ -889,4 +328,85 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 		drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
 			fontsize);
 	}
+}
+
+function get_achievement_palette(done, animstate) {
+	let p = {
+		c0: "red",
+		c1: "yellow",
+		c2: "lime",
+		c3: "blue",
+		c4: "cyan",
+		c5: "purple",
+		c6: "orange",
+		c7: "green",
+		c8: "white",
+		c9: "black",
+		c10: "gray",
+		c11: "#771111",
+		c12: "#1177dd",
+		c13: "#1177ff",
+		c14: "#335544",
+		c16: "#cc1111",
+		c15: "black"
+	};
+	if (!done) {
+		p.c0 = "black";
+		p.c1 = "white";
+		p.c2 = "white";
+		p.c3 = "black";
+		p.c4 = "gray";
+		p.c5 = "gray";
+		p.c6 = "gray";
+		p.c7 = "black";
+		p.c8 = "white";
+		p.c9 = "black";
+		p.c10 = "white";
+		p.c11 = "#111111";
+		p.c12 = "#777777";
+		p.c13 = "#777777";
+		p.c14 = "#333333";
+		p.c16 = "#111111";
+	}
+	if (animstate !== null) {
+		let r = Math.cos(0.1 * animstate) * 15;
+		let g = 0.7 * (Math.cos(0.1 * animstate) + Math.sin(0.1 * animstate)) *
+			15;
+		let b = Math.sin(0.1 * animstate) * 15;
+		let avg = Math.floor(0.11 * (r + g + b) * (r + g + b));
+		r = Math.floor(r * r);
+		g = Math.floor(g * g);
+		b = Math.floor(b * b);
+		if (done) p.c15 = "#" + r.toString(16).padStart(2, '0') + g.toString(16)
+			.padStart(2, '0') + b.toString(16).padStart(2, '0');
+		else p.c15 = "#" + avg.toString(16).padStart(2, '0').repeat(3);
+	}
+	return p;
+}
+
+function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
+	50, bby = 50, bbw = 1000, bbh = 1000, animstate = null, back = true) {
+	if (x < bbx || x > bbw - 0.2 * w || y < bby || y > bbh - 0.2 * h || !name)
+		return;
+	const config = ACHIEVEMENT_REGISTRY[name];
+	if (!config) return;
+	const ach = achievement_get(as, name);
+	if (config.req) {
+		const reqAch = achievement_get(as, config.req);
+		if (reqAch && !reqAch.done) return;
+	}
+	if (!done && ach) {
+		done = ach.done;
+	}
+	const p = get_achievement_palette(done, animstate);
+	ctx.lineWidth = 0.025 * w;
+	if (back) {
+		ctx.globalAlpha *= 0.25;
+		ctx.fillStyle = done ? "green" : "red";
+		ctx.fillRect(x, y, w, h);
+		ctx.strokeStyle = "white";
+		ctx.strokeRect(x, y, w, h);
+		ctx.globalAlpha *= 4;
+	}
+	config.draw(ctx, x, y, w, h, p);
 }

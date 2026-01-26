@@ -1,4 +1,11 @@
 function trashcan_create(g, x, y) {
+	let trashcans = g.objects.filter((obj) => obj.name == "trashcan" && !obj
+		.destroyed);
+	if (trashcans.length > 30) {
+		for (let i = 0; i < trashcans.length - 30; i++) {
+			trashcan_destroy(trashcans[i]);
+		}
+	}
 	let width = 40;
 	let height = 60;
 	let t = {
@@ -7,7 +14,8 @@ function trashcan_create(g, x, y) {
 		w: width,
 		h: height,
 		body: Matter.Bodies.rectangle(x, y, width, height, {
-			mass: 5,
+			inertia: Infinity,
+			mass: 1000.5,
 			friction: 0.5,
 			restitution: 0.1,
 			collisionFilter: {

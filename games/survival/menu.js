@@ -104,6 +104,18 @@ function menu_create() {
 		touched_button_previus_frame: false,
 		mobile: false
 	};
+	let saved = localStorage.getItem("game_settings");
+	if (saved) {
+		try {
+			let data = JSON.parse(saved);
+			Object.assign(m, data);
+			if (data.volume !== undefined) GLOBAL_VOLUME = data.volume;
+			console.log("Загруженные настройки:",
+				data);
+		} catch (e) {
+			console.error("Ошибка загрузки настроек", e);
+		}
+	}
 	m.buttons = m.language_selection_buttons;
 	return m;
 }
@@ -178,6 +190,7 @@ function menu_draw(ctx, m) {
 }
 
 function menu_update(m, dt, input) {
+	let changed = false;
 	if (!m.mobile && input.touch.length > 0)
 		m.mobile = true;
 	let would_be_able_to_touch_button = false;
@@ -215,6 +228,7 @@ function menu_update(m, dt, input) {
 	} else if ((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter',
 			true) || isMouseLeftButtonPressed(input) || (isScreenTouched(
 			input) && m.can_touch_button))) {
+		changed = true;
 		if (m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
 		} else if (m.buttons[m.iselected] == "respawn and continue game") {
@@ -319,6 +333,9 @@ function menu_update(m, dt, input) {
 		m.touched_button_previus_frame = true;
 	else
 		m.touched_button_previus_frame = false;
+	if (changed) {
+		menu_save_settings(m);
+	}
 }
 
 function menu_translate(lang, str) {
@@ -432,4 +449,24 @@ function menu_translate(lang, str) {
 			str = "автоматическое прицеливание";
 	}
 	return prefix + str;
+}
+
+function menu_save_settings(m) {
+	const settings = {
+		want_player_color: m.want_player_color,
+		want_player_draw_gun: m.want_player_draw_gun,
+		want_enemies_spawn: m.want_enemies_spawn,
+		want_trees: m.want_trees,
+		want_language: m.want_language,
+		want_hints: m.want_hints,
+		want_ammo_pickup_last: m.want_ammo_pickup_last,
+		want_lose_items: m.want_lose_items,
+		want_respawn_here: m.want_respawn_here,
+		want_autorespawn: m.want_autorespawn,
+		want_auto_aim: m.want_auto_aim,
+		want_indicators: m.want_indicators,
+		want_auto_pickup: m.want_auto_pickup,
+		volume: GLOBAL_VOLUME
+	};
+	localStorage.setItem("game_settings", JSON.stringify(settings));
 }

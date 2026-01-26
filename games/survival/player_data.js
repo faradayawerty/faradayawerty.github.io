@@ -353,7 +353,6 @@ const ITEM_BEHAVIORS = {
 	},
 	[ITEM_BOSSIFIER]: {
 		action: (p, player_obj) => {
-			
 			let target = game_object_find_closest(player_obj.game, p
 				.body.position.x, p.body.position.y, "animal", 500);
 			let isAnimal = true;
@@ -364,11 +363,9 @@ const ITEM_BEHAVIORS = {
 				isAnimal = false;
 			}
 			if (!target) return false;
-			
 			enemy_create(target.game, target.data.body.position.x,
 				target.data.body.position.y, true, false, target
 				.data.type);
-			
 			if (isAnimal) animal_destroy(target, false);
 			else enemy_destroy(target);
 			return true;
@@ -406,7 +403,7 @@ const ITEM_BEHAVIORS = {
 		achievement: "healthy lifestyle",
 		action: (p) => {
 			p.health += Math.min(p.max_health - p.health, (Math
-			.random() * 0.125 + 0.125) * p.max_health);
+				.random() * 0.125 + 0.125) * p.max_health);
 			return true;
 		}
 	},
@@ -424,7 +421,6 @@ const ITEM_BEHAVIORS = {
 		}
 	}
 };
-
 ITEMS_DRINKS.forEach(id => {
 	ITEM_BEHAVIORS[id] = {
 		sfx: "data/sfx/water_1.mp3",
@@ -437,7 +433,6 @@ ITEMS_DRINKS.forEach(id => {
 		}
 	};
 });
-
 ITEMS_FOODS.forEach(id => {
 	ITEM_BEHAVIORS[id] = {
 		sfx: "data/sfx/eating_1.mp3",
