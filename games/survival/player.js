@@ -397,8 +397,22 @@ function player_update(player_object, dt) {
 		let targetX = shootDir.x;
 		let targetY = shootDir.y;
 		if (player_object.game.settings.auto_aim) {
-			let nearest_enemy = game_object_find_closest(player_object.game, p
-				.body.position.x, p.body.position.y, "rocket", 800);
+			let enemy_rockets = player_object.game.objects.filter(obj =>
+				obj.name === "rocket" && obj.data && obj.data.enemy === true
+			);
+			let nearest_enemy = null;
+			let min_dist = 800;
+			enemy_rockets.forEach(rocket => {
+				let dx = rocket.data.body.position.x - p.body.position
+					.x;
+				let dy = rocket.data.body.position.y - p.body.position
+					.y;
+				let dist = Math.sqrt(dx * dx + dy * dy);
+				if (dist < min_dist) {
+					min_dist = dist;
+					nearest_enemy = rocket;
+				}
+			});
 			if (!nearest_enemy) {
 				nearest_enemy = game_object_find_closest(player_object.game, p
 					.body.position.x, p.body.position.y, "enemy", 800);
@@ -819,12 +833,12 @@ function player_get_best_weapon_with_ammo(player_object) {
 		ITEM_RAINBOW_PISTOLS,
 		ITEM_ROCKET_SHOTGUN,
 		ITEM_ROCKET_LAUNCHER,
-		ITEM_PLASMA_PISTOL,
-		ITEM_PLASMA_LAUNCHER,
 		ITEM_GREEN_GUN,
 		ITEM_SWORD,
 		ITEM_RED_SHOTGUN,
 		ITEM_RED_PISTOLS,
+		ITEM_PLASMA_PISTOL,
+		ITEM_PLASMA_LAUNCHER,
 		ITEM_MINIGUN,
 		ITEM_SHOTGUN,
 		ITEM_DESERT_EAGLE,

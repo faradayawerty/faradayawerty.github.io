@@ -1,4 +1,4 @@
-const ACHIEVEMENT_REGISTRY = {
+let ACHIEVEMENT_REGISTRY = {
 	"joining in": {
 		grid: {
 			x: 0,
@@ -26,8 +26,8 @@ const ACHIEVEMENT_REGISTRY = {
 			y: 1
 		},
 		name: {
-			en: "achievements",
-			ru: "достижения"
+			en: "what an achievement",
+			ru: "вот это достижение"
 		},
 		desc: {
 			mobile: {

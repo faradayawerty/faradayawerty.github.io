@@ -35,27 +35,23 @@ function input_create() {
 function getButtonRegions(ctx) {
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
-	let s = Math.min(w, h) * 0.12;
-	let r = s / 2;
-	let h_btn = r * 0.8;
-	let w_use = r * 1.6;
-	let w_pick = r * 3.8;
-	let gap = 16;
-	let totalWidth = w_use + gap + w_pick;
+	let btnSize = Math.min(w, h) * 0.15;
+	let gap = 20;
+	let totalWidth = (btnSize * 2) + gap;
 	let startX = (w - totalWidth) / 2;
 	let uy = 5 * h / 6;
 	return {
 		use: {
 			x1: startX,
-			x2: startX + w_use,
-			y1: uy - h_btn / 2,
-			y2: uy + h_btn / 2
+			x2: startX + btnSize,
+			y1: uy - btnSize / 2,
+			y2: uy + btnSize / 2
 		},
 		pick: {
-			x1: startX + w_use + gap,
-			x2: startX + w_use + gap + w_pick,
-			y1: uy - h_btn / 2,
-			y2: uy + h_btn / 2
+			x1: startX + btnSize + gap,
+			x2: startX + (btnSize * 2) + gap,
+			y1: uy - btnSize / 2,
+			y2: uy + btnSize / 2
 		}
 	};
 }
@@ -291,39 +287,7 @@ function drawJoysticks(ctx, joystick) {
 function drawMobileActionButtons(ctx, input) {
 	if (!input || input.touch === undefined) return;
 	let regions = getButtonRegions(ctx);
-	let ux = (regions.use.x1 + regions.use.x2) / 2;
-	let uy = (regions.use.y1 + regions.use.y2) / 2;
-	let fx = (regions.pick.x1 + regions.pick.x2) / 2;
-	let fy = (regions.pick.y1 + regions.pick.y2) / 2;
-	let w_use = regions.use.x2 - regions.use.x1;
-	let w_pick = regions.pick.x2 - regions.pick.x1;
-	let h_btn = regions.use.y2 - regions.use.y1;
-	let isUsePressed = false;
-	let isPickPressed = false;
-	for (let t of input.touch) {
-		if (t.x > regions.use.x1 && t.x < regions.use.x2 && t.y > regions.use
-			.y1 && t.y < regions.use.y2) isUsePressed = true;
-		if (t.x > regions.pick.x1 && t.x < regions.pick.x2 && t.y > regions.pick
-			.y1 && t.y < regions.pick.y2) isPickPressed = true;
-	}
-	input.keys.down['c'] = isUsePressed;
-	input.keys.down['f'] = isPickPressed;
-	const drawFlatBase = (x, y, bw, bh, active) => {
-		ctx.globalAlpha = active ? 0.8 : 0.35;
-		ctx.fillStyle = "#4477ff";
-		ctx.beginPath();
-		ctx.roundRect(x - bw / 2, y - bh / 2, bw, bh, 4);
-		ctx.fill();
-		ctx.strokeStyle = "rgba(255,255,255,0.5)";
-		ctx.lineWidth = 1;
-		ctx.stroke();
-		ctx.globalAlpha = 1.0;
-	};
-	let p = 2.2;
-	let th = p * 5;
-	drawFlatBase(ux, uy, w_use, h_btn, isUsePressed);
-	ctx.fillStyle = "white";
-	const renderLet = (data, ox, oy) => {
+	const renderLet = (data, ox, oy, p) => {
 		data.forEach((row, i) => {
 			row.split('').forEach((col, j) => {
 				if (col === '#') ctx.fillRect(ox + j * p,
@@ -331,32 +295,104 @@ function drawMobileActionButtons(ctx, input) {
 			});
 		});
 	};
-	renderLet(["# #", "# #", "# #", "# #", "###"], ux - p * 5.5, uy - th / 2);
-	renderLet(["###", "#  ", "###", "  #", "###"], ux - p * 1.5, uy - th / 2);
-	renderLet(["###", "#  ", "###", "#  ", "###"], ux + p * 2.5, uy - th / 2);
-	drawFlatBase(fx, fy, w_pick, h_btn, isPickPressed);
-	ctx.fillStyle = "white";
-	let curX = fx - (p * 34) / 2;
-	let curY = fy - th / 2;
-	renderLet(["###", "# #", "###", "#  ", "#  "], curX, curY);
-	curX += 4 * p;
-	renderLet([" # ", " # ", " # ", " # ", " # "], curX, curY);
-	curX += 3 * p;
-	renderLet(["###", "#  ", "#  ", "#  ", "###"], curX, curY);
-	curX += 4 * p;
-	renderLet(["# #", "# #", "## ", "# #", "# #"], curX, curY);
-	curX += 4 * p;
-	curX += 2 * p;
-	ctx.strokeStyle = "white";
-	ctx.lineWidth = p;
-	ctx.beginPath();
-	ctx.moveTo(curX, curY + th);
-	ctx.lineTo(curX + p * 2, curY);
-	ctx.stroke();
-	curX += 4 * p;
-	renderLet(["###", "#  ", "#  ", "#  ", "###"], curX, curY);
-	curX += 4 * p;
-	renderLet(["###", "# #", "###", "# #", "# #"], curX, curY);
-	curX += 4 * p;
-	renderLet(["###", "# #", "###", "## ", "# #"], curX, curY);
+	const drawButton = (region, type, isActive) => {
+		let bw = region.x2 - region.x1;
+		let bh = region.y2 - region.y1;
+		let cx = (region.x1 + region.x2) / 2;
+		let cy = (region.y1 + region.y2) / 2;
+		ctx.globalAlpha = isActive ? 0.8 : 0.35;
+		ctx.fillStyle = "#4477ff";
+		ctx.beginPath();
+		ctx.roundRect(region.x1, region.y1, bw, bh, bw * 0.15);
+		ctx.fill();
+		ctx.strokeStyle = "rgba(255,255,255,0.5)";
+		ctx.lineWidth = 2;
+		ctx.stroke();
+		ctx.globalAlpha = 1.0;
+		ctx.fillStyle = "white";
+		if (type === 'USE') {
+			let p = bw * 0.05;
+			let tw = p * 11;
+			let th = p * 5;
+			renderLet(["# #", "# #", "# #", "# #", "###"], cx - tw / 2, cy -
+				th / 2, p);
+			renderLet(["###", "#  ", "###", "  #", "###"], cx - tw / 2 + p *
+				4, cy - th / 2, p);
+			renderLet(["###", "#  ", "###", "#  ", "###"], cx - tw / 2 + p *
+				8, cy - th / 2, p);
+		} else {
+			let p = bw * 0.038;
+			let th = p * 5;
+			let gap = p * 3;
+			let totalH = (th * 2) + gap;
+			let startY = cy - totalH / 2;
+			let pickUpWords = [{
+					m: ["###", "# #", "###", "#  ", "#  "],
+					w: 3
+				},
+				{
+					m: ["#", "#", "#", "#", "#"],
+					w: 1
+				},
+				{
+					m: ["###", "#  ", "#  ", "#  ", "###"],
+					w: 3
+				},
+				{
+					m: ["# #", "# #", "## ", "# #", "# #"],
+					w: 3
+				},
+				{
+					m: [],
+					w: 2
+				},
+				{
+					m: ["# #", "# #", "# #", "# #", "###"],
+					w: 3
+				},
+				{
+					m: ["###", "# #", "###", "#  ", "#  "],
+					w: 3
+				}
+			];
+			let tw1 = pickUpWords.reduce((acc, curr) => acc + curr.w + 1,
+				0) * p;
+			let visualOffset = p * 0.8;
+			let curX1 = (cx - tw1 / 2) + visualOffset;
+			pickUpWords.forEach(letter => {
+				if (letter.m.length > 0) renderLet(letter.m, curX1,
+					startY, p);
+				curX1 += (letter.w + 1) * p;
+			});
+			let carWords = [{
+					m: ["###", "#  ", "#  ", "#  ", "###"],
+					w: 3
+				},
+				{
+					m: ["###", "# #", "###", "# #", "# #"],
+					w: 3
+				},
+				{
+					m: ["###", "# #", "###", "## ", "# #"],
+					w: 3
+				}
+			];
+			let tw2 = carWords.reduce((acc, curr) => acc + curr.w + 1, 0) *
+				p;
+			let curX2 = cx - tw2 / 2;
+			let line2Y = startY + th + gap;
+			carWords.forEach(letter => {
+				renderLet(letter.m, curX2, line2Y, p);
+				curX2 += (letter.w + 1) * p;
+			});
+		}
+	};
+	let isUsePressed = input.touch.some(t => t.x > regions.use.x1 && t.x <
+		regions.use.x2 && t.y > regions.use.y1 && t.y < regions.use.y2);
+	let isPickPressed = input.touch.some(t => t.x > regions.pick.x1 && t.x <
+		regions.pick.x2 && t.y > regions.pick.y1 && t.y < regions.pick.y2);
+	input.keys.down['c'] = isUsePressed;
+	input.keys.down['f'] = isPickPressed;
+	drawButton(regions.use, 'USE', isUsePressed);
+	drawButton(regions.pick, 'PICK_CAR', isPickPressed);
 }

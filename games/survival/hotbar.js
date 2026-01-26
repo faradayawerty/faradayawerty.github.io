@@ -131,9 +131,9 @@ function hotbar_draw(hotbar_object, ctx) {
 			ctx.strokeRect(x, y, s, s);
 			let iconPadding = s * 0.2;
 			let iconSize = s - iconPadding * 2;
-			if (ITEM_RENDERERS[itemKey]) {
+			if (ITEMS_DATA[itemKey].render) {
 				ctx.globalAlpha = 0.85;
-				ITEM_RENDERERS[itemKey](ctx, x + iconPadding, y +
+				ITEMS_DATA[itemKey].render(ctx, x + iconPadding, y +
 					iconPadding, iconSize, iconSize, hb.animation_state);
 			}
 			ctx.restore();

@@ -276,8 +276,8 @@ function item_draw(item_object, ctx) {
 function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
 	if (id === 0)
 		return;
-	let renderer = ITEM_RENDERERS[id] || ITEM_RENDERERS.default;
-	renderer(ctx, x, y, w, h, animstate);
+	let item = ITEMS_DATA[id] || ITEMS_DATA.default;
+	item.render(ctx, x, y, w, h, animstate);
 }
 
 function item_pickup(inventory_element, item_object, force = false) {

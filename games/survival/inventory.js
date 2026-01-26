@@ -1,3 +1,6 @@
+let INVENTORY_X = 40;
+let INVENTORY_Y = 40;
+
 function inventory_create(g, attached_to_object = null) {
 	let inv = {
 		slot_size: 80,
@@ -42,7 +45,7 @@ function inventory_draw(inventory_element, ctx) {
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
-			let sy = 120 + (inv.slot_size * 1.05) * i;
+			let sy = INVENTORY_Y + (inv.slot_size * 1.05) * i;
 			ctx.save();
 			ctx.globalAlpha = 0.9;
 			if (inv.imove === i && inv.jmove === j)
@@ -63,7 +66,8 @@ function inventory_draw(inventory_element, ctx) {
 		let btnW = 120,
 			btnH = 50,
 			gap = 20;
-		let startY = 120 + (inv.slot_size * 1.05) * inv.items.length + 20;
+		let startY = INVENTORY_Y + (inv.slot_size * 1.05) * inv.items.length +
+			20;
 		let startX = 40;
 		const drawStyledBtn = (x, y, w, h, text, color) => {
 			ctx.save();
@@ -187,12 +191,7 @@ function inventory_clear_item(inventory_element, id, count, item_i = -1,
 }
 
 function inventory_draw_item_popup(ctx, game, item_id, x, y) {
-	let data = ITEM_DATA[item_id] || {
-		name: "???",
-		desc: "Unknown item",
-		name_rus: "???",
-		desc_rus: "Неизвестный предмет"
-	};
+	let data = ITEMS_DATA[item_id] || ITEMS_DATA.default;
 	let isRus = game.settings.language === "русский";
 	let name = isRus ? data.name_rus : data.name;
 	let desc = isRus ? data.desc_rus : data.desc;
@@ -266,6 +265,7 @@ function inventory_update(inventory_element, dt) {
 	let is_clicked_right = false;
 	let freeTouch = null;
 	if (game.mobile) {
+		INVENTORY_Y = 120;
 		freeTouch = input.touch.find(t => t.id !== input.joystick.left.id &&
 			t.id !== input.joystick.right.id);
 		if (freeTouch) {
@@ -312,7 +312,7 @@ function inventory_update(inventory_element, dt) {
 	let btnW = 120,
 		btnH = 50,
 		gap = 20;
-	let startY = 120 + (inv.slot_size * 1.05) * inv.items.length + 20;
+	let startY = INVENTORY_Y + (inv.slot_size * 1.05) * inv.items.length + 20;
 	let startX = 40;
 	if (game.mobile && inv.imove !== -1 && is_clicked) {
 		if (doRectsCollide(mx, my, 0, 0, startX, startY, btnW, btnH)) {
@@ -338,7 +338,7 @@ function inventory_update(inventory_element, dt) {
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;
-			let sy = 120 + (inv.slot_size * 1.05) * i;
+			let sy = INVENTORY_Y + (inv.slot_size * 1.05) * i;
 			if (doRectsCollide(mx, my, 0, 0, sx, sy, inv.slot_size, inv
 					.slot_size)) {
 				slot_hit = true;
@@ -423,7 +423,7 @@ function inventory_closing_cross_update(inventory_element, mx, my, is_clicked,
 	};
 	let btn = inv.close_button;
 	btn.x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
-	btn.y = 120;
+	btn.y = INVENTORY_Y;
 	btn.size = inv.cross_size;
 	btn.is_hovered = doRectsCollide(mx, my, 0, 0, btn.x, btn.y, btn.size, btn
 		.size);
