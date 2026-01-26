@@ -276,40 +276,6 @@ function player_update(player_object, dt) {
 		p.achievements_element.shown = false;
 		player_object.game.want_hide_inventory = false;
 	}
-	if (p.mobile_delay <= 0 && player_object.game.input.mouse
-		.leftButtonPressed && p.hotbar_element.shown) {
-		let mx = player_object.game.input.mouse.x / get_scale();
-		let my = player_object.game.input.mouse.y / get_scale();
-		let hb = p.hotbar_element.data;
-		let s = hb.slot_size;
-		let step = s * 1.05;
-		let button_y = 40;
-		if (my >= button_y && my <= button_y + s) {
-			let x_start_buttons = 60 + step * 9;
-			if (mx >= x_start_buttons && mx <= x_start_buttons + s) {
-				achievement_do(p.achievements_element.data.achievements,
-					"discovering inventory", p.achievements_shower_element);
-				p.inventory_element.shown = !p.inventory_element.shown;
-				p.hotbar_element.shown = !p.inventory_element.shown;
-				p.achievements_element.shown = false;
-				p.inventory_element.data.imove = -1;
-				p.inventory_element.data.jmove = -1;
-				p.mobile_delay = 300;
-			} else if (mx >= x_start_buttons + step && mx <= x_start_buttons +
-				step + s) {
-				achievement_do(p.achievements_element.data.achievements,
-					"what an achievement!", p.achievements_shower_element);
-				p.achievements_element.shown = !p.achievements_element.shown;
-				p.inventory_element.shown = false;
-				p.hotbar_element.shown = !p.achievements_element.shown;
-				p.mobile_delay = 300;
-			} else if (mx >= x_start_buttons + step * 2 && mx <=
-				x_start_buttons + step * 2 + s) {
-				player_object.game.want_menu = true;
-				p.mobile_delay = 300;
-			}
-		}
-	}
 	if (isKeyDown(player_object.game.input, 'e', true) || isKeyDown(
 			player_object.game.input, 'i', true) || isKeyDown(player_object.game
 			.input, 'у', true) || isKeyDown(player_object.game.input, 'ш',
@@ -420,6 +386,24 @@ function player_update(player_object, dt) {
 			player_object.game.input.mouse.y / scale,
 			0, 0, 40, 40, hb_w, hb.slot_size
 		);
+		let l_js = player_object.game.input.joystick.left;
+		let leftStickActive = (l_js.dx ** 2 + l_js.dy ** 2 > 0.01);
+		let currentSelectedItem = hb.row[hb.iselected];
+		if (leftStickActive && !p.achievements_element.shown &&
+			!ITEMS_GUNS.includes(currentSelectedItem) &&
+			!ITEMS_MELEE.includes(currentSelectedItem)) {
+			let bestWp = player_get_best_weapon_with_ammo(player_object);
+			if (bestWp > 0) {
+				hb.row[hb.iselected] = bestWp;
+				player_shoot(player_object, dt, null, l_js.dx * 100, l_js.dy *
+					100);
+				hb.row[hb.iselected] = currentSelectedItem;
+				p.last_auto_weapon = bestWp;
+				p.auto_weapon_timer = 100;
+			}
+		}
+		if (p.auto_weapon_timer > 0) p.auto_weapon_timer -= dt;
+		else p.last_auto_weapon = 0;
 		let shooting = (!player_object.game.mobile && player_object.game.input
 				.mouse.leftButtonPressed && !is_clicking_hotbar) ||
 			(player_object.game.mobile && (player_object.game.input.joystick
@@ -531,7 +515,9 @@ function player_draw(player_object, ctx) {
 	if (p.immunity % 350 > 175) return;
 	if (p.car_object) return;
 	let g = player_object.game;
-	let selected_item = hotbar_get_selected_item(p.hotbar_element);
+	let selected_item = (p.last_auto_weapon > 0) ?
+		p.last_auto_weapon :
+		hotbar_get_selected_item(p.hotbar_element);
 	let cfg = WEAPON_DEFS[selected_item];
 	fillMatterBody(ctx, p.body, g.settings.player_color);
 	drawMatterBody(ctx, p.body, "white");
@@ -822,4 +808,47 @@ function player_item_consume(player_object, id, anywhere = false) {
 			);
 		}
 	}
+}
+
+function player_get_best_weapon_with_ammo(player_object) {
+	const p = player_object.data;
+	const inv = p.inventory_element;
+	const weaponPriority = [
+		ITEM_JUNK_CANNON,
+		ITEM_HORN,
+		ITEM_LASER_GUN,
+		ITEM_RAINBOW_PISTOLS,
+		ITEM_ROCKET_SHOTGUN,
+		ITEM_ROCKET_LAUNCHER,
+		ITEM_PLASMA_PISTOL,
+		ITEM_PLASMA_LAUNCHER,
+		ITEM_GREEN_GUN,
+		ITEM_SWORD,
+		ITEM_RED_SHOTGUN,
+		ITEM_RED_PISTOLS,
+		ITEM_MINIGUN,
+		ITEM_SHOTGUN,
+		ITEM_DESERT_EAGLE,
+		ITEM_GUN
+	];
+	for (let id of weaponPriority) {
+		if (inventory_has_item(inv, id)) {
+			let cfg = WEAPON_DEFS[id];
+			if (!cfg) continue;
+			if (cfg.isMelee) return id;
+			if (cfg.ammo) {
+				let hasAmmo = false;
+				if (Array.isArray(cfg.ammo)) {
+					hasAmmo = cfg.ammo.some(aId => inventory_has_item(inv,
+						aId));
+				} else {
+					hasAmmo = inventory_has_item(inv, cfg.ammo);
+				}
+				if (hasAmmo) return id;
+			} else {
+				return id;
+			}
+		}
+	}
+	return 0;
 }
