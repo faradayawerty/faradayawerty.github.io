@@ -386,22 +386,6 @@ function player_update(player_object, dt) {
 			player_object.game.input.mouse.y / scale,
 			0, 0, 40, 40, hb_w, hb.slot_size
 		);
-		let l_js = player_object.game.input.joystick.left;
-		let leftStickActive = (l_js.dx ** 2 + l_js.dy ** 2 > 0.01);
-		let currentSelectedItem = hb.row[hb.iselected];
-		if (leftStickActive && !p.achievements_element.shown &&
-			!ITEMS_GUNS.includes(currentSelectedItem) &&
-			!ITEMS_MELEE.includes(currentSelectedItem)) {
-			let bestWp = player_get_best_weapon_with_ammo(player_object);
-			if (bestWp > 0) {
-				hb.row[hb.iselected] = bestWp;
-				player_shoot(player_object, dt, null, l_js.dx * 100, l_js.dy *
-					100);
-				hb.row[hb.iselected] = currentSelectedItem;
-				p.last_auto_weapon = bestWp;
-				p.auto_weapon_timer = 100;
-			}
-		}
 		if (p.auto_weapon_timer > 0) p.auto_weapon_timer -= dt;
 		else p.last_auto_weapon = 0;
 		let shooting = (!player_object.game.mobile && player_object.game.input
@@ -432,6 +416,21 @@ function player_update(player_object, dt) {
 					targetX = dx / mag * 100;
 					targetY = dy / mag * 100;
 				}
+			}
+		}
+		let l_js = player_object.game.input.joystick.left;
+		let leftStickActive = (l_js.dx ** 2 + l_js.dy ** 2 > 0.01);
+		let currentSelectedItem = hb.row[hb.iselected];
+		if (leftStickActive && !p.achievements_element.shown &&
+			!ITEMS_GUNS.includes(currentSelectedItem) &&
+			!ITEMS_MELEE.includes(currentSelectedItem)) {
+			let bestWp = player_get_best_weapon_with_ammo(player_object);
+			if (bestWp > 0) {
+				hb.row[hb.iselected] = bestWp;
+				player_shoot(player_object, dt, null, targetX, targetY);
+				hb.row[hb.iselected] = currentSelectedItem;
+				p.last_auto_weapon = bestWp;
+				p.auto_weapon_timer = 100;
 			}
 		}
 		if (shooting && !p.achievements_element.shown) {
