@@ -5,23 +5,24 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 	let available_shields = [];
 	let available_food = [ITEM_CANNED_MEAT];
 	let available_drinks = [ITEM_WATER];
-	if (enemy_type == "shooting" || enemy_type == null && g.enemies[
-			"shooting"]) {
+	if (enemy_type == "shooting" || enemy_type == null && g.available_enemies
+		.includes("shooting")) {
 		available_guns.push(ITEM_SHOTGUN);
 		if (enemy_type != null) {
 			available_ammos.push(ITEM_PLASMA);
 			available_shields.push(ITEM_SHIELD);
 		}
 	}
-	if (enemy_type == "shooting red" || enemy_type == null && g.enemies[
-			"shooting red"]) {
+	if (enemy_type == "shooting red" || enemy_type == null && g
+		.available_enemies.includes("shooting red")) {
 		available_ammos.push(ITEM_PLASMA);
 		available_guns.push(ITEM_PLASMA_LAUNCHER);
 		available_shields.push(ITEM_SHIELD);
 		if (enemy_type != null)
 			available_ammos.push(ITEM_RED_PLASMA);
 	}
-	if (enemy_type == "sword" || enemy_type == null && g.enemies["sword"]) {
+	if (enemy_type == "sword" || enemy_type == null && g.available_enemies
+		.includes("sword")) {
 		available_guns.push(ITEM_RED_PISTOLS);
 		available_ammos.push(ITEM_RED_PLASMA);
 		if (enemy_type != null) {
@@ -29,16 +30,16 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			available_shields = [ITEM_SHIELD_GREEN];
 		}
 	}
-	if (enemy_type == "shooting rocket" || enemy_type == null && g.enemies[
-			"shooting rocket"]) {
+	if (enemy_type == "shooting rocket" || enemy_type == null && g
+		.available_enemies.includes("shooting rocket")) {
 		available_guns.push(ITEM_SWORD);
 		available_health.push(ITEM_SHIELD_GREEN);
 		available_health.push(ITEM_HEALTH_GREEN);
 		if (enemy_type != null)
 			available_ammos = [ITEM_ROCKET];
 	}
-	if (enemy_type == "shooting laser" || enemy_type == null && g.enemies[
-			"shooting laser"]) {
+	if (enemy_type == "shooting laser" || enemy_type == null && g
+		.available_enemies.includes("shooting laser")) {
 		available_guns.push(ITEM_ROCKET_LAUNCHER);
 		available_ammos.push(ITEM_ROCKET);
 		if (enemy_type != null) {
@@ -285,8 +286,8 @@ function item_pickup(inventory_element, item_object, force = false) {
 		return false;
 	let inv = inventory_element.data;
 	let item = item_object.data;
-	if (item_object.game.settings.ammo_pickup_last && ITEMS_AMMOS.includes(
-			item_object.data.id) || force) {
+	if (item_object.game.settings.ammo_pickup_last && ITEMS_AMMOS.concat(
+			ITEMS_JUNK).includes(item_object.data.id) || force) {
 		for (let i = inv.items.length - 1; i >= 0; i--)
 			for (let j = inv.items[i].length - 1; j >= 0; j--)
 				if (inv.items[i][j] == 0 || force) {

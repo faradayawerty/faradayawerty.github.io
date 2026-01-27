@@ -1,1 +1,490 @@
-let DUMMY = 1337;
+let ENEMY_TYPES = {
+	"regular": {
+		requires: null,
+		weight: 1,
+		health: 200,
+		speed: 7,
+		damage: 0.1,
+		w: 30,
+		h: 30,
+		color: "green",
+		outline: "white",
+		range: 400,
+		delay: 1000,
+		visuals: {
+			draw_gun: false,
+			outline_width: 1
+		},
+		on_death: (obj, target) => {
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"shoot 'em up", target.data
+				.achievements_shower_element);
+		},
+		on_boss_death: (obj, target) => {
+			item_create(obj.game, Math.random() < 0.33 ? ITEM_MINIGUN :
+				ITEM_SHOTGUN, obj.data.body.position.x, obj.data
+				.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements, "big guy",
+				target.data.achievements_shower_element);
+		}
+	},
+	"shooting": {
+		requires: "regular",
+		weight: 2,
+		health: 1000,
+		speed: 5,
+		damage: 0.2,
+		w: 30,
+		h: 30,
+		color: "#335544",
+		outline: "white",
+		range: 400,
+		delay: 1000,
+		visuals: {
+			draw_gun: true,
+			gun_color: "#331133",
+			gun_width: 0.25,
+			outline_width: 1
+		},
+		behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range) {
+				if (e.shooting_delay >= 1000) {
+					bullet_create(obj.game, e.body.position.x, e.body
+						.position.y, vars.dx, vars.dy, 10, e.damage,
+						true, e.w * 0.2, 2000, "blue", "white");
+					e.shooting_delay = 0;
+				}
+				vars.dx = 0;
+				vars.dy = 0;
+			}
+		},
+		on_death: (obj, target) => {
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"they can shoot?", target.data
+				.achievements_shower_element);
+		},
+		on_boss_death: (obj, target) => {
+			let item = Math.random() < 0.33 ? ITEM_PLASMA_PISTOL :
+				ITEM_PLASMA_LAUNCHER;
+			item_create(obj.game, item, obj.data.body.position.x, obj
+				.data.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"big shooting guy", target.data
+				.achievements_shower_element);
+		}
+	},
+	"shooting red": {
+		requires: "shooting",
+		weight: 4,
+		health: 5000,
+		speed: 8,
+		damage: 0.4,
+		w: 30,
+		h: 30,
+		color: "#999999",
+		outline: "#aa3333",
+		range: 400,
+		delay: 200,
+		visuals: {
+			draw_gun: true,
+			gun_color: "#551111",
+			gun_width: 0.21,
+			double_gun: true,
+			outline_is_relative: true,
+			outline_width: 0.05
+		},
+		behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range) {
+				if (!e.boss && e.shooting_delay >= 200) {
+					bullet_create(obj.game, e.body.position.x + e.w, e
+						.body.position.y, vars.dx, vars.dy, 15, e
+						.damage, true, Math.max(0.09 * e.w, 4),
+						2000, "red", "white");
+					bullet_create(obj.game, e.body.position.x, e.body
+						.position.y, vars.dx, vars.dy, 15, e.damage,
+						true, Math.max(0.09 * e.w, 4), 2000, "red",
+						"white");
+					e.shooting_delay = 0;
+				}
+				vars.dx = 0;
+				vars.dy = 0;
+			}
+		},
+		boss_behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range && e.shooting_delay >= 500) {
+				for (let i = -3; i <= 3; i++) {
+					let theta = Math.PI * i / 14;
+					let rotatedX = vars.ndx * Math.cos(theta) - vars
+						.ndy * Math.sin(theta);
+					let rotatedY = vars.ndx * Math.sin(theta) + vars
+						.ndy * Math.cos(theta);
+					bullet_create(obj.game, e.body.position.x, e.body
+						.position.y, rotatedX, rotatedY, 25, e
+						.damage, true, e.w * 0.1, 2000, "red",
+						"pink");
+				}
+				e.shooting_delay = 0;
+			}
+		},
+		on_death: (obj, target) => {
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"red shooter", target.data
+				.achievements_shower_element);
+		},
+		on_boss_death: (obj, target) => {
+			let item = Math.random() < 0.33 ? ITEM_RED_SHOTGUN :
+				ITEM_RED_PISTOLS;
+			item_create(obj.game, item, obj.data.body.position.x, obj
+				.data.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"big red guy", target.data
+				.achievements_shower_element);
+		}
+	},
+	"sword": {
+		requires: "shooting red",
+		weight: 8,
+		health: 25000,
+		speed: 9.75,
+		damage: 1.6,
+		w: 30,
+		h: 30,
+		color: "#bbaa11",
+		outline: "lime",
+		range: 400,
+		delay: 500,
+		visuals: {
+			draw_gun: false,
+			draw_sword: true,
+			sword_color: "#55aa11",
+			outline_width: 1
+		},
+		minion_behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range && e.shooting_delay >= 500) {
+				bullet_create(obj.game, e.body.position.x, e.body
+					.position.y, vars.tx, vars.ty, 7, e.damage,
+					true, 0.33 * e.w, 2000, "gray", "lime");
+				bullet_create(obj.game, e.body.position.x, e.body
+					.position.y, vars.ty, -vars.tx, 7, e.damage,
+					true, 0.33 * e.w, 2000, "gray", "lime");
+				bullet_create(obj.game, e.body.position.x, e.body
+					.position.y, -vars.tx, -vars.ty, 7, e.damage,
+					true, 0.33 * e.w, 2000, "gray", "lime");
+				bullet_create(obj.game, e.body.position.x, e.body
+					.position.y, -vars.ty, vars.tx, 7, e.damage,
+					true, 0.33 * e.w, 2000, "gray", "lime");
+				e.shooting_delay = 0;
+			}
+		},
+		boss_behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (e.jump_delay >= 1000 && vars.v > 500) {
+				e.jump_delay = 0;
+				Matter.Body.setPosition(e.body, Matter.Vector.create(-e
+					.body.position.x + 2 * target.data.body
+					.position.x, -e.body.position.y + 2 * target
+					.data.body.position.y));
+			}
+		},
+		on_death: (obj, target) => {
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"he has a sword?", target.data
+				.achievements_shower_element);
+		},
+		on_boss_death: (obj, target) => {
+			let item = Math.random() < 0.33 ? ITEM_GREEN_GUN :
+				ITEM_SWORD;
+			item_create(obj.game, item, obj.data.body.position.x, obj
+				.data.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"big guy with a sword", target.data
+				.achievements_shower_element);
+		}
+	},
+	"shooting rocket": {
+		requires: "sword",
+		weight: 16,
+		health: 125000,
+		speed: 4.75,
+		damage: 3.2,
+		w: 30,
+		h: 30,
+		color: "gray",
+		outline: "black",
+		range: 400,
+		delay: 2500,
+		visuals: {
+			draw_gun: true,
+			gun_color: "#113355",
+			gun_width: 0.25,
+			outline_width: 1
+		},
+		behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range) {
+				if (e.shooting_delay >= 2500) {
+					rocket_create(obj.game, e.body.position.x, e.body
+						.position.y, vars.dx, vars.dy, Math.min(
+							0.25 * e.w, 10), target, e.damage, e
+						.max_health * 0.005);
+					e.shooting_delay = 0;
+				}
+				vars.dx = 0;
+				vars.dy = 0;
+			}
+		},
+		on_death: (obj, target) => {
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"rocket shooter", target.data
+				.achievements_shower_element);
+		},
+		on_boss_death: (obj, target) => {
+			let item = Math.random() < 0.33 ? ITEM_ROCKET_SHOTGUN :
+				ITEM_ROCKET_LAUNCHER;
+			item_create(obj.game, item, obj.data.body.position.x, obj
+				.data.body.position.y, false, false);
+			if (Math.random() < 0.5) {
+				let tank_colors = ["green", "#005533", "#003355",
+					"#aaaa11"
+				];
+				car_create(obj.game, obj.data.body.position.x, obj.data
+					.body.position.y, tank_colors[Math.floor(Math
+						.random() * tank_colors.length)], true, true
+					);
+			}
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"big military guy", target.data
+				.achievements_shower_element);
+		}
+	},
+	"shooting laser": {
+		requires: "shooting rocket",
+		weight: 32,
+		health: 625000,
+		speed: 8.25,
+		damage: 6.4,
+		w: 50,
+		h: 50,
+		color: "#ff0000",
+		outline: "white",
+		range: 600,
+		delay: 150,
+		visuals: {
+			draw_gun: true,
+			gun_color: "#331133",
+			gun_width: 0.175,
+			center_gun: true,
+			laser_beam: true,
+			double_gun: true,
+			outline_width: 1
+		},
+		behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range) {
+				if (!e.boss && !e.is_minion) {
+					if (e.shooting_delay >= 150) {
+						let colors = ["red", "orange", "yellow", "lime",
+							"cyan", "blue", "purple"
+						];
+						let angle = Math.atan2(vars.dy, vars.dx);
+						[Math.PI / 4, -Math.PI / 4].forEach(off => {
+							bullet_create(obj.game, e.body
+								.position.x + 50 * Math.cos(
+									angle + off), e.body
+								.position.y + 50 * Math.sin(
+									angle + off), vars.dx,
+								vars.dy, 25, e.damage * 10,
+								true, e.w * 0.125, 2000,
+								colors[Math.floor(e
+										.color_gradient) %
+									7], "white");
+						});
+						e.shooting_delay = 0;
+					}
+					vars.dx = 0;
+					vars.dy = 0;
+				}
+			}
+		},
+		boss_behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (e.jump_delay >= 1000) {
+				let d = vars.v;
+				if (d < 250) {
+					e.jump_delay = 0;
+					Matter.Body.setPosition(e.body, {
+						x: target.data.body.position.x + 2.05 *
+							(target.data.body.position.x - e
+								.body.position.x),
+						y: target.data.body.position.y + 2.05 *
+							(target.data.body.position.y - e
+								.body.position.y)
+					});
+				} else if (d > 750) {
+					e.jump_delay = 0;
+					Matter.Body.setPosition(e.body, {
+						x: target.data.body.position.x + 0.75 *
+							(target.data.body.position.x - e
+								.body.position.x),
+						y: target.data.body.position.y + 0.75 *
+							(target.data.body.position.y - e
+								.body.position.y)
+					});
+				}
+			}
+			if (vars.v < 1.25 * e.shooting_range && e.shooting_delay < -
+				4500) {
+				let t = target.data;
+				if (target.name != "player" || t.immunity <= 0) {
+					let rate = (target.name == "car" && t.is_tank) ?
+						0.975 : 0.75;
+					if (target.name == "player" && t
+						.shield_blue_health > 0) t.shield_blue_health *=
+						Math.pow(0.75, dt / 1000);
+					else if (target.name == "player" && t
+						.shield_green_health > 0) t
+						.shield_green_health *= Math.pow(0.95, dt /
+							1000);
+					else if (target.name != "player" || t
+						.shield_rainbow_health <= 0) t.health *= Math
+						.pow(rate, dt / 1000);
+				}
+			}
+			if (e.shooting_delay >= 1000) e.shooting_delay = -7500;
+		},
+		minion_behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range) {
+				if (e.shooting_delay >= 300) {
+					let colors = ["red", "orange", "yellow", "lime",
+						"cyan", "blue", "purple"
+					];
+					for (let i = 0; i < 7; i++) {
+						let theta = Math.PI * (i - 3) / 14;
+						let rotatedX = vars.ndx * Math.cos(theta) - vars
+							.ndy * Math.sin(theta);
+						let rotatedY = vars.ndx * Math.sin(theta) + vars
+							.ndy * Math.cos(theta);
+						bullet_create(obj.game, e.body.position.x, e
+							.body.position.y, rotatedX, rotatedY,
+							25, e.damage, true, e.w * 0.15, 2000,
+							colors[i], "white");
+					}
+					e.shooting_delay = 0;
+				}
+				vars.dx = 0;
+				vars.dy = 0;
+			}
+		},
+		on_death: (obj, target) => {
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements, "rainbow",
+				target.data.achievements_shower_element);
+		},
+		on_boss_death: (obj, target) => {
+			let item = Math.random() < 0.33 ? ITEM_LASER_GUN :
+				ITEM_RAINBOW_PISTOLS;
+			item_create(obj.game, item, obj.data.body.position.x, obj
+				.data.body.position.y, false, false);
+			for (let j = 0; j < Math.random() * 11 - 4; j++)
+				item_create(obj.game, ITEM_BOSSIFIER, obj.data.body
+					.position.x, obj.data.body.position.y, false, false
+					);
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"huge rainbow guy", target.data
+				.achievements_shower_element);
+		}
+	},
+	"deer": {
+		requires: null,
+		weight: 0,
+		health: 31250000,
+		speed: 7.875,
+		damage: 25.6,
+		w: 30,
+		h: 30,
+		color: "#aa8844",
+		outline: "white",
+		range: 400,
+		delay: 1000,
+		visuals: {
+			draw_gun: false,
+			custom_draw: "deer",
+			outline_width: 1
+		},
+		behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			let k = e.boss ? 6.25 : 1.75;
+			if (e.jump_delay >= 2200) e.jump_delay = 0;
+			else if (e.jump_delay >= 1600) {
+				vars.dx = 0;
+				vars.dy = 0;
+			} else if (e.jump_delay >= 1500) {
+				vars.dx *= k;
+				vars.dy *= k;
+				e.jump_delay = 1600;
+			}
+		},
+		on_boss_death: (obj, target, drop) => {
+			item_create(obj.game, ITEM_HORN, obj.data.body.position.x,
+				obj.data.body.position.y, false, false);
+			if (drop) drop.N++;
+		}
+	},
+	"raccoon": {
+		requires: null,
+		weight: 0,
+		health: 21250000,
+		speed: 8.125,
+		damage: 25.6,
+		w: 30,
+		h: 30,
+		color: "#444444",
+		outline: "#ff0000",
+		range: 600,
+		delay: 500,
+		visuals: {
+			draw_gun: false,
+			custom_draw: "raccoon",
+			outline_width: 2
+		},
+		boss_behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range && e.shooting_delay >= 500) {
+				let cosA = 0.9238,
+					sinA = 0.3826;
+				trash_bullet_create(obj.game, e.body.position.x, e.body
+					.position.y, vars.ndx, vars.ndy, 24, e.damage,
+					true, e.w * 0.5);
+				trash_bullet_create(obj.game, e.body.position.x, e.body
+					.position.y, vars.ndx * cosA - vars.ndy * (-
+						sinA), vars.ndx * (-sinA) + vars.ndy * cosA,
+					24, e.damage, true, e.w * 0.5);
+				trash_bullet_create(obj.game, e.body.position.x, e.body
+					.position.y, vars.ndx * cosA - vars.ndy * sinA,
+					vars.ndx * sinA + vars.ndy * cosA, 24, e.damage,
+					true, e.w * 0.5);
+				e.shooting_delay = 0;
+			}
+		},
+		on_boss_death: (obj, target) => {
+			item_create(obj.game, ITEM_JUNK_CANNON, obj.data.body
+				.position.x, obj.data.body.position.y);
+		}
+	}
+};

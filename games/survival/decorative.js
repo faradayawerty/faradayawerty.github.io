@@ -380,11 +380,11 @@ function decorative_parkinglot_create(g, x, y, w, h, level_visited = true,
 		let textVal = Math.floor(50 + Math.random() * 50);
 		decorative_text_create(g, textVal, spotX + (actualR / 2) - (fontSize /
 			2), spotY + h * 0.15, fontSize, "white");
-		let car_chance = 0.01;
+		let car_chance = 0.02125;
 		if (car_types.includes("fireman"))
-			car_chance = 0.1;
+			car_chance = 0.0725;
 		if (car_types.includes("ambulance"))
-			car_chance = 0.1;
+			car_chance = 0.0725;
 		if (!level_visited && Math.random() < car_chance) {
 			let carX = spotX + (actualR / 2);
 			let carY = spotY + h * 0.4;

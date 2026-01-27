@@ -64,30 +64,8 @@ function game_create(input_, engine_, audios_) {
 			[0, 0, 0, 0, 0, 0, 0, 0, 0],
 		],
 		saved_achievements: [],
-		enemies: {
-			"regular": true,
-			"shooting": false,
-			"shooting red": false,
-			"sword": false,
-			"shooting rocket": false,
-			"shooting laser": false
-		},
-		enemies_default: {
-			"regular": true,
-			"shooting": false,
-			"shooting red": false,
-			"sword": false,
-			"shooting rocket": false,
-			"shooting laser": false
-		},
-		enemy_kills: {
-			"regular": 0,
-			"shooting": 0,
-			"shooting red": 0,
-			"sword": 0,
-			"shooting rocket": 0,
-			"shooting laser": 0
-		},
+		available_enemies: [],
+		enemy_kills: {},
 		debug: false,
 		debug_console: [],
 		godmode: false,
@@ -98,12 +76,7 @@ function game_create(input_, engine_, audios_) {
 }
 
 function game_new(g) {
-	g.enemies["regular"] = g.enemies_default["regular"];
-	g.enemies["shooting"] = g.enemies_default["shooting"];
-	g.enemies["shooting red"] = g.enemies_default["shooting red"];
-	g.enemies["sword"] = g.enemies_default["sword"];
-	g.enemies["shooting rocket"] = g.enemies_default["shooting rocket"];
-	g.enemies["shooting laser"] = g.enemies_default["shooting laser"];
+	g.available_enemies = ["regular"];
 	g.visited_levels = ["0x0"];
 	g.assigned_tiles = [LEVEL_TILE_START];
 	for (let i = 0; i < g.saved_items.length; i++)
@@ -476,13 +449,16 @@ function game_save(g) {
 	let state_object = {
 		name: "state",
 		enemies: {
-			"regular": g.enemies["regular"],
-			"shooting": g.enemies["shooting"],
-			"shooting red": g.enemies["shooting red"],
-			"sword": g.enemies["sword"],
-			"shooting rocket": g.enemies["shooting rocket"],
-			"shooting laser": g.enemies["shooting laser"],
+			"regular": g.available_enemies.includes("regular"),
+			"shooting": g.available_enemies.includes("shooting"),
+			"shooting red": g.available_enemies.includes("shooting red"),
+			"sword": g.available_enemies.includes("sword"),
+			"shooting rocket": g.available_enemies.includes(
+				"shooting rocket"),
+			"shooting laser": g.available_enemies.includes(
+				"shooting laser"),
 		},
+		available_enemies: g.available_enemies,
 		kills: g.kills,
 		boss_kills: g.boss_kills,
 		deaths: g.deaths,
@@ -519,15 +495,18 @@ function game_load(g) {
 			for (let i = 0; i < saved_objects.length; i++) {
 				let obj = saved_objects[i];
 				if (obj.name == "state") {
-					g.enemies["regular"] = obj.enemies["regular"];
-					g.enemies["shooting"] = obj.enemies["shooting"];
-					g.enemies["shooting red"] = obj.enemies[
-						"shooting red"];
-					g.enemies["sword"] = obj.enemies["sword"];
-					g.enemies["shooting rocket"] = obj.enemies[
-						"shooting rocket"];
-					g.enemies["shooting laser"] = obj.enemies[
-						"shooting laser"];
+					if (obj.available_enemies) {
+						g.available_enemies = obj.available_enemies;
+					} else if (obj.enemies) {
+						g.available_enemies = [];
+						for (let key in obj.enemies) {
+							if (obj.enemies[key] === true) {
+								g.available_enemies.push(key);
+							}
+						}
+						if (g.available_enemies.length === 0) g
+							.available_enemies = ["regular"];
+					}
 					g.kills = obj.kills;
 					g.boss_kills = obj.boss_kills;
 					g.deaths = obj.deaths;

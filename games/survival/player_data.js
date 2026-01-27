@@ -261,8 +261,8 @@ const WEAPON_DEFS = {
 			bullet_create(g, p.body.position.x, p.body.position.y, (
 					0.975 + 0.05 * Math.random()) * v.tx - v.sx, (
 					0.975 + 0.05 * Math.random()) * v.ty - v.sy,
-				Math.random() * 10 + 20, 625 * 0.5 * 2 * Math
-				.random(), false, 6, 1500, "lime", "green");
+				Math.random() * 10 + 20, 1000 * Math.random(),
+				false, 6, 1500, "lime", "green");
 			p.health -= 0.0255 * dt;
 			p.hunger -= 0.0125 * dt;
 			p.thirst -= 0.0125 * dt;

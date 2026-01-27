@@ -46,8 +46,6 @@ function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	let N = Math.random() * 80 - 77;
 	if (LEVEL_TILES_FOREST_ZONE.includes(tile) || tile === LEVEL_TILE_CITY_PARK)
 		N = Math.random() * 20 - 17;
-	else if (tile === LEVEL_TILE_DEFAULT)
-		N = Math.max(1, Math.random() * 20 - 18);
 	for (let i = 0; i < N; i++) {
 		let animals = ["deer", "raccoon"];
 		if (tile === LEVEL_TILE_CITY_PARK)
