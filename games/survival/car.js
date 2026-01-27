@@ -1,5 +1,5 @@
 function car_create(g, x, y, color_, is_tank = false, unique = true, type =
-	"default") {
+	"default", health = null, fuel = null) {
 	if (g.objects["shooting laser"] && Math.random() < 0.25) is_tank = true;
 	if (is_tank) type = "tank";
 	let width = 200,
@@ -11,7 +11,8 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 		type: type,
 		health: 1500,
 		max_health: 2000,
-		fuel: Math.max(0, 200 * Math.random() - 150),
+		fuel: (fuel !== null) ? fuel : Math.max(0, 200 * Math.random() -
+			150),
 		max_fuel: 200,
 		speed: 20,
 		max_speed: 20,
@@ -37,7 +38,6 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	switch (type) {
 		case "tank":
 			c.max_health = 20000;
-			c.health = c.max_health;
 			c.max_fuel = 4000;
 			c.speed = 15;
 			c.max_speed = 15;
@@ -48,14 +48,19 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 			break;
 		case "fireman":
 			c.max_health = 7000;
-			c.health = 7000;
 			c.w = 240;
 			break;
 		case "ambulance":
 			c.max_health = 1500;
-			c.health = 1500;
 			break;
 	}
+	if (health !== null) {
+		c.health = health;
+	} else {
+		let variability = 0.75 + (Math.random() * 0.25);
+		c.health = Math.round(c.max_health * variability);
+	}
+	if (fuel !== null && fuel > c.max_fuel) c.max_fuel = fuel;
 	let uname = unique ? "car_" + type + "_" + Math.round(x) + ":" + Math.round(
 		y) : null;
 	let icar = game_object_create(g, "car", c, car_update, car_draw,

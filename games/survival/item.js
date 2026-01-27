@@ -93,7 +93,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 				break;
 			case "ambulance":
 				chance_health = 100;
-				chance_drink = 20;
+				chance_drink = 5;
 				chance_food = 5;
 				break;
 			case "default":
@@ -111,11 +111,11 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			available_drinks = ITEMS_DRINKS;
 		} else if (tile === LEVEL_TILE_CITY_HOSPITAL) {
 			chance_food = 5;
-			chance_drink = 30;
+			chance_drink = 5;
 			chance_ammo = 1;
 			chance_gun = 1;
-			chance_health = 70;
-			chance_shield = 10;
+			chance_health = 50;
+			chance_shield = 50;
 			chance_fuel = 0;
 			available_food = [ITEM_APPLE, ITEM_ORANGE, ITEM_CHERRIES,
 				ITEM_CANNED_MEAT

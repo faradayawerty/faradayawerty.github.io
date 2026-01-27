@@ -395,6 +395,9 @@ function game_object_make_savable(obj) {
 				y: obj.data.body.position.y,
 				is_tank: obj.data.is_tank,
 				color: obj.data.color,
+				type: obj.data.type,
+				health: obj.data.health,
+				fuel: obj.data.fuel
 			}
 		};
 		return saved_obj;
@@ -544,7 +547,10 @@ function game_load(g) {
 						obj.data.dropped, obj.data.despawn);
 				if (obj.name == "car")
 					car_create(g, obj.data.x, obj.data.y, obj.data
-						.color, obj.data.is_tank, true);
+						.color, obj.data.is_tank, true, obj.data.type,
+						obj.data.health,
+						obj.data.fuel
+					);
 			}
 		}
 		try {

@@ -72,3 +72,14 @@ function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
 function smoothMin(a, b) {
 	return 0.5 * (a + b - 0.5 + Math.sqrt(0.25 + (a - b) * (a - b)));
 }
+
+function randomNormal() {
+	let u = 0,
+		v = 0;
+	while (u === 0) u = Math.random();
+	while (v === 0) v = Math.random();
+	let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+	num = num / 10.0 + 0.5;
+	if (num > 1 || num < 0) return randomNormal();
+	return num;
+}

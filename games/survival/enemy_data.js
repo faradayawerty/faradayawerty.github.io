@@ -263,7 +263,7 @@ let ENEMY_TYPES = {
 				car_create(obj.game, obj.data.body.position.x, obj.data
 					.body.position.y, tank_colors[Math.floor(Math
 						.random() * tank_colors.length)], true, true
-					);
+				);
 			}
 			if (target?.name == "player") achievement_do(target.data
 				.achievements_element.data.achievements,
@@ -403,7 +403,7 @@ let ENEMY_TYPES = {
 			for (let j = 0; j < Math.random() * 11 - 4; j++)
 				item_create(obj.game, ITEM_BOSSIFIER, obj.data.body
 					.position.x, obj.data.body.position.y, false, false
-					);
+				);
 			if (target?.name == "player") achievement_do(target.data
 				.achievements_element.data.achievements,
 				"huge rainbow guy", target.data

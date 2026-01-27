@@ -368,8 +368,9 @@ function enemy_draw(enemy_object, ctx) {
 					y: e.body.position.y
 				});
 			} else if (vis.double_gun && (!(e.type === "shooting red" && e
-					.boss) && !(e.type === "shooting laser" && (e.is_minion || e
-						.boss)))) {
+					.boss) && !(e.type === "shooting laser" && (e
+					.is_minion || e
+					.boss)))) {
 				gunPoints.push({
 					x: px,
 					y: py
