@@ -1,6 +1,12 @@
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	"random") {
-	if (!g.settings.enemies_spawn)
+	if (
+		!g.settings.enemies_spawn ||
+		(g.visited_levels.length < 05 && Math.random() < 1.00) ||
+		(g.visited_levels.length < 10 && Math.random() < 0.75) ||
+		(g.visited_levels.length < 15 && Math.random() < 0.50) ||
+		(g.visited_levels.length < 20 && Math.random() < 0.25)
+	)
 		return -1;
 	let enemies = g.objects.filter((obj) => obj.name == "enemy");
 	if (enemies.length > 100) {

@@ -88,6 +88,23 @@ let TILES = {
 				500, visited, ["default", "pickup"]);
 			decorative_grass_create(g, Ox, Oy, 200, 2500, true);
 			decorative_grass_create(g, Ox + 2300, Oy, 200, 2500, true);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.floor(Math.random() * 7 + 3);
+			for (let i = 0; i < N; i++) {
+				let rand = Math.random();
+				if (rand < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else if (rand < 0.7) {
+					item_create(g, ITEM_FUEL, Ox + 500 + Math.random() *
+						1500, Oy + 300 + Math.random() * 500);
+				} else {
+					item_spawn(g, Ox + 280 + Math.random() * 400, Oy +
+						200 + Math.random() * 600, null,
+						LEVEL_TILE_RESIDENTIAL_T_SOUTH);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_CITY_POLICE]: {
@@ -110,6 +127,18 @@ let TILES = {
 				625, visited, ["default", "police"]);
 			decorative_parkinglot_create(g, Ox + 100, Oy + 1310, 2300,
 				525, visited, ["default", "police"]);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 7 + 3;
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					item_spawn(g, Ox + 350 + Math.random() * 1800, Oy +
+						150 + Math.random() * 700, null, tile);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_CITY_HOSPITAL]: {
@@ -134,6 +163,18 @@ let TILES = {
 			decorative_parkinglot_create(g, Ox + 1410, Oy + 1410, 1050,
 				1050, visited, ["default", "ambulance"]);
 			decorative_hospital_v3(g, Ox + 1440, Oy + 150, 950, 850);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 7 + 3;
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					item_spawn(g, Ox + 1540 + Math.random() * 750, Oy +
+						250 + Math.random() * 650, null, tile);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_CITY_FIRE_STATION]: {
@@ -155,10 +196,22 @@ let TILES = {
 				1150);
 			decorative_parkinglot_create(g, Ox + 1400, Oy + 1250, 1050,
 				1200, visited, ["default", "fireman"]);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 7 + 3;
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					item_spawn(g, Ox + 1500 + Math.random() * 850, Oy +
+						140 + Math.random() * 950, null, tile);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_RESIDENTIAL_T_SOUTH]: {
-		weight: 25,
+		weight: 50,
 		connections: {
 			N: 0,
 			E: 1,
@@ -195,6 +248,26 @@ let TILES = {
 			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
 				200, "#222222", "#222222");
 			decorative_grass_create(g, Ox, Oy + 1450, 100, 100, true);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 7 + 3;
+			let houses = [
+				[250, 250],
+				[1600, 250],
+				[250, 1600],
+				[1600, 1600]
+			];
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					let p = houses[Math.floor(Math.random() * houses
+						.length)];
+					item_spawn(g, Ox + p[0] + Math.random() * 600, Oy +
+						p[1] + Math.random() * 600, null, tile);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_RESIDENTIAL_NW]: {
@@ -232,6 +305,25 @@ let TILES = {
 				145, "#999999", "#999999");
 			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
 				200, "#222222", "#222222");
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 7 + 3;
+			let houses = [
+				[250, 250],
+				[250, 1600],
+				[1600, 250]
+			];
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					let p = houses[Math.floor(Math.random() * houses
+						.length)];
+					item_spawn(g, Ox + p[0] + Math.random() * 600, Oy +
+						p[1] + Math.random() * 600, null, tile);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_RESIDENTIAL_NE]: {
@@ -268,6 +360,25 @@ let TILES = {
 				145, "#999999", "#999999");
 			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
 				200, "#222222", "#222222");
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 7 + 3;
+			let houses = [
+				[250, 250],
+				[1600, 250],
+				[1600, 1600]
+			];
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					let p = houses[Math.floor(Math.random() * houses
+						.length)];
+					item_spawn(g, Ox + p[0] + Math.random() * 600, Oy +
+						p[1] + Math.random() * 600, null, tile);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_ROAD_CROSSROAD]: {
@@ -432,6 +543,19 @@ let TILES = {
 		spawn_items: true,
 		populate: (g, Ox, Oy) => {
 			decorative_grass_create(g, Ox, Oy, 2420, 2420);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 5 + 2;
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					item_create(g, ITEM_APPLE, Ox + 100 + Math
+						.random() * 2300, Oy + 100 + Math.random() *
+						2300);
+				}
+			}
 		}
 	},
 	[LEVEL_TILE_CITY_PARK]: {
@@ -504,6 +628,21 @@ let TILES = {
 				850, Oy + 1530);
 			else decorative_hotdog_stand_create(g, Ox + 1470, Oy +
 				1530);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 6 + 2;
+			for (let i = 0; i < N; i++) {
+				if (Math.random() < 0.2) {
+					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+						.random() * 2500, null, tile);
+				} else {
+					let rx = Math.random() > 0.5 ? 100 + Math.random() *
+						800 : 1500 + Math.random() * 800;
+					let ry = Math.random() > 0.5 ? 100 + Math.random() *
+						800 : 1500 + Math.random() * 800;
+					item_create(g, ITEM_APPLE, Ox + rx, Oy + ry);
+				}
+			}
 		}
 	}
 };

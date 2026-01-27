@@ -85,7 +85,6 @@ ITEMS_FOODS = [
 	ITEM_CANNED_MEAT,
 	ITEM_ORANGE,
 	ITEM_APPLE,
-	ITEM_CHERRIES,
 	ITEM_CHICKEN_LEG,
 	ITEM_CHOCOLATE
 ];
@@ -215,10 +214,10 @@ let ITEMS_DATA = {
 		name_rus: "Пистолет",
 		desc_rus: "Стандартный 9-мм пистолет.",
 		render: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#333";
+			ctx.fillStyle = "#000";
 			ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.2);
 			ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.15, h * 0.3);
-			ctx.fillStyle = "#555";
+			ctx.fillStyle = "#333";
 			ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.05);
 		}
 	},

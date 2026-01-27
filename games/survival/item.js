@@ -113,13 +113,11 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_food = 5;
 			chance_drink = 5;
 			chance_ammo = 1;
-			chance_gun = 1;
+			chance_gun = 0.1;
 			chance_health = 50;
 			chance_shield = 50;
 			chance_fuel = 0;
-			available_food = [ITEM_APPLE, ITEM_ORANGE, ITEM_CHERRIES,
-				ITEM_CANNED_MEAT
-			];
+			available_food = [ITEM_ORANGE, ITEM_CANNED_MEAT];
 		} else if (tile === LEVEL_TILE_CITY_FIRE_STATION) {
 			chance_food = 10;
 			chance_drink = 60;
@@ -150,12 +148,12 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			available_food = ITEMS_FOODS;
 			available_drinks = ITEMS_DRINKS;
 		} else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
-			chance_food = 20;
+			chance_food = 30;
 			chance_drink = 0;
-			chance_gun = 0.5;
+			chance_gun = 1;
 			chance_ammo = 2;
 			chance_health = 0;
-			chance_shield = 2;
+			chance_shield = 1;
 			chance_fuel = 0;
 			available_food = [ITEM_APPLE];
 		}
