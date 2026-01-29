@@ -138,7 +138,8 @@ function audio_play(path, volume = null) {
 			playPromise.catch(() => {});
 		}
 		pool.index = (pool.index + 1) % pool.nodes.length;
-	} catch (err) {
+	}
+	catch (err) {
 		console.error(`[Audio Runtime Error]: ${path}`, err);
 	}
 }

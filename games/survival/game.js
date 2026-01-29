@@ -42,7 +42,8 @@ function game_create(input_, engine_, audios_) {
 				"automatically pickup health": false,
 				"automatically pickup ammo": false,
 				"automatically pickup weapons": false,
-				"automatically pickup shields": false
+				"automatically pickup shields": false,
+				"automatically pickup bossifiers": false,
 			},
 			ammo_pickup_last: true,
 			respawn_on_current_level: true
@@ -151,7 +152,8 @@ function game_update(g, dt) {
 			plr.data.ai_controlled = true;
 			g.camera_target_body = null;
 		}
-	} else {
+	}
+	else {
 		if (isKeyDown(g.input, ']', true)) {
 			let plr = g.objects.find((obj) => obj.name == "player" && obj.data
 				.ai_controlled);
@@ -183,7 +185,8 @@ function game_update(g, dt) {
 		g.input.mouse.x = g.input.touch[0].x;
 		g.input.mouse.y = g.input.touch[0].y;
 		g.input.mouse.leftButtonPressed = g.input.touch.length > 0;
-	} else if (g.mobile) {
+	}
+	else if (g.mobile) {
 		g.input.mouse.x = undefined;
 		g.input.mouse.y = undefined;
 	}
@@ -500,7 +503,8 @@ function game_load(g) {
 				if (obj.name == "state") {
 					if (obj.available_enemies) {
 						g.available_enemies = obj.available_enemies;
-					} else if (obj.enemies) {
+					}
+					else if (obj.enemies) {
 						g.available_enemies = [];
 						for (let key in obj.enemies) {
 							if (obj.enemies[key] === true) {
@@ -535,7 +539,8 @@ function game_load(g) {
 								.data.achievements, obj.data
 								.achievements[i].name, plr.data
 								.achievements_shower_element, true);
-					} catch (e) {
+					}
+					catch (e) {
 						g.debug_console.unshift(e);
 					}
 				}
@@ -559,7 +564,8 @@ function game_load(g) {
 				input.type = "text";
 				input.type = "file";
 			}
-		} catch (e) {}
+		}
+		catch (e) {}
 	}
 	input.click();
 }

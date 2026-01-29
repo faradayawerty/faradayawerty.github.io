@@ -320,7 +320,8 @@ function drawMobileActionButtons(ctx, input) {
 				4, cy - th / 2, p);
 			renderLet(["###", "#  ", "###", "#  ", "###"], cx - tw / 2 + p *
 				8, cy - th / 2, p);
-		} else {
+		}
+		else {
 			let p = bw * 0.038;
 			let th = p * 5;
 			let gap = p * 3;

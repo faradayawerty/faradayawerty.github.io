@@ -76,7 +76,8 @@ function inventory_draw(inventory_element, ctx) {
 				ctx.beginPath();
 				ctx.roundRect(x, y, w, h, 8);
 				ctx.fill();
-			} else {
+			}
+			else {
 				ctx.fillRect(x, y, w, h);
 			}
 			ctx.strokeStyle = "white";
@@ -195,8 +196,8 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	let isRus = game.settings.language === "русский";
 	let name = isRus ? data.name_rus : data.name;
 	let desc = isRus ? data.desc_rus : data.desc;
-	let W = 350;
-	let H = 150;
+	let W = 450;
+	let H = 250;
 	let fontsize = 16;
 	let scale = get_scale();
 	if (x + W > window.innerWidth / scale) x -= W;
@@ -223,7 +224,8 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 			ctx.fillText(line, x + 10, lineY);
 			line = words[n] + " ";
 			lineY += fontsize * 1.2;
-		} else {
+		}
+		else {
 			line = testLine;
 		}
 	}
@@ -275,7 +277,8 @@ function inventory_update(inventory_element, dt) {
 				inv.active_touch_id = freeTouch.id;
 				is_clicked = true;
 			}
-		} else {
+		}
+		else {
 			if (inv._cross_held) {
 				inv._cross_held = false;
 				inventory_element.shown = false;
@@ -285,7 +288,8 @@ function inventory_update(inventory_element, dt) {
 			}
 			inv.active_touch_id = null;
 		}
-	} else {
+	}
+	else {
 		let current_left = input.mouse.leftButtonPressed;
 		let current_right = input.mouse.rightButtonPressed;
 		if (current_left && !inv.was_left_down) is_clicked = true;
@@ -350,11 +354,13 @@ function inventory_update(inventory_element, dt) {
 							inv.imove = i;
 							inv.jmove = j;
 						}
-					} else {
+					}
+					else {
 						if (inv.imove === i && inv.jmove === j) {
 							inv.imove = -1;
 							inv.jmove = -1;
-						} else {
+						}
+						else {
 							let temp = inv.items[i][j];
 							inv.items[i][j] = inv.items[inv.imove][inv.jmove];
 							inv.items[inv.imove][inv.jmove] = temp;
@@ -430,10 +436,12 @@ function inventory_closing_cross_update(inventory_element, mx, my, is_clicked,
 	if (game.mobile) {
 		if (freeTouch && btn.is_hovered) {
 			inv._cross_held = true;
-		} else if (freeTouch && !btn.is_hovered) {
+		}
+		else if (freeTouch && !btn.is_hovered) {
 			inv._cross_held = false;
 		}
-	} else {
+	}
+	else {
 		if (is_clicked && btn.is_hovered) {
 			inventory_element.shown = false;
 			inv.imove = -1;

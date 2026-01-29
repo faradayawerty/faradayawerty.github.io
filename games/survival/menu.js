@@ -34,7 +34,8 @@ function menu_create() {
 			"automatically pickup health": false,
 			"automatically pickup ammo": false,
 			"automatically pickup weapons": false,
-			"automatically pickup shields": false
+			"automatically pickup shields": false,
+			"automatically pickup bossifiers": false
 		},
 		iselected: 0,
 		language_selection_buttons: [
@@ -97,6 +98,7 @@ function menu_create() {
 			"automatically pickup ammo",
 			"automatically pickup weapons",
 			"automatically pickup shields",
+			"automatically pickup bossifiers",
 			"back to settings"
 		],
 		buttons: null,
@@ -109,10 +111,18 @@ function menu_create() {
 		try {
 			let data = JSON.parse(saved);
 			Object.assign(m, data);
-			if (data.volume !== undefined) GLOBAL_VOLUME = data.volume;
-			console.log("Загруженные настройки:",
-				data);
-		} catch (e) {
+			if (m.want_auto_pickup["automatically pickup bossifiers"] ===
+				undefined) {
+				m.want_auto_pickup["automatically pickup bossifiers"] = false;
+				console.log(
+					"Добавлено отсутствующее поле: automatically pickup bossifiers"
+				);
+			}
+			if (data.volume !== undefined)
+				GLOBAL_VOLUME = data.volume;
+			console.log("Загруженные настройки:", data);
+		}
+		catch (e) {
 			console.error("Ошибка загрузки настроек", e);
 		}
 	}
@@ -217,111 +227,144 @@ function menu_update(m, dt, input) {
 	if ((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) &&
 		m.iselected < m.buttons.length - 1) {
 		m.iselected += 1;
-	} else if ((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp',
+	}
+	else if ((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp',
 			true)) && m.iselected > 0) {
 		m.iselected -= 1;
-	} else if (isMouseRightButtonPressed(input) && m.buttons[m.iselected] ==
+	}
+	else if (isMouseRightButtonPressed(input) && m.buttons[m.iselected] ==
 		"volume") {
 		GLOBAL_VOLUME = GLOBAL_VOLUME - 10;
 		if (GLOBAL_VOLUME < 0)
 			GLOBAL_VOLUME = 100;
-	} else if ((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter',
+	}
+	else if ((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter',
 			true) || isMouseLeftButtonPressed(input) || (isScreenTouched(
 			input) && m.can_touch_button))) {
 		changed = true;
 		if (m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
-		} else if (m.buttons[m.iselected] == "respawn and continue game") {
+		}
+		else if (m.buttons[m.iselected] == "respawn and continue game") {
 			m.shown = false;
 			m.main_menu_buttons[0] = "continue game";
 			m.want_player_respawn = true;
 			menu1.buttons = menu1.main_menu_buttons;
-		} else if (m.buttons[m.iselected] == "start new game") {
+		}
+		else if (m.buttons[m.iselected] == "start new game") {
 			m.shown = false;
 			m.want_new_game = true;
 			menu1.main_menu_buttons[0] = "continue game";
 			menu1.buttons = menu1.main_menu_buttons;
-		} else if (m.buttons[m.iselected] == "settings" || m.buttons[m
+		}
+		else if (m.buttons[m.iselected] == "settings" || m.buttons[m
 				.iselected] == "back to settings") {
 			m.buttons = m.settings_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.buttons[m.iselected] == "main menu") {
+		}
+		else if (m.buttons[m.iselected] == "main menu") {
 			m.buttons = m.main_menu_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.buttons[m.iselected] == "enemies spawn") {
+		}
+		else if (m.buttons[m.iselected] == "enemies spawn") {
 			m.want_enemies_spawn = !m.want_enemies_spawn;
-		} else if (m.buttons[m.iselected] == "debug") {
+		}
+		else if (m.buttons[m.iselected] == "debug") {
 			m.want_debug = !m.want_debug;
-		} else if (m.buttons[m.iselected] == "automatic respawn") {
+		}
+		else if (m.buttons[m.iselected] == "automatic respawn") {
 			m.want_autorespawn = !m.want_autorespawn;
-		} else if (m.buttons[m.iselected] == "player color") {
+		}
+		else if (m.buttons[m.iselected] == "player color") {
 			m.buttons = m.player_color_selection_menu;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.buttons[m.iselected] == "save game") {
+		}
+		else if (m.buttons[m.iselected] == "save game") {
 			m.want_save = true;
-		} else if (m.buttons[m.iselected] == "load game") {
+		}
+		else if (m.buttons[m.iselected] == "load game") {
 			m.want_load = true;
-		} else if (m.buttons[m.iselected] == "volume") {
+		}
+		else if (m.buttons[m.iselected] == "volume") {
 			GLOBAL_VOLUME = GLOBAL_VOLUME + 10;
 			if (GLOBAL_VOLUME > 100)
 				GLOBAL_VOLUME = 0;
-		} else if (m.buttons[m.iselected] == "indicators") {
+		}
+		else if (m.buttons[m.iselected] == "indicators") {
 			m.buttons = m.indicators_settings;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.buttons[m.iselected] == "new game") {
+		}
+		else if (m.buttons[m.iselected] == "new game") {
 			m.buttons = m.menu_new_game;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.buttons[m.iselected] == "auto pickup") {
+		}
+		else if (m.buttons[m.iselected] == "auto pickup") {
 			m.buttons = m.auto_pickup_settings;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.indicators_settings.includes(m.buttons[m.iselected])) {
+		}
+		else if (m.indicators_settings.includes(m.buttons[m.iselected])) {
 			m.want_indicators[m.buttons[m.iselected]] = !m.want_indicators[m
 				.buttons[m.iselected]];
-		} else if (m.auto_pickup_settings.includes(m.buttons[m.iselected])) {
+		}
+		else if (m.auto_pickup_settings.includes(m.buttons[m.iselected])) {
 			m.want_auto_pickup[m.buttons[m.iselected]] = !m.want_auto_pickup[m
 				.buttons[m.iselected]];
-		} else if (m.buttons[m.iselected] == "player draw gun") {
+		}
+		else if (m.buttons[m.iselected] == "player draw gun") {
 			m.want_player_draw_gun = !m.want_player_draw_gun;
-		} else if (m.buttons[m.iselected] == "ammo pickup in last slot") {
+		}
+		else if (m.buttons[m.iselected] == "ammo pickup in last slot") {
 			m.want_ammo_pickup_last = !m.want_ammo_pickup_last;
-		} else if (m.buttons[m.iselected] == "show hints") {
+		}
+		else if (m.buttons[m.iselected] == "show hints") {
 			m.want_hints = !m.want_hints;
-		} else if (m.buttons[m.iselected] == "lose items on death") {
+		}
+		else if (m.buttons[m.iselected] == "lose items on death") {
 			m.want_lose_items = !m.want_lose_items;
-		} else if (m.buttons[m.iselected] == "respawn on current level") {
+		}
+		else if (m.buttons[m.iselected] == "respawn on current level") {
 			m.want_respawn_here = !m.want_respawn_here;
-		} else if (m.buttons[m.iselected] == "set player color to red") {
+		}
+		else if (m.buttons[m.iselected] == "set player color to red") {
 			m.want_player_color = "red";
-		} else if (m.buttons[m.iselected] == "set player color to lime") {
+		}
+		else if (m.buttons[m.iselected] == "set player color to lime") {
 			m.want_player_color = "lime";
-		} else if (m.buttons[m.iselected] == "set player color to yellow") {
+		}
+		else if (m.buttons[m.iselected] == "set player color to yellow") {
 			m.want_player_color = "yellow";
-		} else if (m.buttons[m.iselected] == "set player color to blue") {
+		}
+		else if (m.buttons[m.iselected] == "set player color to blue") {
 			m.want_player_color = "blue";
-		} else if (m.buttons[m.iselected] == "enable trees") {
+		}
+		else if (m.buttons[m.iselected] == "enable trees") {
 			m.want_trees = !m.want_trees;
-		} else if (m.buttons[m.iselected] == "english") {
+		}
+		else if (m.buttons[m.iselected] == "english") {
 			m.want_language = "english";
 			m.buttons = m.main_menu_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.buttons[m.iselected] == "русский") {
+		}
+		else if (m.buttons[m.iselected] == "русский") {
 			m.want_language = "русский";
 			m.buttons = m.main_menu_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
-		} else if (m.buttons[m.iselected] == "language") {
+		}
+		else if (m.buttons[m.iselected] == "language") {
 			if (m.want_language == "русский")
 				m.want_language = "english";
 			else if (m.want_language == "english")
 				m.want_language = "русский";
-		} else if (m.buttons[m.iselected] == "automatic aim") {
+		}
+		else if (m.buttons[m.iselected] == "automatic aim") {
 			m.want_auto_aim = !m.want_auto_aim;
 		}
 	}
@@ -359,6 +402,8 @@ function menu_translate(lang, str) {
 			str = "да";
 		else if (String(str) == "false")
 			str = "нет";
+		else if (str == "automatically pickup bossifiers")
+			str = "автоматически подбирать боссификаторы";
 		else if (str == "player color")
 			str = "цвет игрока";
 		else if (str == "red")

@@ -61,6 +61,14 @@ function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 
 function levels_spawn_enemies(g, Ox, Oy, player_object, tile =
 	LEVEL_TILE_DEFAULT) {
+	if (
+		!g.settings.enemies_spawn ||
+		(g.visited_levels.length < 05 && Math.random() < 1.00) ||
+		(g.visited_levels.length < 10 && Math.random() < 0.75) ||
+		(g.visited_levels.length < 15 && Math.random() < 0.50) ||
+		(g.visited_levels.length < 20 && Math.random() < 0.25)
+	)
+		return;
 	if (player_object) {
 		let m = 0.33 * (
 			player_object.data.health / player_object.data.max_health +
@@ -82,7 +90,8 @@ function levels_spawn_items(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	let tile_data = TILES[tile];
 	if (tile_data && typeof tile_data.populate_with_items === "function") {
 		tile_data.populate_with_items(g, Ox, Oy, tile);
-	} else {
+	}
+	else {
 		let N = Math.random() * 5;
 		if (LEVEL_TILES_CITY_ZONE.includes(tile) || LEVEL_TILES_SUBURBAN_ZONE
 			.includes(tile)) {

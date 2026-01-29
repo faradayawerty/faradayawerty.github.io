@@ -23,7 +23,8 @@ function trash_bullet_create(g, x, y, dx, dy, speed = 15, damage = 0.5, enemy =
 	};
 	if (b.enemy) {
 		b.body.collisionFilter.category = 4;
-	} else {
+	}
+	else {
 		b.body.collisionFilter.mask = -5;
 	}
 	Matter.Composite.add(g.engine.world, b.body);
@@ -60,7 +61,8 @@ function trash_bullet_update(bullet_object, dt) {
 			if (target.name == "enemy" && !b.enemy) {
 				target.data.health -= b.damage * dt;
 				target.data.hit_by_player = true;
-			} else {
+			}
+			else {
 				target.data.health -= b.damage * dt;
 			}
 		}
@@ -73,11 +75,14 @@ function trash_bullet_update(bullet_object, dt) {
 			let pd = player.data;
 			if (pd.shield_blue_health > 0) {
 				pd.shield_blue_health -= 0.95 * b.damage * dt;
-			} else if (pd.shield_green_health > 0) {
+			}
+			else if (pd.shield_green_health > 0) {
 				pd.shield_green_health -= 0.75 * b.damage * dt;
-			} else if (pd.shield_rainbow_health > 0) {
+			}
+			else if (pd.shield_rainbow_health > 0) {
 				pd.shield_rainbow_health -= 0.55 * b.damage * dt;
-			} else if (pd.immunity <= 0) {
+			}
+			else if (pd.immunity <= 0) {
 				let k = 1.0;
 				if (pd.sword_protection) {
 					k = 0.05;

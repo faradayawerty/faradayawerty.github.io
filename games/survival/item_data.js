@@ -45,6 +45,23 @@ let ITEM_BENT_FORK = 105;
 let ITEM_CRUMPLED_PAPER = 106;
 let ITEM_DEAD_BATTERY = 107;
 let ITEM_JUNK_CANNON = 108;
+let ITEM_REVOLVER = 111;
+let ITEM_STICK = 112;
+let ITEM_STONE = 113;
+let ITEM_BOSSIFIER_REGULAR = 120;
+let ITEM_BOSSIFIER_SHOOTING = 121;
+let ITEM_BOSSIFIER_RED = 122;
+let ITEM_BOSSIFIER_SWORD = 123;
+let ITEM_BOSSIFIER_ROCKET = 124;
+let ITEM_BOSSIFIER_LASER = 125;
+let ITEMS_BOSSIFIERS = [
+	ITEM_BOSSIFIER_REGULAR,
+	ITEM_BOSSIFIER_SHOOTING,
+	ITEM_BOSSIFIER_RED,
+	ITEM_BOSSIFIER_SWORD,
+	ITEM_BOSSIFIER_ROCKET,
+	ITEM_BOSSIFIER_LASER
+];
 let ITEMS_JUNK = [
 	ITEM_APPLE_CORE,
 	ITEM_FISH_BONE,
@@ -63,6 +80,7 @@ ITEMS_AMMOS = [
 ];
 ITEMS_GUNS = [
 	ITEM_GUN,
+	ITEM_REVOLVER,
 	ITEM_DESERT_EAGLE,
 	ITEM_SHOTGUN,
 	ITEM_MINIGUN,
@@ -78,6 +96,7 @@ ITEMS_GUNS = [
 	ITEM_JUNK_CANNON,
 ];
 ITEMS_MELEE = [
+	ITEM_STICK,
 	ITEM_SWORD,
 	ITEM_HORN
 ];
@@ -94,6 +113,43 @@ ITEMS_DRINKS = [
 	ITEM_MILK
 ];
 let ITEMS_DATA = {
+	[ITEM_STONE]: {
+		name: "Stone",
+		desc: "A heavy stone. Can be thrown at enemies.",
+		name_rus: "Камень",
+		desc_rus: "Тяжелый камень. Можно запустить во врага.",
+		render: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#888888";
+			ctx.beginPath();
+			ctx.moveTo(x + 0.3 * w, y + 0.3 * h);
+			ctx.lineTo(x + 0.7 * w, y + 0.2 * h);
+			ctx.lineTo(x + 0.8 * w, y + 0.6 * h);
+			ctx.lineTo(x + 0.5 * w, y + 0.8 * h);
+			ctx.lineTo(x + 0.2 * w, y + 0.5 * h);
+			ctx.closePath();
+			ctx.fill();
+			ctx.strokeStyle = "#666666";
+			ctx.lineWidth = 2;
+			ctx.stroke();
+		}
+	},
+	[ITEM_STICK]: {
+		name: "Stick",
+		desc: "A simple wooden stick. Better than nothing.",
+		name_rus: "Палка",
+		desc_rus: "Простая деревянная палка. Лучше, чем ничего.",
+		render: (ctx, x, y, w, h) => {
+			ctx.save();
+			ctx.translate(x + w * 0.5, y + h * 0.5);
+			ctx.rotate(Math.PI / 4);
+			ctx.fillStyle = "#8B4513";
+			ctx.fillRect(-w * 0.05, -h * 0.4, w * 0.1, h * 0.8);
+			ctx.strokeStyle = "#5D2E0C";
+			ctx.lineWidth = 1;
+			ctx.strokeRect(-w * 0.05, -h * 0.4, w * 0.1, h * 0.8);
+			ctx.restore();
+		}
+	},
 	[ITEM_GREEN_GUN]: {
 		name: "Acid Leech",
 		desc: "Infinite toxic payload fueled by your own energy reserves.",
@@ -143,6 +199,47 @@ let ITEMS_DATA = {
 			ctx.fillStyle = darkGreen;
 			ctx.fillRect(x + w * 0.88, y + h * 0.4, w * 0.06, h * 0.16);
 			ctx.lineCap = "butt";
+		}
+	},
+	[ITEM_REVOLVER]: {
+		name: "Revolver",
+		desc: "Classic six-shooter. Reliable and hard-hitting.",
+		name_rus: "Револьвер",
+		desc_rus: "Классический шестизарядник. Надежный и убойный.",
+		render: (ctx, x, y, w, h) => {
+			const iron = "#777";
+			const lightIron = "#aaa";
+			const darkIron = "#333";
+			const wood = "#5c3c21";
+			ctx.fillStyle = iron;
+			ctx.fillRect(x + w * 0.22, y + h * 0.45, w * 0.15, h * 0.2);
+			ctx.save();
+			ctx.translate(x + w * 0.28, y + h * 0.58);
+			ctx.rotate(Math.PI / 5);
+			ctx.fillStyle = wood;
+			ctx.fillRect(-w * 0.07, 0, w * 0.14, h * 0.28);
+			ctx.restore();
+			ctx.fillStyle = iron;
+			ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.3, h * 0.15);
+			ctx.fillRect(x + w * 0.2, y + h * 0.38, w * 0.45, h * 0.05);
+			ctx.fillStyle = darkIron;
+			ctx.fillRect(x + w * 0.38, y + h * 0.4, w * 0.2, h * 0.2);
+			ctx.fillStyle = "#222";
+			ctx.fillRect(x + w * 0.38, y + h * 0.48, w * 0.2, h * 0.04);
+			ctx.fillStyle = iron;
+			ctx.fillRect(x + w * 0.58, y + h * 0.42, w * 0.32, h * 0.1);
+			ctx.fillStyle = lightIron;
+			ctx.fillRect(x + w * 0.58, y + h * 0.42, w * 0.32, h *
+				0.03);
+			ctx.strokeStyle = darkIron;
+			ctx.lineWidth = w * 0.025;
+			ctx.strokeRect(x + w * 0.33, y + h * 0.55, w * 0.12, h *
+				0.08);
+			ctx.fillStyle = darkIron;
+			ctx.fillRect(x + w * 0.18, y + h * 0.36, w * 0.05, h *
+				0.05);
+			ctx.fillRect(x + w * 0.85, y + h * 0.37, w * 0.03, h *
+				0.05);
 		}
 	},
 	[ITEM_DESERT_EAGLE]: {
@@ -688,10 +785,10 @@ let ITEMS_DATA = {
 		}
 	},
 	[ITEM_BOSSIFIER]: {
-		name: "Bossifier",
-		desc: "Unleashes hidden potential. Use with caution.",
-		name_rus: "Боссификатор",
-		desc_rus: "Раскрывает скрытый потенциал. Использовать осторожно.",
+		name: "Ultimate Bossifier",
+		desc: "Can bossify any living thing.",
+		name_rus: "Абсолютный Боссификатор",
+		desc_rus: "Может боссифицировать любое живое создание.",
 		render: (ctx, x, y, w, h, animstate) => {
 			if (animstate == null) return;
 			let rate = 0.05;
@@ -1034,6 +1131,54 @@ let ITEMS_DATA = {
 			drawLine(ctx, x + 0.42 * w, y + 0.55 * h, x + 0.58 * w, y +
 				0.55 * h, "#333333", 2);
 		}
+	},
+	[ITEM_BOSSIFIER_REGULAR]: {
+		name: "Alpha Stimulant",
+		desc: "Forces a standard unit into its peak evolutionary state.",
+		name_rus: "Альфа-стимулятор",
+		desc_rus: "Вызывает форсированную мутацию рядового юнита.",
+		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
+			ctx, x, y, w, h, animstate, "regular")
+	},
+	[ITEM_BOSSIFIER_SHOOTING]: {
+		name: "Ballistic Catalyst",
+		desc: "Triggers a massive growth spurt in ranged combatants.",
+		name_rus: "Баллистический катализатор",
+		desc_rus: "Провоцирует резкий рост мощи у стреляющих врагов.",
+		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
+			ctx, x, y, w, h, animstate, "shooting")
+	},
+	[ITEM_BOSSIFIER_RED]: {
+		name: "Crimson Overdrive",
+		desc: "A volatile core that reacts only to high-tier marksmen.",
+		name_rus: "Багровый овердрайв",
+		desc_rus: "Нестабильное ядро, реагирующее только на элитных стрелков.",
+		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
+			ctx, x, y, w, h, animstate, "shooting red")
+	},
+	[ITEM_BOSSIFIER_SWORD]: {
+		name: "Ronin's Spark",
+		desc: "Resonates with the spirit of the blade. Creates a monster.",
+		name_rus: "Искра Ронина",
+		desc_rus: "Резонирует с духом клинка. Создает монстра.",
+		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
+			ctx, x, y, w, h, animstate, "sword")
+	},
+	[ITEM_BOSSIFIER_ROCKET]: {
+		name: "Siege Protocol",
+		desc: "Forces heavy artillery units into a state of total war.",
+		name_rus: "Осадный протокол",
+		desc_rus: "Переводит тяжелую артиллерию в режим тотальной войны.",
+		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
+			ctx, x, y, w, h, animstate, "shooting rocket")
+	},
+	[ITEM_BOSSIFIER_LASER]: {
+		name: "Singularity Core",
+		desc: "The ultimate challenge. Only for those who fear nothing.",
+		name_rus: "Ядро сингулярности",
+		desc_rus: "Ультимативный вызов. Только для тех, кто ничего не боится.",
+		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
+			ctx, x, y, w, h, animstate, "shooting laser")
 	},
 	default: {
 		name: "Unknown",

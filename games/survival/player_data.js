@@ -1,4 +1,41 @@
 const WEAPON_DEFS = {
+	[ITEM_STONE]: {
+		cooldown: 600,
+		ammo: ITEM_STONE,
+		chance: 1.0,
+		sound: "data/sfx/sword_1.mp3",
+		vol: 0.25,
+		color: "black",
+		length: 0.8,
+		width: 1.0,
+		doNotDrawGun: true,
+		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
+			.position.y, v.tx - v.sx, v.ty - v.sy, 7.5 + 7.5 * Math
+			.random(), 2 * Math.random(), false, 12, 1500, "gray",
+			"#333")
+	},
+	[ITEM_STICK]: {
+		isMelee: true,
+		color: "#8B4513",
+		swordLength: 70,
+		action: (g, p, v, dt) => {
+			if (Math.cos(p.sword_direction) < -0.97) {
+				audio_play("data/sfx/sword_1.mp3", 0.15);
+			}
+			player_handle_melee(
+				g,
+				p,
+				v,
+				dt,
+				0.015,
+				0.05,
+				0.25,
+				Math.PI / 6,
+				1000,
+				300
+			);
+		}
+	},
 	[ITEM_GUN]: {
 		cooldown: 200,
 		ammo: ITEM_AMMO,
@@ -14,14 +51,34 @@ const WEAPON_DEFS = {
 	[ITEM_DESERT_EAGLE]: {
 		cooldown: 600,
 		ammo: ITEM_AMMO,
-		chance: 0.10,
+		chance: 0.01,
 		sound: "data/sfx/shotgun_1.mp3",
 		vol: 0.35,
 		color: "#888888",
 		length: 0.8,
 		width: 1.0,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 32, 55 * 0.5)
+			.position.y, v.tx - v.sx, v.ty - v.sy, 32, Math.random() *
+			2 + 1)
+	},
+	[ITEM_REVOLVER]: {
+		cooldown: 800,
+		ammo: ITEM_AMMO,
+		chance: 0.01,
+		sound: "data/sfx/revolver_1.mp3",
+		vol: 0.4,
+		color: "#555555",
+		length: 0.9,
+		width: 1.1,
+		action: (g, p, v) => bullet_create(
+			g,
+			p.body.position.x,
+			p.body.position.y,
+			v.tx - v.sx,
+			v.ty - v.sy,
+			25,
+			Math.random() * 2.5 + 1.5
+		)
 	},
 	[ITEM_PLASMA_PISTOL]: {
 		cooldown: 200,
@@ -296,11 +353,13 @@ const WEAPON_DEFS = {
 				c2 = "white";
 				sfx = "red_pistols_1";
 				chance = 0.001;
-			} else if (ammoType === ITEM_RED_PLASMA) {
+			}
+			else if (ammoType === ITEM_RED_PLASMA) {
 				c1 = "red";
 				c2 = "pink";
 				sfx = "red_pistols_1";
-			} else if (ammoType === ITEM_PLASMA) {
+			}
+			else if (ammoType === ITEM_PLASMA) {
 				c1 = "cyan";
 				c2 = "blue";
 				sfx = "red_pistols_1";
@@ -317,7 +376,8 @@ const WEAPON_DEFS = {
 						c1, c2);
 				});
 				audio_play("data/sfx/" + sfx + ".mp3", 0.25);
-			} else {
+			}
+			else {
 				[-Math.PI / 4, Math.PI / 4].forEach(off => {
 					rocket_create(g, p.body.position.x + Math
 						.cos(theta + off) * p.w * 1.75, p
@@ -419,7 +479,27 @@ const ITEM_BEHAVIORS = {
 				ratio);
 			return true;
 		}
-	}
+	},
+	[ITEM_BOSSIFIER]: {
+		action: (p, player_obj) => {
+			let target = game_object_find_closest(player_obj.game, p
+				.body.position.x, p.body.position.y, "animal", 500);
+			let isAnimal = true;
+			if (!target) {
+				target = game_object_find_closest(player_obj.game, p
+					.body.position.x, p.body.position.y, "enemy",
+					500);
+				isAnimal = false;
+			}
+			if (!target) return false;
+			enemy_create(target.game, target.data.body.position.x,
+				target.data.body.position.y, true, false, target
+				.data.type);
+			if (isAnimal) animal_destroy(target, false);
+			else enemy_destroy(target);
+			return true;
+		}
+	},
 };
 ITEMS_DRINKS.forEach(id => {
 	ITEM_BEHAVIORS[id] = {
@@ -447,4 +527,50 @@ ITEMS_FOODS.forEach(id => {
 			return true;
 		}
 	};
+});
+Object.keys(ENEMY_TYPES).forEach(type => {
+	const cfg = ENEMY_TYPES[type];
+	if (cfg.bossifier_item) {
+		const itemId = cfg.bossifier_item;
+		let enemyTypeEng = ENEMY_TYPES[type].name_eng;
+		let enemyTypeRus = ENEMY_TYPES[type].name_rus;
+		let salt = "";
+		let saltRus = "";
+		if (type === "regular") {
+			salt =
+				" To make a boss, stand close to an enemy while holding bossifier and use the item."
+			saltRus =
+				" Чтобы превратить противника в босса, подойдите к нему и воспользуйтесь боссификатором у Вас в руках."
+		}
+		ITEMS_DATA[itemId] = {
+			name: `Bossifier: ${enemyTypeEng}`,
+			desc: `Forces a ${enemyTypeEng} enemy into its boss form.` +
+				salt,
+			name_rus: `Боссификатор: ${enemyTypeRus}`,
+			desc_rus: `Превращает противника типа ${enemyTypeRus} в босса.` +
+				saltRus,
+			render: (ctx, x, y, w, h, animstate) =>
+				item_draw_bossifier_icon(ctx, x, y, w, h, animstate,
+					type)
+		};
+		ITEM_BEHAVIORS[itemId] = {
+			action: (p, player_obj) => {
+				let t = game_object_find_closest(
+					player_obj.game,
+					player_obj.data.body.position.x,
+					player_obj.data.body.position.y,
+					"enemy",
+					600
+				);
+				if (t && t.data.type === type && !t.data.boss) {
+					enemy_create(t.game, t.data.body.position.x,
+						t.data.body.position.y, true, false,
+						type);
+					enemy_destroy(t);
+					return true;
+				}
+				return false;
+			}
+		};
+	}
 });

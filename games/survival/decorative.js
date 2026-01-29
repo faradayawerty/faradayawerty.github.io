@@ -46,7 +46,8 @@ function decorative_roof_draw(self, ctx) {
 		ctx.fillStyle = d.color;
 		ctx.textBaseline = "top";
 		ctx.fillText(d.text, d.x, d.y);
-	} else {
+	}
+	else {
 		ctx.fillStyle = d.color_fill;
 		ctx.fillRect(d.x, d.y, d.w, d.h);
 		if (d.color_outline && d.color_outline !== "transparent") {
@@ -218,7 +219,8 @@ function decorative_house_v2(g, x, y, w, h, door_side, wall_color, roof_color) {
 			decorative_wall_v2(g, sx, sy, (sw_ - dw) / 2, sh_, wall_color);
 			decorative_wall_v2(g, sx + (sw_ + dw) / 2, sy, (sw_ - dw) / 2,
 				sh_, wall_color);
-		} else {
+		}
+		else {
 			decorative_wall_v2(g, sx, sy, sw_, (sh_ - dw) / 2, wall_color);
 			decorative_wall_v2(g, sx, sy + (sh_ + dw) / 2, sw_, (sh_ - dw) /
 				2, wall_color);

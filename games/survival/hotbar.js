@@ -32,7 +32,8 @@ function hotbar_get_selected_item(hotbar_element) {
 			}
 		}
 		return 0;
-	} else if (hotbar_element.data.mouse_over) {
+	}
+	else if (hotbar_element.data.mouse_over) {
 		return 0;
 	}
 	return hotbar_element.data.row[hotbar_element.data.iselected];
@@ -166,7 +167,8 @@ function hotbar_update(hotbar_element, dt) {
 			x: input.mouse.x / scale,
 			y: input.mouse.y / scale
 		});
-	} else {
+	}
+	else {
 		for (let t of input.touch) {
 			pointsToCheck.push({
 				x: t.x / scale,
@@ -238,12 +240,14 @@ function hotbar_update(hotbar_element, dt) {
 						]);
 						if (item !== -1) player_item_consume(player, item,
 							true);
-					} else if (overWater) {
+					}
+					else if (overWater) {
 						let item = inventory_has_item_from_list(inv_el,
 							ITEMS_DRINKS);
 						if (item !== -1) player_item_consume(player, item,
 							true);
-					} else if (overFood) {
+					}
+					else if (overFood) {
 						let item = inventory_has_item_from_list(inv_el,
 							ITEMS_FOODS);
 						if (item !== -1) player_item_consume(player, item,

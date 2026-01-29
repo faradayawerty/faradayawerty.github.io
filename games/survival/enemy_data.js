@@ -1,5 +1,7 @@
 let ENEMY_TYPES = {
 	"regular": {
+		name_eng: "regular zombie",
+		name_rus: "обыкновенный зомби",
 		requires: null,
 		weight: 1,
 		health: 200,
@@ -11,6 +13,7 @@ let ENEMY_TYPES = {
 		outline: "white",
 		range: 400,
 		delay: 1000,
+		bossifier_item: ITEM_BOSSIFIER_REGULAR,
 		visuals: {
 			draw_gun: false,
 			outline_width: 1
@@ -28,9 +31,15 @@ let ENEMY_TYPES = {
 			if (target?.name == "player") achievement_do(target.data
 				.achievements_element.data.achievements, "big guy",
 				target.data.achievements_shower_element);
-		}
+		},
+		render_icon: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "green";
+			ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.2, h * 0.2);
+		},
 	},
 	"shooting": {
+		name_eng: "shooting zombie",
+		name_rus: "стреляющий зомби",
 		requires: "regular",
 		weight: 2,
 		health: 1000,
@@ -42,6 +51,7 @@ let ENEMY_TYPES = {
 		outline: "white",
 		range: 400,
 		delay: 1000,
+		bossifier_item: ITEM_BOSSIFIER_SHOOTING,
 		visuals: {
 			draw_gun: true,
 			gun_color: "#331133",
@@ -76,9 +86,18 @@ let ENEMY_TYPES = {
 				.achievements_element.data.achievements,
 				"big shooting guy", target.data
 				.achievements_shower_element);
-		}
+		},
+		render_icon: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#335544";
+			ctx.fillRect(x + w * 0.38, y + h * 0.5, w * 0.18, h * 0.18);
+			ctx.fillStyle = "#331133";
+			ctx.fillRect(x + w * 0.56, y + h * 0.53, w * 0.15, h *
+				0.08);
+		},
 	},
 	"shooting red": {
+		name_eng: "shooting red zombie",
+		name_rus: "стреляющий красный зомби",
 		requires: "shooting",
 		weight: 4,
 		health: 5000,
@@ -90,6 +109,7 @@ let ENEMY_TYPES = {
 		outline: "#aa3333",
 		range: 400,
 		delay: 200,
+		bossifier_item: ITEM_BOSSIFIER_RED,
 		visuals: {
 			draw_gun: true,
 			gun_color: "#551111",
@@ -148,9 +168,19 @@ let ENEMY_TYPES = {
 				.achievements_element.data.achievements,
 				"big red guy", target.data
 				.achievements_shower_element);
-		}
+		},
+		render_icon: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#999999";
+			ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.2, h * 0.2);
+			ctx.fillStyle = "#551111";
+			ctx.fillRect(x + w * 0.55, y + h * 0.5, w * 0.15, h * 0.06);
+			ctx.fillRect(x + w * 0.55, y + h * 0.62, w * 0.15, h *
+				0.06);
+		},
 	},
 	"sword": {
+		name_eng: "zombie with a sword",
+		name_rus: "зомби с мечом",
 		requires: "shooting red",
 		weight: 8,
 		health: 25000,
@@ -162,6 +192,7 @@ let ENEMY_TYPES = {
 		outline: "lime",
 		range: 400,
 		delay: 500,
+		bossifier_item: ITEM_BOSSIFIER_SWORD,
 		visuals: {
 			draw_gun: false,
 			draw_sword: true,
@@ -211,9 +242,22 @@ let ENEMY_TYPES = {
 				.achievements_element.data.achievements,
 				"big guy with a sword", target.data
 				.achievements_shower_element);
-		}
+		},
+		render_icon: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#bbaa11";
+			ctx.fillRect(x + w * 0.38, y + h * 0.55, w * 0.18, h *
+				0.18);
+			ctx.strokeStyle = "#55aa11";
+			ctx.lineWidth = h * 0.045;
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.5, y + h * 0.7);
+			ctx.lineTo(x + w * 0.65, y + h * 0.45);
+			ctx.stroke();
+		},
 	},
 	"shooting rocket": {
+		name_eng: "zombie with a rocket launcher",
+		name_rus: "зомби с ракетницей",
 		requires: "sword",
 		weight: 16,
 		health: 125000,
@@ -225,6 +269,7 @@ let ENEMY_TYPES = {
 		outline: "black",
 		range: 400,
 		delay: 2500,
+		bossifier_item: ITEM_BOSSIFIER_ROCKET,
 		visuals: {
 			draw_gun: true,
 			gun_color: "#113355",
@@ -269,9 +314,18 @@ let ENEMY_TYPES = {
 				.achievements_element.data.achievements,
 				"big military guy", target.data
 				.achievements_shower_element);
-		}
+		},
+		render_icon: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "gray";
+			ctx.fillRect(x + w * 0.38, y + h * 0.5, w * 0.18, h * 0.18);
+			ctx.fillStyle = "#113355";
+			ctx.fillRect(x + w * 0.56, y + h * 0.53, w * 0.15, h *
+				0.08);
+		},
 	},
 	"shooting laser": {
+		name_eng: "rainbow alien",
+		name_rus: "радужный пришелец",
 		requires: "shooting rocket",
 		weight: 32,
 		health: 625000,
@@ -283,6 +337,7 @@ let ENEMY_TYPES = {
 		outline: "white",
 		range: 600,
 		delay: 150,
+		bossifier_item: ITEM_BOSSIFIER_LASER,
 		visuals: {
 			draw_gun: true,
 			gun_color: "#331133",
@@ -334,7 +389,8 @@ let ENEMY_TYPES = {
 							(target.data.body.position.y - e
 								.body.position.y)
 					});
-				} else if (d > 750) {
+				}
+				else if (d > 750) {
 					e.jump_delay = 0;
 					Matter.Body.setPosition(e.body, {
 						x: target.data.body.position.x + 0.75 *
@@ -408,9 +464,19 @@ let ENEMY_TYPES = {
 				.achievements_element.data.achievements,
 				"huge rainbow guy", target.data
 				.achievements_shower_element);
+		},
+		render_icon: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#ff0000";
+			ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.2, h * 0.2);
+			ctx.fillStyle = "#331133";
+			ctx.fillRect(x + w * 0.55, y + h * 0.5, w * 0.15, h * 0.06);
+			ctx.fillRect(x + w * 0.55, y + h * 0.62, w * 0.15, h *
+				0.06);
 		}
 	},
 	"deer": {
+		name_eng: "deer",
+		name_rus: "олень",
 		requires: null,
 		weight: 0,
 		health: 31250000,
@@ -434,7 +500,8 @@ let ENEMY_TYPES = {
 			else if (e.jump_delay >= 1600) {
 				vars.dx = 0;
 				vars.dy = 0;
-			} else if (e.jump_delay >= 1500) {
+			}
+			else if (e.jump_delay >= 1500) {
 				vars.dx *= k;
 				vars.dy *= k;
 				e.jump_delay = 1600;
@@ -447,6 +514,8 @@ let ENEMY_TYPES = {
 		}
 	},
 	"raccoon": {
+		name_eng: "raccoon",
+		name_rus: "енот",
 		requires: null,
 		weight: 0,
 		health: 21250000,

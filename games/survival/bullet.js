@@ -47,7 +47,8 @@ function bullet_update(bullet_object, dt) {
 	if (bullet_object.data.lifetime < 0) {
 		bullet_destroy(bullet_object);
 		return;
-	} else {
+	}
+	else {
 		bullet_object.data.lifetime -= dt;
 	}
 	for (let i = 0; i < bullet_object.game.objects.length; i++) {
@@ -66,12 +67,14 @@ function bullet_update(bullet_object, dt) {
 				.data.enemy) {
 				bullet_object.game.objects[i].data.health -= 0.0125 *
 					bullet_object.data.damage * dt;
-			} else if (bullet_object.game.objects[i].name == "enemy" && !
+			}
+			else if (bullet_object.game.objects[i].name == "enemy" && !
 				bullet_object.data.enemy) {
 				bullet_object.game.objects[i].data.health -= bullet_object.data
 					.damage * dt;
 				bullet_object.game.objects[i].data.hit_by_player = true;
-			} else if (bullet_object.game.objects[i].name != "enemy") {
+			}
+			else if (bullet_object.game.objects[i].name != "enemy") {
 				bullet_object.game.objects[i].data.health -= bullet_object.data
 					.damage * dt;
 			}
@@ -87,15 +90,18 @@ function bullet_update(bullet_object, dt) {
 		if (bullet_object.game.player_object.data.shield_blue_health > 0) {
 			bullet_object.game.player_object.data.shield_blue_health -= 0.95 *
 				bullet_object.data.damage * dt;
-		} else if (bullet_object.game.player_object.data.shield_green_health >
+		}
+		else if (bullet_object.game.player_object.data.shield_green_health >
 			0) {
 			bullet_object.game.player_object.data.shield_green_health -= 0.75 *
 				bullet_object.data.damage * dt;
-		} else if (bullet_object.game.player_object.data.shield_rainbow_health >
+		}
+		else if (bullet_object.game.player_object.data.shield_rainbow_health >
 			0) {
 			bullet_object.game.player_object.data.shield_rainbow_health -=
 				0.55 * bullet_object.data.damage * dt;
-		} else if (bullet_object.game.player_object.data.immunity <= 0) {
+		}
+		else if (bullet_object.game.player_object.data.immunity <= 0) {
 			let k = 1.0;
 			if (bullet_object.game.player_object.data.sword_protection) {
 				k = 0.05;

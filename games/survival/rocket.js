@@ -40,7 +40,8 @@ function rocket_update(rocket_object, dt) {
 	let r = rocket_object.data;
 	if (rocket_object.data.lifetime < 0) {
 		r.health = -1;
-	} else {
+	}
+	else {
 		rocket_object.data.lifetime -= dt;
 	}
 	if (r.health < 0) {
@@ -70,7 +71,8 @@ function rocket_update(rocket_object, dt) {
 			.name != "car" && r.target_object.name != "rocket" ||
 			r.target_object.name == "car" && r.target_object.data.is_tank) {
 			r.target_object = null;
-		} else {
+		}
+		else {
 			if (r.target_object.name == "player" && r.target_object.data
 				.car_object) {
 				r.target_object = r.target_object.data.car_object;
@@ -89,20 +91,24 @@ function rocket_update(rocket_object, dt) {
 					if (r.target_object.data.shield_blue_health > 0) {
 						r.target_object.data.shield_blue_health -= 0.95 *
 							alpha * rocket_object.data.damage * dt;
-					} else if (r.target_object.data.shield_green_health > 0) {
+					}
+					else if (r.target_object.data.shield_green_health > 0) {
 						r.target_object.data.shield_green_health -= 0.75 *
 							alpha * rocket_object.data.damage * dt;
-					} else if (r.target_object.data.shield_rainbow_health > 0) {
+					}
+					else if (r.target_object.data.shield_rainbow_health > 0) {
 						r.target_object.data.shield_rainbow_health -= 0.55 *
 							alpha * rocket_object.data.damage * dt;
-					} else if (r.target_object.data.immunity <= 0) {
+					}
+					else if (r.target_object.data.immunity <= 0) {
 						let k = 1.0;
 						if (r.target_object.data.sword_visible)
 							k = 0.25;
 						r.target_object.data.health -= alpha * k * rocket_object
 							.data.damage * dt;
 					}
-				} else {
+				}
+				else {
 					r.target_object.data.health -= alpha * rocket_object.data
 						.damage * dt;
 					if (r.target_object.name == "enemy")
@@ -111,7 +117,8 @@ function rocket_update(rocket_object, dt) {
 				r.health -= 10 * alpha * rocket_object.data.damage * dt;
 			}
 		}
-	} else {
+	}
+	else {
 		if (!r.body)
 			return;
 		rocket_object.name = "ROCKET";

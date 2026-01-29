@@ -69,7 +69,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_health = 25;
 			chance_shield = 10;
 		}
-	} else if (car_type !== null) {
+	}
+	else if (car_type !== null) {
 		chance_ammo = 0;
 		chance_gun = 0;
 		chance_fuel = 20;
@@ -86,6 +87,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			case "police":
 				chance_ammo = 50;
 				chance_gun = 15;
+				if (Math.random() < 0.25)
+					available_guns.push(ITEM_DESERT_EAGLE);
 				break;
 			case "fireman":
 				chance_drink = 80;
@@ -95,11 +98,14 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 				chance_health = 100;
 				chance_drink = 5;
 				chance_food = 5;
+				available_food = [ITEM_ORANGE];
+				available_drinks = [ITEM_WATER];
 				break;
 			case "default":
 				break;
 		}
-	} else {
+	}
+	else {
 		if (tile === LEVEL_TILE_CITY_POLICE) {
 			chance_food = 1;
 			chance_drink = 1;
@@ -108,8 +114,12 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_health = 0;
 			chance_shield = 10;
 			chance_fuel = 0;
-			available_drinks = ITEMS_DRINKS;
-		} else if (tile === LEVEL_TILE_CITY_HOSPITAL) {
+			available_drinks = [ITEM_COLA];
+			available_food = [ITEM_CANNED_MEAT];
+			if (Math.random() < 0.25)
+				available_guns.push(ITEM_DESERT_EAGLE);
+		}
+		else if (tile === LEVEL_TILE_CITY_HOSPITAL) {
 			chance_food = 5;
 			chance_drink = 5;
 			chance_ammo = 1;
@@ -117,8 +127,10 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_health = 50;
 			chance_shield = 50;
 			chance_fuel = 0;
-			available_food = [ITEM_ORANGE, ITEM_CANNED_MEAT];
-		} else if (tile === LEVEL_TILE_CITY_FIRE_STATION) {
+			available_food = [ITEM_ORANGE];
+			available_drinks = [ITEM_WATER];
+		}
+		else if (tile === LEVEL_TILE_CITY_FIRE_STATION) {
 			chance_food = 10;
 			chance_drink = 60;
 			chance_ammo = 1;
@@ -126,8 +138,10 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_health = 1;
 			chance_shield = 10;
 			chance_fuel = 0;
-			available_food = ITEMS_FOODS;
-		} else if (tile === LEVEL_TILE_CITY_GAS_STATION) {
+			available_food = [ITEM_CANNED_MEAT];
+			available_drinks = [ITEM_WATER];
+		}
+		else if (tile === LEVEL_TILE_CITY_GAS_STATION) {
 			chance_food = 30;
 			chance_drink = 20;
 			chance_ammo = 5;
@@ -135,9 +149,10 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_health = 0;
 			chance_shield = 10;
 			chance_fuel = 120;
-			available_food = ITEMS_FOODS;
-			available_drinks = ITEMS_DRINKS;
-		} else if (LEVEL_TILES_SUBURBAN_ZONE.includes(tile)) {
+			available_food = [ITEM_ORANGE, ITEM_CHICKEN_LEG, ITEM_CHOCOLATE];
+			available_drinks = [ITEM_MILK, ITEM_COLA];
+		}
+		else if (LEVEL_TILES_SUBURBAN_ZONE.includes(tile)) {
 			chance_food = 20;
 			chance_drink = 20;
 			chance_ammo = 5;
@@ -145,9 +160,10 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_health = 0;
 			chance_shield = 10;
 			chance_fuel = 0;
-			available_food = ITEMS_FOODS;
-			available_drinks = ITEMS_DRINKS;
-		} else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
+			available_food = [ITEM_ORANGE, ITEM_CHICKEN_LEG, ITEM_CHOCOLATE];
+			available_drinks = [ITEM_MILK, ITEM_COLA];
+		}
+		else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
 			chance_food = 30;
 			chance_drink = 0;
 			chance_gun = 1;
@@ -293,7 +309,8 @@ function item_pickup(inventory_element, item_object, force = false) {
 					item_destroy(item_object);
 					return true;
 				}
-	} else {
+	}
+	else {
 		for (let i = 0; i < inv.items.length; i++)
 			for (let j = 0; j < inv.items[i].length; j++) {
 				if (inv.items[i][j] == 0) {
@@ -304,4 +321,37 @@ function item_pickup(inventory_element, item_object, force = false) {
 			}
 	}
 	return false;
+}
+
+function item_draw_bossifier_icon(ctx, x, y, w, h, animstate, enemyType) {
+	if (animstate == null) return;
+	let pulse = 1 + Math.pow(Math.sin(animstate * 0.1), 2);
+	const typeCfg = ENEMY_TYPES[enemyType];
+	ctx.fillStyle = "black";
+	ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+	let uiColor = typeCfg.outline;
+	if (!uiColor || uiColor === "black" || uiColor === "#000000") {
+		uiColor = "white";
+	}
+	if (enemyType === "shooting laser") {
+		let rate = 0.05;
+		let r = Math.floor(Math.pow(Math.cos(rate * animstate) * 15, 2));
+		let g = Math.floor(Math.pow(0.7 * (Math.cos(rate * animstate) + Math
+			.sin(rate * animstate)) * 15, 2));
+		let b = Math.floor(Math.pow(Math.sin(rate * animstate) * 15, 2));
+		uiColor = "#" + r.toString(16).padStart(2, '0') + g.toString(16)
+			.padStart(2, '0') + b.toString(16).padStart(2, '0');
+	}
+	ctx.strokeStyle = uiColor;
+	ctx.lineWidth = h * 0.03 * pulse;
+	ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+	ctx.fillStyle = uiColor;
+	ctx.beginPath();
+	ctx.moveTo(x + w * 0.5, y + h * 0.25);
+	ctx.lineTo(x + w * 0.4, y + h * 0.35);
+	ctx.lineTo(x + w * 0.6, y + h * 0.35);
+	ctx.fill();
+	if (typeCfg && typeCfg.render_icon) {
+		typeCfg.render_icon(ctx, x, y, w, h);
+	}
 }

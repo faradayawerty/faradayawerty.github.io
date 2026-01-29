@@ -35,15 +35,22 @@ function animal_update(ao, dt) {
 	if (a.health <= 0) {
 		if (a.type === "raccoon") {
 			if (Math.random() < 0.75) {
-				let junk_id = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK
-					.length)];
-				item_create(ao.game, junk_id, a.body.position.x, a.body.position
-					.y);
+				if (Math.random() < 0.25)
+					item_spawn(self.game, a.body.position.x, a.body.position.y,
+						null, LEVEL_TILE_RESIDENTIAL_T_SOUTH, null);
+				else {
+					let junk_id = ITEMS_JUNK[Math.floor(Math.random() *
+						ITEMS_JUNK.length)];
+					item_create(ao.game, junk_id, a.body.position.x, a.body
+						.position.y);
+				}
 			}
 			audio_play("data/sfx/raccoon_dies.mp3", 1.0);
-		} else {
-			if (Math.random() < 0.75) item_create(ao.game, ITEM_CANNED_MEAT, a
-				.body.position.x, a.body.position.y);
+		}
+		else if (a.type === "deer") {
+			if (Math.random() < 0.75)
+				item_create(ao.game, ITEM_CANNED_MEAT, a.body.position.x, a.body
+					.position.y);
 			audio_play("data/sfx/deer_dies_1.mp3");
 		}
 		if (Math.random() < 0.0025) item_create(ao.game, ITEM_AMMO, a.body
@@ -68,7 +75,8 @@ function animal_update(ao, dt) {
 		let d = Math.sqrt(dx * dx + dy * dy);
 		dx = (dx / d) * a.speed;
 		dy = (dy / d) * a.speed;
-	} else if (a.movement_change_delay < 0) {
+	}
+	else if (a.movement_change_delay < 0) {
 		dx = 2 * Math.random() - 1;
 		dy = 2 * Math.random() - 1;
 		let d = Math.sqrt(dx * dx + dy * dy);
@@ -92,7 +100,8 @@ function animal_draw(ao, ctx) {
 	let y = a.body.position.y;
 	if (a.type === "raccoon") {
 		animal_raccoon_draw(ctx, x, y, a.w, a.h, a);
-	} else {
+	}
+	else {
 		animal_deer_draw_horns(ctx, x, y, a.w);
 		fillMatterBody(ctx, a.body, "#aa8844");
 		drawMatterBody(ctx, a.body, "white", 0.05 * a.w);

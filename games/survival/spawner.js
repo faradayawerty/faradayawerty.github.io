@@ -28,7 +28,8 @@ function spawner_update(spawner_object, dt) {
 			spawner_object.data.y + Math.random() * spawner_object.data.h);
 		spawner_object.data.delay = spawner_object.data.max_delay;
 		spawner_object.data.overall_limit -= 1;
-	} else {
+	}
+	else {
 		spawner_object.data.delay -= dt;
 	}
 }

@@ -56,7 +56,8 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	}
 	if (health !== null) {
 		c.health = health;
-	} else {
+	}
+	else {
 		let variability = 0.75 + (Math.random() * 0.25);
 		c.health = Math.round(c.max_health * variability);
 	}
@@ -232,7 +233,8 @@ function car_draw(car_object, ctx) {
 			drawLine(ctx, tx, h / 2 - trackH * 0.5, tx, h / 2 + trackH * 0.5,
 				"#333", 2);
 		}
-	} else {
+	}
+	else {
 		ctx.fillStyle = "#111";
 		let wheelW = w * 0.2,
 			wheelH = h * 0.15;

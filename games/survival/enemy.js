@@ -1,13 +1,5 @@
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	"random") {
-	if (
-		!g.settings.enemies_spawn ||
-		(g.visited_levels.length < 05 && Math.random() < 1.00) ||
-		(g.visited_levels.length < 10 && Math.random() < 0.75) ||
-		(g.visited_levels.length < 15 && Math.random() < 0.50) ||
-		(g.visited_levels.length < 20 && Math.random() < 0.25)
-	)
-		return -1;
 	let enemies = g.objects.filter((obj) => obj.name == "enemy");
 	if (enemies.length > 100) {
 		for (let i = 0; i < enemies.length - 100; i++) {
@@ -51,7 +43,7 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		if (-1 < bd && bd < 15000) {
 			m *= 0.01;
 		}
-		if (Math.random() > 1 - 0.25 * m) {
+		if (Math.random() > 1 - 0.001 * m) {
 			boss = true;
 		}
 	}
@@ -161,7 +153,8 @@ function enemy_destroy(enemy_object, death = true) {
 			if (enemy_object.data.type == "shooting laser") {
 				g.kills_for_boss = Math.max(4, g.kills_for_boss);
 			}
-		} else {
+		}
+		else {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
 		}
@@ -306,6 +299,14 @@ function enemy_update(enemy_object, dt) {
 				.achievements_shower_element);
 			if (typeData.on_death) typeData.on_death(enemy_object,
 				target_object);
+			if (typeData.bossifier_item) {
+				let killsOfThisType = enemy_object.game.enemy_kills[e.type] ||
+					0;
+				let finalChance = 0.25 * Math.tanh(0.015 * killsOfThisType);
+				if (!e.boss && !e.is_minion && Math.random() < finalChance)
+					item_create(enemy_object.game, typeData.bossifier_item, e
+						.body.position.x, e.body.position.y);
+			}
 			let dropData = {
 				N: 1
 			};
@@ -314,7 +315,8 @@ function enemy_update(enemy_object, dt) {
 					dropData.N = 20 * Math.random() + 10;
 					if (typeData.on_boss_death) typeData.on_boss_death(
 						enemy_object, target_object, dropData);
-				} else dropData.N = 5 * Math.random();
+				}
+				else dropData.N = 5 * Math.random();
 			}
 			let sound = e.boss ? "data/sfx/zombie_boss_dies_1.mp3" :
 				"data/sfx/zombie_dies_1.mp3";
@@ -373,7 +375,8 @@ function enemy_draw(enemy_object, ctx) {
 					x: e.body.position.x,
 					y: e.body.position.y
 				});
-			} else if (vis.double_gun && (!(e.type === "shooting red" && e
+			}
+			else if (vis.double_gun && (!(e.type === "shooting red" && e
 					.boss) && !(e.type === "shooting laser" && (e
 					.is_minion || e
 					.boss)))) {
@@ -385,7 +388,8 @@ function enemy_draw(enemy_object, ctx) {
 					x: px + e.w,
 					y: py
 				});
-			} else {
+			}
+			else {
 				gunPoints.push({
 					x: px,
 					y: py
@@ -432,7 +436,8 @@ function enemy_draw(enemy_object, ctx) {
 	if (vis.custom_draw === "deer") {
 		animal_deer_draw_horns(ctx, e.body.position.x, e.body.position.y, e.w, e
 			.h);
-	} else if (vis.custom_draw === "raccoon") {
+	}
+	else if (vis.custom_draw === "raccoon") {
 		enemy_raccoon_boss_draw(ctx, e.body.position.x, e.body.position.y, e.w,
 			e.h, e);
 	}

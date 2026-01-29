@@ -46,9 +46,9 @@ function trashcan_update(self, dt) {
 					.body.position.y + offsetY);
 			}
 		}
-		if (Math.random() < 0.01)
-			item_create(self.game, ITEM_DESERT_EAGLE, p.body.position.x, p.body
-				.position.y);
+		if (Math.random() < 0.25)
+			item_spawn(self.game, p.body.position.x, p.body.position.y, null,
+				LEVEL_TILE_RESIDENTIAL_T_SOUTH, null);
 		trashcan_destroy(self);
 	}
 }

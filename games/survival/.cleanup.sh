@@ -4,5 +4,5 @@ sed -i 's/\/\/.*$//' *.js
 
 sed -i -e '/\/\*/,/\*\//d' *.js
 
-js-beautify -r -t --wrap-line-length=80 --max-preserve-newlines=1 *.js *.html
+js-beautify -r -t --wrap-line-length=80 --max-preserve-newlines=1 --brace-style=end-expand *.js *.html
 

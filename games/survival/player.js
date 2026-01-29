@@ -119,7 +119,8 @@ function player_die(player_object) {
 	if (player_object.data.ai_controlled || player_object.game.settings
 		.lose_items_on_death) {
 		inventory_drop_all_items(player_object.data.inventory_element);
-	} else {
+	}
+	else {
 		for (let i = 0; i < player_object.game.saved_items.length; i++)
 			for (let j = 0; j < player_object.game.saved_items[i].length; j++)
 				player_object.game.saved_items[i][j] = player_object.data
@@ -262,7 +263,8 @@ function player_update(player_object, dt) {
 	if (p.inventory_element.shown || p.achievements_element.shown) {
 		p.hotbar_element.shown = false;
 		p.achievements_shower_element.shown = false;
-	} else {
+	}
+	else {
 		p.achievements_shower_element.shown = true;
 	}
 	if (!p.inventory_element.shown && !p.hotbar_element.shown && !p
@@ -344,6 +346,9 @@ function player_update(player_object, dt) {
 					(ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) &&
 						player_object.game.settings.auto_pickup[
 							"automatically pickup food and drinks"]) ||
+					(ITEMS_BOSSIFIERS.includes(id) &&
+						player_object.game.settings.auto_pickup[
+							"automatically pickup bossifiers"]) ||
 					(ITEMS_GUNS.concat(ITEMS_MELEE).includes(id) &&
 						player_object.game.settings.auto_pickup[
 							"automatically pickup weapons"]) ||
@@ -361,12 +366,19 @@ function player_update(player_object, dt) {
 				if (item_pickup(p.inventory_element, closest_item)) {
 					achievement_do(p.achievements_element.data.achievements,
 						"pick an item", p.achievements_shower_element);
-					if (id == ITEM_GUN) achievement_do(p.achievements_element
-						.data.achievements, "get a gun", p
+					if (ITEMS_GUNS.concat(ITEMS_MELEE).includes(id))
+						achievement_do(p
+							.achievements_element
+							.data.achievements, "get a gun", p
+							.achievements_shower_element);
+					if (ITEMS_BOSSIFIERS.includes(id)) achievement_do(p
+						.achievements_element
+						.data.achievements, "bossifier", p
 						.achievements_shower_element);
 				}
 			}
-		} else if (f_down && p.mobile_delay <= 0) {
+		}
+		else if (f_down && p.mobile_delay <= 0) {
 			let found_car = game_object_find_closest(player_object.game, p.body
 				.position.x, p.body.position.y, "car", 200);
 			if (found_car) {
@@ -453,7 +465,8 @@ function player_update(player_object, dt) {
 				hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
 				achievement_do(p.achievements_element.data.achievements,
 					"need for ammo", p.achievements_shower_element);
-		} else {
+		}
+		else {
 			p.laser_sound_has_played = false;
 			p.sword_protection = false;
 		}
@@ -465,7 +478,8 @@ function player_update(player_object, dt) {
 			achievement_do(p.achievements_element.data.achievements,
 				"first steps", p.achievements_shower_element);
 		Matter.Body.setVelocity(p.body, vel);
-	} else {
+	}
+	else {
 		if (player_object.game.settings.auto_pickup[
 				"automatically pickup fuel"]) {
 			let cl_item = game_object_find_closest(player_object.game, p.body
@@ -485,7 +499,8 @@ function player_update(player_object, dt) {
 				moveMag = carData.speed;
 				rotatedir = 1;
 				carData.fuel = Math.max(carData.fuel - 0.005 * dt, 0);
-			} else if (wish.y > 0.1) {
+			}
+			else if (wish.y > 0.1) {
 				moveMag = -carData.speed * 0.5;
 				rotatedir = -1;
 				carData.fuel = Math.max(carData.fuel - 0.005 * dt, 0);
@@ -501,7 +516,8 @@ function player_update(player_object, dt) {
 				x: moveMag * Math.cos(carBody.angle),
 				y: moveMag * Math.sin(carBody.angle)
 			});
-		} else {
+		}
+		else {
 			Matter.Body.setVelocity(carBody, {
 				x: carBody.velocity.x * 0.96,
 				y: carBody.velocity.y * 0.96
@@ -572,7 +588,8 @@ function player_draw(player_object, ctx) {
 		drawLaserLine(p.w * 0.45, "white");
 		p.shooting_laser = false;
 	}
-	if (g.settings.player_draw_gun && cfg && !cfg.isMelee) {
+	if (g.settings.player_draw_gun && cfg && !cfg.isMelee && !cfg
+		.doNotDrawGun) {
 		let mx, my, cx = 0,
 			cy = 0;
 		if (p.ai_controlled) {
@@ -582,10 +599,12 @@ function player_draw(player_object, ctx) {
 			my = target ? target.data.body.position.y : p.body.position.y;
 			cx = p.body.position.x;
 			cy = p.body.position.y;
-		} else if (g.mobile) {
+		}
+		else if (g.mobile) {
 			mx = g.input.joystick.left.dx || g.input.joystick.right.dx || -1;
 			my = g.input.joystick.left.dy || g.input.joystick.right.dy || 1;
-		} else {
+		}
+		else {
 			mx = g.input.mouse.x;
 			my = g.input.mouse.y;
 			cx = 0.5 * ctx.canvas.width;
@@ -625,14 +644,23 @@ function player_draw(player_object, ctx) {
 			py
 		}, lw, gl);
 		ctx.lineWidth = 2;
-	} else if (p.sword_visible) {
+	}
+	else if (p.sword_visible) {
 		let px = p.body.position.x - p.w * 0.45;
 		let py = p.body.position.y - p.h * 0.45;
 		let swLen = 100;
-		let col = (selected_item === ITEM_HORN) ? "brown" : "#55aa11";
+		let col = "#55aa11";
+		let swWidth = 0.25 * p.w;
+		if (selected_item === ITEM_HORN)
+			col = "brown";
+		if (selected_item === ITEM_STICK) {
+			col = "brown";
+			swLen = 0.5 * (50 + 75);
+			swWidth = 0.5 * 0.25 * p.w;
+		}
 		ctx.beginPath();
 		ctx.strokeStyle = col;
-		ctx.lineWidth = 0.25 * p.w;
+		ctx.lineWidth = swWidth;
 		ctx.moveTo(px, py);
 		let dx = Math.cos(p.sword_direction) * swLen;
 		let dy = Math.sin(p.sword_direction) * swLen;
@@ -645,7 +673,8 @@ function player_draw(player_object, ctx) {
 				dy, py + 0.85 * dy - 0.25 * dx, "brown", p.w * 0.2);
 		}
 		p.sword_visible = false;
-	} else if (selected_item > 0) {
+	}
+	else if (selected_item > 0) {
 		item_icon_draw(ctx, selected_item, p.body.position.x - 0.25 * p.w, p
 			.body.position.y - 0.25 * p.h, 0.5 * p.w, 0.5 * p.h, p
 			.item_animstate);
@@ -696,7 +725,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 		sy = p.body.position.y;
 		tx = (target_body.position.x - sx) * 10 + sx;
 		ty = (target_body.position.y - sy) * 10 + sy;
-	} else if (!p.ai_controlled) {
+	}
+	else if (!p.ai_controlled) {
 		sx = 0.5 * window.innerWidth;
 		sy = 0.5 * window.innerHeight;
 		tx = (shoot_dir_x !== null) ? shoot_dir_x + sx : g.input.mouse.x;
@@ -716,7 +746,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 				const hasAnyJunk = cfg.ammo.some(id => inventory_has_item(p
 					.inventory_element, id));
 				if (!hasAnyJunk) return;
-			} else {
+			}
+			else {
 				if (!inventory_has_item(p.inventory_element, cfg.ammo)) return;
 			}
 		}
@@ -730,7 +761,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 					.inventory_element, id));
 				if (itemToClear) inventory_clear_item(p.inventory_element,
 					itemToClear, 1);
-			} else {
+			}
+			else {
 				inventory_clear_item(p.inventory_element, cfg.ammo, 1);
 			}
 		}
@@ -752,7 +784,7 @@ function player_laser_hits_point(px, py, x, y, w, l, alpha) {
 
 function player_handle_melee(g, p, v, dt, rotSpeed, dmgMax, dmgMin, angleLimit,
 	rocketDmgMax, rocketDmgMin) {
-	if (Math.cos(p.sword_direction) < -0.985) audio_play(
+	if (Math.cos(p.sword_direction) < -0.995) audio_play(
 		"data/sfx/sword_1.mp3");
 	p.sword_direction += (v.tx > v.sx ? rotSpeed : -rotSpeed) * dt;
 	p.sword_direction %= (2 * Math.PI);
@@ -802,7 +834,8 @@ function player_item_consume(player_object, id, anywhere = false) {
 		if (p.hotbar_element.shown) {
 			item_i = 0;
 			item_j = p.hotbar_element.data.iselected;
-		} else if (p.inventory_element.shown) {
+		}
+		else if (p.inventory_element.shown) {
 			item_i = p.inventory_element.data.imove;
 			item_j = p.inventory_element.data.jmove;
 		}
@@ -854,11 +887,13 @@ function player_get_best_weapon_with_ammo(player_object) {
 				if (Array.isArray(cfg.ammo)) {
 					hasAmmo = cfg.ammo.some(aId => inventory_has_item(inv,
 						aId));
-				} else {
+				}
+				else {
 					hasAmmo = inventory_has_item(inv, cfg.ammo);
 				}
 				if (hasAmmo) return id;
-			} else {
+			}
+			else {
 				return id;
 			}
 		}

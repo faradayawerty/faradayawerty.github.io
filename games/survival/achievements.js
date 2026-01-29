@@ -12,7 +12,8 @@ function achievements_create(g) {
 				mobile: entry.desc.mobile.ru,
 				pc: entry.desc.pc.ru
 			};
-		} else {
+		}
+		else {
 			description = entry.desc.en;
 			descriptionRus = entry.desc.ru;
 		}
@@ -81,7 +82,8 @@ function achievements_update(ae, dt) {
 			ae.data.y = ae.data.yy + (my - ae.data.myy);
 			ae.data.clicked = true;
 		}
-	} else {
+	}
+	else {
 		ae.data.clicked = false;
 	}
 	let points = [];
@@ -92,7 +94,8 @@ function achievements_update(ae, dt) {
 				y: my
 			});
 		}
-	} else if (input.mouse.leftButtonPressed) {
+	}
+	else if (input.mouse.leftButtonPressed) {
 		points.push({
 			x: mx,
 			y: my
@@ -112,9 +115,11 @@ function achievements_update(ae, dt) {
 		if (is_over_cross) {
 			ae.data._cross_held = true;
 			ae.data.clicked = false;
-		} else if (freeTouch && !is_over_cross) {
+		}
+		else if (freeTouch && !is_over_cross) {
 			ae.data._cross_held = false;
-		} else if (!freeTouch && ae.data._cross_held) {
+		}
+		else if (!freeTouch && ae.data._cross_held) {
 			ae.data._cross_held = false;
 			ae.shown = false;
 			if (ae.game.debug_console) {
@@ -122,7 +127,8 @@ function achievements_update(ae, dt) {
 			}
 			return;
 		}
-	} else {
+	}
+	else {
 		if (is_over_cross && !ae.data.was_left_down && input.mouse
 			.leftButtonPressed) {
 			ae.shown = false;
@@ -282,7 +288,7 @@ function achievements_shower_destroy(ashe) {
 }
 
 function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
-	1000) {
+	1100) {
 	let as = ae.data.achievements;
 	let W = bbw * 0.65;
 	let H = bbh * 0.25;
@@ -302,7 +308,8 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 	let desc = "";
 	if (typeof descRaw === 'object' && descRaw !== null) {
 		desc = ae.game.mobile ? descRaw.mobile : descRaw.pc;
-	} else {
+	}
+	else {
 		desc = descRaw;
 	}
 	let fontsize = Math.floor(W / 27);

@@ -96,10 +96,12 @@ let TILES = {
 				if (rand < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else if (rand < 0.7) {
+				}
+				else if (rand < 0.7) {
 					item_create(g, ITEM_FUEL, Ox + 500 + Math.random() *
 						1500, Oy + 300 + Math.random() * 500);
-				} else {
+				}
+				else {
 					item_spawn(g, Ox + 280 + Math.random() * 400, Oy +
 						200 + Math.random() * 600, null,
 						LEVEL_TILE_RESIDENTIAL_T_SOUTH);
@@ -134,7 +136,8 @@ let TILES = {
 				if (Math.random() < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else {
+				}
+				else {
 					item_spawn(g, Ox + 350 + Math.random() * 1800, Oy +
 						150 + Math.random() * 700, null, tile);
 				}
@@ -170,7 +173,8 @@ let TILES = {
 				if (Math.random() < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else {
+				}
+				else {
 					item_spawn(g, Ox + 1540 + Math.random() * 750, Oy +
 						250 + Math.random() * 650, null, tile);
 				}
@@ -203,7 +207,8 @@ let TILES = {
 				if (Math.random() < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else {
+				}
+				else {
 					item_spawn(g, Ox + 1500 + Math.random() * 850, Oy +
 						140 + Math.random() * 950, null, tile);
 				}
@@ -211,7 +216,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_RESIDENTIAL_T_SOUTH]: {
-		weight: 50,
+		weight: 25,
 		connections: {
 			N: 0,
 			E: 1,
@@ -261,7 +266,8 @@ let TILES = {
 				if (Math.random() < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else {
+				}
+				else {
 					let p = houses[Math.floor(Math.random() * houses
 						.length)];
 					item_spawn(g, Ox + p[0] + Math.random() * 600, Oy +
@@ -271,7 +277,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_RESIDENTIAL_NW]: {
-		weight: 25,
+		weight: 50,
 		connections: {
 			N: 1,
 			E: 0,
@@ -317,7 +323,8 @@ let TILES = {
 				if (Math.random() < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else {
+				}
+				else {
 					let p = houses[Math.floor(Math.random() * houses
 						.length)];
 					item_spawn(g, Ox + p[0] + Math.random() * 600, Oy +
@@ -327,7 +334,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_RESIDENTIAL_NE]: {
-		weight: 25,
+		weight: 50,
 		connections: {
 			N: 1,
 			E: 1,
@@ -372,7 +379,8 @@ let TILES = {
 				if (Math.random() < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else {
+				}
+				else {
 					let p = houses[Math.floor(Math.random() * houses
 						.length)];
 					item_spawn(g, Ox + p[0] + Math.random() * 600, Oy +
@@ -546,16 +554,9 @@ let TILES = {
 		},
 		populate_with_items: (g, Ox, Oy, tile) => {
 			let N = Math.random() * 5 + 2;
-			for (let i = 0; i < N; i++) {
-				if (Math.random() < 0.2) {
-					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
-						.random() * 2500, null, tile);
-				} else {
-					item_create(g, ITEM_APPLE, Ox + 100 + Math
-						.random() * 2300, Oy + 100 + Math.random() *
-						2300);
-				}
-			}
+			for (let i = 0; i < N; i++)
+				item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+					.random() * 2500, null, tile);
 		}
 	},
 	[LEVEL_TILE_CITY_PARK]: {
@@ -635,7 +636,8 @@ let TILES = {
 				if (Math.random() < 0.2) {
 					item_spawn(g, Ox + Math.random() * 2500, Oy + Math
 						.random() * 2500, null, tile);
-				} else {
+				}
+				else {
 					let rx = Math.random() > 0.5 ? 100 + Math.random() *
 						800 : 1500 + Math.random() * 800;
 					let ry = Math.random() > 0.5 ? 100 + Math.random() *
