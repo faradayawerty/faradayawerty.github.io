@@ -165,11 +165,23 @@
 				menu1.want_player_respawn = false;
 			}
 			else {
-				game1.show_gui = true;
-				game_update(game1, dt);
-				Matter.Engine.update(engine1, dt);
+				try {
+					game1.show_gui = true;
+					game_update(game1, dt);
+					Matter.Engine.update(engine1, dt);
+				}
+				catch (e) {
+					console.error(e.stack);
+					console.log(game1);
+				}
 			}
-			game_draw(game1, ctx1);
+			try {
+				game_draw(game1, ctx1);
+			}
+			catch (e) {
+				console.error(e.stack);
+				console.log(game1);
+			}
 			if (menu1.shown)
 				menu_draw(ctx1, menu1);
 			window.requestAnimationFrame(function() {

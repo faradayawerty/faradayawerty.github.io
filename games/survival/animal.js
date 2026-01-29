@@ -36,7 +36,7 @@ function animal_update(ao, dt) {
 		if (a.type === "raccoon") {
 			if (Math.random() < 0.75) {
 				if (Math.random() < 0.25)
-					item_spawn(self.game, a.body.position.x, a.body.position.y,
+					item_spawn(ao.game, a.body.position.x, a.body.position.y,
 						null, LEVEL_TILE_RESIDENTIAL_T_SOUTH, null);
 				else {
 					let junk_id = ITEMS_JUNK[Math.floor(Math.random() *
