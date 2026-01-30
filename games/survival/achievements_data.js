@@ -10,7 +10,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "find a bossifier to bossify the enemies",
-			ru: "найдите боссификатор, чтобы делать врагов боссами"
+			ru: "найдите боссификатор; он позволяет боссифицировать врагов соответствующего типа"
 		},
 		req: "shoot 'em up",
 		draw: (ctx, x, y, w, h, p) => {

@@ -55,6 +55,11 @@ function inventory_draw(inventory_element, ctx) {
 			else
 				ctx.fillStyle = "blue";
 			ctx.fillRect(sx, sy, inv.slot_size, inv.slot_size);
+			if(i === 0) {
+				ctx.strokeStyle = "#3ee";
+				ctx.lineWidth = inv.slot_size * 0.0125;
+				ctx.strokeRect(sx, sy, inv.slot_size, inv.slot_size);
+			}
 			ctx.restore();
 			if (game.mobile || !(inv.imove === i && inv.jmove === j)) {
 				item_icon_draw(ctx, inv.items[i][j], sx, sy, inv.slot_size, inv

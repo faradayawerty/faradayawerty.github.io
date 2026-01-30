@@ -8,6 +8,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 	if (enemy_type == "shooting" || enemy_type == null && g.available_enemies
 		.includes("shooting")) {
 		available_guns.push(ITEM_SHOTGUN);
+		if(tile === LEVEL_TILE_CITY_POLICE || car_type === "police")
+			available_guns.push(ITEM_MINIGUN);
 		if (enemy_type != null) {
 			available_ammos.push(ITEM_PLASMA);
 			available_shields.push(ITEM_SHIELD);
@@ -18,6 +20,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		available_ammos.push(ITEM_PLASMA);
 		available_guns.push(ITEM_PLASMA_LAUNCHER);
 		available_shields.push(ITEM_SHIELD);
+		if(tile === LEVEL_TILE_CITY_POLICE || car_type === "police")
+			available_guns.push(ITEM_PLASMA_PISTOL);
 		if (enemy_type != null)
 			available_ammos.push(ITEM_RED_PLASMA);
 	}
@@ -25,6 +29,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		.includes("sword")) {
 		available_guns.push(ITEM_RED_PISTOLS);
 		available_ammos.push(ITEM_RED_PLASMA);
+		if(tile === LEVEL_TILE_CITY_POLICE || car_type === "police")
+			available_guns.push(ITEM_RED_SHOTGUN);
 		if (enemy_type != null) {
 			available_health = [ITEM_HEALTH_GREEN];
 			available_shields = [ITEM_SHIELD_GREEN];
@@ -35,6 +41,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		available_guns.push(ITEM_SWORD);
 		available_health.push(ITEM_SHIELD_GREEN);
 		available_health.push(ITEM_HEALTH_GREEN);
+		if(tile === LEVEL_TILE_CITY_POLICE || car_type === "police")
+			available_guns.push(ITEM_GREEN_GUN);
 		if (enemy_type != null)
 			available_ammos = [ITEM_ROCKET];
 	}
@@ -42,6 +50,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		.available_enemies.includes("shooting laser")) {
 		available_guns.push(ITEM_ROCKET_LAUNCHER);
 		available_ammos.push(ITEM_ROCKET);
+		if(tile === LEVEL_TILE_CITY_POLICE || car_type === "police")
+			available_guns.push(ITEM_ROCKET_SHOTGUN);
 		if (enemy_type != null) {
 			available_ammos = [ITEM_ROCKET, ITEM_RAINBOW_AMMO];
 			available_shields = [ITEM_SHIELD_RAINBOW];

@@ -77,12 +77,17 @@ function levels_spawn_enemies(g, Ox, Oy, player_object, tile =
 		);
 		let bd = enemy_boss_distance_to_player(g);
 		if (-1 < bd && bd < 5000) m *= 0.45;
-		for (let i = 0; i < Math.random() * 60 * m - 10; i++)
+		for (let i = 0; i < Math.random() * 60 * m - 10; i++) {
 			enemy_create(
 				g,
 				Ox + 1250 + (0.5 - Math.random()) * 1500,
-				Oy + 1250 + (0.5 - Math.random()) * 1500
+				Oy + 1250 + (0.5 - Math.random()) * 1500,
+				false,
+				false,
+				"random",
+				tile
 			);
+		}
 	}
 }
 

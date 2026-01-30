@@ -1132,54 +1132,6 @@ let ITEMS_DATA = {
 				0.55 * h, "#333333", 2);
 		}
 	},
-	[ITEM_BOSSIFIER_REGULAR]: {
-		name: "Alpha Stimulant",
-		desc: "Forces a standard unit into its peak evolutionary state.",
-		name_rus: "Альфа-стимулятор",
-		desc_rus: "Вызывает форсированную мутацию рядового юнита.",
-		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
-			ctx, x, y, w, h, animstate, "regular")
-	},
-	[ITEM_BOSSIFIER_SHOOTING]: {
-		name: "Ballistic Catalyst",
-		desc: "Triggers a massive growth spurt in ranged combatants.",
-		name_rus: "Баллистический катализатор",
-		desc_rus: "Провоцирует резкий рост мощи у стреляющих врагов.",
-		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
-			ctx, x, y, w, h, animstate, "shooting")
-	},
-	[ITEM_BOSSIFIER_RED]: {
-		name: "Crimson Overdrive",
-		desc: "A volatile core that reacts only to high-tier marksmen.",
-		name_rus: "Багровый овердрайв",
-		desc_rus: "Нестабильное ядро, реагирующее только на элитных стрелков.",
-		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
-			ctx, x, y, w, h, animstate, "shooting red")
-	},
-	[ITEM_BOSSIFIER_SWORD]: {
-		name: "Ronin's Spark",
-		desc: "Resonates with the spirit of the blade. Creates a monster.",
-		name_rus: "Искра Ронина",
-		desc_rus: "Резонирует с духом клинка. Создает монстра.",
-		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
-			ctx, x, y, w, h, animstate, "sword")
-	},
-	[ITEM_BOSSIFIER_ROCKET]: {
-		name: "Siege Protocol",
-		desc: "Forces heavy artillery units into a state of total war.",
-		name_rus: "Осадный протокол",
-		desc_rus: "Переводит тяжелую артиллерию в режим тотальной войны.",
-		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
-			ctx, x, y, w, h, animstate, "shooting rocket")
-	},
-	[ITEM_BOSSIFIER_LASER]: {
-		name: "Singularity Core",
-		desc: "The ultimate challenge. Only for those who fear nothing.",
-		name_rus: "Ядро сингулярности",
-		desc_rus: "Ультимативный вызов. Только для тех, кто ничего не боится.",
-		render: (ctx, x, y, w, h, animstate) => item_draw_bossifier_icon(
-			ctx, x, y, w, h, animstate, "shooting laser")
-	},
 	default: {
 		name: "Unknown",
 		desc: "???",

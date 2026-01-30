@@ -92,110 +92,108 @@
 			ctx1.canvas.height = window.innerHeight;
 			ctx1.fillStyle = "black";
 			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
-			// update game settings
-			if (menu1.want_player_color != game1.settings.player_color)
-				game1.settings.player_color = menu1.want_player_color;
-			if (menu1.want_player_draw_gun != game1.settings.player_draw_gun)
-				game1.settings.player_draw_gun = menu1.want_player_draw_gun;
-			if (menu1.want_enemies_spawn != game1.settings.enemies_spawn)
-				game1.settings.enemies_spawn = menu1.want_enemies_spawn;
-			if (menu1.want_hints != game1.settings.show_hints)
-				game1.settings.show_hints = menu1.want_hints;
-			if (menu1.want_language != game1.settings.language)
-				game1.settings.language = menu1.want_language;
-			if (menu1.want_ammo_pickup_last != game1.settings.ammo_pickup_last)
-				game1.settings.ammo_pickup_last = menu1.want_ammo_pickup_last;
-			if (menu1.want_indicators != game1.settings.indicators)
-				game1.settings.indicators = menu1.want_indicators;
-			if (menu1.want_auto_pickup != game1.settings.auto_pickup)
-				game1.settings.auto_pickup = menu1.want_auto_pickup;
-			if (menu1.want_lose_items != game1.settings.lose_items_on_death)
-				game1.settings.lose_items_on_death = menu1.want_lose_items;
-			if (menu1.want_respawn_here != game1.settings.respawn_on_current_level)
-				game1.settings.respawn_on_current_level = menu1.want_respawn_here;
-			if (menu1.want_trees != game1.settings.trees)
-				game1.settings.trees = menu1.want_trees;
-			if (menu1.want_debug != game1.debug)
-				game1.debug = menu1.want_debug;
-			if (menu1.want_auto_aim != game1.settings.auto_aim)
-				game1.settings.auto_aim = menu1.want_auto_aim;
-			if (menu1.want_save) {
-				game_save(game1);
-				menu1.want_save = false;
-			}
-			if (menu1.want_load) {
-				game_load(game1);
-				menu1.want_load = false;
-			}
-			if (game1.mobile)
-				menu1.iselected = -1;
-			// update game if menu is not shown, else update menu
-			if (isKeyDown(input1, 'escape', true)) {
-				menu1.shown = !menu1.shown;
-				game1.want_hide_inventory = true;
-			}
-			if (game1.want_menu) {
-				menu1.shown = true;
-			}
-			if (menu1.shown) {
-				menu_update(menu1, dt, input1);
-				game1.show_gui = false;
-				game1.want_menu = false;
-			}
-			else if (game1.want_respawn_menu) {
-				menu1.shown = true;
-				menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf(
-					"continue game")] = "respawn and continue game";
-				menu1.buttons = menu1.menu_respawn_buttons;
-				game1.want_respawn_menu = false;
-			}
-			else if (menu1.want_new_game) {
-				game_new(game1);
-				menu1.want_new_game = false;
-			}
-			else if (menu1.want_player_respawn) {
-				let level_x = Number(game1.respawn_level.split("x")[0]);
-				let level_y = Number(game1.respawn_level.split("x")[1]);
-				if (!game1.settings.respawn_on_current_level) {
-					level_x = 0;
-					level_y = 0;
+			try {
+				// update game settings
+				if (menu1.want_player_color != game1.settings.player_color)
+					game1.settings.player_color = menu1.want_player_color;
+				if (menu1.want_player_draw_gun != game1.settings.player_draw_gun)
+					game1.settings.player_draw_gun = menu1.want_player_draw_gun;
+				if (menu1.want_enemies_spawn != game1.settings.enemies_spawn)
+					game1.settings.enemies_spawn = menu1.want_enemies_spawn;
+				if (menu1.want_hints != game1.settings.show_hints)
+					game1.settings.show_hints = menu1.want_hints;
+				if (menu1.want_language != game1.settings.language)
+					game1.settings.language = menu1.want_language;
+				if (menu1.want_ammo_pickup_last != game1.settings.ammo_pickup_last)
+					game1.settings.ammo_pickup_last = menu1.want_ammo_pickup_last;
+				if (menu1.want_indicators != game1.settings.indicators)
+					game1.settings.indicators = menu1.want_indicators;
+				if (menu1.want_auto_pickup != game1.settings.auto_pickup)
+					game1.settings.auto_pickup = menu1.want_auto_pickup;
+				if (menu1.want_lose_items != game1.settings.lose_items_on_death)
+					game1.settings.lose_items_on_death = menu1.want_lose_items;
+				if (menu1.want_respawn_here != game1.settings.respawn_on_current_level)
+					game1.settings.respawn_on_current_level = menu1.want_respawn_here;
+				if (menu1.want_trees != game1.settings.trees)
+					game1.settings.trees = menu1.want_trees;
+				if (menu1.want_debug != game1.debug)
+					game1.debug = menu1.want_debug;
+				if (menu1.want_auto_aim != game1.settings.auto_aim)
+					game1.settings.auto_aim = menu1.want_auto_aim;
+				if (menu1.want_save) {
+					game_save(game1);
+					menu1.want_save = false;
 				}
-				player_create(game1, 1250 + level_x * 2500, 1250 + level_y * 2500,
-					true, menu1.want_spawn_ai);
-				menu1.want_player_respawn = false;
-			}
-			else {
-				try {
+				if (menu1.want_load) {
+					game_load(game1);
+					menu1.want_load = false;
+				}
+				if (game1.mobile)
+					menu1.iselected = -1;
+				// update game if menu is not shown, else update menu
+				if (isKeyDown(input1, 'escape', true)) {
+					menu1.shown = !menu1.shown;
+					game1.want_hide_inventory = true;
+				}
+				if (game1.want_menu) {
+					menu1.shown = true;
+				}
+				if (menu1.shown) {
+					menu_update(menu1, dt, input1);
+					game1.show_gui = false;
+					game1.want_menu = false;
+				}
+				else if (game1.want_respawn_menu) {
+					menu1.shown = true;
+					menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf(
+						"continue game")] = "respawn and continue game";
+					menu1.buttons = menu1.menu_respawn_buttons;
+					game1.want_respawn_menu = false;
+				}
+				else if (menu1.want_new_game) {
+					game_new(game1);
+					menu1.want_new_game = false;
+				}
+				else if (menu1.want_player_respawn) {
+					let level_x = Number(game1.respawn_level.split("x")[0]);
+					let level_y = Number(game1.respawn_level.split("x")[1]);
+					if (!game1.settings.respawn_on_current_level) {
+						level_x = 0;
+						level_y = 0;
+					}
+					player_create(game1, 1250 + level_x * 2500, 1250 + level_y * 2500,
+						true, menu1.want_spawn_ai);
+					menu1.want_player_respawn = false;
+				}
+				else {
 					game1.show_gui = true;
 					game_update(game1, dt);
 					Matter.Engine.update(engine1, dt);
 				}
-				catch (e) {
-					console.error(e.stack);
-					console.log(game1);
-				}
-			}
-			try {
 				game_draw(game1, ctx1);
-			}
-			catch (e) {
+				if (menu1.shown)
+					menu_draw(ctx1, menu1);
+			} catch (e) {
 				console.error(e.stack);
-				console.log(game1);
+				console.log(game1, menu1);
 			}
-			if (menu1.shown)
-				menu_draw(ctx1, menu1);
 			window.requestAnimationFrame(function() {
 				animate(lastUpdateTime);
 			});
 		}
 
 		function main() {
-			audio_init();
-			game_new(game1);
-			engine1.world.gravity.y = 0;
-			initializeKeyboardInput(input1.keys);
-			initializeMouseInput(input1.mouse, ctx1);
-			initializeTouchInput(input1.touch, input1.joystick, ctx1);
+			try {
+				audio_init();
+				game_new(game1);
+				engine1.world.gravity.y = 0;
+				initializeKeyboardInput(input1.keys);
+				initializeMouseInput(input1.mouse, ctx1);
+				initializeTouchInput(input1.touch, input1.joystick, ctx1);
+			} catch(e) {
+				console.error(e.stack);
+				console.log(game1, menu1);
+			}
 			animate(Date.now());
 		}
 		main()

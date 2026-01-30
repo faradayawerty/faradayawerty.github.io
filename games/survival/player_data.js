@@ -540,7 +540,7 @@ Object.keys(ENEMY_TYPES).forEach(type => {
 			salt =
 				" To make a boss, stand close to an enemy while holding bossifier and use the item."
 			saltRus =
-				" Чтобы превратить противника в босса, подойдите к нему и воспользуйтесь боссификатором у Вас в руках."
+				" Чтобы превратить противника в босса, подойдите к нему и воспользуйтесь боссификатором в руках."
 		}
 		ITEMS_DATA[itemId] = {
 			name: `Bossifier: ${enemyTypeEng}`,

@@ -7,7 +7,7 @@ function game_create(input_, engine_, audios_) {
 		assigned_tiles: [LEVEL_TILE_START],
 		offset_x: 1250,
 		offset_y: 1250,
-		scale: 0.75,
+		scale: 0.6328125,
 		camera_target_body: null,
 		player_object: null,
 		objects: [],
@@ -140,9 +140,9 @@ function game_update(g, dt) {
 	if (!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
 	}
-	if (isKeyDown(g.input, '=', true) && (g.scale < 2 || !g.camera_target_body))
+	if (isKeyDown(g.input, '=', true) && (g.scale < 4 || !g.camera_target_body))
 		g.scale = g.scale / 0.9375;
-	if (isKeyDown(g.input, '-', true) && (g.scale > 0.5 || !g
+	if (isKeyDown(g.input, '-', true) && (g.scale > 0.25 || !g
 			.camera_target_body))
 		g.scale = g.scale * 0.9375;
 	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data
