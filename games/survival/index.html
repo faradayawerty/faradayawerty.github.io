@@ -112,7 +112,8 @@
 					game1.settings.auto_pickup = menu1.want_auto_pickup;
 				if (menu1.want_lose_items != game1.settings.lose_items_on_death)
 					game1.settings.lose_items_on_death = menu1.want_lose_items;
-				if (menu1.want_respawn_here != game1.settings.respawn_on_current_level)
+				if (menu1.want_respawn_here != game1.settings
+					.respawn_on_current_level)
 					game1.settings.respawn_on_current_level = menu1.want_respawn_here;
 				if (menu1.want_trees != game1.settings.trees)
 					game1.settings.trees = menu1.want_trees;
@@ -173,7 +174,8 @@
 				game_draw(game1, ctx1);
 				if (menu1.shown)
 					menu_draw(ctx1, menu1);
-			} catch (e) {
+			}
+			catch (e) {
 				console.error(e.stack);
 				console.log(game1, menu1);
 			}
@@ -190,7 +192,8 @@
 				initializeKeyboardInput(input1.keys);
 				initializeMouseInput(input1.mouse, ctx1);
 				initializeTouchInput(input1.touch, input1.joystick, ctx1);
-			} catch(e) {
+			}
+			catch (e) {
 				console.error(e.stack);
 				console.log(game1, menu1);
 			}

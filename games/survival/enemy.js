@@ -1,4 +1,5 @@
-function enemy_create(g, x, y, make_boss = false, make_minion = false, type = "random", tile = LEVEL_TILE_VOID) {
+function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
+	"random", tile = LEVEL_TILE_VOID) {
 	let enemies = g.objects.filter((obj) => obj.name == "enemy");
 	if (enemies.length > 100) {
 		for (let i = 0; i < enemies.length - 100; i++) {

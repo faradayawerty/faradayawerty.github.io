@@ -560,7 +560,9 @@ Object.keys(ENEMY_TYPES).forEach(type => {
 					player_obj.data.body.position.x,
 					player_obj.data.body.position.y,
 					"enemy",
-					600
+					600,
+					(obj) => obj.data.type === type && !obj
+					.data.boss
 				);
 				if (t && t.data.type === type && !t.data.boss) {
 					enemy_create(t.game, t.data.body.position.x,

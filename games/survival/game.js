@@ -280,15 +280,18 @@ function game_destroy_level(g, old_level = null) {
 		}
 }
 
-function game_object_find_closest(g, x, y, name, radius) {
+function game_object_find_closest(g, x, y, name, radius, filter_func = null) {
 	let pos = Matter.Vector.create(x, y);
 	let closest = null;
 	for (let i = 0; i < g.objects.length; i++) {
 		if (g.objects[i].destroyed || !g.objects[i].data.body)
 			continue;
 		let obj = null;
-		if (g.objects[i].name == name)
+		if (g.objects[i].name == name) {
+			if (filter_func && !filter_func(g.objects[i]))
+				continue;
 			obj = g.objects[i];
+		}
 		else
 			continue;
 		if (radius >= 0 && !closest && dist(obj.data.body.position, pos) <
