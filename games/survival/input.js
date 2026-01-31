@@ -42,11 +42,11 @@ function getButtonRegions(ctx) {
 	let w = ctx.canvas.width;
 	let h = ctx.canvas.height;
 	let btnSize = Math.min(w, h) * 0.15;
-	let gap = 15;
-	let leftJoyX = w / 6;
-	let rightJoyX = 5 * w / 6;
-	let joyY = 5 * h / 6;
-	let bottomY = joyY - (btnSize * 2) - 100;
+	let gap = h * 0.02;
+	let leftJoyX = w * (1 / 6);
+	let rightJoyX = w * (5 / 6);
+	let joyY = h * (5 / 6);
+	let bottomY = joyY - (btnSize * 2) - (h * 0.15);
 	return {
 		use: {
 			x1: leftJoyX - btnSize / 2,
@@ -318,10 +318,10 @@ function drawMobileActionButtons(ctx, input) {
 		ctx.globalAlpha = isActive ? 0.8 : 0.4;
 		ctx.fillStyle = "#4477ff";
 		ctx.beginPath();
-		ctx.roundRect(region.x1, region.y1, bw, bh, 10);
+		ctx.roundRect(region.x1, region.y1, bw, bh, bw * 0.1);
 		ctx.fill();
 		ctx.strokeStyle = "white";
-		ctx.lineWidth = 2;
+		ctx.lineWidth = Math.max(1, bw * 0.02);
 		ctx.stroke();
 		ctx.globalAlpha = 1.0;
 		ctx.fillStyle = "white";
