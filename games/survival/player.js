@@ -286,6 +286,9 @@ function player_update(player_object, dt) {
 		p.achievements_element.shown = false;
 		player_object.game.want_hide_inventory = false;
 	}
+	SHOW_MOBILE_BUTTONS = true;
+	if (p.inventory_element.shown || p.achievements_element.shown)
+		SHOW_MOBILE_BUTTONS = false;
 	if (isKeyDown(player_object.game.input, 'e', true) || isKeyDown(
 			player_object.game.input, 'i', true) || isKeyDown(player_object.game
 			.input, 'у', true) || isKeyDown(player_object.game.input, 'ш',

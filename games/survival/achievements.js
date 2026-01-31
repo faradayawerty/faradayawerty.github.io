@@ -29,18 +29,18 @@ function achievements_create(g) {
 	let ach = {
 		width: 1000,
 		height: 1000,
-		offset_x: 50,
-		offset_y: 50,
-		x: 150,
-		y: 150,
-		xx: 550,
-		yy: 550,
+		offset_x: 40,
+		offset_y: 40,
+		x: 50,
+		y: 50,
+		xx: 0,
+		yy: 0,
 		mxx: 0,
 		myy: 0,
 		clicked: false,
 		icon_size: 60,
 		animstate: 0,
-		cross_width: 0,
+		cross_width: 40,
 		achievements: achievementsList
 	};
 	return game_gui_element_create(g, "achievements", ach, achievements_update,
@@ -68,23 +68,6 @@ function achievements_update(ae, dt) {
 			mx = freeTouch.x / scale;
 			my = freeTouch.y / scale;
 		}
-	}
-	if (!ae.game.mobile && input.mouse.leftButtonPressed) {
-		if (ae.data.offset_x < mx && mx < ae.data.offset_x + ae.data.width &&
-			ae.data.offset_y < my && my < ae.data.offset_y + ae.data.height) {
-			if (!ae.data.clicked) {
-				ae.data.xx = ae.data.x;
-				ae.data.yy = ae.data.y;
-				ae.data.mxx = mx;
-				ae.data.myy = my;
-			}
-			ae.data.x = ae.data.xx + (mx - ae.data.mxx);
-			ae.data.y = ae.data.yy + (my - ae.data.myy);
-			ae.data.clicked = true;
-		}
-	}
-	else {
-		ae.data.clicked = false;
 	}
 	let points = [];
 	if (ae.game.mobile) {
@@ -114,7 +97,6 @@ function achievements_update(ae, dt) {
 	if (ae.game.mobile) {
 		if (is_over_cross) {
 			ae.data._cross_held = true;
-			ae.data.clicked = false;
 		}
 		else if (freeTouch && !is_over_cross) {
 			ae.data._cross_held = false;
@@ -122,9 +104,6 @@ function achievements_update(ae, dt) {
 		else if (!freeTouch && ae.data._cross_held) {
 			ae.data._cross_held = false;
 			ae.shown = false;
-			if (ae.game.debug_console) {
-				ae.game.debug_console.unshift('hide achievements via release');
-			}
 			return;
 		}
 	}
@@ -150,20 +129,20 @@ function achievements_draw(ae, ctx) {
 	ctx.strokeRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data
 		.height);
 	ctx.globalAlpha = 1.0;
-	let cross_width = ae.data.width * 0.025;
-	ae.data.cross_width = cross_width;
+	let cross_width = ae.data.cross_width;
 	let cx = ae.data.offset_x + ae.data.width - cross_width;
 	let cy = ae.data.offset_y;
 	ctx.fillStyle = "#444444";
 	ctx.fillRect(cx, cy, cross_width, cross_width);
 	ctx.strokeStyle = "white";
 	ctx.strokeRect(cx, cy, cross_width, cross_width);
-	drawLine(ctx, cx, cy, cx + cross_width, cy + cross_width, "white", 0.1 *
-		cross_width);
-	drawLine(ctx, cx, cy + cross_width, cx + cross_width, cy, "white", 0.1 *
-		cross_width);
-	let startX = ae.data.x;
-	let startY = ae.data.y;
+	let p = 0.2 * cross_width;
+	drawLine(ctx, cx + p, cy + p, cx + cross_width - p, cy + cross_width - p,
+		"white", 3);
+	drawLine(ctx, cx + p, cy + cross_width - p, cx + cross_width - p, cy + p,
+		"white", 3);
+	let startX = ae.data.offset_x + ae.data.x;
+	let startY = ae.data.offset_y + ae.data.y;
 	let w = ae.data.icon_size;
 	let h = ae.data.icon_size;
 	let spacing = 2.0;

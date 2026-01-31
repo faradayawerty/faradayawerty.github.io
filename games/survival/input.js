@@ -1,3 +1,5 @@
+let SHOW_MOBILE_BUTTONS = true;
+
 function input_create() {
 	return {
 		keys: {
@@ -304,7 +306,7 @@ function getButtonRegions(ctx) {
 }
 
 function drawMobileActionButtons(ctx, input) {
-	if (!input || input.touch === undefined) return;
+	if (!input || input.touch === undefined || !SHOW_MOBILE_BUTTONS) return;
 	let regions = getButtonRegions(ctx);
 	const renderLet = (data, ox, oy, p) => {
 		data.forEach((row, i) => {
