@@ -140,11 +140,20 @@ function game_update(g, dt) {
 	if (!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
 	}
-	if (isKeyDown(g.input, '=', true) && (g.scale < 4 || !g.camera_target_body))
-		g.scale = g.scale / 0.9375;
+	if (isKeyDown(g.input, '=', true) && (g.scale < 4 || !g
+		.camera_target_body)) {
+		if (g.mobile)
+			g.scale = g.scale * Math.pow(4, dt / 1000);
+		else
+			g.scale = g.scale / 0.9375;
+	}
 	if (isKeyDown(g.input, '-', true) && (g.scale > 0.25 || !g
-			.camera_target_body))
-		g.scale = g.scale * 0.9375;
+			.camera_target_body)) {
+		if (g.mobile)
+			g.scale = g.scale * Math.pow(4, -dt / 1000);
+		else
+			g.scale = g.scale * 0.9375;
+	}
 	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data
 		.ai_controlled);
 	if (plr) {

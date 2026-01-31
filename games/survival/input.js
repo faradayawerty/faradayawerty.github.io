@@ -28,50 +28,7 @@ function input_create() {
 			},
 			radius: 50
 		},
-		touch: [],
-		prevTouchButtons: {
-			use: false,
-			pick: false,
-			plus: false,
-			minus: false
-		}
-	};
-}
-
-function getButtonRegions(ctx) {
-	let w = ctx.canvas.width;
-	let h = ctx.canvas.height;
-	let btnSize = Math.min(w, h) * 0.15;
-	let gap = h * 0.02;
-	let leftJoyX = w * (1 / 6);
-	let rightJoyX = w * (5 / 6);
-	let joyY = h * (5 / 6);
-	let bottomY = joyY - (btnSize * 2) - (h * 0.15);
-	return {
-		use: {
-			x1: leftJoyX - btnSize / 2,
-			x2: leftJoyX + btnSize / 2,
-			y1: bottomY,
-			y2: bottomY + btnSize
-		},
-		pick: {
-			x1: leftJoyX - btnSize / 2,
-			x2: leftJoyX + btnSize / 2,
-			y1: bottomY + btnSize + gap,
-			y2: bottomY + btnSize * 2 + gap
-		},
-		plus: {
-			x1: rightJoyX - btnSize / 2,
-			x2: rightJoyX + btnSize / 2,
-			y1: bottomY,
-			y2: bottomY + btnSize
-		},
-		minus: {
-			x1: rightJoyX - btnSize / 2,
-			x2: rightJoyX + btnSize / 2,
-			y1: bottomY + btnSize + gap,
-			y2: bottomY + btnSize * 2 + gap
-		}
+		touch: []
 	};
 }
 
@@ -184,7 +141,7 @@ function initializeMouseInput(mouse, ctx) {
 }
 
 function touchHandler(touch, joystick, ctx, e) {
-	if (e) e.preventDefault();
+	e.preventDefault();
 	touch.length = 0;
 	for (let i = 0; i < e.touches.length; i++) {
 		let et = e.touches[i];
@@ -224,7 +181,7 @@ function touchHandler(touch, joystick, ctx, e) {
 function initializeTouchInput(touch, joystick, ctx) {
 	window.addEventListener('touchstart', function(e) {
 		let regions = getButtonRegions(ctx);
-		let deadZoneHeight = ctx.canvas.height * 0.2;
+		let deadZoneHeight = ctx.canvas.height * 0.5;
 		for (let i = 0; i < e.changedTouches.length; i++) {
 			let t = e.changedTouches[i];
 			let tx = (t.clientX - ctx.canvas.offsetLeft) * ctx.canvas
@@ -232,9 +189,9 @@ function initializeTouchInput(touch, joystick, ctx) {
 			let ty = (t.clientY - ctx.canvas.offsetTop) * ctx.canvas
 				.height / ctx.canvas.clientHeight;
 			if (ty < deadZoneHeight) continue;
-			let hitButton =
-				(tx > regions.use.x1 && tx < regions.use.x2 && ty >
-					regions.use.y1 && ty < regions.use.y2) ||
+			let hitButton = (tx > regions.use.x1 && tx < regions.use
+					.x2 && ty > regions.use.y1 && ty < regions.use.y2
+					) ||
 				(tx > regions.pick.x1 && tx < regions.pick.x2 && ty >
 					regions.pick.y1 && ty < regions.pick.y2) ||
 				(tx > regions.plus.x1 && tx < regions.plus.x2 && ty >
@@ -245,8 +202,7 @@ function initializeTouchInput(touch, joystick, ctx) {
 			if (tx < ctx.canvas.width / 2 && joystick.left.id === -1)
 				joystick.left.id = t.identifier;
 			else if (tx >= ctx.canvas.width / 2 && joystick.right.id ===
-				-1)
-				joystick.right.id = t.identifier;
+				-1) joystick.right.id = t.identifier;
 		}
 		touchHandler(touch, joystick, ctx, e);
 	}, {
@@ -307,54 +263,183 @@ function drawJoysticks(ctx, joystick) {
 	}
 }
 
+function getButtonRegions(ctx) {
+	let w = ctx.canvas.width;
+	let h = ctx.canvas.height;
+	let baseSize = Math.min(w, h) * 0.15;
+	let btnSize = baseSize * 0.7;
+	let gap = 15;
+	let jx = w / 10;
+	let jy = 5 * h / 6;
+	let jRadius = Math.min(w / 16, h / 16);
+	let startY = (jy - jRadius - 20) - (btnSize + gap);
+	let x1 = jx - btnSize / 2;
+	let x2 = jx + btnSize / 2;
+	return {
+		use: {
+			x1: x1,
+			x2: x2,
+			y1: startY - btnSize,
+			y2: startY
+		},
+		pick: {
+			x1: x1,
+			x2: x2,
+			y1: startY - (btnSize * 2) - gap,
+			y2: startY - btnSize - gap
+		},
+		minus: {
+			x1: x1,
+			x2: x2,
+			y1: startY - (btnSize * 3) - gap * 2,
+			y2: startY - (btnSize * 2) - gap * 2
+		},
+		plus: {
+			x1: x1,
+			x2: x2,
+			y1: startY - (btnSize * 4) - gap * 3,
+			y2: startY - (btnSize * 3) - gap * 3
+		}
+	};
+}
+
 function drawMobileActionButtons(ctx, input) {
 	if (!input || input.touch === undefined) return;
 	let regions = getButtonRegions(ctx);
-	const drawButton = (region, lines, isActive) => {
+	const renderLet = (data, ox, oy, p) => {
+		data.forEach((row, i) => {
+			row.split('').forEach((col, j) => {
+				if (col === '#') ctx.fillRect(ox + j * p,
+					oy + i * p, p, p);
+			});
+		});
+	};
+	const drawButton = (region, type, isActive) => {
 		let bw = region.x2 - region.x1;
 		let bh = region.y2 - region.y1;
 		let cx = (region.x1 + region.x2) / 2;
 		let cy = (region.y1 + region.y2) / 2;
-		ctx.globalAlpha = isActive ? 0.8 : 0.4;
-		ctx.fillStyle = "#4477ff";
+		ctx.globalAlpha = isActive ? 0.9 : 0.35;
+		ctx.fillStyle = (type === 'PLUS' || type === 'MINUS') ? "#777777" :
+			"#4477ff";
 		ctx.beginPath();
-		ctx.roundRect(region.x1, region.y1, bw, bh, bw * 0.1);
+		ctx.roundRect(region.x1, region.y1, bw, bh, bw * 0.15);
 		ctx.fill();
-		ctx.strokeStyle = "white";
-		ctx.lineWidth = Math.max(1, bw * 0.02);
+		ctx.strokeStyle = "rgba(255,255,255,0.5)";
+		ctx.lineWidth = 2;
 		ctx.stroke();
 		ctx.globalAlpha = 1.0;
 		ctx.fillStyle = "white";
-		let fontSize = lines.length > 1 ? bh * 0.22 : bh * 0.4;
-		ctx.font = `bold ${fontSize}px Arial`;
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-		if (lines.length === 1) {
-			ctx.fillText(lines[0], cx, cy);
+		if (type === 'USE') {
+			let p = bw * 0.05;
+			let tw = p * 11;
+			let th = p * 5;
+			renderLet(["# #", "# #", "# #", "# #", "###"], cx - tw / 2, cy -
+				th / 2, p);
+			renderLet(["###", "#  ", "###", "  #", "###"], cx - tw / 2 + p *
+				4, cy - th / 2, p);
+			renderLet(["###", "#  ", "###", "#  ", "###"], cx - tw / 2 + p *
+				8, cy - th / 2, p);
 		}
-		else {
-			ctx.fillText(lines[0], cx, cy - fontSize * 0.6);
-			ctx.fillText(lines[1], cx, cy + fontSize * 0.6);
+		else if (type === 'PICK_CAR') {
+			let p = bw * 0.032;
+			let th = p * 5;
+			let rowGap = p * 2.5;
+			let pickUpWords = [{
+					m: ["###", "# #", "###", "#  ", "#  "],
+					w: 3
+				},
+				{
+					m: ["#", "#", "#", "#", "#"],
+					w: 1
+				},
+				{
+					m: ["###", "#  ", "#  ", "#  ", "###"],
+					w: 3
+				},
+				{
+					m: ["# #", "# #", "## ", "# #", "# #"],
+					w: 3
+				},
+				{
+					m: [],
+					w: 1
+				},
+				{
+					m: ["# #", "# #", "# #", "# #", "###"],
+					w: 3
+				},
+				{
+					m: ["###", "# #", "###", "#  ", "#  "],
+					w: 3
+				}
+			];
+			let tw1 = pickUpWords.reduce((acc, curr) => acc + curr.w + 1,
+				0) * p;
+			let curX1 = cx - tw1 / 2;
+			let startY1 = cy - th - rowGap / 2;
+			pickUpWords.forEach(letter => {
+				if (letter.m.length > 0) renderLet(letter.m, curX1,
+					startY1, p);
+				curX1 += (letter.w + 1) * p;
+			});
+			let carWords = [{
+					m: ["  #", "  #", " # ", "#  ", "#  "],
+					w: 3
+				},
+				{
+					m: [],
+					w: 1
+				},
+				{
+					m: ["###", "#  ", "#  ", "#  ", "###"],
+					w: 3
+				},
+				{
+					m: ["###", "# #", "###", "# #", "# #"],
+					w: 3
+				},
+				{
+					m: ["###", "# #", "###", "## ", "# #"],
+					w: 3
+				}
+			];
+			let tw2 = carWords.reduce((acc, curr) => acc + curr.w + 1, 0) *
+				p;
+			let curX2 = cx - tw2 / 2;
+			let startY2 = cy + rowGap / 2;
+			carWords.forEach(letter => {
+				if (letter.m.length > 0) renderLet(letter.m, curX2,
+					startY2, p);
+				curX2 += (letter.w + 1) * p;
+			});
+		}
+		else if (type === 'PLUS') {
+			let p = bw * 0.12;
+			renderLet(["  #  ", "  #  ", "#####", "  #  ", "  #  "], cx -
+				p * 2.5, cy - p * 2.5, p);
+		}
+		else if (type === 'MINUS') {
+			let p = bw * 0.12;
+			renderLet(["     ", "     ", "#####", "     ", "     "], cx -
+				p * 2.5, cy - p * 2.5, p);
 		}
 	};
-	const isPressed = (r) => input.touch.some(t =>
-		t.x > r.x1 && t.x < r.x2 && t.y > r.y1 && t.y < r.y2 &&
-		t.id !== input.joystick.left.id && t.id !== input.joystick.right.id
-	);
-	let currentUse = isPressed(regions.use);
-	let currentPick = isPressed(regions.pick);
-	let currentPlus = isPressed(regions.plus);
-	let currentMinus = isPressed(regions.minus);
-	input.keys.down['c'] = currentUse;
-	input.keys.down['f'] = currentPick;
-	input.keys.down['='] = currentPlus && !input.prevTouchButtons.plus;
-	input.keys.down['-'] = currentMinus && !input.prevTouchButtons.minus;
-	input.prevTouchButtons.use = currentUse;
-	input.prevTouchButtons.pick = currentPick;
-	input.prevTouchButtons.plus = currentPlus;
-	input.prevTouchButtons.minus = currentMinus;
-	drawButton(regions.use, ['USE'], currentUse);
-	drawButton(regions.pick, ['PICK UP', 'CAR'], currentPick);
-	drawButton(regions.plus, ['+'], currentPlus);
-	drawButton(regions.minus, ['-'], currentMinus);
+	let isUsePressed = input.touch.some(t => t.x > regions.use.x1 && t.x <
+		regions.use.x2 && t.y > regions.use.y1 && t.y < regions.use.y2);
+	let isPickPressed = input.touch.some(t => t.x > regions.pick.x1 && t.x <
+		regions.pick.x2 && t.y > regions.pick.y1 && t.y < regions.pick.y2);
+	let isPlusPressed = input.touch.some(t => t.x > regions.plus.x1 && t.x <
+		regions.plus.x2 && t.y > regions.plus.y1 && t.y < regions.plus.y2);
+	let isMinusPressed = input.touch.some(t => t.x > regions.minus.x1 && t.x <
+		regions.minus.x2 && t.y > regions.minus.y1 && t.y < regions.minus.y2
+		);
+	input.keys.down['c'] = isUsePressed;
+	input.keys.down['f'] = isPickPressed;
+	input.keys.down['='] = isPlusPressed;
+	input.keys.down['-'] = isMinusPressed;
+	drawButton(regions.use, 'USE', isUsePressed);
+	drawButton(regions.pick, 'PICK_CAR', isPickPressed);
+	drawButton(regions.plus, 'PLUS', isPlusPressed);
+	drawButton(regions.minus, 'MINUS', isMinusPressed);
 }
