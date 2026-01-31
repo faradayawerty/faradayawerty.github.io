@@ -305,35 +305,33 @@ function game_object_find_closest(g, x, y, name, radius, filter_func = null) {
 }
 
 function game_objects_arrange(g) {
-	let arrangement = [
-		"bound",
-		"decorative_roof",
-		"decorative_leaves",
-		"decorative_trunk",
-		"decorative_hotdogs",
-		"decorative_fuel_pump",
-		"shield",
-		"rocket",
-		"player",
-		"animal",
-		"enemy",
-		"item",
-		"car",
-		"trashcan",
-		"bullet",
-		"trashbullet",
-		"decorative_wall",
-		"decorative",
-		"decorative_grass",
-		"decorative_level_base"
-	];
-	let objects_new = [];
-	let leftover = g.objects.filter((obj) => !arrangement.includes(obj.name));
-	for (let i = 0; i < arrangement.length; i++)
-		objects_new = g.objects.filter((obj) => obj.name == arrangement[i])
-		.concat(objects_new);
-	objects_new = leftover.concat(objects_new);
-	g.objects = objects_new;
+	const weights = {
+		"bound": 1,
+		"decorative_roof": 2,
+		"decorative_leaves": 3,
+		"decorative_trunk": 4,
+		"decorative_hotdogs": 5,
+		"decorative_fuel_pump": 6,
+		"shield": 7,
+		"rocket": 8,
+		"player": 9,
+		"animal": 10,
+		"enemy": 11,
+		"item": 12,
+		"car": 13,
+		"trashcan": 14,
+		"bullet": 15,
+		"trashbullet": 16,
+		"decorative_wall": 17,
+		"decorative": 18,
+		"decorative_grass": 19,
+		"decorative_level_base": 20
+	};
+	g.objects.sort((a, b) => {
+		let weightA = weights[a.name] || 0;
+		let weightB = weights[b.name] || 0;
+		return weightB - weightA;
+	});
 }
 
 function game_object_change_name(g, i, name) {
