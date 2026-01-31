@@ -201,12 +201,16 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	let isRus = game.settings.language === "русский";
 	let name = isRus ? data.name_rus : data.name;
 	let desc = isRus ? data.desc_rus : data.desc;
-	let W = 450;
-	let H = 250;
-	let fontsize = 16;
+	let W = 750;
+	let H = 400;
+	let fontsize = 32;
 	let scale = get_scale();
-	if (x + W > window.innerWidth / scale) x -= W;
-	if (y + H > window.innerHeight / scale) y -= H;
+	let screenW = window.innerWidth / scale;
+	let screenH = window.innerHeight / scale;
+	if (x + W > screenW) x -= W;
+	if (y + H > screenH) y -= H;
+	if (x < 0) x = 10;
+	if (y < 0) y = 10;
 	ctx.save();
 	ctx.globalAlpha = 0.9;
 	ctx.fillStyle = "black";
@@ -216,13 +220,13 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	ctx.strokeRect(x, y, W, H);
 	ctx.globalAlpha = 1.0;
 	ctx.fillStyle = "yellow";
-	ctx.font = `bold ${fontsize + 2}px Arial`;
-	ctx.fillText(name, x + 10, y + 25);
+	ctx.font = `bold ${fontsize - 2}px Arial`;
+	ctx.fillText(name, x + 10, y + 30);
 	ctx.fillStyle = "white";
 	ctx.font = `${fontsize}px Arial`;
 	let words = desc.split(' ');
 	let line = "";
-	let lineY = y + 50;
+	let lineY = y + 75;
 	for (let n = 0; n < words.length; n++) {
 		let testLine = line + words[n] + " ";
 		if (testLine.length > 30) {

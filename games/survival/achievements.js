@@ -290,29 +290,32 @@ function achievements_shower_destroy(ashe) {
 function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 	1100) {
 	let as = ae.data.achievements;
-	let W = bbw * 0.65;
-	let H = bbh * 0.25;
-	if (x + W > window.innerWidth / get_scale())
-		x = x - W;
-	if (y + H > window.innerHeight / get_scale())
-		y = y - H;
+	let W = bbw * 0.85;
+	let H = bbh * 0.5;
+	let scale = get_scale();
+	let screenW = window.innerWidth / scale;
+	let screenH = window.innerHeight / scale;
+	if (ae.game.mobile) {
+		x += 80;
+		y += 80;
+	}
+	if (x + W > screenW) x = x - W;
+	if (y + H > screenH) y = y - H;
+	if (x < 5) x = 5;
+	if (y < 5) y = 5;
+	if (x + W > screenW) W = screenW - x - 10;
+	if (y + H > screenH) H = screenH - y - 10;
 	let lines = [];
 	let achData = achievement_get(as, ach);
-	let name = achData.name;
-	if (ae.game.settings.language == "русский")
-		name = achData.name_rus;
-	lines.push("** " + name + " **");
+	let name = (ae.game.settings.language == "русский") ? achData.name_rus :
+		achData.name;
+	lines.push(name + "!");
 	lines.push("");
 	let descRaw = (ae.game.settings.language == "русский") ? achData.desc_rus :
 		achData.desc;
-	let desc = "";
-	if (typeof descRaw === 'object' && descRaw !== null) {
-		desc = ae.game.mobile ? descRaw.mobile : descRaw.pc;
-	}
-	else {
-		desc = descRaw;
-	}
-	let fontsize = Math.floor(W / 27);
+	let desc = (typeof descRaw === 'object' && descRaw !== null) ? (ae.game
+		.mobile ? descRaw.mobile : descRaw.pc) : descRaw;
+	let fontsize = Math.floor(W / 24);
 	let charlim = Math.floor(1.25 * W / fontsize);
 	let words = desc.split(' ');
 	let line = "";
@@ -324,17 +327,27 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 		line += words[i] + " ";
 	}
 	lines.push(line);
+	ctx.save();
+	ctx.globalAlpha = 0.85;
 	ctx.fillStyle = "black";
 	ctx.fillRect(x, y, W, H);
+	ctx.globalAlpha = 1.0;
 	ctx.strokeStyle = "gray";
+	ctx.lineWidth = 2;
 	ctx.strokeRect(x, y, W, H);
 	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
-		false, 0, 0, window.innerWidth / get_scale(), window.innerHeight /
-		get_scale(), ae.data.animstate);
+		false, 0, 0, screenW, screenH, ae.data.animstate);
 	for (let i = 0; i < lines.length; i++) {
-		drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
-			fontsize);
+		if (i === 0) {
+			drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
+				fontsize, "yellow", true);
+		}
+		else {
+			drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
+				fontsize, "white", false);
+		}
 	}
+	ctx.restore();
 }
 
 function get_achievement_palette(done, animstate) {

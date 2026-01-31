@@ -6,12 +6,16 @@ function drawButton(ctx, x, y, text) {
 	ctx.fillText(text, x + 1, y + 1);
 }
 
-function drawText(ctx, x, y, text, fontsize = 18) {
-	ctx.font = fontsize + "px sans";
+function drawText(ctx, x, y, text, fontsize = 18, color = 'white', isBold =
+	false) {
+	ctx.save();
+	let weight = isBold ? "bold " : "";
+	ctx.font = weight + fontsize + "px sans-serif";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
-	ctx.fillStyle = 'white';
+	ctx.fillStyle = color;
 	ctx.fillText(text, x + 1, y + 1);
+	ctx.restore();
 }
 
 function fillMatterBody(ctx, b, color) {
