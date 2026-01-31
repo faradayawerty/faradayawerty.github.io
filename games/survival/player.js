@@ -217,24 +217,32 @@ function player_update(player_object, dt) {
 		p.hunger = p.max_hunger;
 		p.thirst = p.max_thirst;
 	}
-	if (p.thirst > 0 && !p.car_object && achievement_get(p.achievements_element
+	if (p.thirst > 0 && !(p.achievements_element.shown && p.thirst < 0.33 * p
+			.max_thirst) && !(p.inventory_element.shown && p.thirst < 0.33 * p
+			.max_thirst) && !p.car_object && achievement_get(p
+			.achievements_element
 			.data
 			.achievements, "first steps").done) {
-		if (p.shield_green_health > 0) p.thirst = Math.max(0, p.thirst -
-			0.0005 * dt);
-		else if (p.shield_rainbow_health > 0) p.thirst = Math.max(0, p.thirst -
-			0.00000025 * dt);
-		else p.thirst = Math.max(0, p.thirst - 0.001 * dt);
+		if (p.shield_green_health > 0)
+			p.thirst = Math.max(0, p.thirst - 0.0005 * dt);
+		else if (p.shield_rainbow_health > 0)
+			p.thirst = Math.max(0, p.thirst - 0.00000025 * dt);
+		else
+			p.thirst = Math.max(0, p.thirst - 0.001 * dt);
 	}
 	if (p.thirst <= 0) p.health -= 0.01 * dt;
-	if (p.hunger > 0 && !p.car_object && achievement_get(p.achievements_element
+	if (p.hunger > 0 && !(p.achievements_element.shown && p.hunger < 0.11 * p
+			.max_hunger) && !(p.inventory_element.shown && p.hunger < 0.11 * p
+			.max_hunger) && !p.car_object && achievement_get(p
+			.achievements_element
 			.data
 			.achievements, "first steps").done) {
-		if (p.shield_green_health > 0) p.hunger = Math.max(0, p.hunger -
-			0.0005 * dt);
-		else if (p.shield_rainbow_health > 0) p.hunger = Math.max(0, p.hunger -
-			0.00000025 * dt);
-		else p.hunger = Math.max(0, p.hunger - 0.001 * dt);
+		if (p.shield_green_health > 0)
+			p.hunger = Math.max(0, p.hunger - 0.0005 * dt);
+		else if (p.shield_rainbow_health > 0)
+			p.hunger = Math.max(0, p.hunger - 0.00000025 * dt);
+		else
+			p.hunger = Math.max(0, p.hunger - 0.001 * dt);
 	}
 	if (p.hunger <= 0) p.health -= 0.005 * dt;
 	p.speed = p.max_speed;
