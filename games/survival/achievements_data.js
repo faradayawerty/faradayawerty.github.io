@@ -116,7 +116,7 @@ let ACHIEVEMENT_REGISTRY = {
 		desc: {
 			mobile: {
 				en: "fill up the inventory with items fully; hint: press item in the inventory then press DROP to drop it",
-				ru: "полностью заполните инвентарь; подсказка: нажмите на предмет, затем DROP, чтобы выкинуть его"
+				ru: "полностью заполните инвентарь; подсказка: нажмите на предмет в инвентаре, затем DROP, чтобы выкинуть его"
 			},
 			pc: {
 				en: "fill up the inventory with items fully; hint: use Q to drop an item from the inventory",

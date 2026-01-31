@@ -141,7 +141,7 @@ function game_update(g, dt) {
 		g.mobile = true;
 	}
 	if (isKeyDown(g.input, '=', true) && (g.scale < 4 || !g
-		.camera_target_body)) {
+			.camera_target_body)) {
 		if (g.mobile)
 			g.scale = g.scale * Math.pow(4, dt / 1000);
 		else

@@ -191,7 +191,7 @@ function initializeTouchInput(touch, joystick, ctx) {
 			if (ty < deadZoneHeight) continue;
 			let hitButton = (tx > regions.use.x1 && tx < regions.use
 					.x2 && ty > regions.use.y1 && ty < regions.use.y2
-					) ||
+				) ||
 				(tx > regions.pick.x1 && tx < regions.pick.x2 && ty >
 					regions.pick.y1 && ty < regions.pick.y2) ||
 				(tx > regions.plus.x1 && tx < regions.plus.x2 && ty >
@@ -433,7 +433,7 @@ function drawMobileActionButtons(ctx, input) {
 		regions.plus.x2 && t.y > regions.plus.y1 && t.y < regions.plus.y2);
 	let isMinusPressed = input.touch.some(t => t.x > regions.minus.x1 && t.x <
 		regions.minus.x2 && t.y > regions.minus.y1 && t.y < regions.minus.y2
-		);
+	);
 	input.keys.down['c'] = isUsePressed;
 	input.keys.down['f'] = isPickPressed;
 	input.keys.down['='] = isPlusPressed;
