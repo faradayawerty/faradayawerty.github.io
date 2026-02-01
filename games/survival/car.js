@@ -165,7 +165,7 @@ function car_update(car_object, dt) {
 			15625 * (0.125 + 1.75 * Math.random()), false, 12.5, 3500
 		);
 		p.shot_cooldown = 0;
-		audio_play("data/sfx/shotgun_1.mp3", 0.25);
+		audio_play("data/sfx/revolver_1.mp3", 0.3);
 	}
 	let closest_animal = game_object_find_closest(car_object.game, p.body
 		.position.x, p.body.position.y, "animal", 400);

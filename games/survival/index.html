@@ -93,6 +93,7 @@
 			ctx1.fillStyle = "black";
 			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
 			try {
+				console.log(game1.want_menu);
 				// update game settings
 				if (menu1.want_player_color != game1.settings.player_color)
 					game1.settings.player_color = menu1.want_player_color;
@@ -129,6 +130,8 @@
 					game_load(game1);
 					menu1.want_load = false;
 				}
+				if (menu1.mobile)
+					game1.mobile = true;
 				if (game1.mobile)
 					menu1.iselected = -1;
 				// update game if menu is not shown, else update menu

@@ -267,7 +267,8 @@ function game_destroy_level(g, old_level = null) {
 						"decorative_wall",
 						"decorative",
 						"decorative_grass",
-						"decorative_level_base"
+						"decorative_level_base",
+						"decorative_no_tree_zone"
 					].includes(g.objects[i].name)) {
 					if (g.objects[i].data.x < Ox || Ox + 2500 <= g.objects[i]
 						.data.x ||
@@ -334,7 +335,8 @@ function game_objects_arrange(g) {
 		"decorative_wall": 17,
 		"decorative": 18,
 		"decorative_grass": 19,
-		"decorative_level_base": 20
+		"decorative_level_base": 20,
+		"decorative_no_tree_zone": 21
 	};
 	g.objects.sort((a, b) => {
 		let weightA = weights[a.name] || 0;

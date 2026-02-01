@@ -130,12 +130,12 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 				available_guns.push(ITEM_DESERT_EAGLE);
 		}
 		else if (tile === LEVEL_TILE_CITY_HOSPITAL) {
-			chance_food = 5;
-			chance_drink = 5;
+			chance_food = 10;
+			chance_drink = 10;
 			chance_ammo = 1;
 			chance_gun = 0.1;
 			chance_health = 50;
-			chance_shield = 50;
+			chance_shield = 15;
 			chance_fuel = 0;
 			available_food = [ITEM_ORANGE];
 			available_drinks = [ITEM_WATER];
@@ -172,6 +172,18 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_fuel = 0;
 			available_food = [ITEM_ORANGE, ITEM_CHICKEN_LEG, ITEM_CHOCOLATE];
 			available_drinks = [ITEM_MILK, ITEM_COLA];
+		}
+		else if (tile === LEVEL_TILE_HUT_IN_FOREST) {
+			chance_food = 40;
+			chance_drink = 20;
+			chance_ammo = 15;
+			chance_gun = 10;
+			chance_health = 0;
+			chance_shield = 0;
+			chance_fuel = 0;
+			available_food = [ITEM_APPLE, ITEM_CANNED_MEAT, ITEM_CHICKEN_LEG];
+			available_drinks = [ITEM_WATER, ITEM_MILK];
+			available_guns.push(ITEM_REVOLVER);
 		}
 		else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
 			chance_food = 30;

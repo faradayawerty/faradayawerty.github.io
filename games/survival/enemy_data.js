@@ -115,6 +115,8 @@ let ENEMY_TYPES = {
 			gun_color: "#551111",
 			gun_width: 0.21,
 			double_gun: true,
+			double_gun_minion: true,
+			double_gun_boss: false,
 			outline_is_relative: true,
 			outline_width: 0.05
 		},
@@ -185,6 +187,10 @@ let ENEMY_TYPES = {
 		weight: 8,
 		health: 25000,
 		speed: 9.75,
+		boss_speed_mult: 1.925,
+		boss_max_health_mult: 3.75,
+		minion_speed_mult: 0,
+		minion_max_health_mult: 0.25,
 		damage: 1.6,
 		w: 30,
 		h: 30,
@@ -192,6 +198,8 @@ let ENEMY_TYPES = {
 		outline: "lime",
 		range: 400,
 		delay: 500,
+		max_minions: 25,
+		minion_dist_mult: 5.25,
 		bossifier_item: ITEM_BOSSIFIER_SWORD,
 		visuals: {
 			draw_gun: false,
@@ -331,21 +339,41 @@ let ENEMY_TYPES = {
 		health: 625000,
 		speed: 8.25,
 		damage: 6.4,
+		boss_shooting_range_mult: 1.5,
 		w: 50,
 		h: 50,
-		color: "#ff0000",
+		color: "#000000",
+		use_rainbow_color_gradient: true,
 		outline: "white",
 		range: 600,
 		delay: 150,
+		max_minions: 5,
+		minion_dist_mult: 7.5,
 		bossifier_item: ITEM_BOSSIFIER_LASER,
 		visuals: {
 			draw_gun: true,
 			gun_color: "#331133",
 			gun_width: 0.175,
-			center_gun: true,
+			center_gun: false,
+			center_gun_minion: false,
+			center_gun_boss: true,
 			laser_beam: true,
 			double_gun: true,
+			double_gun_boss: false,
+			double_gun_minion: false,
 			outline_width: 1
+		},
+		behaviour_no_target: (obj, dt) => {
+			let e = obj.data;
+			let r = Math.pow(Math.cos(0.03 * e.color_gradient) * 15, 2);
+			let g = Math.pow(0.7 * (Math.cos(0.03 * e.color_gradient) +
+				Math
+				.sin(0.03 * e.color_gradient)) * 15, 2);
+			let b = Math.pow(Math.sin(0.03 * e.color_gradient) * 15, 2);
+			e.color = "#" + Math.floor(r).toString(16).padStart(2,
+					'0') + Math
+				.floor(g).toString(16).padStart(2, '0') + Math.floor(b)
+				.toString(16).padStart(2, '0');
 		},
 		behaviour: (obj, dt, target, vars) => {
 			let e = obj.data;
@@ -490,8 +518,11 @@ let ENEMY_TYPES = {
 		delay: 1000,
 		visuals: {
 			draw_gun: false,
-			custom_draw: "deer",
-			outline_width: 1
+			outline_width: 1,
+			custom_draw: (e, ctx) => {
+				animal_deer_draw_horns(ctx, e.body.position.x, e.body
+					.position.y, e.w, e.h);
+			}
 		},
 		behaviour: (obj, dt, target, vars) => {
 			let e = obj.data;
@@ -529,7 +560,10 @@ let ENEMY_TYPES = {
 		delay: 500,
 		visuals: {
 			draw_gun: false,
-			custom_draw: "raccoon",
+			custom_draw: (e, ctx) => {
+				enemy_raccoon_boss_draw(ctx, e.body.position.x, e.body
+					.position.y, e.w, e.h, e);
+			},
 			outline_width: 2
 		},
 		boss_behaviour: (obj, dt, target, vars) => {

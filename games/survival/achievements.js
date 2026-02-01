@@ -221,7 +221,8 @@ function achievements_shower_update(ashe, dt) {
 	if (ashe.data.achievements.length < 1)
 		ashe.data.time_since_last_deleted_achievement = 0;
 	if (ashe.data.time_since_last_deleted_achievement > 10000 / ashe.data
-		.achievements.length || ashe.data.achievements.length > 14) {
+		.achievements.length || ashe.data.achievements.length > (ashe.game
+			.mobile ? 3 : 14)) {
 		ashe.data.achievements.pop();
 		ashe.data.time_since_last_deleted_achievement = 0;
 	}
@@ -230,31 +231,53 @@ function achievements_shower_update(ashe, dt) {
 function achievements_shower_draw(ashe, ctx) {
 	for (let i = 0; i < ashe.data.achievements.length; i++) {
 		let ach = ashe.data.achievements[i];
+		let isMob = ashe.game.mobile;
+		let rowH = ashe.data.h;
+		if (isMob) rowH *= 3.2;
 		let x = ashe.data.x;
-		let y = ashe.data.y + ashe.data.h * 1.25 * i;
+		let y = ashe.data.y + (isMob ? (rowH * 1.05 * i) : (ashe.data.h * 1.25 *
+			i)) + (isMob ? 40 : 0);
 		let w = ashe.data.w;
-		let h = ashe.data.h;
-		let size = Math.min(w, h);
+		let h = isMob ? rowH : ashe.data.h;
+		let baseSize = Math.min(ashe.data.w, ashe.data.h);
 		ctx.globalAlpha *= 0.5;
 		ctx.fillStyle = "black";
 		ctx.fillRect(x, y, w, h);
 		ctx.strokeStyle = "gray";
 		ctx.strokeRect(x, y, w, h);
 		ctx.globalAlpha *= 2;
-		let isMob = ashe.game.mobile;
 		let helpText = isMob ? "tap the gold cup" : "press R or J";
 		let helpTextRus = isMob ? "нажмите на кубок" : "нажмите R или J";
 		let achData = achievement_get(ashe.data.attached_to.data.achievements,
 			ach);
-		let text = "achievement get: " + ach + "! " + helpText + " to view";
-		if (ashe.game.settings.language == "русский") {
-			text = "получено достижение: " + achData.name_rus + "! " +
-				helpTextRus;
+		if (isMob) {
+			let fontSize = 36;
+			let line1 = (ashe.game.settings.language == "русский") ?
+				"Получено достижение" : "Achievement get";
+			let line2 = (ashe.game.settings.language == "русский") ? achData
+				.name_rus + "!" : ach + "!";
+			let line3 = (ashe.game.settings.language == "русский") ?
+				helpTextRus : helpText + " to view";
+			let textX = x + 3.5 * baseSize;
+			drawText(ctx, textX, y + h * 0.25, line1, fontSize, "white");
+			drawText(ctx, textX, y + h * 0.55, line2, fontSize, "yellow");
+			drawText(ctx, textX, y + h * 0.85, line3, fontSize,
+				"rgba(255,255,255,0.7)");
 		}
-		drawText(ctx, x + 1.25 * size, y + 0.6 * size, text, 20);
+		else {
+			let text = "achievement get: " + ach + "! " + helpText + " to view";
+			if (ashe.game.settings.language == "русский") {
+				text = "получено достижение: " + achData.name_rus + "! " +
+					helpTextRus;
+			}
+			drawText(ctx, x + 1.25 * baseSize, y + 0.6 * baseSize, text, 20);
+		}
+		let iconSize = isMob ? h * 0.85 : baseSize * 0.75;
+		let iconX = x + (isMob ? (h - iconSize) / 2 : 0.125 * baseSize);
+		let iconY = y + (h - iconSize) / 2;
 		achievement_icon_draw(ctx, ashe.data.attached_to.data.achievements, ach,
-			x + 0.125 * size, y + 0.125 * size, 0.75 * size, 0.75 * size,
-			false, 50, 50, 1000, 1000, ashe.data.animstate, false);
+			iconX, iconY, iconSize, iconSize,
+			false, 0, 0, 5000, 5000, ashe.data.animstate, false);
 		ctx.globalAlpha = 1;
 	}
 }

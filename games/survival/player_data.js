@@ -19,9 +19,6 @@ const WEAPON_DEFS = {
 		color: "#8B4513",
 		swordLength: 70,
 		action: (g, p, v, dt) => {
-			if (Math.cos(p.sword_direction) < -0.97) {
-				audio_play("data/sfx/sword_1.mp3", 0.15);
-			}
 			player_handle_melee(
 				g,
 				p,
@@ -66,7 +63,7 @@ const WEAPON_DEFS = {
 		ammo: ITEM_AMMO,
 		chance: 0.01,
 		sound: "data/sfx/revolver_1.mp3",
-		vol: 0.4,
+		vol: 0.25,
 		color: "#555555",
 		length: 0.9,
 		width: 1.1,
@@ -288,8 +285,6 @@ const WEAPON_DEFS = {
 		color: "#55aa11",
 		swordLength: 100,
 		action: (g, p, v, dt) => {
-			if (Math.cos(p.sword_direction) < -0.985) audio_play(
-				"data/sfx/sword_1.mp3");
 			player_handle_melee(g, p, v, dt, 0.02, 3000, 2000, Math.PI /
 				8, 1500, 500);
 		}
@@ -300,8 +295,6 @@ const WEAPON_DEFS = {
 		isHorn: true,
 		swordLength: 100,
 		action: (g, p, v, dt) => {
-			if (Math.cos(p.sword_direction) < -0.955) audio_play(
-				"data/sfx/sword_1.mp3");
 			player_handle_melee(g, p, v, dt, 0.04, 300000, 200000, Math
 				.PI / 4, 15000, 5000);
 		}
@@ -320,9 +313,14 @@ const WEAPON_DEFS = {
 					0.975 + 0.05 * Math.random()) * v.ty - v.sy,
 				Math.random() * 10 + 20, 1000 * Math.random(),
 				false, 6, 1500, "lime", "green");
-			p.health -= 0.0255 * dt;
-			p.hunger -= 0.0125 * dt;
-			p.thirst -= 0.0125 * dt;
+			if (p.shield_green_health > 0) {
+				p.shield_green_health -= 0.05 * dt;
+			}
+			else if (p.shield_rainbow_health <= 0) {
+				p.health -= 0.0255 * dt;
+				p.hunger -= 0.0125 * dt;
+				p.thirst -= 0.0125 * dt;
+			}
 		}
 	},
 	[ITEM_RAINBOW_PISTOLS]: {
@@ -408,26 +406,6 @@ const ITEM_BEHAVIORS = {
 				.data.max_fuel * ratio);
 			c.data.health += Math.min(c.data.max_health - c.data.health,
 				c.data.max_health * ratio);
-			return true;
-		}
-	},
-	[ITEM_BOSSIFIER]: {
-		action: (p, player_obj) => {
-			let target = game_object_find_closest(player_obj.game, p
-				.body.position.x, p.body.position.y, "animal", 500);
-			let isAnimal = true;
-			if (!target) {
-				target = game_object_find_closest(player_obj.game, p
-					.body.position.x, p.body.position.y, "enemy",
-					500);
-				isAnimal = false;
-			}
-			if (!target) return false;
-			enemy_create(target.game, target.data.body.position.x,
-				target.data.body.position.y, true, false, target
-				.data.type);
-			if (isAnimal) animal_destroy(target, false);
-			else enemy_destroy(target);
 			return true;
 		}
 	},

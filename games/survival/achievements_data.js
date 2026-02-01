@@ -575,7 +575,7 @@ let ACHIEVEMENT_REGISTRY = {
 			en: "kill the boss",
 			ru: "убейте босса"
 		},
-		req: "bossifier",
+		req: "shoot 'em up",
 		draw: (ctx, x, y, w, h, p) => {
 			ctx.fillStyle = p.c7;
 			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);

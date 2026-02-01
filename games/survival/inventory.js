@@ -3,7 +3,7 @@ let INVENTORY_Y = 40;
 
 function inventory_create(g, attached_to_object = null) {
 	let inv = {
-		slot_size: 80,
+		slot_size: 85,
 		cross_size: 40,
 		iselected: -1,
 		jselected: -1,
@@ -42,6 +42,9 @@ function inventory_draw(inventory_element, ctx) {
 		return;
 	let inv = inventory_element.data;
 	let game = inventory_element.game;
+	if (game.mobile) {
+		inv.slot_size = 110;
+	}
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
 			let sx = 40 + (inv.slot_size * 1.05) * j;

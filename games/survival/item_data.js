@@ -207,39 +207,47 @@ let ITEMS_DATA = {
 		name_rus: "Револьвер",
 		desc_rus: "Классический шестизарядник. Надежный и убойный.",
 		render: (ctx, x, y, w, h) => {
-			const iron = "#777";
-			const lightIron = "#aaa";
-			const darkIron = "#333";
-			const wood = "#5c3c21";
-			ctx.fillStyle = iron;
-			ctx.fillRect(x + w * 0.22, y + h * 0.45, w * 0.15, h * 0.2);
-			ctx.save();
-			ctx.translate(x + w * 0.28, y + h * 0.58);
-			ctx.rotate(Math.PI / 5);
-			ctx.fillStyle = wood;
-			ctx.fillRect(-w * 0.07, 0, w * 0.14, h * 0.28);
-			ctx.restore();
-			ctx.fillStyle = iron;
-			ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.3, h * 0.15);
-			ctx.fillRect(x + w * 0.2, y + h * 0.38, w * 0.45, h * 0.05);
-			ctx.fillStyle = darkIron;
-			ctx.fillRect(x + w * 0.38, y + h * 0.4, w * 0.2, h * 0.2);
+			const silver = "#A0A0A0";
+			const lightSilver = "#D3D3D3";
+			const gripRubber = "#2A2A2A";
+			const gripWood = "#8B2323";
+			const darkMetal = "#444";
+			ctx.fillStyle = gripRubber;
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.22, y + h * 0.55);
+			ctx.quadraticCurveTo(x + w * 0.1, y + h * 0.65, x + w *
+				0.12, y + h * 0.9);
+			ctx.lineTo(x + w * 0.28, y + h * 0.9);
+			ctx.lineTo(x + w * 0.32, y + h * 0.65);
+			ctx.fill();
+			ctx.fillStyle = gripWood;
+			ctx.fillRect(x + w * 0.16, y + h * 0.68, w * 0.08, h *
+				0.18);
+			ctx.fillStyle = silver;
+			ctx.fillRect(x + w * 0.2, y + h * 0.42, w * 0.35, h * 0.18);
+			ctx.fillStyle = "#888";
+			ctx.fillRect(x + w * 0.38, y + h * 0.43, w * 0.22, h *
+				0.16);
+			ctx.fillStyle = darkMetal;
+			for (let i = 0; i < 3; i++) {
+				ctx.fillRect(x + w * 0.4, y + h * (0.45 + i * 0.05), w *
+					0.18, h * 0.02);
+			}
+			ctx.fillStyle = silver;
+			ctx.fillRect(x + w * 0.6, y + h * 0.43, w * 0.32, h * 0.12);
+			ctx.fillStyle = lightSilver;
+			ctx.fillRect(x + w * 0.6, y + h * 0.43, w * 0.32, h * 0.03);
 			ctx.fillStyle = "#222";
-			ctx.fillRect(x + w * 0.38, y + h * 0.48, w * 0.2, h * 0.04);
-			ctx.fillStyle = iron;
-			ctx.fillRect(x + w * 0.58, y + h * 0.42, w * 0.32, h * 0.1);
-			ctx.fillStyle = lightIron;
-			ctx.fillRect(x + w * 0.58, y + h * 0.42, w * 0.32, h *
+			ctx.fillRect(x + w * 0.22, y + h * 0.38, w * 0.06, h *
+				0.04);
+			ctx.fillStyle = "#00FF00";
+			ctx.fillRect(x + w * 0.88, y + h * 0.38, w * 0.03, h *
 				0.03);
-			ctx.strokeStyle = darkIron;
+			ctx.strokeStyle = silver;
 			ctx.lineWidth = w * 0.025;
-			ctx.strokeRect(x + w * 0.33, y + h * 0.55, w * 0.12, h *
-				0.08);
-			ctx.fillStyle = darkIron;
-			ctx.fillRect(x + w * 0.18, y + h * 0.36, w * 0.05, h *
-				0.05);
-			ctx.fillRect(x + w * 0.85, y + h * 0.37, w * 0.03, h *
-				0.05);
+			ctx.strokeRect(x + w * 0.3, y + h * 0.6, w * 0.14, h * 0.1);
+			ctx.fillStyle = darkMetal;
+			ctx.fillRect(x + w * 0.18, y + h * 0.4, w * 0.04, h * 0.06);
 		}
 	},
 	[ITEM_DESERT_EAGLE]: {

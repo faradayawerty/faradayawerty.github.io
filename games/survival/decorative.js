@@ -158,12 +158,24 @@ function decorative_grass_create(g, x, y, w, h, trees = true) {
 	if (trees) {
 		let N = w / 300.0;
 		let M = h / 300.0;
+		let zones = g.objects.filter(o => o.name ===
+			"decorative_no_tree_zone" && !o.destroyed);
 		for (let i = 1; i < N - 1; i++) {
 			for (let j = 0.75; j < M - 1; j++) {
-				decorative_tree_create(g, x + (i + 0.5 * (Math.random() -
-						0.5)) * w / N, y + (j + 0.5 * (Math.random() -
-						0.5)) *
-					h / M);
+				let treeX = x + (i + 0.5 * (Math.random() - 0.5)) * w / N;
+				let treeY = y + (j + 0.5 * (Math.random() - 0.5)) * h / M;
+				let skip = false;
+				for (let z = 0; z < zones.length; z++) {
+					let zd = zones[z].data;
+					if (treeX >= zd.x && treeX <= zd.x + zd.w &&
+						treeY >= zd.y && treeY <= zd.y + zd.h) {
+						skip = true;
+						break;
+					}
+				}
+				if (!skip) {
+					decorative_tree_create(g, treeX, treeY);
+				}
 			}
 		}
 	}
@@ -444,4 +456,28 @@ function decorative_hotdog_stand_create(g, x, y) {
 		game_object_change_name(g, stripe, "decorative_hotdogs");
 	}
 	return body;
+}
+
+function decorative_no_tree_zone_create(g, x, y, w, h) {
+	let i = game_object_create(g, "decorative_no_tree_zone", {
+			x: x,
+			y: y,
+			w: w,
+			h: h
+		},
+		function() {},
+		function(self, ctx) {
+			if (self.game.debug) {
+				ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
+				ctx.lineWidth = 5;
+				ctx.strokeRect(self.data.x, self.data.y, self.data.w, self
+					.data.h);
+			}
+		},
+		function(o) {
+			o.destroyed = true;
+		}
+	);
+	if (i !== -1) g.objects[i].persistent = false;
+	return i;
 }

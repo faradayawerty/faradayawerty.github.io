@@ -78,11 +78,21 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		is_minion: false,
 		jump_delay: 4000,
 		sword_rotation: 0,
-		color_gradient: Math.random() * 10000,
+		color_gradient: 0,
 		laser_angle: 0,
 		hunt_delay: 1000,
 		hunt_delay_max: 1000
 	};
+	if (config.use_rainbow_color_gradient) {
+		e.color_gradient = Math.random() * 2 * Math.PI / 0.03;
+		let r = Math.pow(Math.cos(0.02 * e.color_gradient) * 15, 2);
+		let g = Math.pow(0.7 * (Math.cos(0.02 * e.color_gradient) + Math
+			.sin(0.02 * e.color_gradient)) * 15, 2);
+		let b = Math.pow(Math.sin(0.02 * e.color_gradient) * 15, 2);
+		e.color = "#" + Math.floor(r).toString(16).padStart(2, '0') + Math
+			.floor(g).toString(16).padStart(2, '0') + Math.floor(b)
+			.toString(16).padStart(2, '0');
+	}
 	if (config.mask) {
 		e.body.collisionFilter.mask = config.mask;
 	}
@@ -93,14 +103,13 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		e.hunger = 1.75 * e.max_hunger;
 		e.max_hunger = 1.75 * e.max_hunger;
 		e.speed = 0.5 * e.speed;
-		if (e.type == "sword") {
-			e.speed *= 1.925;
-			e.health = 3.75 * e.max_health;
-			e.max_health = 3.75 * e.max_health;
-		}
-		if (e.type == "shooting laser") {
-			e.shooting_range *= 1.5;
-			e.speed *= 2.25;
+		if (config.boss_shooting_range_mult !== undefined)
+			e.shooting_range *= config.boss_shooting_range_mult;
+		if (config.boss_speed_mult !== undefined)
+			e.speed *= config.boss_speed_mult;
+		if (config.boss_max_health_mult !== undefined) {
+			e.health = config.boss_max_health_mult * e.max_health;
+			e.max_health = config.boss_max_health_mult * e.max_health;
 		}
 		e.boss = true;
 		e.follow_range = 10 * e.follow_range;
@@ -113,10 +122,12 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		e.hunger = 0.05 * e.max_hunger;
 		e.max_hunger = 0.05 * e.max_hunger;
 		e.speed = 1.25 * e.speed;
-		if (e.type == "sword") {
-			e.speed = 0;
-			e.health *= 0.25;
-			e.max_health *= 0.25;
+		if (config.minion_speed_mult !== undefined) {
+			e.speed *= config.minion_speed_mult;
+		}
+		if (config.minion_max_health_mult !== undefined) {
+			e.health *= config.minion_max_health_mult;
+			e.max_health *= config.minion_max_health_mult;
 		}
 		e.boss = false;
 		e.follow_range = 1.75 * e.follow_range;
@@ -149,9 +160,6 @@ function enemy_destroy(enemy_object, death = true) {
 					}
 					g.available_enemies.push(nextType);
 				}
-			}
-			if (enemy_object.data.type == "shooting laser") {
-				g.kills_for_boss = Math.max(4, g.kills_for_boss);
 			}
 		}
 		else {
@@ -206,6 +214,8 @@ function enemy_update(enemy_object, dt) {
 	if (e.jump_delay < 4000) e.jump_delay += Math.random() * dt;
 	e.sword_rotation += 0.01 * dt;
 	e.color_gradient += 0.01 * dt;
+	if (typeData.behaviour_no_target)
+		typeData.behaviour_no_target(enemy_object, dt);
 	let target_object = enemy_get_target_object(enemy_object, dt);
 	if (target_object != null) {
 		let tx = target_object.data.body.position.x - e.body.position.x;
@@ -220,15 +230,6 @@ function enemy_update(enemy_object, dt) {
 			ndx: tx / v,
 			ndy: ty / v
 		};
-		if (e.type == "shooting laser") {
-			let r = Math.pow(Math.cos(0.01 * e.color_gradient) * 15, 2);
-			let g = Math.pow(0.7 * (Math.cos(0.01 * e.color_gradient) + Math
-				.sin(0.01 * e.color_gradient)) * 15, 2);
-			let b = Math.pow(Math.sin(0.01 * e.color_gradient) * 15, 2);
-			e.color = "#" + Math.floor(r).toString(16).padStart(2, '0') + Math
-				.floor(g).toString(16).padStart(2, '0') + Math.floor(b)
-				.toString(16).padStart(2, '0');
-		}
 		if (typeData.behaviour) typeData.behaviour(enemy_object, dt,
 			target_object, vars);
 		if (e.boss && typeData.boss_behaviour) typeData.boss_behaviour(
@@ -267,20 +268,18 @@ function enemy_update(enemy_object, dt) {
 		}
 		if (e.boss) {
 			if (e.spawn_minion_delay >= 4000) {
-				let max_minions = e.type == "sword" ? 25 : (e.type ==
-					"shooting laser" ? 5 : 10);
+				let max_minions = typeData.max_minions || 10;
 				if (enemy_count_minions(enemy_object) < max_minions) {
 					for (let i = 0; i < Math.random() * 4 + 1; i++) {
 						let theta = 2 * Math.PI * Math.random();
 						let sx = e.body.position.x + 200 * Math.cos(theta);
 						let sy = e.body.position.y + 200 * Math.sin(theta);
-						if (e.type == "shooting laser" || e.type == "sword") {
-							let distMult = e.type == "shooting laser" ? 7.5 :
-								5.25;
-							sx = target_object.data.body.position.x + distMult *
-								e.w * Math.cos(theta);
-							sy = target_object.data.body.position.y + distMult *
-								e.w * Math.sin(theta);
+						if (typeData.minion_dist_mult) {
+							let dist = typeData.minion_dist_mult * e.w;
+							sx = target_object.data.body.position.x + dist *
+								Math.cos(theta);
+							sy = target_object.data.body.position.y + dist *
+								Math.sin(theta);
 						}
 						enemy_create(enemy_object.game, sx, sy, false, true, e
 							.type);
@@ -370,16 +369,23 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.strokeStyle = vis.gun_color || "#331133";
 			ctx.lineWidth = (vis.gun_width || 0.25) * e.w;
 			let gunPoints = [];
-			if (vis.center_gun && (!(e.type === "shooting laser" && !e.boss))) {
+			let useCenter = vis.center_gun;
+			if (e.boss && vis.center_gun_boss !== undefined) useCenter = vis
+				.center_gun_boss;
+			if (e.is_minion && vis.center_gun_minion !== undefined) useCenter =
+				vis.center_gun_minion;
+			let useDouble = vis.double_gun;
+			if (e.boss && vis.double_gun_boss !== undefined) useDouble = vis
+				.double_gun_boss;
+			if (e.is_minion && vis.double_gun_minion !== undefined) useDouble =
+				vis.double_gun_minion;
+			if (useCenter) {
 				gunPoints.push({
 					x: e.body.position.x,
 					y: e.body.position.y
 				});
 			}
-			else if (vis.double_gun && (!(e.type === "shooting red" && e
-					.boss) && !(e.type === "shooting laser" && (e
-					.is_minion || e
-					.boss)))) {
+			else if (useDouble) {
 				gunPoints.push({
 					x: px,
 					y: py
@@ -395,9 +401,7 @@ function enemy_draw(enemy_object, ctx) {
 					y: py
 				});
 			}
-			let k = (e.type === "shooting red" && !e.boss) ? 0.75 :
-				(e.type === "shooting laser" && !e.boss && !e.is_minion) ?
-				0.75 : 1;
+			let k = 1;
 			gunPoints.forEach(p => {
 				ctx.beginPath();
 				ctx.moveTo(p.x, p.y);
@@ -433,14 +437,8 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.stroke();
 		}
 	}
-	if (vis.custom_draw === "deer") {
-		animal_deer_draw_horns(ctx, e.body.position.x, e.body.position.y, e.w, e
-			.h);
-	}
-	else if (vis.custom_draw === "raccoon") {
-		enemy_raccoon_boss_draw(ctx, e.body.position.x, e.body.position.y, e.w,
-			e.h, e);
-	}
+	if (vis.custom_draw)
+		vis.custom_draw(e, ctx);
 }
 
 function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {

@@ -46,6 +46,7 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		laser_direction: 0,
 		shooting_laser: false,
 		laser_sound_has_played: false,
+		last_melee_angle_sound: 0
 	};
 	p.achievements_element = g.gui_elements[achievements_create(g)];
 	p.achievements_shower_element = g.gui_elements[achievements_shower_create(g,
@@ -778,10 +779,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 			}
 		}
 	}
-	if (cfg.sound && (!p.ai_controlled || cfg.isMelee)) {
-		if (cfg.isMelee && Math.cos(p.sword_direction) < -0.985) audio_play(cfg
-			.sound);
-		else if (!cfg.isMelee) audio_play(cfg.sound, cfg.vol || 0.25);
+	if (cfg.sound && !p.ai_controlled && !cfg.isMelee) {
+		audio_play(cfg.sound, cfg.vol || 0.25);
 	}
 }
 
@@ -791,48 +790,6 @@ function player_laser_hits_point(px, py, x, y, w, l, alpha) {
 	let X = x * Math.cos(alpha) + y * Math.sin(alpha);
 	let Y = -x * Math.sin(alpha) + y * Math.cos(alpha);
 	return Math.pow(Math.abs(X / l - 1), 4) + Math.pow(Math.abs(Y / w), 4) < 1;
-}
-
-function player_handle_melee(g, p, v, dt, rotSpeed, dmgMax, dmgMin, angleLimit,
-	rocketDmgMax, rocketDmgMin) {
-	if (Math.cos(p.sword_direction) < -0.995) audio_play(
-		"data/sfx/sword_1.mp3");
-	p.sword_direction += (v.tx > v.sx ? rotSpeed : -rotSpeed) * dt;
-	p.sword_direction %= (2 * Math.PI);
-	let target = ["enemy", "animal", "car", "trashcan"].reduce((found, name) =>
-		found || game_object_find_closest(g, p.body.position.x, p.body
-			.position.y, name, name === "car" ? 300 : 200), null);
-	if (target && !(target.name === "car" && target.data.is_tank)) {
-		let dir = Math.atan2(target.data.body.position.y - p.body.position.y,
-			target.data.body.position.x - p.body.position.x);
-		if (Math.abs(dir - p.sword_direction) % (2 * Math.PI) < angleLimit) {
-			target.data.health -= (Math.random() * dmgMax + dmgMin) * dt;
-			if (target.name === "enemy") target.data.hit_by_player = true;
-		}
-	}
-	let bullet = game_object_find_closest(g, p.body.position.x, p.body.position
-		.y, "bullet", 200);
-	if (bullet) {
-		let vx = bullet.data.body.position.x - p.body.position.x,
-			vy = bullet.data.body.position.y - p.body.position.y;
-		let dist = Math.sqrt(vx * vx + vy * vy);
-		Matter.Body.setVelocity(bullet.data.body, {
-			x: 5 * vx / dist,
-			y: 5 * vy / dist
-		});
-	}
-	let rocket = game_object_find_closest(g, p.body.position.x, p.body.position
-		.y, "rocket", 200);
-	if (rocket) {
-		let rDir = Math.atan2(rocket.data.body.position.y - p.body.position.y,
-			rocket.data.body.position.x - p.body.position.x);
-		if (Math.abs(rDir - p.sword_direction) % (2 * Math.PI) < Math.PI / 8) {
-			rocket.data.health -= (Math.random() * rocketDmgMax +
-				rocketDmgMin) * dt;
-			rocket.data.hit_by_player = true;
-		}
-	}
-	p.sword_visible = p.sword_protection = true;
 }
 
 function player_item_consume(player_object, id, anywhere = false) {
@@ -910,4 +867,66 @@ function player_get_best_weapon_with_ammo(player_object) {
 		}
 	}
 	return 0;
+}
+
+function player_handle_melee(g, p, v, dt, rotSpeed, dmgMax, dmgMin, angleLimit,
+	rocketDmgMax, rocketDmgMin) {
+	p.sword_direction += (v.tx > v.sx ? rotSpeed : -rotSpeed) * dt;
+	if (Math.abs(p.sword_direction - p.last_melee_angle_sound) >= 2 * Math.PI) {
+		audio_play("data/sfx/sword_1.mp3");
+		p.last_melee_angle_sound = p.sword_direction;
+	}
+	const {
+		x,
+		y
+	} = p.body.position;
+	let renderAngle = Math.atan2(Math.sin(p.sword_direction), Math.cos(p
+		.sword_direction));
+	let target = ["enemy", "animal", "car", "trashcan"].reduce((found, name) =>
+		found || game_object_find_closest(g, x, y, name, name === "car" ?
+			300 : 200), null);
+	if (target && !(target.name === "car" && target.data.is_tank)) {
+		let tPos = target.data.body.position;
+		let dir = Math.atan2(tPos.y - y, tPos.x - x);
+		let diff = Math.abs(dir - renderAngle) % (2 * Math.PI);
+		if (diff > Math.PI) diff = 2 * Math.PI - diff;
+		if (diff < angleLimit) {
+			target.data.health -= (Math.random() * dmgMax + dmgMin) * dt;
+			if (target.name === "enemy")
+				target.data.hit_by_player = true;
+			const knockbackForce = 0.01;
+			const forceVector = {
+				x: Math.cos(dir) * knockbackForce,
+				y: Math.sin(dir) * knockbackForce
+			};
+			Matter.Body.applyForce(target.data.body, target.data.body.position,
+				forceVector);
+		}
+	}
+	let bullet = game_object_find_closest(g, x, y, "bullet", 200);
+	if (bullet) {
+		let bPos = bullet.data.body.position;
+		let vx = bPos.x - x,
+			vy = bPos.y - y;
+		let dist = Math.sqrt(vx * vx + vy * vy);
+		if (dist > 0) {
+			Matter.Body.setVelocity(bullet.data.body, {
+				x: 5 * vx / dist,
+				y: 5 * vy / dist
+			});
+		}
+	}
+	let rocket = game_object_find_closest(g, x, y, "rocket", 200);
+	if (rocket) {
+		let rPos = rocket.data.body.position;
+		let rDir = Math.atan2(rPos.y - y, rPos.x - x);
+		let rDiff = Math.abs(rDir - renderAngle) % (2 * Math.PI);
+		if (rDiff > Math.PI) rDiff = 2 * Math.PI - rDiff;
+		if (rDiff < Math.PI / 8) {
+			rocket.data.health -= (Math.random() * rocketDmgMax +
+				rocketDmgMin) * dt;
+			rocket.data.hit_by_player = true;
+		}
+	}
+	p.sword_visible = p.sword_protection = true;
 }

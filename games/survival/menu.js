@@ -38,6 +38,8 @@ function menu_create() {
 			"automatically pickup bossifiers": false
 		},
 		iselected: 0,
+		iselected_last_frame: 0,
+		pressed_previous_frame: false,
 		language_selection_buttons: [
 			"english",
 			"русский"
@@ -224,6 +226,9 @@ function menu_update(m, dt, input) {
 		m.want_player_respawn = true;
 		menu1.buttons = menu1.main_menu_buttons;
 	}
+	m.pressed_this_frame = (isKeyDown(input, ' ', true) || isKeyDown(input,
+		'enter', true) || isMouseLeftButtonPressed(input) || (
+		isScreenTouched(input)));
 	if ((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) &&
 		m.iselected < m.buttons.length - 1) {
 		m.iselected += 1;
@@ -238,9 +243,8 @@ function menu_update(m, dt, input) {
 		if (GLOBAL_VOLUME < 0)
 			GLOBAL_VOLUME = 100;
 	}
-	else if ((isKeyDown(input, ' ', true) || isKeyDown(input, 'enter',
-			true) || isMouseLeftButtonPressed(input) || (isScreenTouched(
-			input) && m.can_touch_button))) {
+	else if (m.pressed_previous_frame && !m.pressed_this_frame) {
+		m.iselected = m.iselected_last_frame;
 		changed = true;
 		if (m.buttons[m.iselected] == "continue game") {
 			m.shown = false;
@@ -368,6 +372,8 @@ function menu_update(m, dt, input) {
 			m.want_auto_aim = !m.want_auto_aim;
 		}
 	}
+	m.pressed_previous_frame = m.pressed_this_frame;
+	m.iselected_last_frame = m.iselected;
 	if (would_be_able_to_touch_button && !m.touched_button_previus_frame)
 		m.can_touch_button = true;
 	else

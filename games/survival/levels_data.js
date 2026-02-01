@@ -16,6 +16,7 @@ let LEVEL_TILE_RESIDENTIAL_NW = 15;
 let LEVEL_TILE_RESIDENTIAL_NE = 16;
 let LEVEL_TILE_RESIDENTIAL_T_SOUTH = 17;
 let LEVEL_TILE_CITY_PARK = 18;
+let LEVEL_TILE_HUT_IN_FOREST = 19;
 let LEVEL_TILES_FOREST_ZONE = [
 	LEVEL_TILE_DEFAULT,
 	LEVEL_TILE_ROAD_HORIZONTAL,
@@ -24,7 +25,8 @@ let LEVEL_TILES_FOREST_ZONE = [
 	LEVEL_TILE_ROAD_TURN_WN,
 	LEVEL_TILE_ROAD_TURN_WS,
 	LEVEL_TILE_ROAD_TURN_EN,
-	LEVEL_TILE_ROAD_TURN_ES
+	LEVEL_TILE_ROAD_TURN_ES,
+	LEVEL_TILE_HUT_IN_FOREST
 ];
 let LEVEL_TILES_CITY_ZONE = [
 	LEVEL_TILE_CITY_POLICE,
@@ -39,6 +41,46 @@ let LEVEL_TILES_SUBURBAN_ZONE = [
 	LEVEL_TILE_RESIDENTIAL_T_SOUTH
 ];
 let TILES = {
+	[LEVEL_TILE_HUT_IN_FOREST]: {
+		weight: 25,
+		connections: {
+			N: 0,
+			E: 0,
+			S: 0,
+			W: 0
+		},
+		base_color: DECORATIVE_COLOR_GRASS,
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_no_tree_zone_create(g, Ox + 800, Oy + 800, 900,
+				900);
+			decorative_grass_create(g, Ox, Oy, 2500, 2500, true);
+			decorative_rectangle_create(g, Ox + 1000, Oy + 1000, 500,
+				500, "#554433", "transparent");
+			decorative_house_v2(
+				g,
+				Ox + 1050, Oy + 1050,
+				400, 400,
+				"down",
+				"#775533",
+				"#442211"
+			);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.floor(Math.random() * 5 + 3);
+			for (let i = 0; i < N; i++) {
+				item_spawn(
+					g,
+					Ox + 1100 + Math.random() * 300,
+					Oy + 1100 + Math.random() * 300,
+					null,
+					tile
+				);
+			}
+		}
+	},
 	[LEVEL_TILE_START]: {
 		weight: 100,
 		connections: {
