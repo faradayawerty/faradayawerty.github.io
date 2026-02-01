@@ -239,7 +239,6 @@ function hotbar_update(hotbar_element, dt) {
 			let col_sys_x = col_res_x + step;
 			if (doRectsCollide(pt.x, pt.y, 0, 0, col_sys_x, start_y, s, s) && !
 				hb.did_want_menu) {
-				console.log('doing want menu');
 				hotbar_element.game.want_menu = true;
 				hb.did_want_menu = true;
 			}
