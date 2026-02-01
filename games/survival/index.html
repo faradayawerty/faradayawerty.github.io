@@ -66,6 +66,8 @@
 	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.js" type="text/javascript"></script>-->
 	<script src="lib/matter.js" type="text/javascript"></script>
 	<script>
+		let DPR = window.devicePixelRatio || 1;
+
 		let cvs1 = document.getElementById("canvas");
 		let ctx1 = cvs1.getContext("2d");
 		let engine1 = Matter.Engine.create();
@@ -73,8 +75,6 @@
 		let audios1 = null;
 		let menu1 = menu_create();
 		let game1 = game_create(input1, engine1, audios1);
-
-		let DPR = window.devicePixelRatio || 1;
 
 		document.addEventListener("visibilitychange", function() {
 			if (document.hidden)
