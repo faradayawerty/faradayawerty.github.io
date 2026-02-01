@@ -1,6 +1,7 @@
 function menu_create() {
 	let m = {
 		shown: true,
+		corrected_for_mobile: false,
 		want_new_game: false,
 		want_spawn_ai: false,
 		want_player_respawn: false,
@@ -120,6 +121,9 @@ function menu_create() {
 					"Добавлено отсутствующее поле: automatically pickup bossifiers"
 				);
 			}
+			if (data.corrected_for_mobile !== undefined) {
+				m.corrected_for_mobile = data.corrected_for_mobile;
+			}
 			if (data.volume !== undefined)
 				GLOBAL_VOLUME = data.volume;
 			console.log("Загруженные настройки:", data);
@@ -203,8 +207,15 @@ function menu_draw(ctx, m) {
 
 function menu_update(m, dt, input) {
 	let changed = false;
-	if (!m.mobile && input.touch.length > 0)
+	if (!m.mobile && input.touch.length > 0) {
 		m.mobile = true;
+		if (!m.corrected_for_mobile) {
+			m.want_auto_aim = true;
+			m.want_lose_items = false;
+			m.corrected_for_mobile = true;
+			changed = true;
+		}
+	}
 	let would_be_able_to_touch_button = false;
 	for (let i = 0; i < m.buttons.length; i++)
 		if ((!m.mobile && doRectsCollide(input.mouse.x / get_scale(), input
@@ -504,6 +515,7 @@ function menu_translate(lang, str) {
 
 function menu_save_settings(m) {
 	const settings = {
+		corrected_for_mobile: m.corrected_for_mobile,
 		want_player_color: m.want_player_color,
 		want_player_draw_gun: m.want_player_draw_gun,
 		want_enemies_spawn: m.want_enemies_spawn,
