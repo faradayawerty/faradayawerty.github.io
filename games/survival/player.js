@@ -501,33 +501,27 @@ function player_update(player_object, dt) {
 		}
 		let carBody = p.car_object.data.body;
 		let carData = p.car_object.data;
-		let wish = getWishDir(player_object.game.input);
+		let inputDir = player_object.game.mobile ? {
+				x: player_object.game.input.joystick.right.dx,
+				y: player_object.game.input.joystick.right.dy
+			} :
+			getWishDir(player_object.game.input);
 		player_object.game.camera_target_body = carBody;
 		p.body.collisionFilter.mask = -3;
-		let moveMag = 0;
-		let rotatedir = 0;
-		if (carData.fuel > 0) {
-			if (wish.y < -0.1) {
-				moveMag = carData.speed;
-				rotatedir = 1;
-				carData.fuel = Math.max(carData.fuel - 0.005 * dt, 0);
-			}
-			else if (wish.y > 0.1) {
-				moveMag = -carData.speed * 0.5;
-				rotatedir = -1;
-				carData.fuel = Math.max(carData.fuel - 0.005 * dt, 0);
-			}
-			if (Math.abs(wish.x) > 0.1) {
-				let turnFactor = (moveMag !== 0) ? rotatedir : 0.5;
-				Matter.Body.rotate(carBody, turnFactor * (wish.x * 0.0018) *
-					dt);
-			}
-		}
-		if (moveMag !== 0) {
+		let inputMag = Math.sqrt(inputDir.x ** 2 + inputDir.y ** 2);
+		if (carData.fuel > 0 && inputMag > 0.1) {
+			let targetAngle = Math.atan2(inputDir.y, inputDir.x);
+			let angleDiff = targetAngle - carBody.angle;
+			while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+			while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+			Matter.Body.setAngle(carBody, carBody.angle + angleDiff * 0.005 *
+				dt);
+			let moveMag = carData.speed * Math.min(inputMag, 1.0);
 			Matter.Body.setVelocity(carBody, {
 				x: moveMag * Math.cos(carBody.angle),
 				y: moveMag * Math.sin(carBody.angle)
 			});
+			carData.fuel = Math.max(carData.fuel - 0.0025 * dt, 0);
 		}
 		else {
 			Matter.Body.setVelocity(carBody, {
