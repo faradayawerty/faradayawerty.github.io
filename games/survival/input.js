@@ -197,7 +197,8 @@ function initializeTouchInput(touch, joystick, ctx) {
 			if (hitButton) continue;
 			if (tx < window.innerWidth / 2 && joystick.left.id === -1)
 				joystick.left.id = t.identifier;
-			else if (tx >= window.innerWidth / 2 && joystick.right.id ===
+			else if (tx >= window.innerWidth / 2 && joystick.right
+				.id ===
 				-1) joystick.right.id = t.identifier;
 		}
 		touchHandler(touch, joystick, ctx, e);
