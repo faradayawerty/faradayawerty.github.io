@@ -135,7 +135,7 @@ function menu_create() {
 function menu_draw(ctx, m) {
 	ctx.globalAlpha = 0.75;
 	ctx.fillStyle = "black";
-	ctx.fillRect(0, 0, cvs1.width, cvs1.height);
+	ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 	ctx.globalAlpha = 1.0;
 	ctx.save();
 	ctx.scale(get_scale(), get_scale());

@@ -73,6 +73,9 @@
 		let audios1 = null;
 		let menu1 = menu_create();
 		let game1 = game_create(input1, engine1, audios1);
+
+		let DPR = window.devicePixelRatio || 1;
+
 		document.addEventListener("visibilitychange", function() {
 			if (document.hidden)
 				menu1.shown = true;
@@ -86,10 +89,13 @@
 		function animate(lastUpdateTime) {
 			// calculate delta time
 			let dt = Date.now() - lastUpdateTime;
+			if(dt > 50)
+				dt = 50;
 			lastUpdateTime = Date.now();
 			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
-			ctx1.canvas.width = window.innerWidth;
-			ctx1.canvas.height = window.innerHeight;
+			ctx1.canvas.width = window.innerWidth * DPR;
+			ctx1.canvas.height = window.innerHeight * DPR;
+			ctx1.scale(DPR, DPR);
 			ctx1.fillStyle = "black";
 			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
 			try {

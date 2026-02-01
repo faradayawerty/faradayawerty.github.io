@@ -116,10 +116,8 @@ function initializeKeyboardInput(keys) {
 }
 
 function mouseMoveHandler(mouse, ctx, e) {
-	mouse.x = (e.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width / ctx
-		.canvas.clientWidth;
-	mouse.y = (e.clientY - ctx.canvas.offsetTop) * ctx.canvas.height / ctx
-		.canvas.clientHeight;
+	mouse.x = (e.clientX - ctx.canvas.offsetLeft);
+	mouse.y = (e.clientY - ctx.canvas.offsetTop);
 }
 
 function mouseHandler(mouse, ctx, e) {
@@ -149,14 +147,12 @@ function touchHandler(touch, joystick, ctx, e) {
 		let et = e.touches[i];
 		touch.push({
 			id: et.identifier,
-			x: (et.clientX - ctx.canvas.offsetLeft) * ctx.canvas.width /
-				ctx.canvas.clientWidth,
-			y: (et.clientY - ctx.canvas.offsetTop) * ctx.canvas.height /
-				ctx.canvas.clientHeight
+			x: (et.clientX - ctx.canvas.offsetLeft),
+			y: (et.clientY - ctx.canvas.offsetTop)
 		});
 	}
-	let w = ctx.canvas.width;
-	let h = ctx.canvas.height;
+	let w = window.innerWidth;
+	let h = window.innerHeight;
 	joystick.radius = Math.min(w / 16, h / 16);
 	joystick.left.x = w / 6;
 	joystick.left.y = 5 * h / 6;
@@ -183,13 +179,11 @@ function touchHandler(touch, joystick, ctx, e) {
 function initializeTouchInput(touch, joystick, ctx) {
 	window.addEventListener('touchstart', function(e) {
 		let regions = getButtonRegions(ctx);
-		let deadZoneHeight = ctx.canvas.height * 0.5;
+		let deadZoneHeight = window.innerHeight * 0.5;
 		for (let i = 0; i < e.changedTouches.length; i++) {
 			let t = e.changedTouches[i];
-			let tx = (t.clientX - ctx.canvas.offsetLeft) * ctx.canvas
-				.width / ctx.canvas.clientWidth;
-			let ty = (t.clientY - ctx.canvas.offsetTop) * ctx.canvas
-				.height / ctx.canvas.clientHeight;
+			let tx = (t.clientX - ctx.canvas.offsetLeft);
+			let ty = (t.clientY - ctx.canvas.offsetTop);
 			if (ty < deadZoneHeight) continue;
 			let hitButton = (tx > regions.use.x1 && tx < regions.use
 					.x2 && ty > regions.use.y1 && ty < regions.use.y2
@@ -201,9 +195,9 @@ function initializeTouchInput(touch, joystick, ctx) {
 				(tx > regions.minus.x1 && tx < regions.minus.x2 && ty >
 					regions.minus.y1 && ty < regions.minus.y2);
 			if (hitButton) continue;
-			if (tx < ctx.canvas.width / 2 && joystick.left.id === -1)
+			if (tx < window.innerWidth / 2 && joystick.left.id === -1)
 				joystick.left.id = t.identifier;
-			else if (tx >= ctx.canvas.width / 2 && joystick.right.id ===
+			else if (tx >= window.innerHeight / 2 && joystick.right.id ===
 				-1) joystick.right.id = t.identifier;
 		}
 		touchHandler(touch, joystick, ctx, e);
@@ -266,8 +260,8 @@ function drawJoysticks(ctx, joystick) {
 }
 
 function getButtonRegions(ctx) {
-	let w = ctx.canvas.width;
-	let h = ctx.canvas.height;
+	let w = window.innerWidth;
+	let h = window.innerHeight;
 	let baseSize = Math.min(w, h) * 0.15;
 	let btnSize = baseSize * 0.7;
 	let gap = 15;

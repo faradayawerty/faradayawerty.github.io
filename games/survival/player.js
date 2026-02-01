@@ -619,8 +619,8 @@ function player_draw(player_object, ctx) {
 		else {
 			mx = g.input.mouse.x;
 			my = g.input.mouse.y;
-			cx = 0.5 * ctx.canvas.width;
-			cy = 0.5 * ctx.canvas.height;
+			cx = 0.5 * window.innerWidth;
+			cy = 0.5 * window.innerHeight;
 		}
 		let gx = mx - cx,
 			gy = my - cy,

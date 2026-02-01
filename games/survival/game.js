@@ -208,8 +208,7 @@ function game_draw(g, ctx) {
 		g.offset_y = g.camera_target_body.position.y;
 	}
 	ctx.scale(g.scale, g.scale);
-	ctx.translate(0.5 * ctx.canvas.width / g.scale - g.offset_x, 0.5 * ctx
-		.canvas.height / g.scale - g.offset_y);
+	ctx.translate(0.5 * window.innerWidth / g.scale - g.offset_x, 0.5 * window.innerHeight / g.scale - g.offset_y);
 	for (let i = 0; i < g.objects.length; i++)
 		if (!g.objects[i].destroyed)
 			g.objects[i].draw(g.objects[i], ctx);
