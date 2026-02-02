@@ -672,3 +672,4 @@ function game_autoload(g) {
 		return false;
 	}
 }
+
