@@ -326,7 +326,7 @@ function enemy_update(enemy_object, dt) {
 			if (p_close && !p_close.data.ai_controlled) audio_play(sound);
 			for (let i = 0; i < dropData.N; i++) {
 				let theta = 2 * Math.PI * Math.random();
-				if (Math.random() < 0.5 && DROP_ITEMS) item_spawn(enemy_object
+				if (3 * Math.random() < 1 && DROP_ITEMS) item_spawn(enemy_object
 					.game, e.body
 					.position.x + 50 * Math.cos(theta), e.body.position.y +
 					50 * Math.sin(theta), e.type);
