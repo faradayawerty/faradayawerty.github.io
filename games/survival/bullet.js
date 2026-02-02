@@ -19,7 +19,8 @@ function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 		enemy: enemy,
 		color_fill: color_fill,
 		color_outline: color_outline,
-		invisible: invisible
+		invisible: invisible,
+		can_hit: true
 	};
 	if (b.enemy)
 		b.body.collisionFilter.category = 4;

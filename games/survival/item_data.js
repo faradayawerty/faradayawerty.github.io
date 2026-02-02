@@ -54,6 +54,7 @@ let ITEM_BOSSIFIER_RED = 122;
 let ITEM_BOSSIFIER_SWORD = 123;
 let ITEM_BOSSIFIER_ROCKET = 124;
 let ITEM_BOSSIFIER_LASER = 125;
+let ITEM_SHIELD_GRAY = 126;
 let ITEMS_BOSSIFIERS = [
 	ITEM_BOSSIFIER_REGULAR,
 	ITEM_BOSSIFIER_SHOOTING,
@@ -744,6 +745,16 @@ let ITEMS_DATA = {
 				0.7, "#cc1111", 0.05 * w);
 			ctx.fillStyle = "#dd1111";
 			ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
+		}
+	},
+	[ITEM_SHIELD_GRAY]: {
+		name: "Gray shield",
+		desc: "technical item. not in the game",
+		name_rus: "Серый щит",
+		desc_rus: "Технический предмет. Не в игре",
+		render: (ctx, x, y, w, h) => {
+			drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "gray",
+				"white", 0.05 * w);
 		}
 	},
 	[ITEM_SHIELD]: {

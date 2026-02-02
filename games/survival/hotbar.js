@@ -100,7 +100,7 @@ function hotbar_draw(hotbar_object, ctx) {
 		if (hb.has_shield_button) {
 			let sVal = 0,
 				sMax = 100,
-				sIcon = ITEM_SHIELD,
+				sIcon = ITEM_SHIELD_GRAY,
 				sColor = "#00ffff";
 			if (p.shield_rainbow_health > 0) {
 				sVal = p.shield_rainbow_health;

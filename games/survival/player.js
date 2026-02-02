@@ -31,11 +31,11 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		}),
 		immunity: 6000,
 		shield_blue_health: 0,
-		shield_blue_health_max: 500,
+		shield_blue_health_max: 100,
 		shield_green_health: 0,
-		shield_green_health_max: 2500,
+		shield_green_health_max: 200,
 		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 12500,
+		shield_rainbow_health_max: 400,
 		sword_direction: 0,
 		sword_visible: false,
 		sword_protection: false,
@@ -193,9 +193,9 @@ function player_update(player_object, dt) {
 	if (p.shotgun_cooldown > 0) p.shotgun_cooldown -= dt;
 	if (p.minigun_cooldown > 0) p.minigun_cooldown -= dt;
 	p.item_animstate += 0.01 * dt;
-	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.01 * dt;
-	if (p.shield_green_health > 0) p.shield_green_health -= 0.01 * dt;
-	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.01 * dt;
+	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.002 * dt;
+	if (p.shield_green_health > 0) p.shield_green_health -= 0.002 * dt;
+	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.002 * dt;
 	if (p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(
 				p.health) + ", change " + Math.round(p.saved_health - p
@@ -451,8 +451,8 @@ function player_update(player_object, dt) {
 				}
 				let mag = Math.sqrt(dx * dx + dy * dy);
 				if (mag > 0) {
-					targetX = dx / mag * 100;
-					targetY = dy / mag * 100;
+					targetX = dx / mag * 1000;
+					targetY = dy / mag * 1000;
 				}
 			}
 		}
@@ -751,10 +751,11 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 			if (Array.isArray(cfg.ammo)) {
 				const hasAnyJunk = cfg.ammo.some(id => inventory_has_item(p
 					.inventory_element, id));
-				if (!hasAnyJunk) return;
+				if (!hasAnyJunk && NEED_AMMO) return;
 			}
 			else {
-				if (!inventory_has_item(p.inventory_element, cfg.ammo)) return;
+				if (!inventory_has_item(p.inventory_element, cfg.ammo) &&
+					NEED_AMMO) return;
 			}
 		}
 	}

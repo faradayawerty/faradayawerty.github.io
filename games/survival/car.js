@@ -1,16 +1,19 @@
 function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	"default", health = null, fuel = null) {
+	if (type === "default" && Math.random() < 0.01)
+		type = "taxi";
 	if (g.objects["shooting laser"] && Math.random() < 0.25) is_tank = true;
 	if (is_tank) type = "tank";
-	let width = 200,
-		height = 110;
 	if (type === "police") color_ = "#222";
 	if (type === "fireman") color_ = "#b22222";
 	if (type === "ambulance") color_ = "#f0f0f0";
+	if (type === "taxi") color_ = "#f7b500";
+	let width = 200,
+		height = 110;
 	let c = {
 		type: type,
-		health: 1500,
-		max_health: 2000,
+		health: 75,
+		max_health: 100,
 		fuel: (fuel !== null) ? fuel : Math.max(0, 200 * Math.random() -
 			150),
 		max_fuel: 200,
@@ -37,7 +40,7 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	};
 	switch (type) {
 		case "tank":
-			c.max_health = 20000;
+			c.max_health = 300;
 			c.max_fuel = 4000;
 			c.speed = 15;
 			c.max_speed = 15;
@@ -47,11 +50,14 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 			c.speed = 32;
 			break;
 		case "fireman":
-			c.max_health = 7000;
 			c.w = 240;
 			break;
 		case "ambulance":
-			c.max_health = 1500;
+			c.max_health = 100;
+			break;
+		case "taxi":
+			c.max_speed = 28;
+			c.speed = 28;
 			break;
 	}
 	if (health !== null) {
@@ -61,6 +67,8 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 		let variability = 0.75 + (Math.random() * 0.25);
 		c.health = Math.round(c.max_health * variability);
 	}
+	if (c.health > c.max_health)
+		c.max_health = c.health;
 	if (fuel !== null && fuel > c.max_fuel) c.max_fuel = fuel;
 	let uname = unique ? "car_" + type + "_" + Math.round(x) + ":" + Math.round(
 		y) : null;
@@ -71,8 +79,7 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 }
 
 function car_destroy(car_object) {
-	if (car_object.destroyed)
-		return;
+	if (car_object.destroyed) return;
 	car_object.game.debug_console.unshift("destroying car");
 	let player_object = game_object_find_closest(car_object.game, car_object
 		.data.body.position.x, car_object.data.body.position.y, "player",
@@ -122,23 +129,20 @@ function drawIndicators(car_object, ctx, p) {
 }
 
 function car_update(car_object, dt) {
-	if (car_object.destroyed || !car_object.data.body)
-		return;
+	if (car_object.destroyed || !car_object.data.body) return;
 	let p = car_object.data;
 	let player_object = game_object_find_closest(car_object.game, p.body
 		.position.x, p.body.position.y, "player", 100);
-	if (["police", "fireman", "ambulance"].includes(p.type)) {
+	if (["police", "fireman", "ambulance", "taxi"].includes(p.type)) {
 		p.siren_timer += dt;
 	}
-	if (p.shot_cooldown < 2000)
-		p.shot_cooldown += dt;
+	if (p.shot_cooldown < 2000) p.shot_cooldown += dt;
 	p.speed = p.max_speed;
 	for (let i = 0; i < car_object.game.objects.length; i++) {
 		let grass = null;
 		if (car_object.game.objects[i].name == "decorative_grass")
 			grass = car_object.game.objects[i].data;
-		else
-			continue;
+		else continue;
 		if (doRectsCollide(p.body.position.x, p.body.position.y, 0, 0, grass.x,
 				grass.y, grass.w, grass.h)) {
 			p.speed = 0.66 * p.max_speed;
@@ -162,7 +166,7 @@ function car_update(car_object, dt) {
 			p.body.position.x + 0.5 * p.w * Math.cos(theta),
 			p.body.position.y + 0.5 * p.w * Math.sin(theta),
 			dx, dy, 60,
-			15625 * (0.125 + 1.75 * Math.random()), false, 12.5, 3500
+			1.5 + 18 * Math.random(), false, 12.5, 3500
 		);
 		p.shot_cooldown = 0;
 		audio_play("data/sfx/revolver_1.mp3", 0.3);
@@ -177,8 +181,8 @@ function car_update(car_object, dt) {
 		for (let i = 0; i < N; i++) {
 			let theta = 2 * Math.PI * Math.random();
 			item_spawn(car_object.game, p.body.position.x + 50 * Math.cos(
-					theta), p.body.position.y + 50 * Math.sin(theta),
-				null, null, car_object.data.type);
+					theta), p.body.position.y + 50 * Math.sin(theta), null,
+				null, car_object.data.type);
 		}
 		car_destroy(car_object);
 	}
@@ -206,6 +210,20 @@ function car_draw(car_object, ctx) {
 	if (p.type === "ambulance") {
 		ctx.fillStyle = "#d32f2f";
 		ctx.fillRect(-w / 2, -h * 0.1, w, h * 0.2);
+	}
+	if (p.type === "taxi") {
+		ctx.fillStyle = "#000";
+		let checkerSize = 12;
+		for (let i = 0; i < 5; i++) {
+			ctx.fillRect(-w / 2 + 30 + (i * checkerSize * 2), -h / 2 + 2,
+				checkerSize, 5);
+			ctx.fillRect(-w / 2 + 30 + checkerSize + (i * checkerSize * 2), -h /
+				2 + 7, checkerSize, 5);
+			ctx.fillRect(-w / 2 + 30 + (i * checkerSize * 2), h / 2 - 7,
+				checkerSize, 5);
+			ctx.fillRect(-w / 2 + 30 + checkerSize + (i * checkerSize * 2), h /
+				2 - 12, checkerSize, 5);
+		}
 	}
 	if (!p.is_tank) {
 		ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
@@ -267,10 +285,6 @@ function car_draw(car_object, ctx) {
 		ctx.arc(0, 0, h * 0.45, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.stroke();
-		ctx.fillStyle = "rgba(0,0,0,0.2)";
-		ctx.beginPath();
-		ctx.arc(-w * 0.1, 0, h * 0.15, 0, Math.PI * 2);
-		ctx.fill();
 		ctx.restore();
 	}
 	if (p.type === "fireman") {
@@ -297,6 +311,12 @@ function car_draw(car_object, ctx) {
 		ctx.globalAlpha = 0.3;
 		drawCircle(ctx, 0, 0, 50, s_color, "transparent", 0);
 		ctx.globalAlpha = 1.0;
+	}
+	else if (p.type === "taxi") {
+		ctx.fillStyle = "#000";
+		ctx.fillRect(-15, -25, 30, 50);
+		ctx.fillStyle = "#ffcc00";
+		ctx.fillRect(-10, -20, 20, 40);
 	}
 	ctx.restore();
 	drawIndicators(car_object, ctx, p);

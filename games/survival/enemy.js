@@ -1,3 +1,5 @@
+let DAMAGE_COEFFICIENT = 1;
+
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	"random", tile = LEVEL_TILE_VOID) {
 	let enemies = g.objects.filter((obj) => obj.name == "enemy");
@@ -43,7 +45,7 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		if (-1 < bd && bd < 15000) {
 			m *= 0.01;
 		}
-		if (Math.random() > 1 - 0.00625 * m) {
+		if (Math.random() > 1 - 0.003125 * m) {
 			boss = true;
 		}
 	}
@@ -61,7 +63,7 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		max_health: config.health,
 		hunger: 300,
 		max_hunger: 300,
-		damage: config.damage,
+		damage: config.damage * DAMAGE_COEFFICIENT,
 		speed: config.speed,
 		w: width,
 		h: height,
@@ -97,9 +99,9 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		e.body.collisionFilter.mask = config.mask;
 	}
 	if (boss) {
-		e.damage = 5 * e.damage;
-		e.health = 30 * e.max_health;
-		e.max_health = 30 * e.max_health;
+		e.damage = 1.05 * e.damage;
+		e.health = 50 * e.max_health;
+		e.max_health = 50 * e.max_health;
 		e.hunger = 1.75 * e.max_hunger;
 		e.max_hunger = 1.75 * e.max_hunger;
 		e.speed = 0.5 * e.speed;
@@ -324,7 +326,8 @@ function enemy_update(enemy_object, dt) {
 			if (p_close && !p_close.data.ai_controlled) audio_play(sound);
 			for (let i = 0; i < dropData.N; i++) {
 				let theta = 2 * Math.PI * Math.random();
-				if (Math.random() < 0.75) item_spawn(enemy_object.game, e.body
+				if (Math.random() < 0.5 && DROP_ITEMS) item_spawn(enemy_object
+					.game, e.body
 					.position.x + 50 * Math.cos(theta), e.body.position.y +
 					50 * Math.sin(theta), e.type);
 			}

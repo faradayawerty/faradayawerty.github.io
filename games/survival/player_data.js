@@ -11,7 +11,8 @@ const WEAPON_DEFS = {
 		doNotDrawGun: true,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
 			.position.y, v.tx - v.sx, v.ty - v.sy, 7.5 + 7.5 * Math
-			.random(), 2 * Math.random(), false, 12, 1500, "gray",
+			.random(), 0.3 + 0.2 * Math.random(), false, 12, 1500,
+			"gray",
 			"#333")
 	},
 	[ITEM_STICK]: {
@@ -25,8 +26,8 @@ const WEAPON_DEFS = {
 				v,
 				dt,
 				0.015,
-				0.05,
-				0.25,
+				0.8,
+				0.5,
 				Math.PI / 6,
 				1000,
 				300
@@ -43,7 +44,7 @@ const WEAPON_DEFS = {
 		length: 0.8,
 		width: 1.0,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.5)
+			.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25)
 	},
 	[ITEM_DESERT_EAGLE]: {
 		cooldown: 600,
@@ -55,8 +56,7 @@ const WEAPON_DEFS = {
 		length: 0.8,
 		width: 1.0,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 32, Math.random() *
-			2 + 1)
+			.position.y, v.tx - v.sx, v.ty - v.sy, 32, 1.2)
 	},
 	[ITEM_REVOLVER]: {
 		cooldown: 800,
@@ -74,7 +74,7 @@ const WEAPON_DEFS = {
 			v.tx - v.sx,
 			v.ty - v.sy,
 			25,
-			Math.random() * 2.5 + 1.5
+			1.5
 		)
 	},
 	[ITEM_PLASMA_PISTOL]: {
@@ -87,8 +87,8 @@ const WEAPON_DEFS = {
 		length: 0.8,
 		width: 1.0,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 20, (25 + 25 * Math
-				.random()) * 0.5, false, 6, 1500, "cyan", "blue")
+			.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25 + 0.5 * Math
+			.random(), false, 6, 1500, "cyan", "blue")
 	},
 	[ITEM_SHOTGUN]: {
 		cd_prop: 'shotgun_cooldown',
@@ -105,8 +105,7 @@ const WEAPON_DEFS = {
 				bullet_create(g, p.body.position.x, p.body.position.y, (
 						0.95 + 0.1 * Math.random()) * v.tx - v.sx, (
 						0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
-					.random() * 10 + 10, 5 * 0.5 * (0.5 + 1.0 * Math
-						.random()));
+					.random() * 10 + 10, 0.06 + 0.16 * Math.random());
 		}
 	},
 	[ITEM_MINIGUN]: {
@@ -122,7 +121,7 @@ const WEAPON_DEFS = {
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
 			.position.y, (0.95 + 0.1 * Math.random()) * v.tx - v.sx, (
 				0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
-			.random() * 10 + 10, 0.66 * 10 * 0.5 * Math.random())
+			.random() * 10 + 10, 0.1 + 0.1 * Math.random())
 	},
 	[ITEM_JUNK_CANNON]: {
 		cooldown: 250,
@@ -142,7 +141,7 @@ const WEAPON_DEFS = {
 					.w * 1.5,
 					Math.cos(finalAngle), Math.sin(
 						finalAngle), 25,
-					150 * 15625 * 0.5 * (1 + Math.random()),
+					15 + 15 * Math.random(),
 					false, 45);
 			});
 			return true;
@@ -159,8 +158,8 @@ const WEAPON_DEFS = {
 		length: 1.3,
 		width: 2.25,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 17.5, 4.25 * 25 *
-			0.5 * (0.25 + 1.5 * Math.random()), false, 12.5, 1500,
+			.position.y, v.tx - v.sx, v.ty - v.sy, 17.5, 0.75 + 0.5 *
+			Math.random(), false, 12.5, 1500,
 			"cyan", "blue")
 	},
 	[ITEM_ROCKET_LAUNCHER]: {
@@ -177,8 +176,8 @@ const WEAPON_DEFS = {
 			rocket_create(g, p.body.position.x + Math.cos(theta) * p.w *
 				1.75, p.body.position.y + Math.sin(theta) * p.h *
 				1.75, v.tx - v.sx, v.ty - v.sy, Math.min(0.25 * p.w,
-					10), null, 0.33 * 3125 * 0.5 * (0.75 + 0.5 *
-					Math.random()), p.max_health, false, 20);
+					10), null, 9 + 18 * Math.random(), p.max_health,
+				false, 20);
 		}
 	},
 	[ITEM_RED_PISTOLS]: {
@@ -197,8 +196,8 @@ const WEAPON_DEFS = {
 				bullet_create(g, p.body.position.x + p.w * Math
 					.cos(theta + off), p.body.position.y + p
 					.w * Math.sin(theta + off), v.tx - v.sx,
-					v.ty - v.sy, 30, 1.5 * 125 * 0.5 * 2.5 *
-					Math.random(), false, 6, 1500, "pink",
+					v.ty - v.sy, 30, 0.4 + 0.8 * Math
+					.random(), false, 6, 1500, "pink",
 					"red");
 			});
 		}
@@ -220,8 +219,8 @@ const WEAPON_DEFS = {
 						theta - (0.5 * N - i) * Math.PI / N), p.body
 					.position.y + 2 * p.w * Math.sin(theta - (0.5 * N -
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 6,
-					null, 0.11 * 3125 * 0.5 * (0.1 + 0.9 * Math
-						.random()), p.max_health, false, 20, 1500);
+					null, 3 + 6 * Math.random(), p.max_health, false,
+					20, 1500);
 		}
 	},
 	[ITEM_RED_SHOTGUN]: {
@@ -241,7 +240,7 @@ const WEAPON_DEFS = {
 						theta - (0.5 * N - i) * Math.PI / N), p.body
 					.position.y + 2 * p.w * Math.sin(theta - (0.5 * N -
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 30,
-					4.0 * 125 * 0.5 * (0.75 + 0.25 * Math.random()),
+					2.5 + 0.5 * Math.random(),
 					false, 6, 1500, "pink", "red");
 		}
 	},
@@ -271,7 +270,7 @@ const WEAPON_DEFS = {
 							.position.x, obj.data.body.position
 							.y, 1.5 * p.w, 60 * p.w, p
 							.laser_direction)) {
-						obj.data.health -= 15625 * dt;
+						obj.data.health -= 6 * dt;
 						obj.data.hit_by_player = true;
 					}
 				}
@@ -285,7 +284,7 @@ const WEAPON_DEFS = {
 		color: "#55aa11",
 		swordLength: 100,
 		action: (g, p, v, dt) => {
-			player_handle_melee(g, p, v, dt, 0.02, 3000, 2000, Math.PI /
+			player_handle_melee(g, p, v, dt, 0.02, 10.0, 7.0, Math.PI /
 				8, 1500, 500);
 		}
 	},
@@ -295,7 +294,7 @@ const WEAPON_DEFS = {
 		isHorn: true,
 		swordLength: 100,
 		action: (g, p, v, dt) => {
-			player_handle_melee(g, p, v, dt, 0.04, 300000, 200000, Math
+			player_handle_melee(g, p, v, dt, 0.04, 80.0, 60.0, Math
 				.PI / 4, 15000, 5000);
 		}
 	},
@@ -311,7 +310,8 @@ const WEAPON_DEFS = {
 			bullet_create(g, p.body.position.x, p.body.position.y, (
 					0.975 + 0.05 * Math.random()) * v.tx - v.sx, (
 					0.975 + 0.05 * Math.random()) * v.ty - v.sy,
-				Math.random() * 10 + 20, 1000 * Math.random(),
+				Math.random() * 10 + 20, 1.5 + 0.375 * Math
+				.random(),
 				false, 6, 1500, "lime", "green");
 			if (p.shield_green_health > 0) {
 				p.shield_green_health -= 0.05 * dt;
@@ -345,22 +345,26 @@ const WEAPON_DEFS = {
 			let c1 = "yellow",
 				c2 = "orange",
 				sfx = "gunshot_1",
-				chance = 0.01;
+				chance = 0.01,
+				dmgBase = 1.0;
 			if (ammoType === ITEM_RAINBOW_AMMO) {
 				c1 = colors[Math.floor(p.gradient) % 7];
 				c2 = "white";
 				sfx = "red_pistols_1";
 				chance = 0.001;
+				dmgBase = 2.0;
 			}
 			else if (ammoType === ITEM_RED_PLASMA) {
 				c1 = "red";
 				c2 = "pink";
 				sfx = "red_pistols_1";
+				dmgBase = 1.75;
 			}
 			else if (ammoType === ITEM_PLASMA) {
 				c1 = "cyan";
 				c2 = "blue";
 				sfx = "red_pistols_1";
+				dmgBase = 1.5;
 			}
 			if (ammoType !== ITEM_ROCKET || ammoType ===
 				ITEM_RAINBOW_AMMO) {
@@ -369,8 +373,8 @@ const WEAPON_DEFS = {
 						Math.cos(theta + off), p.body
 						.position.y + p.w * Math.sin(theta +
 							off), v.tx - v.sx, v.ty - v.sy,
-						30, 3 * 15625 * 0.5 * (0.25 + 1.5 *
-							Math.random()), false, 6, 1500,
+						30, dmgBase * (1.6 + 3.2 * Math
+							.random()), false, 6, 1500,
 						c1, c2);
 				});
 				audio_play("data/sfx/" + sfx + ".mp3", 0.25);
@@ -381,9 +385,9 @@ const WEAPON_DEFS = {
 						.cos(theta + off) * p.w * 1.75, p
 						.body.position.y + Math.sin(theta +
 							off) * p.h * 1.75, v.tx - v.sx,
-						v.ty - v.sy, 0.15 * p.w, null, 0.5 *
-						15625 * 0.5 * (0.25 + 1.5 * Math
-							.random()), p.max_health, false,
+						v.ty - v.sy, 0.15 * p.w, null, 0.8 +
+						1.6 * Math.random(), p.max_health,
+						false,
 						20);
 				});
 				audio_play("data/sfx/rocketlauncher_1.mp3", 0.125);

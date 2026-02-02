@@ -1,5 +1,6 @@
 function game_create(input_, engine_, audios_) {
 	let g = {
+		autosave_timer: 120001,
 		want_levels: [],
 		level_set_delay: 100,
 		respawn_level: "0x0",
@@ -76,7 +77,14 @@ function game_create(input_, engine_, audios_) {
 	return g;
 }
 
-function game_new(g) {
+function game_new(g, force_clean = false) {
+	if (!force_clean) {
+		let loaded = game_autoload(g);
+		if (loaded) {
+			console.log("Загружено предыдущее сохранение.");
+			return;
+		}
+	}
 	g.available_enemies = ["regular"];
 	g.visited_levels = ["0x0"];
 	g.assigned_tiles = [LEVEL_TILE_START];
@@ -198,6 +206,12 @@ function game_update(g, dt) {
 	else if (g.mobile) {
 		g.input.mouse.x = undefined;
 		g.input.mouse.y = undefined;
+	}
+	bindings_update();
+	g.autosave_timer = (g.autosave_timer || 0) + dt;
+	if (g.autosave_timer > 120000) {
+		game_autosave(g);
+		g.autosave_timer = 0;
 	}
 }
 
@@ -580,4 +594,81 @@ function game_load(g) {
 		catch (e) {}
 	}
 	input.click();
+}
+
+function game_autosave(g) {
+	let objs = [];
+	let state_object = {
+		name: "state",
+		available_enemies: g.available_enemies,
+		kills: g.kills,
+		boss_kills: g.boss_kills,
+		deaths: g.deaths,
+		visited_levels: g.visited_levels,
+		assigned_tiles: g.assigned_tiles
+	};
+	objs.push(state_object);
+	for (let i = 0; i < g.objects.length; i++) {
+		let obj = game_object_make_savable(g.objects[i]);
+		if (obj) objs.push(obj);
+	}
+	localStorage.setItem("faw_survival_autosave_1", JSON.stringify(objs));
+	console.log("Игра автоматически сохранена");
+}
+
+function game_autoload(g) {
+	let content = localStorage.getItem("faw_survival_autosave_1");
+	if (!content) return false;
+	try {
+		let saved_objects = JSON.parse(content);
+		game_destroy_all_gui_elements(g);
+		game_destroy_all_objects(g);
+		for (let i = 0; i < saved_objects.length; i++) {
+			let obj = saved_objects[i];
+			if (obj.name == "state") {
+				g.available_enemies = obj.available_enemies || ["regular"];
+				g.kills = obj.kills;
+				g.boss_kills = obj.boss_kills;
+				g.deaths = obj.deaths;
+				g.visited_levels = obj.visited_levels;
+				g.assigned_tiles = obj.assigned_tiles;
+			}
+			if (obj.name == "player") {
+				let iplayer = player_create(g, obj.data.x, obj.data.y, false,
+					obj.data.ai_controlled);
+				let plr = g.objects[iplayer];
+				for (let row = 0; row < plr.data.inventory_element.data.items
+					.length; row++) {
+					for (let col = 0; col < plr.data.inventory_element.data
+						.items[row].length; col++) {
+						plr.data.inventory_element.data.items[row][col] = obj
+							.data.items[row][col];
+					}
+				}
+				try {
+					for (let j = 0; j < obj.data.achievements.length; j++) {
+						achievement_do(plr.data.achievements_element.data
+							.achievements,
+							obj.data.achievements[j].name,
+							plr.data.achievements_shower_element, true);
+					}
+				}
+				catch (e) {
+					g.debug_console.unshift(e);
+				}
+			}
+			if (obj.name == "enemy") enemy_create(g, obj.data.x, obj.data.y, obj
+				.data.boss, obj.data.is_minion, obj.data.type);
+			if (obj.name == "item") item_create(g, obj.data.id, obj.data.x, obj
+				.data.y, obj.data.dropped, obj.data.despawn);
+			if (obj.name == "car") car_create(g, obj.data.x, obj.data.y, obj
+				.data.color, obj.data.is_tank, true, obj.data.type, obj.data
+				.health, obj.data.fuel);
+		}
+		return true;
+	}
+	catch (e) {
+		console.error("Ошибка автозагрузки:", e);
+		return false;
+	}
 }

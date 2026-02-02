@@ -1,6 +1,5 @@
 function rocket_create(g, x, y, dx, dy, w, target_object, damage, health,
 	enemy = true, speed = 10, lifetime = 4800) {
-	let rockets = g.objects.filter((obj) => obj.name == "rocket");
 	let r = {
 		lifetime: lifetime,
 		health: health,
@@ -9,7 +8,12 @@ function rocket_create(g, x, y, dx, dy, w, target_object, damage, health,
 		speed: speed,
 		damage: damage,
 		target_object: target_object,
-		body: Matter.Bodies.rectangle(x, y, 20, 20),
+		bounce_ticks: 0,
+		body: Matter.Bodies.rectangle(x, y, 20, 20, {
+			restitution: 0.4,
+			friction: 0.1,
+			frictionAir: 0.01
+		}),
 		enemy: enemy
 	};
 	let d = Math.sqrt(dx * dx + dy * dy);
@@ -38,143 +42,159 @@ function rocket_update(rocket_object, dt) {
 	if (rocket_object.destroyed)
 		return;
 	let r = rocket_object.data;
-	if (rocket_object.data.lifetime < 0) {
+	if (r.lifetime < 0) {
 		r.health = -1;
 	}
 	else {
-		rocket_object.data.lifetime -= dt;
+		r.lifetime -= dt;
 	}
 	if (r.health < 0) {
 		rocket_destroy(rocket_object);
 		return;
 	}
-	if (!r.enemy) {
-		r.target_object = game_object_find_closest(rocket_object.game, r.body
-			.position.x, r.body.position.y, "enemy", 300);
-		if (!r.target_object)
-			r.target_object = game_object_find_closest(rocket_object.game, r
-				.body.position.x, r.body.position.y, "car", 200);
-		if (!r.target_object)
-			r.target_object = game_object_find_closest(rocket_object.game, r
-				.body.position.x, r.body.position.y, "animal", 200);
-		if (!r.target_object) {
-			rocket_object.name = "ROCKET";
-			r.target_object = game_object_find_closest(rocket_object.game, r
-				.body.position.x, r.body.position.y, "rocket", 25);
-			rocket_object.name = "rocket";
+	if (r.bounce_ticks > 0) r.bounce_ticks--;
+	for (let i = 0; i < rocket_object.game.objects.length; i++) {
+		let obj = rocket_object.game.objects[i];
+		if (!obj.data.body || obj === rocket_object) continue;
+		if (obj.name == "rocket") {
+			if (r.enemy && obj.data.enemy) continue;
+			if (!r.enemy && !obj.data.enemy) continue;
 		}
-	}
-	if (r.target_object) {
-		if (r.target_object.destroyed ||
-			r.target_object.name != "animal" && r.target_object.name !=
-			"player" && r.target_object.name != "enemy" && r.target_object
-			.name != "car" && r.target_object.name != "rocket" ||
-			r.target_object.name == "car" && r.target_object.data.is_tank) {
-			r.target_object = null;
-		}
-		else {
-			if (r.target_object.name == "player" && r.target_object.data
-				.car_object) {
-				r.target_object = r.target_object.data.car_object;
-			}
-			let dx = r.target_object.data.body.position.x - r.body.position.x;
-			let dy = r.target_object.data.body.position.y - r.body.position.y;
-			let d = Math.sqrt(dx * dx + dy * dy);
-			let vel = Matter.Vector.create(r.speed * dx / d, r.speed * dy / d);
-			Matter.Body.setVelocity(r.body, vel);
-			if (r.target_object && Matter.Collision.collides(rocket_object.data
-					.body, r.target_object.data.body) != null) {
-				rocket_object.game.debug_console.unshift(
-					"rocket object collides with " + r.target_object.name);
-				let alpha = 25;
-				if (r.target_object.name == "player") {
-					if (r.target_object.data.shield_blue_health > 0) {
-						r.target_object.data.shield_blue_health -= 0.95 *
-							alpha * rocket_object.data.damage * dt;
-					}
-					else if (r.target_object.data.shield_green_health > 0) {
-						r.target_object.data.shield_green_health -= 0.75 *
-							alpha * rocket_object.data.damage * dt;
-					}
-					else if (r.target_object.data.shield_rainbow_health > 0) {
-						r.target_object.data.shield_rainbow_health -= 0.55 *
-							alpha * rocket_object.data.damage * dt;
-					}
-					else if (r.target_object.data.immunity <= 0) {
-						let k = 1.0;
-						if (r.target_object.data.sword_visible)
-							k = 0.25;
-						r.target_object.data.health -= alpha * k * rocket_object
-							.data.damage * dt;
-					}
+		if (r.enemy && obj.name == "enemy") continue;
+		if ((obj.name == "enemy" || obj.name == "car" || obj.name ==
+				"trashcan" ||
+				obj.name == "animal" || obj.name == "rocket") &&
+			Matter.Collision.collides(r.body, obj.data.body) != null) {
+			if (obj.name == "car") {
+				if (obj.data.is_tank && !r.enemy) {
+					obj.data.health -= 0.0125 * r.damage * dt;
 				}
 				else {
-					r.target_object.data.health -= alpha * rocket_object.data
-						.damage * dt;
-					if (r.target_object.name == "enemy")
-						r.target_object.data.hit_by_player = true;
+					obj.data.health -= r.damage * dt;
 				}
-				r.health -= 10 * alpha * rocket_object.data.damage * dt;
+			}
+			else if (obj.name == "enemy" && !r.enemy) {
+				obj.data.health -= r.damage * dt;
+				obj.data.hit_by_player = true;
+			}
+			else {
+				obj.data.health -= r.damage * dt;
+			}
+			r.health -= 10 * r.damage * dt;
+			r.target_object = null;
+			r.bounce_ticks = 10;
+		}
+	}
+	if (r.enemy) {
+		let player_obj = game_object_find_closest(rocket_object.game, r.body
+			.position.x, r.body.position.y, "player", 1500);
+		if (player_obj && Matter.Collision.collides(r.body, player_obj.data
+				.body) != null) {
+			let player = player_obj.data;
+			if (player.shield_blue_health > 0) player.shield_blue_health -=
+				0.95 * r.damage * dt;
+			else if (player.shield_green_health > 0) player
+				.shield_green_health -= 0.75 * r.damage * dt;
+			else if (player.shield_rainbow_health > 0) player
+				.shield_rainbow_health -= 0.55 * r.damage * dt;
+			else if (player.immunity <= 0) {
+				let k = (player.sword_protection || player.sword_visible) ?
+					0.25 : 1.0;
+				player.health -= k * r.damage * dt;
+			}
+			r.health -= 10 * r.damage * dt;
+			r.target_object = null;
+			r.bounce_ticks = 10;
+		}
+	}
+	if (r.bounce_ticks <= 0) {
+		if (!r.target_object) {
+			if (r.enemy) {
+				r.target_object = game_object_find_closest(rocket_object.game, r
+					.body.position.x, r.body.position.y, "player", 1500);
+			}
+			else {
+				r.target_object = game_object_find_closest(rocket_object.game, r
+					.body.position.x, r.body.position.y, "enemy", 500);
+				if (!r.target_object) r.target_object =
+					game_object_find_closest(rocket_object.game, r.body.position
+						.x, r.body.position.y, "car", 400);
+				if (!r.target_object) r.target_object =
+					game_object_find_closest(rocket_object.game, r.body.position
+						.x, r.body.position.y, "trashcan", 200);
+				if (!r.target_object) {
+					rocket_object.name = "ROCKET_SEARCH";
+					let target_rocket = game_object_find_closest(rocket_object
+						.game, r.body.position.x, r.body.position.y,
+						"rocket", 150);
+					rocket_object.name = "rocket";
+					if (target_rocket && target_rocket.data.enemy) r
+						.target_object = target_rocket;
+				}
+			}
+		}
+		if (r.target_object) {
+			if (r.target_object.destroyed || (r.target_object.name == "car" && r
+					.target_object.data.is_tank && !r.enemy)) {
+				r.target_object = null;
+			}
+			else {
+				let target_body = r.target_object.data.body;
+				if (r.target_object.name == "player" && r.target_object.data
+					.car_object) {
+					target_body = r.target_object.data.car_object.data.body;
+				}
+				let dx = target_body.position.x - r.body.position.x;
+				let dy = target_body.position.y - r.body.position.y;
+				let d = Math.sqrt(dx * dx + dy * dy);
+				if (d > 0.1) {
+					let vel = Matter.Vector.create(r.speed * dx / d, r.speed *
+						dy / d);
+					Matter.Body.setVelocity(r.body, vel);
+				}
 			}
 		}
 	}
-	else {
-		if (!r.body)
-			return;
-		rocket_object.name = "ROCKET";
-		r.target_object = game_object_find_closest(rocket_object.game, r.body
-			.position.x, r.body.position.y, "rocket", 50);
-		rocket_object.name = "rocket";
-		if (r.target_object && !r.target_object.data.enemy)
-			r.target_object = null;
-	}
-	let dx = Matter.Body.getVelocity(r.body).x;
-	let dy = Matter.Body.getVelocity(r.body).y;
-	let d = Math.sqrt(dx * dx + dy * dy);
-	if (d < 8.5)
+	let current_vel = Matter.Body.getVelocity(r.body);
+	let current_d = Math.sqrt(current_vel.x * current_vel.x + current_vel.y *
+		current_vel.y);
+	if (current_d < 1.0 && r.bounce_ticks <= 0)
 		r.health = -1;
 }
 
 function rocket_draw(rocket_object, ctx) {
 	let r = rocket_object.data;
-	if (r.target_object && r.target_object.data.body) {
-		let rx = r.body.position.x;
-		let ry = r.body.position.y;
-		let dx = r.target_object.data.body.position.x - r.body.position.x;
-		let dy = r.target_object.data.body.position.y - r.body.position.y;
-		let d = Math.sqrt(dx * dx + dy * dy);
-		dx = 2.5 * r.w * dx / d;
-		dy = 2.5 * r.w * dy / d;
-		drawLine(ctx, rx + 0.3 * dy - dx, ry - 0.3 * dx - dy, rx - 0.3 * dy -
-			dx, ry + 0.3 * dx - dy, "red", r.w);
-		drawLine(ctx, rx - 0.25 * dx - dx, ry - 0.25 * dy - dy, rx + dx - dx,
-			ry + dy - dy, "gray", r.w);
-		drawLine(ctx, rx - dx, ry - dy, rx + 1.125 * dx - dx, ry + 1.125 * dy -
-			dy, "gray", 0.75 * r.w);
+	let rx = r.body.position.x;
+	let ry = r.body.position.y;
+	let vel = Matter.Body.getVelocity(r.body);
+	let dx, dy;
+	if (r.target_object && r.target_object.data && r.target_object.data.body &&
+		r.bounce_ticks <= 0) {
+		dx = r.target_object.data.body.position.x - rx;
+		dy = r.target_object.data.body.position.y - ry;
 	}
-	if (!r.target_object) {
-		let rx = r.body.position.x;
-		let ry = r.body.position.y;
-		let dx = Matter.Body.getVelocity(r.body).x;
-		let dy = Matter.Body.getVelocity(r.body).y;
-		let d = Math.sqrt(dx * dx + dy * dy);
-		dx = 2.5 * r.w * dx / d;
-		dy = 2.5 * r.w * dy / d;
-		drawLine(ctx, rx + 0.3 * dy - dx, ry - 0.3 * dx - dy, rx - 0.3 * dy -
-			dx, ry + 0.3 * dx - dy, "red", r.w);
-		drawLine(ctx, rx - 0.25 * dx - dx, ry - 0.25 * dy - dy, rx + dx - dx,
-			ry + dy - dy, "gray", r.w);
-		drawLine(ctx, rx - dx, ry - dy, rx + 1.125 * dx - dx, ry + 1.125 * dy -
-			dy, "gray", 0.75 * r.w);
+	else {
+		dx = vel.x;
+		dy = vel.y;
+	}
+	let d = Math.sqrt(dx * dx + dy * dy);
+	if (d > 0.1) {
+		let sdx = 2.5 * r.w * dx / d;
+		let sdy = 2.5 * r.w * dy / d;
+		drawLine(ctx, rx + 0.3 * sdy - sdx, ry - 0.3 * sdx - sdy, rx - 0.3 *
+			sdy - sdx, ry + 0.3 * sdx - sdy, "red", r.w);
+		drawLine(ctx, rx - 0.25 * sdx - sdx, ry - 0.25 * sdy - sdy, rx + sdx -
+			sdx, ry + sdy - sdy, "gray", r.w);
+		drawLine(ctx, rx - sdx, ry - sdy, rx + 1.125 * sdx - sdx, ry + 1.125 *
+			sdy - sdy, "gray", 0.75 * r.w);
 	}
 	if (rocket_object.game.settings.indicators["show rocket health"] && r
 		.health > 0) {
-		let e = rocket_object.data;
 		ctx.fillStyle = "red";
-		ctx.fillRect(e.body.position.x - 7 * e.w / 2, e.body.position.y - 3 * e
-			.w, 7 * e.w, Math.min(4, e.w * 0.5));
+		ctx.fillRect(rx - 7 * r.w / 2, ry - 3 * r.w, 7 * r.w, Math.min(4, r.w *
+			0.5));
 		ctx.fillStyle = "lime";
-		ctx.fillRect(e.body.position.x - 7 * e.w / 2, e.body.position.y - 3 * e
-			.w, 7 * e.w * e.health / e.max_health, Math.min(4, e.w * 0.5));
+		ctx.fillRect(rx - 7 * r.w / 2, ry - 3 * r.w, 7 * r.w * r.health / r
+			.max_health, Math.min(4, r.w * 0.5));
 	}
 }
