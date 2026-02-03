@@ -254,7 +254,7 @@ let ITEMS_DATA = {
 	[ITEM_DESERT_EAGLE]: {
 		name: "Desert Eagle",
 		desc: "High-caliber hand cannon. Massive stopping power, heavy recoil.",
-		name_rus: "Desert Eagle",
+		name_rus: "Дезерт Игл",
 		desc_rus: "Крупнокалиберная ручная пушка. Огромная убойная сила и сильная отдача.",
 		render: (ctx, x, y, w, h) => {
 			const silver = "#aaa";

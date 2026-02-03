@@ -319,6 +319,8 @@ function enemy_update(enemy_object, dt) {
 				}
 				else dropData.N = 5 * Math.random();
 			}
+			if (!e.bossa && Math.random() < 0.25)
+				dropData.N = 2;
 			let sound = e.boss ? "data/sfx/zombie_boss_dies_1.mp3" :
 				"data/sfx/zombie_dies_1.mp3";
 			let p_close = game_object_find_closest(enemy_object.game, e.body
@@ -326,10 +328,11 @@ function enemy_update(enemy_object, dt) {
 			if (p_close && !p_close.data.ai_controlled) audio_play(sound);
 			for (let i = 0; i < dropData.N; i++) {
 				let theta = 2 * Math.PI * Math.random();
-				if (3 * Math.random() < 1 && DROP_ITEMS) item_spawn(enemy_object
-					.game, e.body
-					.position.x + 50 * Math.cos(theta), e.body.position.y +
-					50 * Math.sin(theta), e.type);
+				if ((3 * Math.random() < 1 && !e.boss || Math.random() < 0.75 &&
+						e.boss) && DROP_ITEMS)
+					item_spawn(enemy_object.game, e.body.position.x + 50 * Math
+						.cos(theta), e.body.position.y + 50 * Math.sin(theta), e
+						.type);
 			}
 		}
 		enemy_destroy(enemy_object);

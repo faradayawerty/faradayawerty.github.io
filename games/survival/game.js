@@ -672,3 +672,7 @@ function game_autoload(g) {
 		return false;
 	}
 }
+
+function game_has_player(g) {
+	return g.objects.some(obj => obj.name === "player");
+}

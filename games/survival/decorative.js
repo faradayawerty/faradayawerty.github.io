@@ -266,7 +266,10 @@ function decorative_hospital_v3(g, x, y, w, h) {
 		"#1177ff");
 	roof_rect_create(g, cx - 20, cy - 80, 40, 160, x, y, w, h, "#1177ff",
 		"#1177ff");
-	roof_text_create(g, "CITY HOSPITAL", x + (w / 2) - 200, y + h - 100, 50, x,
+	let text = "CITY HOSPITAL";
+	if (g.settings.language === "русский")
+		text = "ПОЛИКЛИНИКА";
+	roof_text_create(g, text, x + (w / 2) - 200, y + h - 100, 50, x,
 		y, w, h, "#1177ff");
 }
 
@@ -278,7 +281,13 @@ function decorative_police_station_v3(g, x, y, w, h) {
 	decorative_wall_v2(g, x + w - sw, y, sw, h, "#222266");
 	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#111144",
 		"#000022");
-	roof_text_create(g, "POLICE", x + (w / 2) - 110, y + (h / 2) - 30, 60, x, y,
+	let text = "POLICE";
+	let ofs = 0.5
+	if (g.settings.language === "русский") {
+		text = "ПОЛИЦЕЙСКИЙ УЧАСТОК";
+		ofs = 0.35;
+	}
+	roof_text_create(g, text, x + (ofs * w) - 110, y + (h / 2) - 30, 60, x, y,
 		w, h, "white");
 }
 
@@ -290,7 +299,13 @@ function decorative_fire_station_v3(g, x, y, w, h) {
 	decorative_wall_v2(g, x + w - sw, y, sw, h, "#992222");
 	roof_rect_create(g, x + 5, y + 5, w - 10, h - 10, x, y, w, h, "#771111",
 		"#440000");
-	roof_text_create(g, "FIRE DEPT", x + (w / 2) - 140, y + (h / 2) - 25, 50, x,
+	let text = "FIRE DEPT";
+	let ofs = 0.5;
+	if (g.settings.language === "русский") {
+		text = "ПОЖАРНАЯ ЧАСТЬ";
+		ofs = 0.4;
+	}
+	roof_text_create(g, text, x + (ofs * w) - 140, y + (h / 2) - 25, 50, x,
 		y, w, h, "white");
 }
 
@@ -319,10 +334,10 @@ function decorative_fuel_pump_draw(self, ctx) {
 	ctx.globalAlpha = 1.0;
 }
 
-function decorative_fuel_pump_create(g, x, y, w = 45, h = 65, label = "95") {
+function decorative_fuel_pump_create(g, x, y, w = 45, h = 65, label = "98") {
 	let accent = "#00FF00";
-	if (label === "98") accent = "#0088FF";
-	if (label === "DT") accent = "#FFCC00";
+	if (label === "80") accent = "#0088FF";
+	if (label === "92") accent = "#FFCC00";
 	bound_create(g, x, y + h * 0.5, w, h * 0.5);
 	let i = game_object_create(g, "decorative_fuel_pump", {
 		x,
@@ -366,7 +381,7 @@ function decorative_gas_station_create(g, x, y, w, h, level_visited = true) {
 		for (let c = 0; c < cols; c++) {
 			let px = ix + (island_w / (cols + 1)) * (c + 1) - (pump_w / 2);
 			let py = iy - (pump_h * 0.7);
-			let fuels = ["95", "98", "DT"];
+			let fuels = ["92", "98", "80"];
 			decorative_fuel_pump_create(g, px, py, pump_w, pump_h, fuels[c]);
 		}
 	}

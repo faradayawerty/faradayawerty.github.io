@@ -78,3 +78,17 @@ function cheat_no_enemy_loot() {
 function cheat_infinite_ammo() {
 	NEED_AMMO = !NEED_AMMO;
 }
+
+function cheat_teleport(x, y) {
+	let plr = game1.objects.find(obj => obj.name == "player" && !obj.destroyed);
+	if (plr && plr.data.body) {
+		Matter.Body.setPosition(plr.data.body, {
+			x: x,
+			y: y
+		});
+		Matter.Body.setVelocity(plr.data.body, {
+			x: 0,
+			y: 0
+		});
+	}
+}
