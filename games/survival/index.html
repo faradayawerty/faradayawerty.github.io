@@ -170,8 +170,7 @@
 					game_new(game1, true);
 					menu1.want_new_game = false;
 				}
-				else if (menu1.want_player_respawn || (!menu1.shown && !
-						game_has_player(game1))) {
+				else if ((menu1.want_player_respawn || !menu1.shown) && !game_has_player(game1)) {
 					let level_x = Number(game1.respawn_level.split("x")[0]);
 					let level_y = Number(game1.respawn_level.split("x")[1]);
 					if (!game1.settings.respawn_on_current_level) {
@@ -181,6 +180,8 @@
 					player_create(game1, 1250 + level_x * 2500, 1250 + level_y * 2500,
 						true, menu1.want_spawn_ai);
 					menu1.want_player_respawn = false;
+					menu1.buttons = menu1.main_menu_buttons;
+					menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf("respawn and continue game")] = "continue game";
 				}
 				else {
 					game1.show_gui = true;
