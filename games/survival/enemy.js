@@ -1,3 +1,4 @@
+let DEBUG_ENEMY = false;
 let DAMAGE_COEFFICIENT = 1;
 
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
@@ -145,14 +146,14 @@ function enemy_destroy(enemy_object, death = true) {
 	if (enemy_object.destroyed)
 		return;
 	let g = enemy_object.game;
-	g.debug_console.unshift("destroying enemy");
 	if (enemy_object.data.hit_by_player && enemy_object.data.hunger > 0 &&
 		death) {
 		if (g.enemy_kills[enemy_object.data.type] === undefined)
 			g.enemy_kills[enemy_object.data.type] = 0;
 		g.enemy_kills[enemy_object.data.type] += 1;
-		g.debug_console.unshift("killed " + enemy_object.data.type + ": " + g
-			.enemy_kills[enemy_object.data.type]);
+		if (DEBUG_ENEMY)
+			g.debug_console.unshift("killed " + enemy_object.data.type + ": " +
+				g.enemy_kills[enemy_object.data.type]);
 		if (enemy_object.data.boss) {
 			g.boss_kills += 1;
 			for (let nextType in ENEMY_TYPES) {
@@ -168,14 +169,17 @@ function enemy_destroy(enemy_object, death = true) {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
 		}
-		g.debug_console.unshift("need kills for boss: " + g.kills_for_boss +
-			", kills: " + g.kills);
+		if (DEBUG_ENEMY)
+			g.debug_console.unshift("need kills for boss: " + g.kills_for_boss +
+				", kills: " + g.kills);
 	}
 	if (enemy_object.data.boss && enemy_object.data.hit_by_player &&
 		enemy_object.data.hunger <= 0 && death) {
 		g.kills_for_boss = Math.max(32, g.kills_for_boss);
-		g.debug_console.unshift("couldn't defeat boss, need kills for boss: " +
-			g.kills_for_boss + ", kills: " + g.kills);
+		if (DEBUG_ENEMY)
+			g.debug_console.unshift(
+				"couldn't defeat boss, need kills for boss: " + g
+				.kills_for_boss + ", kills: " + g.kills);
 	}
 	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
 	enemy_object.data.body = null;
@@ -319,7 +323,7 @@ function enemy_update(enemy_object, dt) {
 				}
 				else dropData.N = 5 * Math.random();
 			}
-			if (!e.bossa && Math.random() < 0.25)
+			if (!e.boss && Math.random() < 0.25)
 				dropData.N = 2;
 			let sound = e.boss ? "data/sfx/zombie_boss_dies_1.mp3" :
 				"data/sfx/zombie_dies_1.mp3";

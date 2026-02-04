@@ -1,5 +1,6 @@
 function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	"default", health = null, fuel = null) {
+	return;
 	if (type === "default" && Math.random() < 0.01)
 		type = "taxi";
 	if (g.objects["shooting laser"] && Math.random() < 0.25) is_tank = true;
@@ -82,7 +83,6 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 
 function car_destroy(car_object) {
 	if (car_object.destroyed) return;
-	car_object.game.debug_console.unshift("destroying car");
 	let player_object = game_object_find_closest(car_object.game, car_object
 		.data.body.position.x, car_object.data.body.position.y, "player",
 		100);

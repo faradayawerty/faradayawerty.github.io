@@ -1,3 +1,5 @@
+let DEBUG_ACHIEVEMENTS = false;
+
 function achievements_create(g) {
 	const achievementsList = Object.keys(ACHIEVEMENT_REGISTRY).map(key => {
 		const entry = ACHIEVEMENT_REGISTRY[key];
@@ -118,6 +120,7 @@ function achievements_update(ae, dt) {
 }
 
 function achievements_draw(ae, ctx) {
+	let drawTime = performance.now();
 	let as = ae.data.achievements;
 	let scale = get_scale();
 	ctx.globalAlpha = 0.75;
@@ -149,6 +152,11 @@ function achievements_draw(ae, ctx) {
 	let mx = ae.game.input.mouse.x / scale;
 	let my = ae.game.input.mouse.y / scale;
 	let hoveredAchKey = null;
+	if (DEBUG_ACHIEVEMENTS)
+		ae.game.debug_console.unshift(
+			'1st step in achievements draw completed in ' + (performance.now() -
+				drawTime));
+	drawTime = performance.now();
 	for (let key in ACHIEVEMENT_REGISTRY) {
 		let config = ACHIEVEMENT_REGISTRY[key];
 		let ix = startX + config.grid.x * (w * spacing);
@@ -169,6 +177,10 @@ function achievements_draw(ae, ctx) {
 			}
 		}
 	}
+	if (DEBUG_ACHIEVEMENTS)
+		ae.game.debug_console.unshift(
+			'2st step in achievements draw completed in ' + (performance.now() -
+				drawTime));
 	if (hoveredAchKey) {
 		achievement_draw_popup(ctx, ae, hoveredAchKey, mx, my, w, h);
 	}
@@ -182,19 +194,35 @@ function achievement_get(as, name) {
 }
 
 function achievement_do(as, name, ash = null, silent = false) {
+	if (DEBUG_ACHIEVEMENTS && false)
+		game1.debug_console.unshift("doing achievement " + name);
 	let achData = achievement_get(as, name);
-	if (!achData || achData.done) return;
+	if (!achData) {
+		return;
+	}
+	if (achData.done) return;
 	const config = ACHIEVEMENT_REGISTRY[name];
-	if (config && config.req) {
+	if (!config) {
+		achData.done = true;
+		return;
+	}
+	if (config.req) {
 		achievement_do(as, config.req, ash, silent);
 		let reqAch = achievement_get(as, config.req);
-		if (reqAch && !reqAch.done) return;
-	}
-	if (ash && !silent) {
-		audio_play("data/sfx/achievement_get_1.mp3", 0.1875);
-		ash.data.achievements.unshift(name);
+		if (!reqAch || !reqAch.done) {
+			return;
+		}
 	}
 	achData.done = true;
+	if (ash && !silent) {
+		ash.data.achievements.unshift(name);
+		try {
+			audio_play("data/sfx/achievement_get_1.mp3", 0.1875);
+		}
+		catch (e) {
+			console.error("Audio play failed:", e);
+		}
+	}
 }
 
 function achievements_shower_create(g, ae = null) {
@@ -408,6 +436,7 @@ function get_achievement_palette(done, animstate) {
 
 function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
 	50, bby = 50, bbw = 1000, bbh = 1000, animstate = null, back = true) {
+	let drawTime = performance.now();
 	if (x < bbx || x > bbw - 0.2 * w || y < bby || y > bbh - 0.2 * h || !name)
 		return;
 	const config = ACHIEVEMENT_REGISTRY[name];
@@ -431,4 +460,7 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
 		ctx.globalAlpha *= 4;
 	}
 	config.draw(ctx, x, y, w, h, p);
+	if (DEBUG_ACHIEVEMENTS)
+		game1.debug_console.unshift('drawn icon ' + name + ' in ' + (performance
+			.now() - drawTime));
 }

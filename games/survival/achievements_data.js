@@ -1,3 +1,4 @@
+let DEBUG_ACHIEVEMENTS_REGISTRY = true;
 let ACHIEVEMENT_REGISTRY = {
 	"bossifier": {
 		grid: {
@@ -15,11 +16,13 @@ let ACHIEVEMENT_REGISTRY = {
 		req: "shoot 'em up",
 		draw: (ctx, x, y, w, h, p) => {
 			if (p.c0 === "black") {
-				ctx.filter = "grayscale(100%) opacity(100%)";
+				const grayIcon = get_bossifier_gray_icon(ctx, w, h);
+				ctx.drawImage(grayIcon, x, y, w, h);
 			}
-			item_draw_bossifier_icon(ctx, x, y, w, h, p.animstate || 0,
-				"regular");
-			ctx.filter = "none";
+			else {
+				item_draw_bossifier_icon(ctx, x, y, w, h, p.animstate ||
+					0, "regular");
+			}
 		}
 	},
 	"joining in": {

@@ -1,8 +1,14 @@
+let DEBUG_CREATION = false;
+let DEBUG_UPDATE = false;
+let DEBUG_DRAW = false;
+let DEBUG_ELEMENTS_UPDATE = false;
+let DEBUG_ELEMENTS_DRAW = false;
+let DO_AUTOSAVES = false;
+
 function game_create(input_, engine_, audios_) {
 	let g = {
 		autosave_timer: 120001,
 		want_levels: [],
-		level_set_delay: 100,
 		respawn_level: "0x0",
 		visited_levels: ["0x0"],
 		assigned_tiles: [LEVEL_TILE_START],
@@ -16,6 +22,12 @@ function game_create(input_, engine_, audios_) {
 		input: input_,
 		audio: audios_,
 		engine: engine_,
+		creationDurations: {},
+		updateDurations: {},
+		drawDurations: {},
+		totalUpdates: {},
+		totalDraws: {},
+		totalCreations: {},
 		settings: {
 			language: "english",
 			auto_aim: false,
@@ -102,12 +114,12 @@ function game_new(g, force_clean = false) {
 
 function game_object_create(g, name_, data_, func_update, func_draw,
 	func_destroy, unique_name_ = null) {
+	let creationTime = performance.now();
 	let debug_line = "creating " + name_;
 	if (name_ != "item" && name_ != "bound" && name_ != "decorative" && name_ !=
 		"bullet" && name_ != "rocket")
-		g.debug_console.unshift(debug_line);
-	if (g.debug_console.length > 50)
-		g.debug_console.pop();
+		if (g.debug_console.length > 50)
+			g.debug_console.pop();
 	if (unique_name_ && g.objects.find((obj) => obj.unique_name ==
 			unique_name_))
 		return -1;
@@ -120,12 +132,54 @@ function game_object_create(g, name_, data_, func_update, func_draw,
 		draw: func_draw,
 		destroy: func_destroy,
 		persistent: true,
-		destroyed: false
+		destroyed: false,
+		prevX: 0,
+		prevY: 0
 	};
-	g.objects.push(obj);
-	game_objects_arrange(g);
-	let iobj = g.objects.indexOf(obj);
-	return iobj;
+	const weights = {
+		"bound": 1,
+		"decorative_roof": 2,
+		"decorative_leaves": 3,
+		"decorative_trunk": 4,
+		"decorative_hotdogs": 5,
+		"decorative_fuel_pump": 6,
+		"shield": 7,
+		"rocket": 8,
+		"player": 9,
+		"animal": 10,
+		"enemy": 11,
+		"item": 12,
+		"car": 13,
+		"trashcan": 14,
+		"bullet": 15,
+		"trashbullet": 16,
+		"decorative_wall": 17,
+		"decorative": 18,
+		"decorative_grass": 19,
+		"decorative_level_base": 20,
+		"decorative_no_tree_zone": 21
+	};
+	const newWeight = weights[name_] || 0;
+	let insertIndex = g.objects.length;
+	for (let i = 0; i < g.objects.length; i++) {
+		let currentWeight = weights[g.objects[i].name] || 0;
+		if (newWeight > currentWeight) {
+			insertIndex = i;
+			break;
+		}
+	}
+	g.objects.splice(insertIndex, 0, obj);
+	if (DEBUG_CREATION) {
+		if (g.totalCreations[name_] === undefined)
+			g.totalCreations[name_] = 0;
+		else
+			g.totalCreations[name_] += 1;
+		if (g.creationDurations[name_] === undefined)
+			g.creationDurations[name_] = 0;
+		else
+			g.creationDurations[name_] += (performance.now() - creationTime);
+	}
+	return insertIndex;
 }
 
 function game_gui_element_create(g, name_, data_, func_update, func_draw,
@@ -144,7 +198,6 @@ function game_gui_element_create(g, name_, data_, func_update, func_draw,
 }
 
 function game_update(g, dt) {
-	g.level_set_delay += dt;
 	if (!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
 	}
@@ -189,12 +242,40 @@ function game_update(g, dt) {
 	g.objects = g.objects.filter((obj) => !obj.destroyed);
 	g.gui_elements = g.gui_elements.filter((elem) => !elem.destroyed);
 	for (let i = 0; i < g.objects.length; i++) {
-		if (!g.objects[i].destroyed)
+		if (!g.objects[i].destroyed) {
+			if (g.objects[i].data) {
+				if (g.objects[i].data.body) {
+					g.objects[i].prevX = g.objects[i].data.body.position.x;
+					g.objects[i].prevY = g.objects[i].data.body.position.y;
+				}
+				else {
+					g.objects[i].prevX = g.objects[i].data.x || 0;
+					g.objects[i].prevY = g.objects[i].data.y || 0;
+				}
+			}
+			let updateTime = performance.now();
 			g.objects[i].update(g.objects[i], dt);
+			if (DEBUG_UPDATE) {
+				if (g.totalUpdates[g.objects[i].name] === undefined)
+					g.totalUpdates[g.objects[i].name] = 0;
+				else
+					g.totalUpdates[g.objects[i].name] += 1;
+				if (g.updateDurations[g.objects[i].name] === undefined)
+					g.updateDurations[g.objects[i].name] = 0;
+				else
+					g.updateDurations[g.objects[i].name] += (performance.now() -
+						updateTime);
+			}
+		}
 	}
 	for (let i = 0; i < g.gui_elements.length; i++) {
-		if (!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
+		if (!g.gui_elements[i].destroyed && g.gui_elements[i].shown) {
+			let updateTime = performance.now();
 			g.gui_elements[i].update(g.gui_elements[i], dt);
+			if (DEBUG_ELEMENTS_UPDATE)
+				g.debug_console.unshift('updated ' + g.gui_elements[i].name +
+					' in ' + (performance.now() - updateTime));
+		}
 	}
 	if (g.debug_console.length > 50)
 		g.debug_console.pop();
@@ -209,39 +290,102 @@ function game_update(g, dt) {
 	}
 	bindings_update();
 	g.autosave_timer = (g.autosave_timer || 0) + dt;
-	if (g.autosave_timer > 120000) {
+	if (g.autosave_timer > 120000 && DO_AUTOSAVES) {
 		game_autosave(g);
 		g.autosave_timer = 0;
 	}
+	const logSortedMetrics = (title, durations, totals) => {
+		Object.entries(durations)
+			.map(([key, value]) => ({
+				key,
+				avg: value / (totals[key] || 1)
+			}))
+			.sort((a, b) => b.avg - a.avg)
+			.forEach(item => {
+				g.debug_console.unshift(
+					`${title} ${item.key}: ${item.avg.toFixed(4)}ms`
+					);
+			});
+	};
+	if (DEBUG_CREATION) {
+		logSortedMetrics("CREATE", g.creationDurations, g.totalCreations);
+	}
+	if (DEBUG_UPDATE) {
+		logSortedMetrics("UPDATE", g.updateDurations, g.totalUpdates);
+	}
+	if (DEBUG_DRAW) {
+		logSortedMetrics("DRAW", g.drawDurations, g.totalDraws);
+	}
 }
 
-function game_draw(g, ctx) {
+function game_draw(g, ctx, alpha) {
 	ctx.save();
 	if (g.camera_target_body) {
-		g.offset_x = g.camera_target_body.position.x;
-		g.offset_y = g.camera_target_body.position.y;
+		let targetObj = g.objects.find(obj => obj.data && obj.data.body === g
+			.camera_target_body);
+		if (targetObj) {
+			g.offset_x = targetObj.prevX + (g.camera_target_body.position.x -
+				targetObj.prevX) * alpha;
+			g.offset_y = targetObj.prevY + (g.camera_target_body.position.y -
+				targetObj.prevY) * alpha;
+		}
+		else {
+			g.offset_x = g.camera_target_body.position.x;
+			g.offset_y = g.camera_target_body.position.y;
+		}
 	}
 	ctx.scale(g.scale, g.scale);
 	ctx.translate(0.5 * window.innerWidth / g.scale - g.offset_x, 0.5 * window
 		.innerHeight / g.scale - g.offset_y);
 	for (let i = 0; i < g.objects.length; i++)
-		if (!g.objects[i].destroyed)
+		if (!g.objects[i].destroyed) {
+			let drawTime = performance.now();
+			let curX = (g.objects[i].data && g.objects[i].data.body) ? g
+				.objects[i].data.body.position.x : (g.objects[i].data ? g
+					.objects[i].data.x : null);
+			let curY = (g.objects[i].data && g.objects[i].data.body) ? g
+				.objects[i].data.body.position.y : (g.objects[i].data ? g
+					.objects[i].data.y : null);
+			ctx.save();
+			if (curX !== null && curY !== null) {
+				let shiftX = (curX - g.objects[i].prevX) * (alpha - 1);
+				let shiftY = (curY - g.objects[i].prevY) * (alpha - 1);
+				ctx.translate(shiftX, shiftY);
+			}
 			g.objects[i].draw(g.objects[i], ctx);
+			ctx.restore();
+			if (DEBUG_DRAW) {
+				if (g.totalDraws[g.objects[i].name] === undefined)
+					g.totalDraws[g.objects[i].name] = 0;
+				else
+					g.totalDraws[g.objects[i].name] += 1;
+				if (g.drawDurations[g.objects[i].name] === undefined)
+					g.drawDurations[g.objects[i].name] = 0;
+				else
+					g.drawDurations[g.objects[i].name] += (performance.now() -
+						drawTime);
+			}
+		}
 	ctx.restore();
 	if (!g.show_gui)
 		return;
 	if (g.debug) {
 		ctx.save();
 		ctx.scale(get_scale(), get_scale());
-		for (let i = 0; i < g.debug_console.length; i++)
+		for (let i = 0; i < Math.min(50, g.debug_console.length); i++)
 			drawText(ctx, 50, 110 + i * 20, g.debug_console[i]);
 		ctx.restore();
 	}
 	ctx.save()
 	ctx.scale(get_scale(), get_scale());
 	for (let i = 0; i < g.gui_elements.length; i++) {
-		if (!g.gui_elements[i].destroyed && g.gui_elements[i].shown)
+		if (!g.gui_elements[i].destroyed && g.gui_elements[i].shown) {
+			let drawTime = performance.now();
 			g.gui_elements[i].draw(g.gui_elements[i], ctx);
+			if (DEBUG_ELEMENTS_DRAW)
+				g.debug_console.unshift('drawn ' + g.gui_elements[i].name +
+					' in ' + (performance.now() - drawTime));
+		}
 	}
 	ctx.restore();
 	if (g.mobile) {
@@ -597,6 +741,10 @@ function game_load(g) {
 }
 
 function game_autosave(g) {
+	if (!game_has_player(g)) {
+		console.log('Автосохранение невозможно - нет игрока.');
+		return;
+	}
 	let objs = [];
 	let state_object = {
 		name: "state",
@@ -674,5 +822,5 @@ function game_autoload(g) {
 }
 
 function game_has_player(g) {
-	return g.objects.some(obj => obj.name === "player");
+	return g.objects.some(obj => obj.name === "player" && !obj.destroyed);
 }

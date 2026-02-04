@@ -27,6 +27,8 @@
 			border: 0px solid;
 			display: block;
 			image-rendering: pixelated;
+			backface-visibility: hidden;
+			will-change: transform;
 		}
 	</style>
 </head>
@@ -69,12 +71,35 @@
 	<script>
 		let DPR = window.devicePixelRatio || 1;
 		let cvs1 = document.getElementById("canvas");
-		let ctx1 = cvs1.getContext("2d");
+		let ctx1 = cvs1.getContext("2d", { alpha: false });
 		let engine1 = Matter.Engine.create();
 		let input1 = input_create();
 		let audios1 = null;
 		let menu1 = menu_create();
 		let game1 = game_create(input1, engine1, audios1);
+		let frameRate = 1000 / 60;
+		let totalUpdates = 0;
+		let totalDraws = 0;
+		let totalTimeUpdates = 0;
+		let totalTimeDraws = 0;
+		let gameStartTime = 0;
+		let totalEngineUpdates = 0;
+		let accumulatorEngine = 0;
+		let accumulatorUpdate = 0;
+		let accumulatorDraw = 0;
+		let DEBUG_INDEX = false;
+
+		function get_scale() {
+			return Math.min(window.innerWidth / 1200, window.innerHeight / 1200);
+		}
+
+		function resize() {
+			DPR = window.devicePixelRatio || 1;
+			cvs1.width = window.innerWidth * DPR;
+			cvs1.height = window.innerHeight * DPR;
+			game1.scale = 0.6328125 / DPR;
+		}
+		window.addEventListener('resize', resize);
 		document.addEventListener("visibilitychange", function() {
 			if (document.hidden)
 				menu1.shown = true;
@@ -89,19 +114,19 @@
 		});
 		document.addEventListener('contextmenu', event => event.preventDefault());
 
-		function get_scale() {
-			return Math.min(window.innerWidth / 1200, window.innerHeight / 1200);
-		}
-
 		function animate(lastUpdateTime) {
 			// calculate delta time
-			let dt = Date.now() - lastUpdateTime;
+			let dt = performance.now() - lastUpdateTime;
 			if (dt > 50)
 				dt = 50;
-			lastUpdateTime = Date.now();
+			lastUpdateTime = performance.now();
+			if (!menu1.shown) {
+				accumulatorEngine += dt;
+				accumulatorUpdate += dt;
+				accumulatorDraw += dt;
+			}
 			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
-			ctx1.canvas.width = window.innerWidth * DPR;
-			ctx1.canvas.height = window.innerHeight * DPR;
+			ctx1.save();
 			ctx1.scale(DPR, DPR);
 			ctx1.fillStyle = "black";
 			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
@@ -146,6 +171,30 @@
 					game1.mobile = true;
 				if (game1.mobile)
 					menu1.iselected = -1;
+				if (game_has_player(game1)) {
+					let makeMenu = false;
+					if (menu1.buttons == menu1.main_menu_buttons)
+						makeMenu = true;
+					menu1.main_menu_buttons = [
+						"continue game",
+						"settings",
+						"save game",
+						"load game",
+					];
+					if (makeMenu)
+						menu1.buttons = menu1.main_menu_buttons;
+				}
+				else {
+					let makeMenu = false;
+					if (menu1.buttons == menu1.main_menu_buttons)
+						makeMenu = true;
+					menu1.main_menu_buttons = [
+						"continue game",
+						"settings",
+					];
+					if (makeMenu)
+						menu1.buttons = menu1.main_menu_buttons;
+				}
 				// update game if menu is not shown, else update menu
 				if (isKeyDown(input1, 'escape', true)) {
 					menu1.shown = !menu1.shown;
@@ -170,7 +219,8 @@
 					game_new(game1, true);
 					menu1.want_new_game = false;
 				}
-				else if ((menu1.want_player_respawn || !menu1.shown) && !game_has_player(game1)) {
+				else if ((menu1.want_player_respawn || !menu1.shown) && !
+					game_has_player(game1)) {
 					let level_x = Number(game1.respawn_level.split("x")[0]);
 					let level_y = Number(game1.respawn_level.split("x")[1]);
 					if (!game1.settings.respawn_on_current_level) {
@@ -181,20 +231,72 @@
 						true, menu1.want_spawn_ai);
 					menu1.want_player_respawn = false;
 					menu1.buttons = menu1.main_menu_buttons;
-					menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf("respawn and continue game")] = "continue game";
+					menu1.main_menu_buttons[menu1.main_menu_buttons.indexOf(
+						"respawn and continue game")] = "continue game";
 				}
 				else {
 					game1.show_gui = true;
-					game_update(game1, dt);
-					Matter.Engine.update(engine1, dt);
+					let updateTime = performance.now();
+					while (accumulatorUpdate >= frameRate) {
+						game_update(game1, frameRate);
+						accumulatorUpdate -= frameRate;
+						if (DEBUG_INDEX) {
+							let deltaTimeUpdate = performance.now() - updateTime;
+							totalTimeUpdates += deltaTimeUpdate;
+							totalUpdates++;
+							if (deltaTimeUpdate > 3 * totalTimeUpdates /
+								totalUpdates) {
+								console.log('большой скачок game_update!');
+							}
+							game1.debug_console.unshift('game_update: ' +
+								totalTimeUpdates / totalUpdates);
+							game1.debug_console.unshift('ups: ' + 1000 *
+								totalUpdates / (performance.now() - gameStartTime)
+								);
+							game1.debug_console.unshift('ups (now): ' + (1000 / dt)
+								.toFixed(1));
+						}
+					}
+					while (accumulatorEngine >= frameRate) {
+						Matter.Engine.update(engine1, frameRate);
+						accumulatorEngine -= frameRate;
+						if (DEBUG_INDEX) {
+							totalEngineUpdates++;
+							game1.debug_console.unshift('engine ups: ' + 1000 *
+								totalEngineUpdates / (performance.now() -
+									gameStartTime));
+						}
+					}
 				}
-				game_draw(game1, ctx1);
+				let alpha = accumulatorUpdate / frameRate;
+				if (menu1.shown)
+					alpha = 0;
+				let drawTime = performance.now();
+				game_draw(game1, ctx1, alpha);
+				if (DEBUG_INDEX) {
+					totalTimeDraws += performance.now() - drawTime;
+					totalDraws++;
+					game1.debug_console.unshift('game_draw: ' + totalTimeDraws /
+						totalDraws);
+					game1.debug_console.unshift('fps: ' + 1000 * totalDraws / (
+						performance.now() - gameStartTime));
+					game1.debug_console.unshift('fps (now): ' + (1000 / dt).toFixed(
+						1));
+				}
 				if (menu1.shown)
 					menu_draw(ctx1, menu1);
 			}
 			catch (e) {
 				console.error(e.stack);
 				console.log(game1, menu1);
+			}
+			ctx1.restore();
+			if (DEBUG_INDEX && performance.memory) {
+				let memory = performance.memory;
+				game1.debug_console.unshift('used: ' + (memory.usedJSHeapSize / 1024 /
+					1024).toFixed(2) + ' MB');
+				game1.debug_console.unshift('total: ' + (memory.totalJSHeapSize /
+					1024 / 1024).toFixed(2) + ' MB');
 			}
 			window.requestAnimationFrame(function() {
 				animate(lastUpdateTime);
@@ -209,12 +311,14 @@
 				initializeKeyboardInput(input1.keys);
 				initializeMouseInput(input1.mouse, ctx1);
 				initializeTouchInput(input1.touch, input1.joystick, ctx1);
+				resize();
+				gameStartTime = performance.now();
 			}
 			catch (e) {
 				console.error(e.stack);
 				console.log(game1, menu1);
 			}
-			animate(Date.now());
+			animate(performance.now());
 		}
 		main()
 	</script>

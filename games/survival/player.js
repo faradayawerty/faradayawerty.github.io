@@ -1,3 +1,5 @@
+let DEBUG_PLAYER = false;
+
 function player_create(g, x, y, respawn = false, ai_controlled = false) {
 	let width = 40,
 		height = 40;
@@ -98,7 +100,6 @@ function player_destroy(player_object) {
 		return;
 	let p = player_object.data;
 	let g = player_object.game;
-	g.debug_console.unshift("destroying player");
 	if (!level_visible(g, p.want_level, player_object))
 		game_destroy_level(g, p.want_level);
 	if (player_object.game.camera_target_body == player_object.data.body)
@@ -196,7 +197,7 @@ function player_update(player_object, dt) {
 	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.002 * dt;
 	if (p.shield_green_health > 0) p.shield_green_health -= 0.002 * dt;
 	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.002 * dt;
-	if (p.saved_health - p.health > 1) {
+	if (DEBUG_PLAYER && p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(
 				p.health) + ", change " + Math.round(p.saved_health - p
 				.health) +

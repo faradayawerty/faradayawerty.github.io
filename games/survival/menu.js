@@ -220,7 +220,7 @@ function menu_update(m, dt, input) {
 	for (let i = 0; i < m.buttons.length; i++)
 		if ((!m.mobile && doRectsCollide(input.mouse.x / get_scale(), input
 				.mouse.y / get_scale(), 0, 0,
-				80, 40 + 60 * i, 1000 + 30 * menu_translate(m.want_language,
+				80, 40 + 60 * i, 80 + 30 * menu_translate(m.want_language,
 					m.buttons[i]).length, 60)) ||
 			(input.touch && input.touch.length > 0 && doRectsCollide(input
 				.touch[0].x / get_scale(), input.touch[0].y / get_scale(),
@@ -237,9 +237,8 @@ function menu_update(m, dt, input) {
 		m.want_player_respawn = true;
 		menu1.buttons = menu1.main_menu_buttons;
 	}
-	m.pressed_this_frame = (isKeyDown(input, ' ', true) || isKeyDown(input,
-		'enter', true) || isMouseLeftButtonPressed(input) || (
-		isScreenTouched(input)));
+	m.pressed_this_frame = isKeyDown(input, 'enter', true) ||
+		isMouseLeftButtonPressed(input) || (isScreenTouched(input));
 	if ((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) &&
 		m.iselected < m.buttons.length - 1) {
 		m.iselected += 1;

@@ -1,7 +1,6 @@
+let DEBUG_LEVEL = false;
+
 function levels_set(g, level, old_level = null) {
-	g.debug_console.unshift("time from previous level creation " + g
-		.level_set_delay);
-	g.level_set_delay = 0;
 	let [level_x, level_y] = level.split("x").map(Number);
 	let Ox = 2500 * level_x;
 	let Oy = 2500 * level_y;
@@ -18,8 +17,10 @@ function levels_set(g, level, old_level = null) {
 			available_tiles = [LEVEL_TILE_DEFAULT];
 		}
 		g.assigned_tiles.push(getRandomTileByWeight(available_tiles));
-		g.debug_console.unshift("new level: " + level);
-		g.debug_console.unshift("available tiles: " + available_tiles);
+		if (DEBUG_LEVEL) {
+			g.debug_console.unshift("new level: " + level);
+			g.debug_console.unshift("available tiles: " + available_tiles);
+		}
 		g.visited_levels.push(level);
 	}
 	let tile = g.assigned_tiles[g.visited_levels.indexOf(level)];
@@ -40,6 +41,7 @@ function levels_set(g, level, old_level = null) {
 	}
 	let base_color = config.base_color || "gray";
 	decorative_level_base_create(g, Ox, Oy, base_color);
+	game_autosave(g);
 }
 
 function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {

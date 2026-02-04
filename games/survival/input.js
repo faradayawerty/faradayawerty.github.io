@@ -30,7 +30,8 @@ function input_create() {
 			},
 			radius: 50
 		},
-		touch: []
+		touch: [],
+		language: "english"
 	};
 }
 

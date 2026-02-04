@@ -1,3 +1,6 @@
+let DEBUG_ITEM = false;
+let BOSSIFIER_GRAY_CACHE = null;
+
 function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 	let available_guns = [ITEM_GUN];
 	let available_ammos = [ITEM_AMMO];
@@ -241,18 +244,19 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		item = available_ammos[Math.floor(Math.random() * available_ammos
 			.length)];
 	a += chance_ammo;
-	g.debug_console.unshift(
-		"item_spawn" +
-		" i:" + item +
-		" r:" + Math.round(100 * r) + "%" +
-		" H:" + Math.round(100 * chance_health) + "%" +
-		" S:" + Math.round(100 * chance_shield) + "%" +
-		" W:" + Math.round(100 * chance_gun) + "%" +
-		" G:" + Math.round(100 * chance_fuel) + "%" +
-		" F:" + Math.round(100 * chance_food) + "%" +
-		" D:" + Math.round(100 * chance_drink) + "%" +
-		" A:" + Math.round(100 * chance_ammo) + "%"
-	);
+	if (DEBUG_ITEM)
+		g.debug_console.unshift(
+			"item_spawn" +
+			" i:" + item +
+			" r:" + Math.round(100 * r) + "%" +
+			" H:" + Math.round(100 * chance_health) + "%" +
+			" S:" + Math.round(100 * chance_shield) + "%" +
+			" W:" + Math.round(100 * chance_gun) + "%" +
+			" G:" + Math.round(100 * chance_fuel) + "%" +
+			" F:" + Math.round(100 * chance_food) + "%" +
+			" D:" + Math.round(100 * chance_drink) + "%" +
+			" A:" + Math.round(100 * chance_ammo) + "%"
+		);
 	if (enemy_type == "deer")
 		item = ITEM_CANNED_MEAT;
 	if (enemy_type == "raccoon")
@@ -376,4 +380,22 @@ function item_draw_bossifier_icon(ctx, x, y, w, h, animstate, enemyType) {
 	if (typeCfg && typeCfg.render_icon) {
 		typeCfg.render_icon(ctx, x, y, w, h);
 	}
+}
+
+function get_bossifier_gray_icon(ctx, w, h) {
+	if (!BOSSIFIER_GRAY_CACHE) {
+		const tempCanvas = document.createElement('canvas');
+		tempCanvas.width = w;
+		tempCanvas.height = h;
+		const tempCtx = tempCanvas.getContext('2d');
+		item_draw_bossifier_icon(tempCtx, 0, 0, w, h, 0, "regular");
+		const grayCanvas = document.createElement('canvas');
+		grayCanvas.width = w;
+		grayCanvas.height = h;
+		const gctx = grayCanvas.getContext('2d');
+		gctx.filter = "grayscale(100%)";
+		gctx.drawImage(tempCanvas, 0, 0);
+		BOSSIFIER_GRAY_CACHE = grayCanvas;
+	}
+	return BOSSIFIER_GRAY_CACHE;
 }
