@@ -46,6 +46,35 @@ const WEAPON_DEFS = {
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
 			.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25)
 	},
+	[ITEM_KALASHNIKOV]: {
+		cooldown: 130,
+		ammo: ITEM_AMMO,
+		chance: 0.008,
+		sound: "data/sfx/gunshot_1.mp3",
+		vol: 0.2,
+		color: "#333333",
+		length: 1.4,
+		width: 1.1,
+		action: (g, p, v) => {
+			let spread = 25;
+			let dx = (v.tx - v.sx) + (Math.random() - 0.5) * spread;
+			let dy = (v.ty - v.sy) + (Math.random() - 0.5) * spread;
+			bullet_create(
+				g,
+				p.body.position.x,
+				p.body.position.y,
+				dx,
+				dy,
+				22,
+				0.35 + 0.35 * Math.random(),
+				false,
+				7,
+				1500,
+				"#ffcc00",
+				"orange"
+			);
+		}
+	},
 	[ITEM_DESERT_EAGLE]: {
 		cooldown: 600,
 		ammo: ITEM_AMMO,
@@ -74,7 +103,7 @@ const WEAPON_DEFS = {
 			v.tx - v.sx,
 			v.ty - v.sy,
 			25,
-			1.5
+			1.5 + 2 * Math.random()
 		)
 	},
 	[ITEM_PLASMA_PISTOL]: {

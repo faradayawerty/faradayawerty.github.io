@@ -16,7 +16,7 @@ function levels_set(g, level, old_level = null) {
 		if (available_tiles.length < 1) {
 			available_tiles = [LEVEL_TILE_DEFAULT];
 		}
-		g.assigned_tiles.push(getRandomTileByWeight(available_tiles));
+		g.assigned_tiles.push(getRandomTileByWeight(g, level, available_tiles));
 		if (DEBUG_LEVEL) {
 			g.debug_console.unshift("new level: " + level);
 			g.debug_console.unshift("available tiles: " + available_tiles);
@@ -219,18 +219,38 @@ function getAvailableTiles(g, level) {
 		});
 }
 
-function getRandomTileByWeight(availableTiles) {
+function getRandomTileByWeight(g, level, availableTiles) {
 	if (availableTiles.length === 0) return LEVEL_TILE_DEFAULT;
-	let totalWeight = availableTiles.reduce((sum, tileId) => {
-		return sum + (TILES[tileId].weight || 1);
-	}, 0);
+	let allowedTiles = availableTiles.filter(tileId => {
+		let tileTheme = Math.floor(tileId / 200) * 200;
+		if (tileTheme === THEME_DESERT) {
+			return g.available_enemies.includes("shooting");
+		}
+		return true;
+	});
+	if (allowedTiles.length === 0) allowedTiles = [LEVEL_TILE_DEFAULT];
+	let neighborThemes = [
+		level_tile_get_neighbour_west(g, level),
+		level_tile_get_neighbour_east(g, level),
+		level_tile_get_neighbour_north(g, level),
+		level_tile_get_neighbour_south(g, level)
+	].filter(id => id > 0).map(id => Math.floor(id / 200) * 200);
+	let totalWeight = 0;
+	let weights = allowedTiles.map(tileId => {
+		let baseWeight = TILES[tileId].weight || 1;
+		let tileTheme = Math.floor(tileId / 200) * 200;
+		let finalWeight = neighborThemes.includes(tileTheme) ?
+			baseWeight * 8 : baseWeight;
+		totalWeight += finalWeight;
+		return finalWeight;
+	});
 	let random = Math.random() * totalWeight;
 	let currentSum = 0;
-	for (let tileId of availableTiles) {
-		currentSum += (TILES[tileId].weight || 1);
+	for (let i = 0; i < allowedTiles.length; i++) {
+		currentSum += weights[i];
 		if (random <= currentSum) {
-			return tileId;
+			return allowedTiles[i];
 		}
 	}
-	return availableTiles[0];
+	return allowedTiles[0];
 }

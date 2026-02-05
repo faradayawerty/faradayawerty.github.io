@@ -1,3 +1,6 @@
+let THEME_FOREST = 0;
+let THEME_DESERT = 200;
+let THEME_TAIGA = 400;
 let LEVEL_TILE_VOID = 0;
 let LEVEL_TILE_START = 1;
 let LEVEL_TILE_ROAD_VERTICAL = 2;
@@ -17,6 +20,15 @@ let LEVEL_TILE_RESIDENTIAL_NE = 16;
 let LEVEL_TILE_RESIDENTIAL_T_SOUTH = 17;
 let LEVEL_TILE_CITY_PARK = 18;
 let LEVEL_TILE_HUT_IN_FOREST = 19;
+let LEVEL_TILE_ROAD_CROSSROAD_DESERT = THEME_DESERT + 5;
+let LEVEL_TILE_ROAD_VERTICAL_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_VERTICAL;
+let LEVEL_TILE_ROAD_HORIZONTAL_DESERT = THEME_DESERT +
+	LEVEL_TILE_ROAD_HORIZONTAL;
+let LEVEL_TILE_DEFAULT_DESERT = THEME_DESERT + LEVEL_TILE_DEFAULT;
+let LEVEL_TILE_ROAD_TURN_WN_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_WN;
+let LEVEL_TILE_ROAD_TURN_WS_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_WS;
+let LEVEL_TILE_ROAD_TURN_EN_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_EN;
+let LEVEL_TILE_ROAD_TURN_ES_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_ES;
 let LEVEL_TILES_FOREST_ZONE = [
 	LEVEL_TILE_DEFAULT,
 	LEVEL_TILE_ROAD_HORIZONTAL,
@@ -429,6 +441,174 @@ let TILES = {
 						p[1] + Math.random() * 600, null, tile);
 				}
 			}
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_WN_DESERT]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 0,
+			S: 0,
+			W: 1
+		},
+		base_color: "gray",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 1090, 1090);
+			decorative_sand_create(g, Ox + 1410, Oy, 1090, 2500);
+			decorative_sand_create(g, Ox, Oy + 1410, 1410, 1090);
+			decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_WS_DESERT]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 0,
+			S: 1,
+			W: 1
+		},
+		base_color: "gray",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 2500, 1090);
+			decorative_sand_create(g, Ox, Oy + 1410, 1090, 1090);
+			decorative_sand_create(g, Ox + 1410, Oy + 1090, 1090, 1410);
+			decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_ES_DESERT]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 1,
+			S: 1,
+			W: 0
+		},
+		base_color: "gray",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 2500, 1090);
+			decorative_sand_create(g, Ox, Oy + 1090, 1090, 1410);
+			decorative_sand_create(g, Ox + 1410, Oy + 1410, 1090, 1090);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_EN_DESERT]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 1,
+			S: 0,
+			W: 0
+		},
+		base_color: "gray",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 1090, 1500);
+			decorative_sand_create(g, Ox + 1410, Oy, 1090, 1090);
+			decorative_sand_create(g, Ox, Oy + 1410, 2500, 1090);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_HORIZONTAL_DESERT]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 1,
+			S: 0,
+			W: 1
+		},
+		base_color: "gray",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 2500, 1090);
+			decorative_sand_create(g, Ox, Oy + 1410, 2500, 1090);
+			decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+		}
+	},
+	[LEVEL_TILE_ROAD_VERTICAL_DESERT]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 0,
+			S: 1,
+			W: 0
+		},
+		base_color: "gray",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 1090, 2500);
+			decorative_sand_create(g, Ox + 1410, Oy, 1090, 2500);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
+		}
+	},
+	[LEVEL_TILE_DEFAULT_DESERT]: {
+		weight: 50,
+		connections: {
+			N: 0,
+			E: 0,
+			S: 0,
+			W: 0
+		},
+		base_color: "#E3C16F",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 2500, 2500);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 3 + 1;
+			for (let i = 0; i < N; i++)
+				item_spawn(g, Ox + Math.random() * 2500, Oy + Math
+					.random() * 2500, null, tile);
+		}
+	},
+	[LEVEL_TILE_ROAD_CROSSROAD_DESERT]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 1,
+			S: 1,
+			W: 1
+		},
+		base_color: "gray",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: false,
+		populate: (g, Ox, Oy) => {
+			decorative_sand_create(g, Ox, Oy, 1090, 1090);
+			decorative_sand_create(g, Ox + 1410, Oy, 1090, 1090);
+			decorative_sand_create(g, Ox, Oy + 1410, 1090, 1090);
+			decorative_sand_create(g, Ox + 1410, Oy + 1410, 1090,
+				1090);
+			decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
 		}
 	},
 	[LEVEL_TILE_ROAD_CROSSROAD]: {

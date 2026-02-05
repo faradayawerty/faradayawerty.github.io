@@ -690,5 +690,49 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.strokeStyle = p.c8;
 			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
 		}
-	}
+	},
+	"desert heat": {
+		grid: {
+			x: 6,
+			y: 0
+		},
+		name: {
+			en: "desert heat",
+			ru: "пустынная жара"
+		},
+		desc: {
+			en: "kill one desert dweller",
+			ru: "убейте одного пустынного жителя"
+		},
+		req: "shoot 'em up",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c21;
+			ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			ctx.strokeStyle = p.c22;
+			ctx.lineWidth = 2;
+			ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		}
+	},
+	"sand lord": {
+		grid: {
+			x: 7,
+			y: 0
+		},
+		name: {
+			en: "sand lord",
+			ru: "повелитель песков"
+		},
+		desc: {
+			en: "kill the desert boss",
+			ru: "убейте пустынного босса"
+		},
+		req: "desert heat",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c21;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c20;
+			ctx.lineWidth = 3;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
 };

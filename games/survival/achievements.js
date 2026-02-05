@@ -398,7 +398,10 @@ function get_achievement_palette(done, animstate) {
 		c13: "#1177ff",
 		c14: "#335544",
 		c16: "#cc1111",
-		c15: "black"
+		c15: "black",
+		c20: "#ffcc00",
+		c21: "#c2a26b",
+		c22: "#4d3d21",
 	};
 	if (!done) {
 		p.c0 = "black";
@@ -417,6 +420,9 @@ function get_achievement_palette(done, animstate) {
 		p.c13 = "#777777";
 		p.c14 = "#333333";
 		p.c16 = "#111111";
+		p.c20 = "#111111";
+		p.c21 = "#c2c2c2";
+		p.c22 = "#4d4d4d";
 	}
 	if (animstate !== null) {
 		let r = Math.cos(0.1 * animstate) * 15;

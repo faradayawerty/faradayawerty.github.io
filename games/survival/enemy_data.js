@@ -591,5 +591,79 @@ let ENEMY_TYPES = {
 			item_create(obj.game, ITEM_JUNK_CANNON, obj.data.body
 				.position.x, obj.data.body.position.y);
 		}
-	}
+	},
+	"desert": {
+		name_eng: "desert dweller",
+		name_rus: "пустынный житель",
+		requires: "regular",
+		weight: 2,
+		health: 200,
+		speed: 5.5,
+		damage: 0.25,
+		w: 30,
+		h: 30,
+		color: "#c2a26b",
+		outline: "#4d3d21",
+		range: 450,
+		delay: 400,
+		bossifier_item: ITEM_BOSSIFIER_DESERT,
+		theme: THEME_DESERT,
+		visuals: {
+			draw_gun: false,
+			draw_gun_boss: true,
+			gun_color: "#222222",
+			gun_width: 0.2,
+			outline_width: 1
+		},
+		boss_behaviour: (obj, dt, target, vars) => {
+			let e = obj.data;
+			if (vars.v < e.shooting_range) {
+				if (e.shooting_delay >= 400) {
+					bullet_create(
+						obj.game,
+						e.body.position.x,
+						e.body.position.y,
+						vars.ndx,
+						vars.ndy,
+						18,
+						e.damage,
+						true,
+						e.w * 0.15,
+						1500,
+						"#ffcc00",
+						"orange"
+					);
+					e.shooting_delay = 0;
+				}
+				vars.dx *= 0.5;
+				vars.dy *= 0.5;
+			}
+		},
+		on_death: (obj, target) => {
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"desert heat", target.data
+				.achievements_shower_element);
+		},
+		on_boss_death: (obj, target) => {
+			if (3 * Math.random() < 1)
+				item_create(obj.game, ITEM_REVOLVER, obj.data.body
+					.position.x, obj
+					.data.body.position.y, false, false);
+			else
+				item_create(obj.game, ITEM_KALASHNIKOV, obj.data.body
+					.position.x, obj
+					.data.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data
+				.achievements_element.data.achievements,
+				"sand lord", target.data
+				.achievements_shower_element);
+		},
+		render_icon: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#c2a26b";
+			ctx.fillRect(x + w * 0.35, y + h * 0.45, w * 0.3, h * 0.3);
+			ctx.fillStyle = "#222222";
+			ctx.fillRect(x + w * 0.5, y + h * 0.6, w * 0.25, h * 0.05);
+		},
+	},
 };

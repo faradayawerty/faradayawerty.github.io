@@ -5,6 +5,7 @@ let DEBUG_ELEMENTS_UPDATE = false;
 let DEBUG_ELEMENTS_DRAW = false;
 let DO_AUTOSAVES = false;
 let DEBUG_AMOUNTS = false;
+let INTEROLATION = true;
 
 function game_create(input_, engine_, audios_) {
 	let g = {
@@ -134,9 +135,7 @@ function game_object_create(g, name_, data_, func_update, func_draw,
 		draw: func_draw,
 		destroy: func_destroy,
 		persistent: true,
-		destroyed: false,
-		prevX: 0,
-		prevY: 0
+		destroyed: false
 	};
 	const weights = {
 		"bound": 1,
@@ -345,7 +344,8 @@ function game_draw(g, ctx, alpha) {
 	if (g.camera_target_body) {
 		let targetObj = g.objects.find(obj => obj.data && obj.data.body === g
 			.camera_target_body);
-		if (targetObj) {
+		if (targetObj && targetObj.prevX !== undefined && targetObj.prevY !==
+			undefined) {
 			g.offset_x = targetObj.prevX + (g.camera_target_body.position.x -
 				targetObj.prevX) * alpha;
 			g.offset_y = targetObj.prevY + (g.camera_target_body.position.y -
@@ -369,7 +369,8 @@ function game_draw(g, ctx, alpha) {
 				.objects[i].data.body.position.y : (g.objects[i].data ? g
 					.objects[i].data.y : null);
 			ctx.save();
-			if (curX !== null && curY !== null) {
+			if (INTEROLATION && curX !== null && curY !== null && g.objects[i]
+				.prevX !== undefined && g.objects[i].prevY !== undefined) {
 				let shiftX = (curX - g.objects[i].prevX) * (alpha - 1);
 				let shiftY = (curY - g.objects[i].prevY) * (alpha - 1);
 				ctx.translate(shiftX, shiftY);

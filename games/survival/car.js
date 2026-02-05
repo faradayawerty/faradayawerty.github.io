@@ -1,6 +1,5 @@
 function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	"default", health = null, fuel = null) {
-	return;
 	if (type === "default" && Math.random() < 0.01)
 		type = "taxi";
 	if (g.objects["shooting laser"] && Math.random() < 0.25) is_tank = true;

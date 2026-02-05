@@ -11,21 +11,36 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		}
 	}
 	if (type === "random") {
+		let currentTileTheme = undefined;
+		if (tile >= THEME_TAIGA) {
+			currentTileTheme = THEME_TAIGA;
+		}
+		else if (tile >= THEME_DESERT) {
+			currentTileTheme = THEME_DESERT;
+		}
 		const availableKeys = Object.keys(ENEMY_TYPES).filter(k => {
-			if (k === "regular") return true;
-			return g.available_enemies.includes(k);
+			const isUnlocked = (k === "regular") || g.available_enemies
+				.includes(k);
+			const isCorrectTheme = (ENEMY_TYPES[k].theme ===
+				currentTileTheme);
+			return isUnlocked && isCorrectTheme;
 		});
-		const totalWeight = availableKeys.reduce((sum, key) => sum + (
-			ENEMY_TYPES[key].weight || 0), 0);
-		let randomNum = Math.random() * totalWeight;
-		for (let i = 0; i < availableKeys.length; i++) {
-			const key = availableKeys[i];
-			const weight = ENEMY_TYPES[key].weight || 0;
-			if (randomNum < weight || i === availableKeys.length - 1) {
-				type = key;
-				break;
+		if (availableKeys.length === 0) {
+			type = "regular";
+		}
+		else {
+			const totalWeight = availableKeys.reduce((sum, key) => sum + (
+				ENEMY_TYPES[key].weight || 0), 0);
+			let randomNum = Math.random() * totalWeight;
+			for (let i = 0; i < availableKeys.length; i++) {
+				const key = availableKeys[i];
+				const weight = ENEMY_TYPES[key].weight || 0;
+				if (randomNum < weight || i === availableKeys.length - 1) {
+					type = key;
+					break;
+				}
+				randomNum -= weight;
 			}
-			randomNum -= weight;
 		}
 	}
 	const config = ENEMY_TYPES[type] || ENEMY_TYPES["regular"];
@@ -59,9 +74,10 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		width = width * 0.67;
 		height = height * 0.67;
 	}
+	let max_health_random = config.health * (1 + 0.5 * Math.random());
 	let e = {
-		health: config.health,
-		max_health: config.health,
+		health: max_health_random,
+		max_health: max_health_random,
 		hunger: 300,
 		max_hunger: 300,
 		damage: config.damage * DAMAGE_COEFFICIENT,
@@ -375,7 +391,8 @@ function enemy_draw(enemy_object, ctx) {
 		let g = Math.sqrt(gx * gx + gy * gy) || 0.001;
 		let px = e.body.position.x - 0.45 * e.w;
 		let py = e.body.position.y - 0.45 * e.h;
-		if (vis.draw_gun && g < 1.25 * e.shooting_range) {
+		if ((vis.draw_gun && !e.boss || vis.draw_gun_boss && e.boss) && g <
+			1.25 * e.shooting_range) {
 			ctx.strokeStyle = vis.gun_color || "#331133";
 			ctx.lineWidth = (vis.gun_width || 0.25) * e.w;
 			let gunPoints = [];

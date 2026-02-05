@@ -1,4 +1,5 @@
 let DECORATIVE_COLOR_GRASS = "#117711";
+let DECORATIVE_COLOR_SAND = "#bbaa55";
 
 function roof_apply_transparency(g, bx, by, bw, bh) {
 	let p = g.player_object;
@@ -495,4 +496,99 @@ function decorative_no_tree_zone_create(g, x, y, w, h) {
 	);
 	if (i !== -1) g.objects[i].persistent = false;
 	return i;
+}
+
+function decorative_sand_create(g, x, y, w, h, cacti = true) {
+	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h,
+			DECORATIVE_COLOR_SAND, DECORATIVE_COLOR_SAND),
+		"decorative_grass");
+	if (cacti) {
+		let N = w / 300.0;
+		let M = h / 300.0;
+		let zones = g.objects.filter(o => o.name ===
+			"decorative_no_tree_zone" && !o.destroyed);
+		let chance = 1.0;
+		let gridPositions = [];
+		for (let i = 1; i < N - 1; i++) {
+			for (let j = 0.75; j < M - 1; j++) {
+				gridPositions.push({
+					i,
+					j
+				});
+			}
+		}
+		for (let k = gridPositions.length - 1; k > 0; k--) {
+			const r = Math.floor(Math.random() * (k + 1));
+			[gridPositions[k], gridPositions[r]] = [gridPositions[r],
+				gridPositions[k]
+			];
+		}
+		for (let p = 0; p < gridPositions.length; p++) {
+			let pos = gridPositions[p];
+			let i = pos.i;
+			let j = pos.j;
+			let cactusX = x + (i + 0.5 * (Math.random() - 0.5)) * w / N;
+			let cactusY = y + (j + 0.5 * (Math.random() - 0.5)) * h / M;
+			let skip = false;
+			for (let z = 0; z < zones.length; z++) {
+				let zd = zones[z].data;
+				if (cactusX >= zd.x && cactusX <= zd.x + zd.w &&
+					cactusY >= zd.y && cactusY <= zd.y + zd.h) {
+					skip = true;
+					break;
+				}
+			}
+			if (!skip && Math.random() < chance) {
+				decorative_cactus_create(g, cactusX, cactusY);
+				chance *= 0.5;
+			}
+		}
+	}
+}
+
+function decorative_cactus_create(g, x, y) {
+	if (!g.settings.trees) return;
+	let type = Math.floor(Math.random() * 3);
+	let bodyColor = "#33aa33";
+	let outlineColor = "#114411";
+	let branchColor = "#2a882a";
+	let flowerColor = "#ff66aa";
+	bound_create(g, x + 5, y + 145, 20, 20);
+	game_object_change_name(g, decorative_rectangle_create(g, x, y + 50, 25,
+		125,
+		bodyColor, outlineColor), "decorative_trunk");
+	if (type === 0) {
+		game_object_change_name(g, decorative_rectangle_create(g, x - 25, y +
+				100, 25, 15, branchColor, outlineColor),
+			"decorative_leaves");
+		game_object_change_name(g, decorative_rectangle_create(g, x - 25, y +
+			70, 15, 30, branchColor, outlineColor), "decorative_leaves");
+		game_object_change_name(g, decorative_rectangle_create(g, x + 25, y +
+			80, 25, 15, branchColor, outlineColor), "decorative_leaves");
+		game_object_change_name(g, decorative_rectangle_create(g, x + 35, y +
+			40, 15, 40, branchColor, outlineColor), "decorative_leaves");
+	}
+	else if (type === 1) {
+		game_object_change_name(g, decorative_rectangle_create(g, x + 25, y +
+				110, 20, 15, branchColor, outlineColor),
+			"decorative_leaves");
+		game_object_change_name(g, decorative_rectangle_create(g, x + 30, y +
+			80, 15, 30, branchColor, outlineColor), "decorative_leaves");
+	}
+	else {
+		game_object_change_name(g, decorative_rectangle_create(g, x - 20, y +
+				120, 20, 15, branchColor, outlineColor),
+			"decorative_leaves");
+		game_object_change_name(g, decorative_rectangle_create(g, x - 20, y +
+			95, 15, 25, branchColor, outlineColor), "decorative_leaves");
+		game_object_change_name(g, decorative_rectangle_create(g, x + 25, y +
+				120, 20, 15, branchColor, outlineColor),
+			"decorative_leaves");
+		game_object_change_name(g, decorative_rectangle_create(g, x + 30, y +
+			95, 15, 25, branchColor, outlineColor), "decorative_leaves");
+	}
+	if (Math.random() < 0.1) {
+		game_object_change_name(g, decorative_rectangle_create(g, x + 5, y + 40,
+			15, 10, flowerColor, outlineColor), "decorative_flower");
+	}
 }

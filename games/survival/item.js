@@ -82,6 +82,9 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_health = 25;
 			chance_shield = 15;
 		}
+		if (enemy_type == "desert") {
+			chance_drink = 0;
+		}
 	}
 	else if (car_type !== null) {
 		chance_ammo = 0;
@@ -186,7 +189,6 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			chance_fuel = 0;
 			available_food = [ITEM_APPLE, ITEM_CANNED_MEAT, ITEM_CHICKEN_LEG];
 			available_drinks = [ITEM_WATER, ITEM_MILK];
-			available_guns.push(ITEM_REVOLVER);
 		}
 		else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
 			chance_food = 30;

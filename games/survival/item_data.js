@@ -55,13 +55,16 @@ let ITEM_BOSSIFIER_SWORD = 123;
 let ITEM_BOSSIFIER_ROCKET = 124;
 let ITEM_BOSSIFIER_LASER = 125;
 let ITEM_SHIELD_GRAY = 126;
+let ITEM_KALASHNIKOV = 114;
+let ITEM_BOSSIFIER_DESERT = 127;
 let ITEMS_BOSSIFIERS = [
 	ITEM_BOSSIFIER_REGULAR,
 	ITEM_BOSSIFIER_SHOOTING,
 	ITEM_BOSSIFIER_RED,
 	ITEM_BOSSIFIER_SWORD,
 	ITEM_BOSSIFIER_ROCKET,
-	ITEM_BOSSIFIER_LASER
+	ITEM_BOSSIFIER_LASER,
+	ITEM_BOSSIFIER_DESERT
 ];
 let ITEMS_JUNK = [
 	ITEM_APPLE_CORE,
@@ -85,6 +88,7 @@ ITEMS_GUNS = [
 	ITEM_DESERT_EAGLE,
 	ITEM_SHOTGUN,
 	ITEM_MINIGUN,
+	ITEM_KALASHNIKOV,
 	ITEM_PLASMA_LAUNCHER,
 	ITEM_PLASMA_PISTOL,
 	ITEM_RED_PISTOLS,
@@ -149,6 +153,50 @@ let ITEMS_DATA = {
 			ctx.lineWidth = 1;
 			ctx.strokeRect(-w * 0.05, -h * 0.4, w * 0.1, h * 0.8);
 			ctx.restore();
+		}
+	},
+	[ITEM_KALASHNIKOV]: {
+		name: "Kalashnikov rifle",
+		desc: "Reliable desert classic. High fire rate, distinctive yellow muzzle flash.",
+		name_rus: "Автомат Калашникова",
+		desc_rus: "Надежная классика пустыни. Высокая скорострельность и узнаваемая вспышка.",
+		render: (ctx, x, y, w, h) => {
+			const wood = "#8B4513";
+			const metal = "#333";
+			const lightMetal = "#555";
+			ctx.fillStyle = wood;
+			ctx.save();
+			ctx.translate(x + w * 0.33, y + h * 0.5);
+			ctx.rotate(0.15);
+			ctx.fillRect(0, 0, w * 0.05, h * 0.14);
+			ctx.restore();
+			ctx.fillStyle = wood;
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.1, y + h * 0.46);
+			ctx.lineTo(x + w * 0.3, y + h * 0.45);
+			ctx.lineTo(x + w * 0.3, y + h * 0.52);
+			ctx.lineTo(x + w * 0.1, y + h * 0.58);
+			ctx.fill();
+			ctx.fillStyle = metal;
+			ctx.fillRect(x + w * 0.3, y + h * 0.43, w * 0.25, h * 0.1);
+			ctx.strokeStyle = metal;
+			ctx.lineWidth = w * 0.075;
+			ctx.lineCap = "butt";
+			ctx.beginPath();
+			ctx.arc(x + w * 0.725, y + h * 0.55, w * 0.25, Math.PI *
+				0.8, Math.PI * 1.05);
+			ctx.stroke();
+			ctx.fillStyle = wood;
+			ctx.fillRect(x + w * 0.55, y + h * 0.48, w * 0.15, h *
+				0.06);
+			ctx.fillStyle = metal;
+			ctx.fillRect(x + w * 0.55, y + h * 0.45, w * 0.35, h *
+				0.03);
+			ctx.fillRect(x + w * 0.55, y + h * 0.42, w * 0.12, h *
+				0.03);
+			ctx.fillRect(x + w * 0.88, y + h * 0.4, w * 0.02, h * 0.06);
+			ctx.fillStyle = lightMetal;
+			ctx.fillRect(x + w * 0.4, y + h * 0.46, w * 0.08, h * 0.02);
 		}
 	},
 	[ITEM_GREEN_GUN]: {
