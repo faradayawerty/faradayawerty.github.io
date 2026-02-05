@@ -56,17 +56,27 @@ function levels_set(g, level, old_level = null) {
 
 function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	let N = Math.random() * 80 - 77;
-	if (LEVEL_TILES_FOREST_ZONE.includes(tile) || tile === LEVEL_TILE_CITY_PARK)
+	if (LEVEL_TILES_FOREST_ZONE.includes(tile) || tile ===
+		LEVEL_TILE_CITY_PARK) {
 		N = Math.random() * 20 - 17;
+	}
+	let tileTheme = Math.floor(tile / 200) * 200;
+	let possibleAnimals = ["deer", "raccoon"];
+	if (tileTheme === THEME_DESERT) {
+		possibleAnimals = ["snake", "scorpion"];
+		N = Math.random() * 20 - 17;
+	}
+	else if (tile === LEVEL_TILE_CITY_PARK) {
+		possibleAnimals = ["raccoon"];
+	}
 	for (let i = 0; i < N; i++) {
-		let animals = ["deer", "raccoon"];
-		if (tile === LEVEL_TILE_CITY_PARK)
-			animals = ["raccoon"];
+		let chosenType = possibleAnimals[Math.floor(Math.random() *
+			possibleAnimals.length)];
 		animal_create(
 			g,
 			Ox + 1250 + (0.5 - Math.random()) * 1500,
 			Oy + 1250 + (0.5 - Math.random()) * 1500,
-			animals[Math.floor(Math.random() * animals.length)]
+			chosenType
 		);
 	}
 }

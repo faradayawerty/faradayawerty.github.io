@@ -453,7 +453,7 @@ let TILES = {
 		},
 		base_color: "gray",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 1090, 1090);
@@ -475,7 +475,7 @@ let TILES = {
 		},
 		base_color: "gray",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 2500, 1090);
@@ -497,7 +497,7 @@ let TILES = {
 		},
 		base_color: "gray",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 2500, 1090);
@@ -519,7 +519,7 @@ let TILES = {
 		},
 		base_color: "gray",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 1090, 1500);
@@ -541,7 +541,7 @@ let TILES = {
 		},
 		base_color: "gray",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 2500, 1090);
@@ -559,7 +559,7 @@ let TILES = {
 		},
 		base_color: "gray",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 1090, 2500);
@@ -577,7 +577,7 @@ let TILES = {
 		},
 		base_color: "#E3C16F",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 2500, 2500);
@@ -599,7 +599,7 @@ let TILES = {
 		},
 		base_color: "gray",
 		spawn_enemies: true,
-		spawn_animals: false,
+		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
 			decorative_sand_create(g, Ox, Oy, 1090, 1090);

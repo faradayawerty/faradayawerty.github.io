@@ -92,7 +92,7 @@ const WEAPON_DEFS = {
 		ammo: ITEM_AMMO,
 		chance: 0.01,
 		sound: "data/sfx/revolver_1.mp3",
-		vol: 0.25,
+		vol: 0.1,
 		color: "#555555",
 		length: 0.9,
 		width: 1.1,

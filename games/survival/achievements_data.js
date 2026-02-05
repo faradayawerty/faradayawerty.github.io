@@ -704,7 +704,7 @@ let ACHIEVEMENT_REGISTRY = {
 			en: "kill one desert dweller",
 			ru: "убейте одного пустынного жителя"
 		},
-		req: "shoot 'em up",
+		req: "desert biome",
 		draw: (ctx, x, y, w, h, p) => {
 			ctx.fillStyle = p.c21;
 			ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
@@ -748,7 +748,7 @@ let ACHIEVEMENT_REGISTRY = {
 			en: "discover the desert biome",
 			ru: "найдите биом пустыни"
 		},
-		req: "shoot 'em up",
+		req: "big guy",
 		draw: (ctx, x, y, w, h, p) => {
 			ctx.fillStyle = p.c6;
 			ctx.beginPath();
