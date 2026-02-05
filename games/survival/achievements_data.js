@@ -735,4 +735,35 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
 		}
 	},
+	"desert biome": {
+		grid: {
+			x: 1,
+			y: 4
+		},
+		name: {
+			en: "desert",
+			ru: "пустыня"
+		},
+		desc: {
+			en: "discover the desert biome",
+			ru: "найдите биом пустыни"
+		},
+		req: "shoot 'em up",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c6;
+			ctx.beginPath();
+			ctx.moveTo(x + 0.1 * w, y + 0.8 * h);
+			ctx.quadraticCurveTo(x + 0.3 * w, y + 0.4 * h, x + 0.5 * w,
+				y + 0.7 * h);
+			ctx.quadraticCurveTo(x + 0.7 * w, y + 0.3 * h, x + 0.9 * w,
+				y + 0.8 * h);
+			ctx.lineTo(x + 0.1 * w, y + 0.8 * h);
+			ctx.fill();
+			ctx.strokeStyle = p.c8;
+			ctx.stroke();
+			ctx.fillStyle = p.c1;
+			ctx.arc(x + 0.8 * w, y + 0.2 * h, 0.1 * w, 0, Math.PI * 2);
+			ctx.fill();
+		}
+	},
 };

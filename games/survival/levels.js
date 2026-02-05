@@ -24,6 +24,16 @@ function levels_set(g, level, old_level = null) {
 		g.visited_levels.push(level);
 	}
 	let tile = g.assigned_tiles[g.visited_levels.indexOf(level)];
+	if (player_object && !player_object.data.ai_controlled) {
+		let tileTheme = Math.floor(tile / 200) * 200;
+		if (tileTheme === THEME_DESERT) {
+			achievement_do(
+				player_object.data.achievements_element.data.achievements,
+				"desert biome",
+				player_object.data.achievements_shower_element
+			);
+		}
+	}
 	let config = TILES[tile] || TILES[LEVEL_TILE_DEFAULT];
 	if (config.populate) {
 		config.populate(g, Ox, Oy, level_visited);
