@@ -112,8 +112,7 @@ function audio_play(path, volume = null) {
 		audio_create(path, volume || 0.75).then(audioObj => {
 			if (audioObj) {
 				AUDIO_CACHE[path] = audioObj;
-				audio_play(path,
-					volume);
+				audio_play(path, volume);
 			}
 		});
 		return;
@@ -121,7 +120,7 @@ function audio_play(path, volume = null) {
 	if (!AUDIO_CHANNELS[path]) {
 		AUDIO_CHANNELS[path] = {
 			nodes: Array.from({
-				length: 5
+				length: 10
 			}, () => master.cloneNode()),
 			index: 0
 		};
@@ -129,13 +128,20 @@ function audio_play(path, volume = null) {
 	const pool = AUDIO_CHANNELS[path];
 	const channel = pool.nodes[pool.index];
 	try {
+		channel.pause();
+		if (channel.readyState >= 1) {
+			channel.currentTime = 0;
+		}
 		let baseVol = volume !== null ? volume : parseFloat(master.dataset
 			.baseVolume);
 		channel.volume = baseVol * (GLOBAL_VOLUME / 100);
-		channel.currentTime = 0;
 		const playPromise = channel.play();
 		if (playPromise !== undefined) {
-			playPromise.catch(() => {});
+			playPromise.catch((err) => {
+				if (err.name !== 'AbortError') {
+					console.warn(`[Audio Play Blocked]: ${path}`, err);
+				}
+			});
 		}
 		pool.index = (pool.index + 1) % pool.nodes.length;
 	}

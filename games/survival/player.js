@@ -699,7 +699,7 @@ function player_draw(player_object, ctx) {
 			stroke, 0.05 * p.w);
 		ctx.globalAlpha = 1.0;
 	};
-	renderShield(p.shield_blue_health, p.shield_blue_health_max, "#115577",
+	renderShield(p.shield_blue_health, p.shield_blue_health_max, "#1177aa",
 		"#113377");
 	renderShield(p.shield_green_health, p.shield_green_health_max, "lime",
 		"#117733");
