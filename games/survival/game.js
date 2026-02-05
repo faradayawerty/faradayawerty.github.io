@@ -4,6 +4,7 @@ let DEBUG_DRAW = false;
 let DEBUG_ELEMENTS_UPDATE = false;
 let DEBUG_ELEMENTS_DRAW = false;
 let DO_AUTOSAVES = false;
+let DEBUG_AMOUNTS = false;
 
 function game_create(input_, engine_, audios_) {
 	let g = {
@@ -28,6 +29,7 @@ function game_create(input_, engine_, audios_) {
 		totalUpdates: {},
 		totalDraws: {},
 		totalCreations: {},
+		objectsInFrame: {},
 		settings: {
 			language: "english",
 			auto_aim: false,
@@ -253,18 +255,21 @@ function game_update(g, dt) {
 					g.objects[i].prevY = g.objects[i].data.y || 0;
 				}
 			}
+			if (DEBUG_AMOUNTS) {
+				if (g.objectsInFrame[g.objects[i].name] === undefined)
+					g.objectsInFrame[g.objects[i].name] = 0;
+				g.objectsInFrame[g.objects[i].name]++;
+			}
 			let updateTime = performance.now();
 			g.objects[i].update(g.objects[i], dt);
 			if (DEBUG_UPDATE) {
 				if (g.totalUpdates[g.objects[i].name] === undefined)
 					g.totalUpdates[g.objects[i].name] = 0;
-				else
-					g.totalUpdates[g.objects[i].name] += 1;
+				g.totalUpdates[g.objects[i].name] += 1;
 				if (g.updateDurations[g.objects[i].name] === undefined)
 					g.updateDurations[g.objects[i].name] = 0;
-				else
-					g.updateDurations[g.objects[i].name] += (performance.now() -
-						updateTime);
+				g.updateDurations[g.objects[i].name] += (performance.now() -
+					updateTime);
 			}
 		}
 	}
@@ -296,25 +301,42 @@ function game_update(g, dt) {
 	}
 	const logSortedMetrics = (title, durations, totals) => {
 		Object.entries(durations)
-			.map(([key, value]) => ({
-				key,
-				avg: value / (totals[key] || 1)
-			}))
-			.sort((a, b) => b.avg - a.avg)
+			.map(([key, value]) => {
+				const count = totals[key] || 1;
+				return {
+					key,
+					avg: value / count,
+					time: value,
+					count: count
+				};
+			})
+			.sort((a, b) => a.key.localeCompare(b.key))
 			.forEach(item => {
 				g.debug_console.unshift(
-					`${title} ${item.key}: ${item.avg.toFixed(4)}ms`
-					);
+					`${title} ${item.key}: AVG ${item.avg.toFixed(4)}ms | SUM ${item.time.toFixed(4)}ms (x${item.count})`
+				);
 			});
 	};
 	if (DEBUG_CREATION) {
 		logSortedMetrics("CREATE", g.creationDurations, g.totalCreations);
+		g.totalCreations = {};
+		g.creationDurations = {};
 	}
 	if (DEBUG_UPDATE) {
 		logSortedMetrics("UPDATE", g.updateDurations, g.totalUpdates);
+		g.updateDurations = {};
+		g.totalUpdates = {};
 	}
 	if (DEBUG_DRAW) {
 		logSortedMetrics("DRAW", g.drawDurations, g.totalDraws);
+		g.drawDurations = {};
+		g.totalDraws = {};
+	}
+	if (DEBUG_AMOUNTS) {
+		for (const [key, value] of Object.entries(g.objectsInFrame)) {
+			g.debug_console.unshift(`AMOUNT ${key}: ${value}`);
+		}
+		g.objectsInFrame = {};
 	}
 }
 
@@ -352,18 +374,32 @@ function game_draw(g, ctx, alpha) {
 				let shiftY = (curY - g.objects[i].prevY) * (alpha - 1);
 				ctx.translate(shiftX, shiftY);
 			}
-			g.objects[i].draw(g.objects[i], ctx);
+			let doDraw = true;
+			let d = g.objects[i].data;
+			if (d) {
+				let [level_x, level_y] = g.respawn_level.split("x").map(Number);
+				let Ox = 2500 * level_x;
+				let Oy = 2500 * level_y;
+				let x = d.body ? d.body.position.x : d.x;
+				let y = d.body ? d.body.position.y : d.y;
+				if (x !== undefined && y !== undefined) {
+					if (x < Ox - 2500 || x > Ox + 5000 || y < Oy - 2500 || y >
+						Oy + 5000) {
+						doDraw = false;
+					}
+				}
+			}
+			if (doDraw)
+				g.objects[i].draw(g.objects[i], ctx);
 			ctx.restore();
 			if (DEBUG_DRAW) {
 				if (g.totalDraws[g.objects[i].name] === undefined)
 					g.totalDraws[g.objects[i].name] = 0;
-				else
-					g.totalDraws[g.objects[i].name] += 1;
+				g.totalDraws[g.objects[i].name] += 1;
 				if (g.drawDurations[g.objects[i].name] === undefined)
 					g.drawDurations[g.objects[i].name] = 0;
-				else
-					g.drawDurations[g.objects[i].name] += (performance.now() -
-						drawTime);
+				g.drawDurations[g.objects[i].name] += (performance.now() -
+					drawTime);
 			}
 		}
 	ctx.restore();

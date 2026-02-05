@@ -270,7 +270,7 @@ const WEAPON_DEFS = {
 							.position.x, obj.data.body.position
 							.y, 1.5 * p.w, 60 * p.w, p
 							.laser_direction)) {
-						obj.data.health -= 6 * dt;
+						obj.data.health -= 3 * dt;
 						obj.data.hit_by_player = true;
 					}
 				}

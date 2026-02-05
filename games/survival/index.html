@@ -27,8 +27,6 @@
 			border: 0px solid;
 			display: block;
 			image-rendering: pixelated;
-			backface-visibility: hidden;
-			will-change: transform;
 		}
 	</style>
 </head>
@@ -71,7 +69,9 @@
 	<script>
 		let DPR = window.devicePixelRatio || 1;
 		let cvs1 = document.getElementById("canvas");
-		let ctx1 = cvs1.getContext("2d", { alpha: false });
+		let ctx1 = cvs1.getContext("2d", {
+			alpha: false
+		});
 		let engine1 = Matter.Engine.create();
 		let input1 = input_create();
 		let audios1 = null;
@@ -252,7 +252,7 @@
 								totalTimeUpdates / totalUpdates);
 							game1.debug_console.unshift('ups: ' + 1000 *
 								totalUpdates / (performance.now() - gameStartTime)
-								);
+							);
 							game1.debug_console.unshift('ups (now): ' + (1000 / dt)
 								.toFixed(1));
 						}
