@@ -691,8 +691,8 @@ const ENEMY_TYPES = {
 						true,
 						Math.random() * 5 + 3,
 						800 + Math.random() * 500,
-						"#ffd700",
-						"#ffaa00"
+						"orange",
+						"black"
 					);
 				}
 				e.shooting_delay = 0;

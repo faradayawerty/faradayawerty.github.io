@@ -99,6 +99,17 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		if (enemy_type == "desert") {
 			chance_drink = 0;
 		}
+		if (enemy_type == "mummy") {
+			chance_drink = 0;
+		}
+		if (enemy_type == "shadow") {
+			chance_drink = 0;
+			chance_shield = 15;
+		}
+		if (enemy_type == "anubis") {
+			chance_drink = 0;
+			chance_shield = 15;
+		}
 	}
 	else if (car_type !== null) {
 		chance_ammo = 0;

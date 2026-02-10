@@ -120,6 +120,14 @@ const WEAPON_DEFS = {
 		length: 1.8,
 		width: 0.8,
 		action: (g, p, v, dt) => {
+			let mainColor = "yellow";
+			let secondaryColor = "orange";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "orange";
+				secondaryColor = "black";
+			}
 			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
 			for (let i = 0; i < 4; i++) {
 				let offsetSide = (Math.random() - 0.5) * (p.w * 2.25);
@@ -136,8 +144,8 @@ const WEAPON_DEFS = {
 					BALANCE_FACTOR * (1000 / 150000) *
 					weapon_damage_from_tier(8),
 					false, Math.random() * 3 + 4, 700 + Math
-					.random() * 300,
-					"#ffd700", "#ffaa00", false, true
+					.random() * 300, mainColor, secondaryColor,
+					false, true
 				);
 			}
 			return true;
@@ -313,9 +321,21 @@ const WEAPON_DEFS = {
 		color: "black",
 		length: 0.8,
 		width: 1.0,
-		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25 * 5.49 *
-			BALANCE_FACTOR * weapon_damage_from_tier(1))
+		action: (g, p, v) => {
+			let mainColor = "yellow";
+			let secondaryColor = "orange";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "yellow";
+				secondaryColor = "black";
+			}
+			bullet_create(g, p.body.position.x, p.body
+				.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25 *
+				5.49 *
+				BALANCE_FACTOR * weapon_damage_from_tier(1),
+				false, 6, 1500, mainColor, secondaryColor)
+		}
 	},
 	[ITEM_KALASHNIKOV]: {
 		cooldown: 130,
@@ -334,7 +354,7 @@ const WEAPON_DEFS = {
 				g, p.body.position.x, p.body.position.y, dx, dy,
 				22, (0.5 + 0.5 * Math.random()) * 2.14 *
 				BALANCE_FACTOR * weapon_damage_from_tier(4), false,
-				7, 1500, "#ffcc00", "orange"
+				7, 1500, "#ffcc00", "black"
 			);
 		}
 	},
@@ -347,9 +367,21 @@ const WEAPON_DEFS = {
 		color: "#888888",
 		length: 0.8,
 		width: 1.0,
-		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 32, 1.2 * 5.68 *
-			BALANCE_FACTOR * weapon_damage_from_tier(1))
+		action: (g, p, v) => {
+			let mainColor = "yellow";
+			let secondaryColor = "orange";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "yellow";
+				secondaryColor = "black";
+			}
+			bullet_create(g, p.body.position.x, p.body
+				.position.y, v.tx - v.sx, v.ty - v.sy, 32, 1.2 *
+				5.68 *
+				BALANCE_FACTOR * weapon_damage_from_tier(1),
+				false, 6, 1500, mainColor, secondaryColor)
+		}
 	},
 	[ITEM_REVOLVER]: {
 		cooldown: 800,
@@ -360,12 +392,24 @@ const WEAPON_DEFS = {
 		color: "#555555",
 		length: 0.9,
 		width: 1.1,
-		action: (g, p, v) => bullet_create(
-			g, p.body.position.x, p.body.position.y, v.tx - v.sx, v.ty -
-			v.sy,
-			25, (3 + 2 * Math.random()) * 4.93 * BALANCE_FACTOR * (
-				1000 / 9000) * 2 * weapon_damage_from_tier(4)
-		)
+		action: (g, p, v) => {
+			let mainColor = "yellow";
+			let secondaryColor = "orange";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "orange";
+				secondaryColor = "black";
+			}
+			bullet_create(
+				g, p.body.position.x, p.body.position.y, v.tx - v
+				.sx, v.ty -
+				v.sy,
+				25, (3 + 2 * Math.random()) * 4.93 *
+				BALANCE_FACTOR * (
+					1000 / 9000) * 2 * weapon_damage_from_tier(4),
+				false, 6, 1500, mainColor, secondaryColor)
+		}
 	},
 	[ITEM_PLASMA_PISTOL]: {
 		cooldown: 200,
@@ -376,12 +420,23 @@ const WEAPON_DEFS = {
 		color: "#331133",
 		length: 0.8,
 		width: 1.0,
-		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, v.tx - v.sx, v.ty - v.sy, 20, (0.25 + 0.5 *
-				Math
-				.random()) * 1.91 * BALANCE_FACTOR *
-			weapon_damage_from_tier(3), false, 6, 1500,
-			"cyan", "blue")
+		action: (g, p, v) => {
+			let mainColor = "cyan";
+			let secondaryColor = "blue";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "blue";
+				secondaryColor = "black";
+			}
+			bullet_create(g, p.body.position.x, p.body
+				.position.y, v.tx - v.sx, v.ty - v.sy, 20, (0.25 +
+					0.5 *
+					Math
+					.random()) * 1.91 * BALANCE_FACTOR *
+				weapon_damage_from_tier(3), false, 6, 1500,
+				mainColor, secondaryColor)
+		}
 	},
 	[ITEM_SHOTGUN]: {
 		cd_prop: 'shotgun_cooldown',
@@ -394,12 +449,21 @@ const WEAPON_DEFS = {
 		length: 1.3,
 		width: 1.25,
 		action: (g, p, v) => {
+			let mainColor = "yellow";
+			let secondaryColor = "orange";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "yellow";
+				secondaryColor = "black";
+			}
 			for (let i = 0; i < Math.random() * 7 + 7; i++)
 				bullet_create(g, p.body.position.x, p.body.position.y, (
 						0.95 + 0.1 * Math.random()) * v.tx - v.sx, (
 						0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
 					.random() * 10 + 10, (0.06 + 0.16 * Math.random()) *
-					4.74 * BALANCE_FACTOR * weapon_damage_from_tier(2));
+					4.74 * BALANCE_FACTOR * weapon_damage_from_tier(2),
+					false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
 	[ITEM_MINIGUN]: {
@@ -412,11 +476,24 @@ const WEAPON_DEFS = {
 		color: "#113377",
 		length: 1.5,
 		width: 1.4,
-		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
-			.position.y, (0.95 + 0.1 * Math.random()) * v.tx - v.sx, (
-				0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
-			.random() * 10 + 10, (0.1 + 0.1 * Math.random()) * 5.15 *
-			BALANCE_FACTOR * weapon_damage_from_tier(2))
+		action: (g, p, v) => {
+			let mainColor = "yellow";
+			let secondaryColor = "orange";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "yellow";
+				secondaryColor = "black";
+			}
+			bullet_create(g, p.body.position.x, p.body
+				.position.y, (0.95 + 0.1 * Math.random()) * v.tx - v
+				.sx, (
+					0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
+				.random() * 10 + 10, (0.1 + 0.1 * Math.random()) *
+				5.15 *
+				BALANCE_FACTOR * weapon_damage_from_tier(2),
+				false, 6, 1500, mainColor, secondaryColor);
+		}
 	},
 	[ITEM_JUNK_CANNON]: {
 		cooldown: 250,
@@ -492,6 +569,14 @@ const WEAPON_DEFS = {
 		width: 1.0,
 		hasSecondary: true,
 		action: (g, p, v) => {
+			let mainColor = "pink";
+			let secondaryColor = "red";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "#ff0000";
+				secondaryColor = "black";
+			}
 			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
 			[-Math.PI / 4, Math.PI / 4].forEach(off => {
 				bullet_create(g, p.body.position.x + p.w * Math
@@ -500,7 +585,8 @@ const WEAPON_DEFS = {
 					v.ty - v.sy, 30, (0.4 + 0.8 * Math
 						.random()) * 2.04 * BALANCE_FACTOR *
 					weapon_damage_from_tier(5),
-					false, 6, 1500, "pink", "red");
+					false, 6, 1500, mainColor,
+					secondaryColor);
 			});
 		}
 	},
@@ -537,6 +623,14 @@ const WEAPON_DEFS = {
 		length: 1.3,
 		width: 1.25,
 		action: (g, p, v) => {
+			let mainColor = "pink";
+			let secondaryColor = "red";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "#ff0000";
+				secondaryColor = "black";
+			}
 			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
 			let N = Math.floor(Math.random() * 7 + 5);
 			for (let i = 0; i <= N; i++)
@@ -547,7 +641,7 @@ const WEAPON_DEFS = {
 					(2.5 + 0.5 * Math.random()) * 0.62 *
 					BALANCE_FACTOR * (1000 / 400) *
 					weapon_damage_from_tier(5),
-					false, 6, 1500, "pink", "red");
+					false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
 	[ITEM_LASER_GUN]: {
@@ -626,13 +720,21 @@ const WEAPON_DEFS = {
 		length: 1.6,
 		width: 1.0,
 		action: (g, p, v, dt) => {
+			let mainColor = "lime";
+			let secondaryColor = "green";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "black";
+				secondaryColor = "lime";
+			}
 			bullet_create(g, p.body.position.x, p.body.position.y, (
 					0.975 + 0.05 * Math.random()) * v.tx - v.sx, (
 					0.975 + 0.05 * Math.random()) * v.ty - v.sy,
 				Math.random() * 10 + 20, (1.5 + 0.375 * Math
 					.random()) * 1.04 * BALANCE_FACTOR *
 				weapon_damage_from_tier(6),
-				false, 6, 1500, "lime", "green");
+				false, 6, 1500, mainColor, secondaryColor);
 			if (p.shield_green_health > 0) {
 				p.shield_green_health -= 0.05 * dt;
 			}
