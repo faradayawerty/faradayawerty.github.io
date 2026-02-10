@@ -243,7 +243,7 @@ let ACHIEVEMENT_REGISTRY = {
 			},
 			pc: {
 				en: "use gasoline to refuel a car by standing close to it and pressing left mouse button",
-				ru: "воспользуйтесь бензином, чтобы заправить автомобиль; для этого подойдите близко к автомобилю с топливом в руках и нажмите F или SPACE"
+				ru: "воспользуйтесь бензином, чтобы заправить автомобиль; для этого подойдите близко к автомобилю с топливом в руках и нажмите ЛКМ по автомобилю"
 			}
 		},
 		req: "pick an item",
