@@ -52,7 +52,8 @@ function animal_create(g, x, y, type = "deer") {
 		target_vel: {
 			x: 0,
 			y: 0
-		}
+		},
+		is_minion: true
 	};
 	Matter.Composite.add(g.engine.world, a.body);
 	return game_object_create(
@@ -95,6 +96,11 @@ function animal_update(ao, dt) {
 				item_create(ao.game, ITEM_CANNED_MEAT, a.body.position.x, a.body
 					.position.y);
 			audio_play("data/sfx/deer_dies_1.mp3");
+		}
+		else if (a.type === "scorpion" || a.type === "snake") {
+			if (Math.random() < 0.75)
+				item_create(ao.game, ITEM_VENOM, a.body.position.x, a.body
+					.position.y);
 		}
 		if (Math.random() < 0.0025) item_create(ao.game, ITEM_AMMO, a.body
 			.position.x, a.body.position.y);
@@ -256,7 +262,7 @@ function animal_snake_draw(ctx, x, y, w, h, angle) {
 		ctx.fillRect(posX - s / 2, wave - s / 2, s, s);
 		if (i === 0) {
 			ctx.fillStyle = "red";
-			let eyeSize = 1.2;
+			let eyeSize = 0.03 * w;
 			ctx.fillRect(posX + s / 6, wave - s / 4, eyeSize, eyeSize);
 			ctx.fillRect(posX + s / 6, wave + s / 4 - eyeSize, eyeSize,
 				eyeSize);
@@ -267,84 +273,190 @@ function animal_snake_draw(ctx, x, y, w, h, angle) {
 }
 
 function animal_scorpion_draw(ctx, x, y, w, h, angle) {
+	h = w * 0.45;
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.rotate(angle);
-	ctx.fillStyle = "black";
-	ctx.strokeStyle = "black";
-	ctx.lineWidth = Math.max(1, w * 0.06);
-	let time = Date.now() * 0.002;
-	for (let i = 0; i < 5; i++) {
-		let segmentX = (0.3 - i * 0.15) * w;
-		ctx.beginPath();
-		ctx.ellipse(segmentX, 0, w * 0.12, h * 0.4 - i * (h * 0.08), 0, 0, Math
-			.PI * 2);
-		ctx.fill();
-	}
-	ctx.fillStyle = "red";
-	let headX = 0.3 * w;
-	let eyeSize = w * 0.035;
-	ctx.beginPath();
-	ctx.arc(headX + w * 0.02, -h * 0.15, eyeSize, 0, Math.PI * 2);
-	ctx.arc(headX + w * 0.02, h * 0.15, eyeSize, 0, Math.PI * 2);
-	ctx.fill();
-	ctx.fillStyle = "black";
+	let time = Date.now();
+	let t = time * 0.001;
+	const clrDark = "#0a0a0a";
+	const clrMid = "#222222";
+	const clrLight = "#3d3d3d";
 	for (let side = -1; side <= 1; side += 2) {
-		for (let j = 0; j < 3; j++) {
-			let legPhase = (Date.now() * 0.008) + j * 0.8;
-			let moveX = Math.cos(legPhase) * (w * 0.1);
-			let moveY = Math.sin(legPhase) * (h * 0.15);
+		for (let i = 0; i < 4; i++) {
+			let phase = (t * 7) + (i * 0.8) + (side === 1 ? Math.PI : 0);
+			let legX = (0.2 - i * 0.18) * w;
+			let lift = Math.max(0, Math.sin(phase)) * (h * 0.3);
+			let stretch = Math.cos(phase) * (w * 0.12);
+			ctx.strokeStyle = clrDark;
+			ctx.lineCap = "round";
+			ctx.lineJoin = "round";
 			ctx.beginPath();
-			ctx.moveTo(w * (0.1 - j * 0.1), side * h * 0.2);
-			ctx.lineTo(w * (0.1 - j * 0.1) + moveX, side * (h * 0.7) + moveY);
-			ctx.lineTo(w * (-0.1 - j * 0.1) + moveX, side * (h * 0.9) + moveY);
+			ctx.lineWidth = w * 0.06;
+			ctx.moveTo(legX, side * h * 0.1);
+			let kneeX = legX + stretch;
+			let kneeY = side * (h * 0.7) + (side * lift * 0.5);
+			ctx.lineTo(kneeX, kneeY);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.lineWidth = w * 0.04;
+			ctx.moveTo(kneeX, kneeY);
+			let footX = kneeX + stretch * 0.5;
+			let footY = side * (h * 1.1);
+			ctx.lineTo(footX, footY);
+			ctx.lineWidth = w * 0.02;
+			ctx.lineTo(footX + (side * w * 0.04), footY + (side * h * 0.05));
+			ctx.stroke();
+			ctx.fillStyle = clrLight;
+			ctx.beginPath();
+			ctx.arc(kneeX, kneeY, w * 0.02, 0, Math.PI * 2);
+			ctx.fill();
+		}
+	}
+	let tailX = -w * 0.25;
+	let tailY = 0;
+	let tailSegments = 7;
+	for (let i = 0; i < tailSegments; i++) {
+		let isLast = (i === tailSegments - 1);
+		let segScale = 1 - (i / tailSegments) * 0.5;
+		let segW = w * (isLast ? 0.14 : 0.12) * segScale;
+		let segH = h * (isLast ? 0.32 : 0.25) * segScale;
+		let wave = Math.sin(t * 4 - i * 0.5) * (h * 0.08);
+		tailX -= segW * 1.3;
+		tailY += wave;
+		let g = ctx.createRadialGradient(tailX, tailY - segH * 0.2, 1, tailX,
+			tailY, segH);
+		g.addColorStop(0, clrLight);
+		g.addColorStop(1, "black");
+		ctx.fillStyle = g;
+		ctx.beginPath();
+		if (isLast) ctx.ellipse(tailX, tailY, segW * 1.3, segH * 1.1, 0, 0, Math
+			.PI * 2);
+		else ctx.ellipse(tailX, tailY, segW, segH, 0, 0, Math.PI * 2);
+		ctx.fill();
+		if (isLast) {
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = 0.05 * w;
+			ctx.beginPath();
+			ctx.moveTo(tailX - segW * 0.8, tailY);
+			ctx.quadraticCurveTo(tailX - w * 0.25, tailY, tailX - w * 0.18,
+				tailY - h * 0.35);
 			ctx.stroke();
 		}
+	}
+	for (let side = -1; side <= 1; side += 2) {
 		ctx.save();
-		ctx.translate(w * 0.35, side * h * 0.2);
-		let armAngle = side * (0.6 + Math.sin(time * 5) * 0.15);
-		ctx.rotate(armAngle);
+		ctx.translate(w * 0.25, side * h * 0.15);
+		ctx.rotate(side * 0.4 + Math.sin(t * 2) * 0.1);
+		ctx.fillStyle = "black";
+		ctx.fillRect(0, -h * 0.04, w * 0.25, h * 0.08);
+		ctx.translate(w * 0.25, 0);
+		ctx.rotate(side * -0.2);
+		let clawG = ctx.createRadialGradient(w * 0.15, 0, 1, w * 0.15, 0, w *
+			0.3);
+		clawG.addColorStop(0, clrMid);
+		clawG.addColorStop(1, "black");
+		ctx.fillStyle = clawG;
 		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(w * 0.2, 0);
+		ctx.ellipse(w * 0.15, 0, w * 0.22, h * 0.22, 0, 0, Math.PI * 2);
+		ctx.fill();
+		let pinch = (Math.sin(t * 8) * 0.5 + 0.5) * -0.6;
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = w * 0.05;
+		ctx.lineCap = "round";
+		ctx.beginPath();
+		ctx.moveTo(w * 0.3, side * -h * 0.05);
+		ctx.quadraticCurveTo(w * 0.45, side * -h * 0.4, w * 0.5, side * -h *
+			0.05);
 		ctx.stroke();
-		ctx.translate(w * 0.2, 0);
-		ctx.rotate(side * -0.4 + Math.sin(time * 8) * 0.1);
+		ctx.save();
+		ctx.translate(w * 0.3, side * h * 0.05);
+		ctx.rotate(side * pinch * -1);
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
-		ctx.lineTo(w * 0.15, 0);
-		ctx.stroke();
-		ctx.translate(w * 0.15, 0);
-		let pinch = Math.sin(time * 15) * 0.3 + 0.3;
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(w * 0.15, -side * pinch * (h * 0.5));
-		ctx.stroke();
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(w * 0.15, side * pinch * (h * 0.1));
+		ctx.quadraticCurveTo(w * 0.1, side * h * 0.35, w * 0.25, 0);
 		ctx.stroke();
 		ctx.restore();
+		ctx.restore();
 	}
-	let tailBaseX = -w * 0.3;
-	let tailWave = Math.sin(time * 4);
+	for (let i = 0; i < 6; i++) {
+		let segX = (0.35 - i * 0.15) * w;
+		let segW = w * 0.16;
+		let segH = h * 0.45 - (i * i * 0.01);
+		let g = ctx.createLinearGradient(segX, -segH, segX, segH);
+		g.addColorStop(0, "black");
+		g.addColorStop(0.5, clrMid);
+		g.addColorStop(1, "black");
+		ctx.fillStyle = g;
+		ctx.beginPath();
+		if (i === 0) {
+			if (ctx.roundRect) ctx.roundRect(segX - segW * 0.8, -segH, segW * 2,
+				segH * 2, 10);
+			else ctx.rect(segX - segW * 0.8, -segH, segW * 2, segH * 2);
+		}
+		else {
+			ctx.ellipse(segX, 0, segW, segH, 0, 0, Math.PI * 2);
+		}
+		ctx.fill();
+	}
+	ctx.fillStyle = "#ff0000";
+	ctx.shadowBlur = 5;
+	ctx.shadowColor = "red";
 	ctx.beginPath();
-	ctx.moveTo(tailBaseX, 0);
-	let cp1x = tailBaseX - w * 0.5,
-		cp1y = tailWave * (h * 1.25);
-	let cp2x = tailBaseX - w * 0.7 + tailWave * (w * 0.3),
-		cp2y = -h * 1.8;
-	let endX = tailBaseX + w * 0.1 + tailWave * (w * 0.4),
-		endY = -h * 2.2;
-	ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endX, endY);
-	ctx.stroke();
+	ctx.arc(w * 0.42, -h * 0.07, w * 0.025, 0, Math.PI * 2);
+	ctx.arc(w * 0.42, h * 0.07, w * 0.025, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.shadowBlur = 0;
+	ctx.restore();
+}
+
+function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
+	ctx.fillStyle = "#333333";
 	ctx.beginPath();
-	ctx.ellipse(endX, endY, w * 0.15, h * 0.25, Math.atan2(endY - cp2y, endX -
-		cp2x), 0, Math.PI * 2);
+	ctx.moveTo(x - w * 0.4, y - h * 0.5);
+	ctx.lineTo(x - w * 0.6, y - h * 0.9);
+	ctx.lineTo(x - w * 0.1, y - h * 0.5);
 	ctx.fill();
 	ctx.beginPath();
-	ctx.moveTo(endX, endY);
-	ctx.lineTo(endX + w * 0.2, endY - h * 0.3);
+	ctx.moveTo(x + w * 0.4, y - h * 0.5);
+	ctx.lineTo(x + w * 0.6, y - h * 0.85);
+	ctx.lineTo(x + w * 0.1, y - h * 0.5);
+	ctx.fill();
+	fillMatterBody(ctx, e.body, "#555555");
+	drawMatterBody(ctx, e.body, e.color_outline, 2);
+	ctx.fillStyle = "#111111";
+	ctx.fillRect(x - w * 0.5, y - h * 0.25, w, h * 0.4);
+	let eyeSize = w * 0.12;
+	ctx.fillStyle = "#ff0000";
+	ctx.shadowBlur = 15;
+	ctx.shadowColor = "red";
+	ctx.beginPath();
+	ctx.arc(x - w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
+	ctx.arc(x + w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.shadowBlur = 0;
+	ctx.fillStyle = "black";
+	ctx.fillRect(x - w * 0.26, y - h * 0.15, w * 0.02, h * 0.2);
+	ctx.fillRect(x + w * 0.24, y - h * 0.15, w * 0.02, h * 0.2);
+	ctx.strokeStyle = "white";
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.moveTo(x - w * 0.2, y + h * 0.2);
+	ctx.lineTo(x - w * 0.1, y + h * 0.3);
+	ctx.lineTo(x, y + h * 0.2);
+	ctx.lineTo(x + w * 0.1, y + h * 0.3);
+	ctx.lineTo(x + w * 0.2, y + h * 0.2);
 	ctx.stroke();
-	ctx.restore();
+	let tailX = x - w * 0.5;
+	let tailY = y + h * 0.3;
+	for (let i = 0; i < 6; i++) {
+		ctx.strokeStyle = (i % 2 === 0) ? "#222222" : "#666666";
+		ctx.lineWidth = h * 0.25;
+		ctx.beginPath();
+		ctx.moveTo(tailX - (i * w * 0.12), tailY + Math.sin(e.color_gradient +
+			i) * 5);
+		ctx.lineTo(tailX - ((i + 1) * w * 0.12), tailY + Math.sin(e
+			.color_gradient + i + 1) * 5);
+		ctx.stroke();
+	}
 }

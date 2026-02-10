@@ -33,11 +33,18 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		}),
 		immunity: 6000,
 		shield_blue_health: 0,
-		shield_blue_health_max: 100,
+		shield_blue_health_max: 125,
 		shield_green_health: 0,
-		shield_green_health_max: 200,
+		shield_green_health_max: 250,
 		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 400,
+		shield_rainbow_health_max: 500,
+		shield_shadow_health: 0,
+		shield_shadow_health_max: 250,
+		shield_anubis_health: 0,
+		shield_anubis_health_max: 500,
+		shadow_jump_lock: false,
+		shadow_jump_delay: 0,
+		shadow_jump_time: 0,
 		sword_direction: 0,
 		sword_visible: false,
 		sword_protection: false,
@@ -196,7 +203,9 @@ function player_update(player_object, dt) {
 	p.item_animstate += 0.01 * dt;
 	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.002 * dt;
 	if (p.shield_green_health > 0) p.shield_green_health -= 0.002 * dt;
+	if (p.shield_shadow_health > 0) p.shield_shadow_health -= 0.002 * dt;
 	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.002 * dt;
+	if (p.shield_anubis_health > 0) p.shield_anubis_health -= 0.002 * dt;
 	if (DEBUG_PLAYER && p.saved_health - p.health > 1) {
 		player_object.game.debug_console.unshift("player health: " + Math.round(
 				p.health) + ", change " + Math.round(p.saved_health - p
@@ -214,7 +223,7 @@ function player_update(player_object, dt) {
 		player_die(player_object);
 		return;
 	}
-	if (player_object.game.godmode) {
+	if (player_object.game.godmode || p.shield_anubis_health > 0) {
 		p.health = p.max_health;
 		p.hunger = p.max_hunger;
 		p.thirst = p.max_thirst;
@@ -342,8 +351,26 @@ function player_update(player_object, dt) {
 	if (!p.car_object) {
 		player_object.game.camera_target_body = p.body;
 		p.body.collisionFilter.mask = -1;
-		let vel = Matter.Vector.mult(getWishDir(player_object.game.input), p
-			.speed);
+		let wd = getWishDir(player_object.game.input);
+		if (wd.x * wd.x + wd.y * wd.y > 0) {
+			p.shadow_jump_lock = false;
+		}
+		let vel = Matter.Vector.mult(wd, p.speed);
+		p.shadow_jump_time -= dt;
+		if (p.shield_shadow_health > 0 && !(p.shadow_jump_delay > 0) && vel.x *
+			vel.x + vel.y * vel.y > 0) {
+			vel.x *= 5;
+			vel.y *= 5;
+			p.shadow_jump_delay = 1000;
+			p.shadow_jump_time = 200;
+		}
+		else if (vel.x * vel.x + vel.y * vel.y === 0) {
+			p.shadow_jump_delay -= dt;
+		}
+		else {
+			if (p.shadow_jump_delay - dt > 0)
+				p.shadow_jump_delay -= dt;
+		}
 		let f_down = isKeyDown(player_object.game.input, 'f', true) ||
 			isKeyDown(player_object.game.input, 'а', true) || isKeyDown(
 				player_object.game.input, ' ', true);
@@ -490,7 +517,13 @@ function player_update(player_object, dt) {
 		if (Matter.Vector.magnitude(vel) > 0)
 			achievement_do(p.achievements_element.data.achievements,
 				"first steps", p.achievements_shower_element);
-		Matter.Body.setVelocity(p.body, vel);
+		let oldvel = Matter.Body.getVelocity(p.body);
+		if (!(vel.x * vel.x + vel.y * vel.y < oldvel.x * oldvel.x + oldvel.y *
+				oldvel.y && p.shadow_jump_time > 0 || p.shadow_jump_lock))
+			Matter.Body.setVelocity(p.body, vel);
+		if (p.shadow_jump_time > 0) {
+			p.shadow_jump_lock = true && false;
+		}
 	}
 	else {
 		if (player_object.game.settings.auto_pickup[
@@ -703,6 +736,10 @@ function player_draw(player_object, ctx) {
 		"#113377");
 	renderShield(p.shield_green_health, p.shield_green_health_max, "lime",
 		"#117733");
+	renderShield(p.shield_shadow_health, p.shield_shadow_health_max, "#1a0033",
+		"#8800ff");
+	renderShield(p.shield_anubis_health, p.shield_anubis_health_max, "#cc0000",
+		"#FFD700");
 	if (p.shield_rainbow_health > 0) {
 		let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15, 2));
 		let gre = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) +
@@ -721,6 +758,8 @@ function player_shoot(player_object, dt, target_body = null, shoot_dir_x = null,
 	if (p.immunity > 0) return;
 	let g = player_object.game;
 	let item_id = hotbar_get_selected_item(p.hotbar_element);
+	g.current_weapon = item_id;
+	g.is_player_shooting = true;
 	let cfg = WEAPON_DEFS[item_id];
 	if (!cfg) return;
 	let sx = 0,
@@ -887,9 +926,16 @@ function player_handle_melee(g, p, v, dt, rotSpeed, dmgMax, dmgMin, angleLimit,
 		let diff = Math.abs(dir - renderAngle) % (2 * Math.PI);
 		if (diff > Math.PI) diff = 2 * Math.PI - diff;
 		if (diff < angleLimit) {
-			target.data.health -= (Math.random() * dmgMax + dmgMin) * dt;
+			let damage_dealt = (Math.random() * dmgMax + dmgMin) * dt;
+			target.data.health -= damage_dealt;
 			if (target.name === "enemy")
 				target.data.hit_by_player = true;
+			let w = g.current_weapon;
+			if (!g.dps_history[w]) g.dps_history[w] = [];
+			g.dps_history[w].push({
+				dmg: damage_dealt,
+				time: Date.now()
+			});
 			const knockbackForce = 0.01;
 			const forceVector = {
 				x: Math.cos(dir) * knockbackForce,

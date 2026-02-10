@@ -580,7 +580,7 @@ let TILES = {
 		spawn_animals: true,
 		spawn_items: false,
 		populate: (g, Ox, Oy) => {
-			decorative_sand_create(g, Ox, Oy, 2500, 2500);
+			decorative_sand_create(g, Ox, Oy, 2500, 2500, true, 0.875);
 		},
 		populate_with_items: (g, Ox, Oy, tile) => {
 			let N = Math.random() * 3 + 1;

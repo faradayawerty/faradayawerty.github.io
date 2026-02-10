@@ -6,6 +6,7 @@ let DEBUG_ELEMENTS_DRAW = false;
 let DO_AUTOSAVES = false;
 let DEBUG_AMOUNTS = false;
 let INTEROLATION = true;
+let SHOW_DPS = false;
 
 function game_create(input_, engine_, audios_) {
 	let g = {
@@ -31,6 +32,13 @@ function game_create(input_, engine_, audios_) {
 		totalDraws: {},
 		totalCreations: {},
 		objectsInFrame: {},
+		current_dps: 0,
+		dps_sessions: [],
+		dps_history: {},
+		dps_stats: {},
+		last_dps_second: 0,
+		current_weapon: 0,
+		is_player_shooting: false,
 		settings: {
 			language: "english",
 			auto_aim: false,
@@ -199,6 +207,7 @@ function game_gui_element_create(g, name_, data_, func_update, func_draw,
 }
 
 function game_update(g, dt) {
+	g.is_player_shooting = false;
 	if (!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
 	}
@@ -424,6 +433,7 @@ function game_draw(g, ctx, alpha) {
 					' in ' + (performance.now() - drawTime));
 		}
 	}
+	game_draw_dps(g, ctx);
 	ctx.restore();
 	if (g.mobile) {
 		drawJoysticks(ctx, g.input.joystick);
@@ -782,6 +792,28 @@ function game_autosave(g) {
 		console.log('Автосохранение невозможно - нет игрока.');
 		return;
 	}
+	if (SHOW_DPS) {
+		console.log("=== ОТЧЕТ ПО ОРУЖИЮ (АВТОСОХРАНЕНИЕ) ===");
+		let weaponsFound = Object.keys(g.dps_stats);
+		if (weaponsFound.length === 0) {
+			console.log("Статистика боя пуста.");
+		}
+		else {
+			weaponsFound.forEach(wId => {
+				let s = g.dps_stats[wId];
+				console.log(
+					`Weapon ID: ${wId} | ` +
+					`AVG: ${s.avg} | ` +
+					`MAX: ${s.max} | ` +
+					`MIN: ${s.min} | ` +
+					`MED: ${s.median} | ` +
+					`MODE: ${s.mode} | ` +
+					`Samples: ${s.sessions.length}`
+				);
+			});
+		}
+		console.log("=========================================");
+	}
 	let objs = [];
 	let state_object = {
 		name: "state",
@@ -860,4 +892,64 @@ function game_autoload(g) {
 
 function game_has_player(g) {
 	return g.objects.some(obj => obj.name === "player" && !obj.destroyed);
+}
+
+function game_update_dps_counter(g) {
+	let now = Date.now();
+	let weapon = g.current_weapon;
+	if (!g.dps_history[weapon]) g.dps_history[weapon] = [];
+	if (!g.dps_stats[weapon]) {
+		g.dps_stats[weapon] = {
+			sessions: [],
+			min: 0,
+			max: 0,
+			avg: 0,
+			median: 0,
+			mode: 0,
+			last_second: now
+		};
+	}
+	let history = g.dps_history[weapon];
+	let stats = g.dps_stats[weapon];
+	let one_second_ago = now - 1000;
+	g.dps_history[weapon] = history.filter(hit => hit.time > one_second_ago);
+	let total_damage = g.dps_history[weapon].reduce((sum, hit) => sum + hit.dmg,
+		0);
+	g.current_dps = Math.round(total_damage);
+	if (now - stats.last_second >= 1000) {
+		if (g.current_dps > 0 || g.is_player_shooting) {
+			stats.sessions.push(g.current_dps);
+			if (stats.sessions.length > 100) stats.sessions.shift();
+			let s = [...stats.sessions].sort((a, b) => a - b);
+			let sum = s.reduce((a, b) => a + b, 0);
+			stats.min = s[0];
+			stats.max = s[s.length - 1];
+			stats.avg = Math.round(sum / s.length);
+			stats.median = s[Math.floor(s.length / 2)];
+			let counts = {};
+			let mVal = s[0],
+				mCount = 0;
+			s.forEach(v => {
+				counts[v] = (counts[v] || 0) + 1;
+				if (counts[v] > mCount) {
+					mCount = counts[v];
+					mVal = v;
+				}
+			});
+			stats.mode = mVal;
+		}
+		stats.last_second = now;
+	}
+}
+
+function game_draw_dps(g, ctx) {
+	if (!SHOW_DPS) return;
+	game_update_dps_counter(g);
+	let w = g.current_weapon;
+	let s = g.dps_stats[w];
+	if (s) {
+		let log =
+			`Weapon ${w} | DPS: ${g.current_dps} | AVG: ${s.avg} | MAX: ${s.max} | MED: ${s.median}`;
+		g.debug_console.unshift(log);
+	}
 }

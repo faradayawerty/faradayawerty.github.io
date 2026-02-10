@@ -1,6 +1,6 @@
 function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 	size = 6, lifetime = 1500, color_fill = "yellow", color_outline = "orange",
-	invisible = false) {
+	invisible = false, poisoned = false) {
 	let bullets = g.objects.filter((obj) => obj.name == "bullet");
 	if (bullets.length > 300)
 		for (let i = 0; i < bullets.length - 300; i++)
@@ -20,7 +20,8 @@ function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 		color_fill: color_fill,
 		color_outline: color_outline,
 		invisible: invisible,
-		can_hit: true
+		can_hit: true,
+		poisoned: poisoned
 	};
 	if (b.enemy)
 		b.body.collisionFilter.category = 4;
@@ -71,8 +72,19 @@ function bullet_update(bullet_object, dt) {
 			}
 			else if (bullet_object.game.objects[i].name == "enemy" && !
 				bullet_object.data.enemy) {
-				bullet_object.game.objects[i].data.health -= bullet_object.data
-					.damage * dt;
+				let damage_dealt = bullet_object.data.damage * dt;
+				bullet_object.game.objects[i].data.health -= damage_dealt;
+				if (!bullet_object.data.enemy) {
+					let g = bullet_object.game;
+					let w = g.current_weapon;
+					if (!g.dps_history[w]) {
+						g.dps_history[w] = [];
+					}
+					g.dps_history[w].push({
+						dmg: damage_dealt,
+						time: Date.now()
+					});
+				}
 				bullet_object.game.objects[i].data.hit_by_player = true;
 			}
 			else if (bullet_object.game.objects[i].name != "enemy") {
@@ -97,9 +109,19 @@ function bullet_update(bullet_object, dt) {
 			bullet_object.game.player_object.data.shield_green_health -= 0.75 *
 				bullet_object.data.damage * dt;
 		}
+		else if (bullet_object.game.player_object.data.shield_shadow_health >
+			0) {
+			bullet_object.game.player_object.data.shield_shadow_health -= 0.75 *
+				bullet_object.data.damage * dt;
+		}
 		else if (bullet_object.game.player_object.data.shield_rainbow_health >
 			0) {
 			bullet_object.game.player_object.data.shield_rainbow_health -=
+				0.55 * bullet_object.data.damage * dt;
+		}
+		else if (bullet_object.game.player_object.data.shield_anubis_health >
+			0) {
+			bullet_object.game.player_object.data.shield_anubis_health -=
 				0.55 * bullet_object.data.damage * dt;
 		}
 		else if (bullet_object.game.player_object.data.immunity <= 0) {

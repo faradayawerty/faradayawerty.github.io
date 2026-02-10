@@ -60,6 +60,20 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 			available_shields = [ITEM_SHIELD_RAINBOW];
 		}
 	}
+	if (enemy_type == "mummy") {
+		available_guns.push(ITEM_KALASHNIKOV);
+		available_ammos.push(ITEM_PLASMA);
+	}
+	if (enemy_type == "shadow") {
+		available_guns.push(ITEM_MUMMY_PISTOLS);
+		available_ammos.push(ITEM_PLASMA);
+		available_shields.push(ITEM_SHADOW_SHIELD);
+	}
+	if (enemy_type == "anubis") {
+		available_guns.push(ITEM_SHADOW_STAFF);
+		available_ammos.push(ITEM_RED_PLASMA);
+		available_shields.push(ITEM_ANUBIS_REGEN_SHIELD);
+	}
 	let chance_ammo = 1;
 	let chance_health = 1;
 	let chance_shield = 1;
@@ -261,6 +275,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		);
 	if (enemy_type == "deer")
 		item = ITEM_CANNED_MEAT;
+	if (enemy_type == "scorpion" || enemy_type == "snake")
+		item = ITEM_VENOM;
 	if (enemy_type == "raccoon")
 		item = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
 	item_create(g, item, x, y);
@@ -370,6 +386,7 @@ function item_draw_bossifier_icon(ctx, x, y, w, h, animstate, enemyType) {
 		uiColor = "#" + r.toString(16).padStart(2, '0') + g.toString(16)
 			.padStart(2, '0') + b.toString(16).padStart(2, '0');
 	}
+	ctx.save();
 	ctx.strokeStyle = uiColor;
 	ctx.lineWidth = h * 0.03 * pulse;
 	ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
@@ -379,6 +396,7 @@ function item_draw_bossifier_icon(ctx, x, y, w, h, animstate, enemyType) {
 	ctx.lineTo(x + w * 0.4, y + h * 0.35);
 	ctx.lineTo(x + w * 0.6, y + h * 0.35);
 	ctx.fill();
+	ctx.restore();
 	if (typeCfg && typeCfg.render_icon) {
 		typeCfg.render_icon(ctx, x, y, w, h);
 	}

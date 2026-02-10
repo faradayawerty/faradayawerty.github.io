@@ -498,7 +498,8 @@ function decorative_no_tree_zone_create(g, x, y, w, h) {
 	return i;
 }
 
-function decorative_sand_create(g, x, y, w, h, cacti = true) {
+function decorative_sand_create(g, x, y, w, h, cacti = true,
+	cacti_chance_delta = 0.5) {
 	game_object_change_name(g, decorative_rectangle_create(g, x, y, w, h,
 			DECORATIVE_COLOR_SAND, DECORATIVE_COLOR_SAND),
 		"decorative_grass");
@@ -540,7 +541,7 @@ function decorative_sand_create(g, x, y, w, h, cacti = true) {
 			}
 			if (!skip && Math.random() < chance) {
 				decorative_cactus_create(g, cactusX, cactusY);
-				chance *= 0.5;
+				chance *= cacti_chance_delta;
 			}
 		}
 	}

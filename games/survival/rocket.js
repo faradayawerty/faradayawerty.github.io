@@ -74,8 +74,16 @@ function rocket_update(rocket_object, dt) {
 				}
 			}
 			else if (obj.name == "enemy" && !r.enemy) {
-				obj.data.health -= r.damage * dt;
+				let damage_dealt = r.damage * dt;
+				obj.data.health -= damage_dealt;
 				obj.data.hit_by_player = true;
+				let g = rocket_object.game;
+				let w = g.current_weapon;
+				if (!g.dps_history[w]) g.dps_history[w] = [];
+				g.dps_history[w].push({
+					dmg: damage_dealt,
+					time: Date.now()
+				});
 			}
 			else {
 				obj.data.health -= r.damage * dt;
@@ -95,8 +103,12 @@ function rocket_update(rocket_object, dt) {
 				0.95 * r.damage * dt;
 			else if (player.shield_green_health > 0) player
 				.shield_green_health -= 0.75 * r.damage * dt;
+			else if (player.shield_shadow_health > 0) player
+				.shield_shadow_health -= 0.75 * r.damage * dt;
 			else if (player.shield_rainbow_health > 0) player
 				.shield_rainbow_health -= 0.55 * r.damage * dt;
+			else if (player.shield_anubis_health > 0) player
+				.shield_anubis_health -= 0.55 * r.damage * dt;
 			else if (player.immunity <= 0) {
 				let k = (player.sword_protection || player.sword_visible) ?
 					0.25 : 1.0;

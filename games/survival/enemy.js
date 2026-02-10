@@ -1,5 +1,6 @@
 let DEBUG_ENEMY = false;
-let DAMAGE_COEFFICIENT = 1;
+let ENEMY_DAMAGE_COEFFICIENT = 1.0;
+let ENEMY_HEALTH_COEFFICIENT = 1.0;
 
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	"random", tile = LEVEL_TILE_VOID) {
@@ -66,21 +67,21 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		}
 	}
 	if (make_minion) boss = false;
-	if (boss) {
+	if (boss || config.is_snake) {
 		width = width * 2.67;
 		height = height * 2.67;
 	}
-	if (make_minion) {
+	if (make_minion && !config.is_snake) {
 		width = width * 0.67;
 		height = height * 0.67;
 	}
 	let max_health_random = config.health * (1 + 0.5 * Math.random());
 	let e = {
-		health: max_health_random,
-		max_health: max_health_random,
+		health: max_health_random * ENEMY_HEALTH_COEFFICIENT,
+		max_health: max_health_random * ENEMY_HEALTH_COEFFICIENT,
 		hunger: 300,
 		max_hunger: 300,
-		damage: config.damage * DAMAGE_COEFFICIENT,
+		damage: config.damage * ENEMY_DAMAGE_COEFFICIENT,
 		speed: config.speed,
 		w: width,
 		h: height,
@@ -100,7 +101,9 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		color_gradient: 0,
 		laser_angle: 0,
 		hunt_delay: 1000,
-		hunt_delay_max: 1000
+		hunt_delay_max: 1000,
+		poisoned_time: 0,
+		is_snake: config.is_snake
 	};
 	if (config.use_rainbow_color_gradient) {
 		e.color_gradient = Math.random() * 2 * Math.PI / 0.03;
@@ -117,8 +120,8 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	}
 	if (boss) {
 		e.damage = 1.05 * e.damage;
-		e.health = 50 * e.max_health;
-		e.max_health = 50 * e.max_health;
+		e.health = 25 * e.max_health;
+		e.max_health = 25 * e.max_health;
 		e.hunger = 1.75 * e.max_hunger;
 		e.max_hunger = 1.75 * e.max_hunger;
 		e.speed = 0.5 * e.speed;
@@ -140,6 +143,10 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		e.max_health = 0.25 * e.max_health;
 		e.hunger = 0.05 * e.max_hunger;
 		e.max_hunger = 0.05 * e.max_hunger;
+		if (config.is_snake) {
+			e.hunger = 1.75 * e.max_hunger;
+			e.max_hunger = 1.75 * e.max_hunger;
+		}
 		e.speed = 1.25 * e.speed;
 		if (config.minion_speed_mult !== undefined) {
 			e.speed *= config.minion_speed_mult;
@@ -232,18 +239,31 @@ function enemy_update(enemy_object, dt) {
 		e.health *= Math.pow(0.5, dt / 1000);
 		e.health -= 0.01 * e.max_health * dt / 1000;
 	}
+	if (e.poisoned_time > 0) {
+		e.health -= 2.75 * dt / 1000;
+		e.poisoned_time -= dt;
+	}
 	if (e.shooting_delay < 5000) e.shooting_delay += dt;
 	if (e.jump_delay < 4000) e.jump_delay += Math.random() * dt;
 	e.sword_rotation += 0.01 * dt;
 	e.color_gradient += 0.01 * dt;
 	if (typeData.behaviour_no_target)
 		typeData.behaviour_no_target(enemy_object, dt);
+	let vars = {
+		tx: 0,
+		ty: 0,
+		v: 0,
+		dx: 0,
+		dy: 0,
+		ndx: 0,
+		ndy: 0,
+	};
 	let target_object = enemy_get_target_object(enemy_object, dt);
 	if (target_object != null) {
 		let tx = target_object.data.body.position.x - e.body.position.x;
 		let ty = target_object.data.body.position.y - e.body.position.y;
 		let v = Math.sqrt(tx * tx + ty * ty) || 0.001;
-		let vars = {
+		vars = {
 			tx: tx,
 			ty: ty,
 			v: v,
@@ -273,7 +293,11 @@ function enemy_update(enemy_object, dt) {
 					dt;
 				else if (t.shield_green_health > 0) t.shield_green_health -=
 					0.25 * e.damage * dt;
+				else if (t.shield_shadow_health > 0) t.shield_shadow_health -=
+					0.25 * e.damage * dt;
 				else if (t.shield_rainbow_health > 0) t.shield_rainbow_health -=
+					0.10 * e.damage * dt;
+				else if (t.shield_anubis_health > 0) t.shield_anubis_health -=
 					0.10 * e.damage * dt;
 				else if (t.immunity <= 0) t.health -= e.damage * dt;
 			}
@@ -291,6 +315,8 @@ function enemy_update(enemy_object, dt) {
 		if (e.boss) {
 			if (e.spawn_minion_delay >= 4000) {
 				let max_minions = typeData.max_minions || 10;
+				if (typeData.max_minions === 0)
+					max_minions = 0;
 				if (enemy_count_minions(enemy_object) < max_minions) {
 					for (let i = 0; i < Math.random() * 4 + 1; i++) {
 						let theta = 2 * Math.PI * Math.random();
@@ -364,26 +390,14 @@ function enemy_draw(enemy_object, ctx) {
 	if (e.health <= 0) return;
 	const typeData = ENEMY_TYPES[e.type] || ENEMY_TYPES["regular"];
 	const vis = typeData.visuals || {};
-	fillMatterBody(ctx, e.body, e.color);
-	let outlineW = vis.outline_is_relative ? vis.outline_width * e.w : (vis
-		.outline_width || 1);
-	drawMatterBody(ctx, e.body, e.color_outline, outlineW);
-	if (enemy_object.game.settings.indicators["show enemy hunger"]) {
-		ctx.fillStyle = "red";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
-			e.w, e.h * 0.05);
-		ctx.fillStyle = "orange";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
-			e.w * e.hunger / e.max_hunger, e.h * 0.05);
+	if (!typeData.only_draw_custom) {
+		fillMatterBody(ctx, e.body, e.color);
+		let outlineW = vis.outline_is_relative ? vis.outline_width * e.w : (vis
+			.outline_width || 1);
+		drawMatterBody(ctx, e.body, e.color_outline, outlineW);
 	}
-	if (enemy_object.game.settings.indicators["show enemy health"]) {
-		ctx.fillStyle = "red";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
-			e.w, e.h * 0.05);
-		ctx.fillStyle = "lime";
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
-			e.w * e.health / e.max_health, e.h * 0.05);
-	}
+	if (vis.custom_draw)
+		vis.custom_draw(e, ctx);
 	let target_object = enemy_get_target_object(enemy_object, -1);
 	if (target_object != null) {
 		let gx = target_object.data.body.position.x - e.body.position.x;
@@ -464,58 +478,21 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.stroke();
 		}
 	}
-	if (vis.custom_draw)
-		vis.custom_draw(e, ctx);
-}
-
-function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
-	ctx.fillStyle = "#333333";
-	ctx.beginPath();
-	ctx.moveTo(x - w * 0.4, y - h * 0.5);
-	ctx.lineTo(x - w * 0.6, y - h * 0.9);
-	ctx.lineTo(x - w * 0.1, y - h * 0.5);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.moveTo(x + w * 0.4, y - h * 0.5);
-	ctx.lineTo(x + w * 0.6, y - h * 0.85);
-	ctx.lineTo(x + w * 0.1, y - h * 0.5);
-	ctx.fill();
-	fillMatterBody(ctx, e.body, "#555555");
-	drawMatterBody(ctx, e.body, e.color_outline, 2);
-	ctx.fillStyle = "#111111";
-	ctx.fillRect(x - w * 0.5, y - h * 0.25, w, h * 0.4);
-	let eyeSize = w * 0.12;
-	ctx.fillStyle = "#ff0000";
-	ctx.shadowBlur = 15;
-	ctx.shadowColor = "red";
-	ctx.beginPath();
-	ctx.arc(x - w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
-	ctx.arc(x + w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
-	ctx.fill();
-	ctx.shadowBlur = 0;
-	ctx.fillStyle = "black";
-	ctx.fillRect(x - w * 0.26, y - h * 0.15, w * 0.02, h * 0.2);
-	ctx.fillRect(x + w * 0.24, y - h * 0.15, w * 0.02, h * 0.2);
-	ctx.strokeStyle = "white";
-	ctx.lineWidth = 2;
-	ctx.beginPath();
-	ctx.moveTo(x - w * 0.2, y + h * 0.2);
-	ctx.lineTo(x - w * 0.1, y + h * 0.3);
-	ctx.lineTo(x, y + h * 0.2);
-	ctx.lineTo(x + w * 0.1, y + h * 0.3);
-	ctx.lineTo(x + w * 0.2, y + h * 0.2);
-	ctx.stroke();
-	let tailX = x - w * 0.5;
-	let tailY = y + h * 0.3;
-	for (let i = 0; i < 6; i++) {
-		ctx.strokeStyle = (i % 2 === 0) ? "#222222" : "#666666";
-		ctx.lineWidth = h * 0.25;
-		ctx.beginPath();
-		ctx.moveTo(tailX - (i * w * 0.12), tailY + Math.sin(e.color_gradient +
-			i) * 5);
-		ctx.lineTo(tailX - ((i + 1) * w * 0.12), tailY + Math.sin(e
-			.color_gradient + i + 1) * 5);
-		ctx.stroke();
+	if (enemy_object.game.settings.indicators["show enemy hunger"]) {
+		ctx.fillStyle = "red";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
+			e.w, e.h * 0.05);
+		ctx.fillStyle = "orange";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
+			e.w * e.hunger / e.max_hunger, e.h * 0.05);
+	}
+	if (enemy_object.game.settings.indicators["show enemy health"]) {
+		ctx.fillStyle = "red";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
+			e.w, e.h * 0.05);
+		ctx.fillStyle = "lime";
+		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
+			e.w * e.health / e.max_health, e.h * 0.05);
 	}
 }
 

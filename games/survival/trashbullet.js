@@ -59,8 +59,15 @@ function trash_bullet_update(bullet_object, dt) {
 				"animal") &&
 			Matter.Collision.collides(b.body, target.data.body) != null) {
 			if (target.name == "enemy" && !b.enemy) {
-				target.data.health -= b.damage * dt;
+				let damage_dealt = b.damage * dt;
+				target.data.health -= damage_dealt;
 				target.data.hit_by_player = true;
+				if (!g.dps_history[g.current_weapon]) g.dps_history[g
+					.current_weapon] = [];
+				g.dps_history[g.current_weapon].push({
+					dmg: damage_dealt,
+					time: Date.now()
+				});
 			}
 			else {
 				target.data.health -= b.damage * dt;
@@ -79,8 +86,14 @@ function trash_bullet_update(bullet_object, dt) {
 			else if (pd.shield_green_health > 0) {
 				pd.shield_green_health -= 0.75 * b.damage * dt;
 			}
+			else if (pd.shield_shadow_health > 0) {
+				pd.shield_shadow_health -= 0.75 * b.damage * dt;
+			}
 			else if (pd.shield_rainbow_health > 0) {
 				pd.shield_rainbow_health -= 0.55 * b.damage * dt;
+			}
+			else if (pd.shield_anubis_health > 0) {
+				pd.shield_anubis_health -= 0.55 * b.damage * dt;
 			}
 			else if (pd.immunity <= 0) {
 				let k = 1.0;

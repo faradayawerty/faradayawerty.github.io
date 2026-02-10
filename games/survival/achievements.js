@@ -144,8 +144,8 @@ function achievements_draw(ae, ctx) {
 		"white", 3);
 	drawLine(ctx, cx + p, cy + cross_width - p, cx + cross_width - p, cy + p,
 		"white", 3);
-	let startX = ae.data.offset_x + ae.data.x;
-	let startY = ae.data.offset_y + ae.data.y;
+	let startX = ae.data.offset_x + 0.5 * ae.data.x;
+	let startY = ae.data.offset_y + 0.5 * ae.data.y;
 	let w = ae.data.icon_size;
 	let h = ae.data.icon_size;
 	let spacing = 2.0;
