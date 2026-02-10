@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="icon.png">
+    <title>Презентация игры для стрима</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --btn-start: #22c55e;
+            --btn-mid: #f59e0b;
+            --btn-end: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            padding: 40px;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .description {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            color: var(--text-main);
+        }
+
+        .game-link {
+            display: inline-block;
+            margin-bottom: 40px;
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 2px solid var(--accent-color);
+            transition: opacity 0.3s;
+        }
+
+        .game-link:hover {
+            opacity: 0.8;
+        }
+
+        .saves-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .save-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .save-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .save-instruction {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            width: 80%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-start { background-color: var(--btn-start); }
+        .btn-mid { background-color: var(--btn-mid); }
+        .btn-end { background-color: var(--btn-end); }
+
+        .time-tag {
+            background: rgba(0,0,0,0.3);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Привет, xkoster!</h1>
+    
+    <p class="description">
+    	Решил сделать небольшое описание и сэкономить твоё время.
+	Моя игра - браузерка на стыке выживания и буллет хелла.
+	В ней около 15 боссов, около полусотни различных предметов,
+	около двух десятков различных локаций,
+	так что вряд ли получится пройти всё на стриме.
+    </p>
+    <p class="description">
+	Но я всё же хотел бы, чтобы ты не судил игру лишь по её началу.
+	В связи с чем, вот три точки отсчёта, с которых можно начать играть.
+	Так же я указал, сколько времени в минутах можно потратить на каждый из сейвов.
+	Затянет на подольше - буду только рад :)
+    </p>
+
+    <a href="https://faradayawerty.github.io/games/survival/" class="game-link" target="_blank">👉 Игра здесь</a>
+
+    <div class="saves-grid">
+        <div class="save-card">
+            <div class="save-title">📍 Начало</div>
+            <div class="save-instruction">Просто запусти "Новую игру".</div>
+            <div class="time-tag">⏱ 1-2 минуты</div>
+        </div>
+
+        <div class="save-card">
+            <div class="save-title">⚔️ Середина игры</div>
+		<div class="save-instruction">Ctrl+S скачивает JSON. В игре нажми "Загрузить игру" и выбери сейв.<br>Тут начинается экшен!</div>
+            <a href="faw_survival_save_midgame.json" class="btn btn-mid">Скачать сейв: Мид-гейм</a>
+            <div class="time-tag">⏱ 2 минуты</div>
+        </div>
+
+        <div class="save-card">
+            <div class="save-title">🏆 Финал (Эпик)</div>
+            <div class="save-instruction">Самая крутая сцена и развязка.</div>
+            <a href="faw_survival_save_endgame.json" class="btn btn-end">Скачать сейв: Финал</a>
+            <div class="time-tag">⏱ 1 минута</div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
