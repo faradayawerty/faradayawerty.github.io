@@ -473,7 +473,8 @@ function player_update(player_object, dt) {
 				let dx = nearest_enemy.data.body.position.x - p.body.position.x;
 				let dy = nearest_enemy.data.body.position.y - p.body.position.y;
 				let item = hotbar_get_selected_item(p.hotbar_element);
-				if (item == ITEM_RED_PISTOLS || item == ITEM_RAINBOW_PISTOLS || item == ITEM_MUMMY_PISTOLS) {
+				if (item == ITEM_RED_PISTOLS || item == ITEM_RAINBOW_PISTOLS ||
+					item == ITEM_MUMMY_PISTOLS) {
 					dx += p.w;
 					dy += p.h;
 				}
