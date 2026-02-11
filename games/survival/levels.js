@@ -81,11 +81,13 @@ function levels_spawn_animals(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
 	}
 }
 
-function levels_spawn_enemies(g, Ox, Oy, player_object, tile = LEVEL_TILE_DEFAULT) {
+function levels_spawn_enemies(g, Ox, Oy, player_object, tile =
+	LEVEL_TILE_DEFAULT) {
 	if (!g.settings.enemies_spawn)
 		return;
 	if (player_object) {
-		if(!achievement_get(player_object.data.achievements_element.data.achievements, "get a gun").done)
+		if (!achievement_get(player_object.data.achievements_element.data
+				.achievements, "get a gun").done)
 			return;
 		let m = 0.33 * (
 			player_object.data.health / player_object.data.max_health +

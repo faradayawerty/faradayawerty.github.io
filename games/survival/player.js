@@ -228,13 +228,14 @@ function player_update(player_object, dt) {
 		p.hunger = p.max_hunger;
 		p.thirst = p.max_thirst;
 	}
-
 	let can_lose_hunger_or_thirst = false;
-	if(achievement_get(p.achievements_element.data.achievements, "stay hydrated").done
-		|| achievement_get(p.achievements_element.data.achievements, "yummy").done
-		|| achievement_get(p.achievements_element.data.achievements, "shoot 'em up").done)
+	if (achievement_get(p.achievements_element.data.achievements,
+			"stay hydrated").done ||
+		achievement_get(p.achievements_element.data.achievements, "yummy")
+		.done ||
+		achievement_get(p.achievements_element.data.achievements,
+			"shoot 'em up").done)
 		can_lose_hunger_or_thirst = true;
-
 	if (p.thirst > 0 && !(p.achievements_element.shown && p.thirst < 0.33 * p
 			.max_thirst) && !(p.inventory_element.shown && p.thirst < 0.33 * p
 			.max_thirst) && !p.car_object && can_lose_hunger_or_thirst) {
