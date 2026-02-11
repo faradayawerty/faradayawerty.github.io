@@ -11,7 +11,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "find a bossifier to bossify the enemies; it drops from the respective enemy type",
-			ru: "найдите боссификатор; он позволяет боссифицировать врагов соответствующего типа и выпадает с противников этого типа"
+			ru: "найдите боссификатор; он позволяет превращать врагов в боссов и выпадает с противников соответствующего типа"
 		},
 		req: "shoot 'em up",
 		draw: (ctx, x, y, w, h, p) => {
@@ -36,7 +36,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "launch the game",
-			ru: "зайти в игру"
+			ru: "запустите игру"
 		},
 		req: null,
 		draw: (ctx, x, y, w, h, p) => {
@@ -119,7 +119,7 @@ let ACHIEVEMENT_REGISTRY = {
 		desc: {
 			mobile: {
 				en: "fill up the inventory with items fully; hint: press item in the inventory then press DROP to drop it",
-				ru: "полностью заполните инвентарь; подсказка: нажмите на предмет в инвентаре, затем DROP, чтобы выкинуть его"
+				ru: "полностью заполните инвентарь предметами; подсказка: нажмите на предмет в инвентаре, а затем на кнопку DROP, чтобы выбросить его"
 			},
 			pc: {
 				en: "fill up the inventory with items fully; hint: use Q to drop an item from the inventory",
@@ -212,11 +212,11 @@ let ACHIEVEMENT_REGISTRY = {
 		desc: {
 			mobile: {
 				en: "get a ride in the car by standing close to it and pressing PICK UP / CAR",
-				ru: "сядьте в автомобиль, подойдя к нему близко и нажав кнопку PICK UP / CAR"
+				ru: "сядьте в автомобиль, подойдя к нему и нажав кнопку PICK UP / CAR"
 			},
 			pc: {
 				en: "get a ride in the car by standing close to it and pressing F or SPACE",
-				ru: "сядьте в автомобиль, подойдя к нему близко и нажав F или SPACE"
+				ru: "сядьте в автомобиль, подойдя к нему и нажав F или SPACE"
 			}
 		},
 		req: "first steps",
@@ -239,11 +239,11 @@ let ACHIEVEMENT_REGISTRY = {
 		desc: {
 			mobile: {
 				en: "use gasoline to refuel a car by standing close to it pressing USE",
-				ru: "используйте бензин, чтобы заправить авто через кнопку USE"
+				ru: "используйте канистру, чтобы заправить автомобиль через кнопку USE, стоя рядом с ним"
 			},
 			pc: {
 				en: "use gasoline to refuel a car by standing close to it and pressing left mouse button",
-				ru: "воспользуйтесь бензином, чтобы заправить автомобиль; для этого подойдите близко к автомобилю с топливом в руках и нажмите ЛКМ по автомобилю"
+				ru: "воспользуйтесь бензином, чтобы заправить автомобиль; для этого подойдите к нему с топливом в руках и нажмите ЛКМ"
 			}
 		},
 		req: "pick an item",
@@ -277,11 +277,11 @@ let ACHIEVEMENT_REGISTRY = {
 		desc: {
 			mobile: {
 				en: "pick up an item by standing close to it and pressing PICK UP",
-				ru: "подберите предмет, подойдя к нему близко и нажав кнопку PICK UP"
+				ru: "подберите предмет, подойдя к нему и нажав кнопку PICK UP"
 			},
 			pc: {
 				en: "pick up an item by standing close to it and pressing F or SPACE",
-				ru: "подберите предмет, подойдя к нему близко и нажав F или SPACE"
+				ru: "подберите предмет, подойдя к нему и нажав F или SPACE"
 			}
 		},
 		req: "outside the box",
@@ -316,7 +316,7 @@ let ACHIEVEMENT_REGISTRY = {
 			},
 			pc: {
 				en: "eat any food: select it in inventory and left-click on your character",
-				ru: "съешьте любую еду: выберите её в инвентаре, затем переместите к персонажу и нажмите ЛКМ, либо выберите еду в хотбаре и нажмите ЛКМ по игроку"
+				ru: "съешьте любую еду: выберите её в инвентаре, переместите к персонажу и нажмите ЛКМ, либо выберите еду в хотбаре и нажмите ЛКМ по игроку"
 			}
 		},
 		req: "pick an item",
@@ -334,16 +334,16 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		name: {
 			en: "stay hydrated",
-			ru: "поддержка водного баланса"
+			ru: "водный баланс"
 		},
 		desc: {
 			mobile: {
 				en: "drink any liquid by selecting it and pressing USE",
-				ru: "употребите любую жидкость, выбрав её и нажав USE"
+				ru: "выпейте любую жидкость, выбрав её и нажав USE"
 			},
 			pc: {
 				en: "drink any liquid: select it in inventory and left-click on your character",
-				ru: "выпейте любую жидкость: выберите её в инвентаре, поднесите к игроку и нажмите ЛКМ"
+				ru: "выпейте любую жидкость: выберите её в инвентаре, поднесите курсор к игроку и нажмите ЛКМ"
 			}
 		},
 		req: "pick an item",
@@ -370,7 +370,7 @@ let ACHIEVEMENT_REGISTRY = {
 			},
 			pc: {
 				en: "use health pack: select it in inventory and left-click on your character",
-				ru: "используйте аптечку: выберите её в инвентаре, поднесите к игроку и нажмите ЛКМ"
+				ru: "используйте аптечку: выберите её в инвентаре, поднесите курсор к игроку и нажмите ЛКМ"
 			}
 		},
 		req: "pick an item",
@@ -395,7 +395,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "find a gun and pick it up",
-			ru: "найдите и подберите оружие"
+			ru: "найдите и подберите любое огнестрельное оружие"
 		},
 		req: "pick an item",
 		draw: (ctx, x, y, w, h, p) => {
@@ -418,11 +418,11 @@ let ACHIEVEMENT_REGISTRY = {
 		desc: {
 			mobile: {
 				en: "try shooting with the right joystick without having any ammo",
-				ru: "попробуйте выстрелить правым джойстиком"
+				ru: "попробуйте выстрелить, используя правый джойстик, при отсутствии патронов"
 			},
 			pc: {
 				en: "try shooting a gun without having any ammo for it",
-				ru: "попробуйте выстрелить из оружия, не имея подходящих патронов"
+				ru: "попробуйте выстрелить из оружия, не имея к нему подходящих патронов"
 			}
 		},
 		req: "get a gun",
@@ -446,11 +446,11 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		name: {
 			en: "shoot 'em up",
-			ru: "зомби шутер"
+			ru: "зомби-шутер"
 		},
 		desc: {
 			en: "kill an enemy by shooting at it",
-			ru: "убейте врага, выстрелив по нему"
+			ru: "убейте врага, выстрелив в него"
 		},
 		req: "get a gun",
 		draw: (ctx, x, y, w, h, p) => {
@@ -471,7 +471,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "kill the first shooting enemy",
-			ru: "убейте первого стрелка"
+			ru: "убейте первого стреляющего врага"
 		},
 		req: "big guy",
 		draw: (ctx, x, y, w, h, p) => {
@@ -534,7 +534,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "kill one rocket shooting enemy",
-			ru: "убейте одного стрелка с ракетницей"
+			ru: "убейте одного врага, стреляющего ракетами"
 		},
 		req: "big guy with a sword",
 		draw: (ctx, x, y, w, h, p) => {
@@ -597,7 +597,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "kill a shooting boss",
-			ru: "убейте босса стрелка"
+			ru: "убейте стреляющего босса"
 		},
 		req: "big guy",
 		draw: (ctx, x, y, w, h, p) => {
@@ -1048,7 +1048,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "defeat the boss giant serpent",
-			ru: "победите босса гигантского змея"
+			ru: "победите босса — гигантского змея"
 		},
 		req: "huge rainbow guy",
 		draw: (ctx, x, y, w, h, p) => {

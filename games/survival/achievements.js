@@ -1,3 +1,4 @@
+
 let DEBUG_ACHIEVEMENTS = false;
 
 function achievements_create(g) {
@@ -152,6 +153,7 @@ function achievements_draw(ae, ctx) {
 	let mx = ae.game.input.mouse.x / scale;
 	let my = ae.game.input.mouse.y / scale;
 	let hoveredAchKey = null;
+
 	if (DEBUG_ACHIEVEMENTS)
 		ae.game.debug_console.unshift(
 			'1st step in achievements draw completed in ' + (performance.now() -
@@ -161,20 +163,15 @@ function achievements_draw(ae, ctx) {
 		let config = ACHIEVEMENT_REGISTRY[key];
 		let ix = startX + config.grid.x * (w * spacing);
 		let iy = startY + config.grid.y * (h * spacing);
+		
 		achievement_icon_draw(ctx, as, key, ix, iy, w, h,
 			false, ae.data.offset_x, ae.data.offset_y,
 			ae.data.offset_x + ae.data.width,
 			ae.data.offset_y + ae.data.height,
 			ae.data.animstate);
+			
 		if (mx > ix && mx < ix + w && my > iy && my < iy + h) {
-			let canSee = true;
-			if (config.req) {
-				let reqAch = achievement_get(as, config.req);
-				if (!reqAch || !reqAch.done) canSee = false;
-			}
-			if (canSee) {
-				hoveredAchKey = key;
-			}
+			hoveredAchKey = key;
 		}
 	}
 	if (DEBUG_ACHIEVEMENTS)
@@ -335,16 +332,34 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 	if (y < 5) y = 5;
 	if (x + W > screenW) W = screenW - x - 10;
 	if (y + H > screenH) H = screenH - y - 10;
+	
+	const config = ACHIEVEMENT_REGISTRY[ach];
+	let isHidden = false;
+	if (config.req) {
+		const reqAch = achievement_get(as, config.req);
+		if (!reqAch || !reqAch.done) isHidden = true;
+	}
+
 	let lines = [];
 	let achData = achievement_get(as, ach);
-	let name = (ae.game.settings.language == "русский") ? achData.name_rus :
-		achData.name;
-	lines.push(name + "!");
+	
+	let name = "";
+	let desc = "";
+	
+	if (isHidden) {
+		name = (ae.game.settings.language == "русский") ? "Скрытое достижение" : "Hidden Achievement";
+		desc = (ae.game.settings.language == "русский") ? 
+			"Новые достижения открываются по мере получения других достижений. Используйте достижения как гайд в мир игры. Ваша цель - получить все достижения." :
+			"New achievements are unlocked as you earn others. Use achievements as a guide to the game world. Your goal is to collect them all.";
+	} else {
+		name = (ae.game.settings.language == "русский") ? achData.name_rus : achData.name;
+		let descRaw = (ae.game.settings.language == "русский") ? achData.desc_rus : achData.desc;
+		desc = (typeof descRaw === 'object' && descRaw !== null) ? (ae.game.mobile ? descRaw.mobile : descRaw.pc) : descRaw;
+	}
+
+	lines.push(name[0].toUpperCase() + name.slice(1) + (isHidden ? "" : "!"));
 	lines.push("");
-	let descRaw = (ae.game.settings.language == "русский") ? achData.desc_rus :
-		achData.desc;
-	let desc = (typeof descRaw === 'object' && descRaw !== null) ? (ae.game
-		.mobile ? descRaw.mobile : descRaw.pc) : descRaw;
+	
 	let fontsize = Math.floor(W / 24);
 	let charlim = Math.floor(1.25 * W / fontsize);
 	let words = desc.split(' ');
@@ -355,8 +370,11 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 			line = "";
 		}
 		line += words[i] + " ";
+		if(i === 0)
+			line = line[0].toUpperCase() + line.slice(1);
 	}
 	lines.push(line);
+
 	ctx.save();
 	ctx.globalAlpha = 0.85;
 	ctx.fillStyle = "black";
@@ -365,8 +383,10 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 	ctx.strokeStyle = "gray";
 	ctx.lineWidth = 2;
 	ctx.strokeRect(x, y, W, H);
+	
 	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
 		false, 0, 0, screenW, screenH, ae.data.animstate);
+		
 	for (let i = 0; i < lines.length; i++) {
 		if (i === 0) {
 			drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
@@ -440,6 +460,29 @@ function get_achievement_palette(done, animstate) {
 	return p;
 }
 
+function achievement_icon_draw_question_mark(ctx, x, y, w, h) {
+	ctx.save();
+	let cx = x + w / 2;
+	let cy = y + h / 2;
+	ctx.strokeStyle = "#555555";
+	ctx.lineWidth = w * 0.12;
+	ctx.lineCap = "round";
+	ctx.lineJoin = "round";
+
+	ctx.beginPath();
+	// Классический изгиб вправо
+	ctx.arc(cx, cy - h * 0.15, w * 0.22, 0.9 * Math.PI, -0.2 * Math.PI, false);
+	ctx.bezierCurveTo(cx + w * 0.2, cy - h * 0.1, cx - w * 0.1, cy, cx, cy + h * 0.15);
+	ctx.stroke();
+
+	// Точка внизу
+	ctx.beginPath();
+	ctx.arc(cx, cy + h * 0.35, w * 0.05, 0, Math.PI * 2);
+	ctx.fillStyle = "#555555";
+	ctx.fill();
+	ctx.restore();
+}
+
 function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
 	50, bby = 50, bbw = 1000, bbh = 1000, animstate = null, back = true) {
 	let drawTime = performance.now();
@@ -448,10 +491,15 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
 	const config = ACHIEVEMENT_REGISTRY[name];
 	if (!config) return;
 	const ach = achievement_get(as, name);
+	
 	if (config.req) {
 		const reqAch = achievement_get(as, config.req);
-		if (reqAch && !reqAch.done) return;
+		if (reqAch && !reqAch.done) {
+			achievement_icon_draw_question_mark(ctx, x, y, w, h);
+			return;
+		}
 	}
+	
 	if (!done && ach) {
 		done = ach.done;
 	}
