@@ -4,13 +4,13 @@ let ENEMY_HEALTH_COEFFICIENT = 1.0;
 
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	"random", tile = LEVEL_TILE_VOID) {
-	let enemies = g.objects.filter((obj) => obj.name == "enemy");
-	if (enemies.length > 100) {
-		for (let i = 0; i < enemies.length - 100; i++) {
-			if (!enemies[i].data.boss)
-				enemies[i].destroy(enemies[i]);
-		}
-	}
+	//let enemies = g.objects.filter((obj) => obj.name == "enemy");
+	//if (enemies.length > 100) {
+	//	for (let i = 0; i < enemies.length - 100; i++) {
+	//		if (!enemies[i].data.boss)
+	//			enemies[i].destroy(enemies[i]);
+	//	}
+	//}
 	if (type === "random") {
 		let currentTileTheme = undefined;
 		if (tile >= THEME_TAIGA) {

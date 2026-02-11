@@ -172,7 +172,7 @@ const WEAPON_DEFS = {
 					Math.cos(finalAngle), Math.sin(
 						finalAngle),
 					17.5, (0.75 + 0.5 * Math.random()) *
-					29.4 * BALANCE_FACTOR * (1000 / 15000) *
+					29.4 * BALANCE_FACTOR * (1000 / 10000) *
 					weapon_damage_from_tier(8),
 					false, 12.5, 1500, "red", "gold"
 				);

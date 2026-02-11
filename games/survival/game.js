@@ -7,6 +7,7 @@ let DO_AUTOSAVES = false;
 let DEBUG_AMOUNTS = false;
 let INTEROLATION = true;
 let SHOW_DPS = false;
+let BULLET_LIMIT = 200;
 
 function game_create(input_, engine_, audios_) {
 	let g = {
@@ -39,6 +40,7 @@ function game_create(input_, engine_, audios_) {
 		last_dps_second: 0,
 		current_weapon: 0,
 		is_player_shooting: false,
+		last_bullet_num: 0,
 		settings: {
 			language: "english",
 			auto_aim: false,
@@ -177,6 +179,10 @@ function game_object_create(g, name_, data_, func_update, func_draw,
 			break;
 		}
 	}
+	if(name_ === "bullet") {
+		g.last_bullet_num++;
+		obj.bullet_num = g.last_bullet_num;
+	}
 	g.objects.splice(insertIndex, 0, obj);
 	if (DEBUG_CREATION) {
 		if (g.totalCreations[name_] === undefined)
@@ -269,7 +275,10 @@ function game_update(g, dt) {
 				g.objectsInFrame[g.objects[i].name]++;
 			}
 			let updateTime = performance.now();
-			g.objects[i].update(g.objects[i], dt);
+			if(g.objects[i].name === "bullet" && g.objects[i].bullet_num < g.last_bullet_num - BULLET_LIMIT)
+				bullet_destroy(g.objects[i]);
+			else
+				g.objects[i].update(g.objects[i], dt);
 			if (DEBUG_UPDATE) {
 				if (g.totalUpdates[g.objects[i].name] === undefined)
 					g.totalUpdates[g.objects[i].name] = 0;
@@ -399,8 +408,10 @@ function game_draw(g, ctx, alpha) {
 					}
 				}
 			}
-			if (doDraw)
-				g.objects[i].draw(g.objects[i], ctx);
+			if (doDraw) {
+				if(!(g.objects[i].name === "bullet" && g.objects[i].data.last_bullet_num < g.last_bullet_num - BULLET_LIMIT))
+					g.objects[i].draw(g.objects[i], ctx);
+			}
 			ctx.restore();
 			if (DEBUG_DRAW) {
 				if (g.totalDraws[g.objects[i].name] === undefined)

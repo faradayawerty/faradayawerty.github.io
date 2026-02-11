@@ -468,11 +468,15 @@ const ENEMY_TYPES = {
 				0.04);
 			ctx.shadowBlur = 0;
 		},
+		on_death: (obj, target) => {
+		    if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "ancient curse", target.data.achievements_shower_element);
+		},
 		on_boss_death: (obj, target) => {
 			let item = Math.random() < 0.33 ? ITEM_MUMMY_SHOTGUN :
 				ITEM_MUMMY_PISTOLS;
 			item_create(obj.game, item, obj.data.body.position.x, obj
 				.data.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "big mummy guy", target.data.achievements_shower_element);
 		},
 	},
 	"shooting rocket": {
@@ -492,6 +496,7 @@ const ENEMY_TYPES = {
 		bossifier_item: ITEM_BOSSIFIER_ROCKET,
 		visuals: {
 			draw_gun: true,
+			draw_gun_boss: true,
 			gun_color: "#113355",
 			gun_width: 0.25,
 			outline_width: 1
@@ -594,11 +599,15 @@ const ENEMY_TYPES = {
 			ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
 			ctx.strokeRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
 		},
+		on_death: (obj, target) => {
+		    if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "desert shadow", target.data.achievements_shower_element);
+		},
 		on_boss_death: (obj, target) => {
 			let item = Math.random() < 0.33 ?
 				ITEM_SHADOW_DUAL_SHOTGUNS : ITEM_SHADOW_STAFF;
 			item_create(obj.game, item, obj.data.body.position.x, obj
 				.data.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "big shadow guy", target.data.achievements_shower_element);
 		},
 	},
 	"anubis": {
@@ -719,11 +728,15 @@ const ENEMY_TYPES = {
 			ctx.fillRect(x + w * 0.53, y + h * 0.63, w * 0.04, h *
 				0.04);
 		},
+		on_death: (obj, target) => {
+		    if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "anubis kill", target.data.achievements_shower_element);
+		},
 		on_boss_death: (obj, target) => {
 			let item = Math.random() < 0.33 ?
 				ITEM_ANUBIS_SANDSTORM_STAFF : ITEM_ANUBIS_PUNISHER_ROD;
 			item_create(obj.game, item, obj.data.body.position.x, obj
 				.data.body.position.y, false, false);
+			if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "big anubis guy", target.data.achievements_shower_element);
 		},
 	},
 	"shooting laser": {
@@ -940,6 +953,7 @@ const ENEMY_TYPES = {
 			item_create(obj.game, ITEM_HORN, obj.data.body.position.x,
 				obj.data.body.position.y, false, false);
 			if (drop) drop.N++;
+			if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "lord of the horns", target.data.achievements_shower_element);
 		}
 	},
 	"raccoon": {
@@ -989,6 +1003,7 @@ const ENEMY_TYPES = {
 		on_boss_death: (obj, target) => {
 			item_create(obj.game, ITEM_JUNK_CANNON, obj.data.body
 				.position.x, obj.data.body.position.y);
+			if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "junk master", target.data.achievements_shower_element);
 		}
 	},
 	"scorpion": {
@@ -1032,6 +1047,7 @@ const ENEMY_TYPES = {
 			item_create(obj.game, ITEM_VENOM_DUAL_SHOTGUNS, obj.data
 				.body.position.x,
 				obj.data.body.position.y);
+			if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "venomous king", target.data.achievements_shower_element);
 		}
 	},
 	"snake": {
@@ -1112,6 +1128,7 @@ const ENEMY_TYPES = {
 		on_boss_death: (obj, target) => {
 			item_create(obj.game, ITEM_SNAKE_STAFF, obj.data.body
 				.position.x, obj.data.body.position.y);
+			if (target?.name == "player") achievement_do(target.data.achievements_element.data.achievements, "emerald dragon", target.data.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
 			ctx.strokeStyle = "#00ff44";

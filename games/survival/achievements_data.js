@@ -766,4 +766,160 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.fill();
 		}
 	},
+	"ancient mummy": {
+		grid: { x: 6, y: 1 },
+		name: { en: "ancient curse", ru: "древнее проклятие" },
+		desc: { en: "kill one ancient mummy", ru: "убейте одну древнюю мумию" },
+		req: "sand lord",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c21;
+			ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			ctx.strokeStyle = p.c22;
+			ctx.lineWidth = 2;
+			ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			// Бинты - рисуем строго внутри
+			ctx.beginPath();
+			ctx.strokeStyle = p.c10;
+			for (let i = 1; i < 4; i++) {
+				ctx.moveTo(x + 0.2 * w, y + (0.2 + i * 0.15) * h);
+				ctx.lineTo(x + 0.8 * w, y + (0.2 + i * 0.15) * h);
+			}
+			ctx.stroke();
+		}
+	},
+	"desert shadow": {
+		grid: { x: 6, y: 2 },
+		name: { en: "elusive shadow", ru: "неуловимая тень" },
+		desc: { en: "kill one desert shadow", ru: "убейте одну пустынную тень" },
+		req: "big mummy guy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c9; // Просто черный (из палитры)
+			ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			ctx.strokeStyle = p.c8;
+			ctx.setLineDash([w * 0.05, w * 0.05]);
+			ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			ctx.setLineDash([]);
+		}
+	},
+	"anubis kill": {
+		grid: { x: 6, y: 3 },
+		name: { en: "trial of anubis", ru: "испытание Анубиса" },
+		desc: { en: "defeat the guardian of the sands", ru: "победите стража песков" },
+		req: "big shadow guy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c9;
+			ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			ctx.strokeStyle = p.c20;
+			ctx.lineWidth = 2;
+			ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			ctx.fillStyle = p.c1;
+			ctx.fillRect(x + 0.35 * w, y + 0.4 * h, 0.05 * w, 0.05 * h);
+			ctx.fillRect(x + 0.6 * w, y + 0.4 * h, 0.05 * w, 0.05 * h);
+		}
+	},
+	"big mummy guy": {
+		grid: { x: 7, y: 1 },
+		name: { en: "pharaoh's wrath", ru: "гнев фараона" },
+		desc: { en: "kill the boss mummy", ru: "убейте босса-мумию" },
+		req: "ancient mummy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c21;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c4;
+			ctx.lineWidth = 3;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
+	"big shadow guy": {
+		grid: { x: 7, y: 2 },
+		name: { en: "nightmare stalker", ru: "кошмарный преследователь" },
+		desc: { en: "kill the boss shadow", ru: "убейте босса-тень" },
+		req: "desert shadow",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c9;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c5;
+			ctx.lineWidth = 3;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
+	"big anubis guy": {
+		grid: { x: 7, y: 3 },
+		name: { en: "god of death", ru: "бог смерти" },
+		desc: { en: "kill the boss Anubis", ru: "убейте босса Анубиса" },
+		req: "anubis kill",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c9;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c20;
+			ctx.lineWidth = 4;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
+	"lord of the horns": {
+		grid: { x: 4, y: 6 },
+		name: { en: "lord of the horns", ru: "повелитель рогов" },
+		desc: { en: "defeat the boss deer", ru: "победите босса-оленя" },
+		req: "huge rainbow guy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c6;
+			ctx.fillRect(x + 0.15 * w, y + 0.2 * h, 0.7 * w, 0.6 * h);
+			ctx.strokeStyle = p.c8;
+			ctx.lineWidth = 3;
+			ctx.strokeRect(x + 0.15 * w, y + 0.2 * h, 0.7 * w, 0.6 * h);
+			// Исправленные рога (не выходят за границы)
+			ctx.beginPath();
+			ctx.moveTo(x + 0.3 * w, y + 0.2 * h); ctx.lineTo(x + 0.2 * w, y + 0.05 * h);
+			ctx.moveTo(x + 0.7 * w, y + 0.2 * h); ctx.lineTo(x + 0.8 * w, y + 0.05 * h);
+			ctx.stroke();
+		}
+	},
+	"junk master": {
+		grid: { x: 5, y: 6 },
+		name: { en: "junk master", ru: "мастер хлама" },
+		desc: { en: "defeat the boss raccoon", ru: "победите босса-енота" },
+		req: "huge rainbow guy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c14;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c0;
+			ctx.lineWidth = 3;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.fillStyle = p.c9;
+			ctx.fillRect(x + 0.25 * w, y + 0.3 * h, 0.5 * w, 0.2 * h);
+		}
+	},
+	"venomous king": {
+		grid: { x: 6, y: 4 },
+		name: { en: "venomous king", ru: "король яда" },
+		desc: { en: "defeat the boss scorpion", ru: "победите босса-скорпиона" },
+		req: "huge rainbow guy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c9;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c2;
+			ctx.lineWidth = 4;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			// Хвост скорпиона внутри квадрата
+			ctx.beginPath();
+			ctx.arc(x + 0.5 * w, y + 0.7 * h, 0.2 * w, 0, Math.PI, true);
+			ctx.stroke();
+		}
+	},
+	"emerald dragon": {
+		grid: { x: 7, y: 4 },
+		name: { en: "emerald serpent", ru: "изумрудный змей" },
+		desc: { en: "defeat the boss giant serpent", ru: "победите босса гигантского змея" },
+		req: "huge rainbow guy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c9;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c7;
+			ctx.lineWidth = 4;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.fillStyle = p.c2;
+			ctx.fillRect(x + 0.3 * w, y + 0.4 * h, 0.1 * w, 0.1 * h);
+			ctx.fillRect(x + 0.6 * w, y + 0.4 * h, 0.1 * w, 0.1 * h);
+		}
+	},
 };
