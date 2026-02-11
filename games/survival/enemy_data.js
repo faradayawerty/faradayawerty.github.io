@@ -1,5 +1,5 @@
 function enemy_health_from_tier(n) {
-	return 1000 * Math.pow(n, 1.5);
+	return 1000 * Math.pow(1.5, n);
 }
 
 function enemy_damage_from_tier(n) {
@@ -119,6 +119,7 @@ const ENEMY_TYPES = {
 		bossifier_item: ITEM_BOSSIFIER_DESERT,
 		theme: THEME_DESERT,
 		visuals: {
+			glowColor: "black",
 			draw_gun: false,
 			draw_gun_boss: true,
 			gun_color: "#222222",
@@ -363,6 +364,7 @@ const ENEMY_TYPES = {
 		theme: THEME_DESERT,
 		bossifier_item: ITEM_BOSSIFIER_MUMMY,
 		visuals: {
+			glowColor: "black",
 			draw_gun: true,
 			draw_gun_boss: true,
 			gun_color: "#5588aa",
@@ -404,12 +406,15 @@ const ENEMY_TYPES = {
 					bullet_create(obj.game, e.body.position.x + e.w, e
 						.body.position.y, vars.dx, vars.dy, 15, e
 						.damage, true, Math.max(0.09 * e.w, 4),
-						2000, "#44bbff", "white");
+						2000, "#44bbff", "white",
+						false, false, null
+					);
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, vars.dx, vars.dy, 15, e.damage,
 						true, Math.max(0.09 * e.w, 4), 2000,
 						"#44bbff",
-						"white"
+						"white",
+						false, false, null
 					);
 					e.shooting_delay = 0;
 				}
@@ -430,7 +435,8 @@ const ENEMY_TYPES = {
 						.position.y, rx, ry, 25, e.damage, true, e
 						.w * 0.1, 2000,
 						"#44bbff",
-						"white"
+						"white",
+						false, false, null
 					);
 				}
 				e.shooting_delay = 0;
@@ -725,9 +731,9 @@ const ENEMY_TYPES = {
 		name_rus: "радужный пришелец",
 		requires: "shooting rocket",
 		weight: 6,
-		health: enemy_health_from_tier(8),
+		health: enemy_health_from_tier(9),
 		speed: 8.25,
-		damage: enemy_damage_from_tier(8),
+		damage: enemy_damage_from_tier(9),
 		boss_shooting_range_mult: 1.5,
 		boss_speed_mult: 1.75,
 		boss_max_health_mult: 1.05,
@@ -743,6 +749,7 @@ const ENEMY_TYPES = {
 		bossifier_item: ITEM_BOSSIFIER_LASER,
 		visuals: {
 			draw_gun: true,
+			draw_gun_boss: true,
 			gun_color: "#331133",
 			gun_width: 0.175,
 			center_gun: false,
@@ -1088,8 +1095,8 @@ const ENEMY_TYPES = {
 						true,
 						Math.random() * 4 + 2,
 						700 + Math.random() * 400,
-						"#00ff44",
-						"#aaff00"
+						"lime",
+						"black",
 					);
 				}
 				e.shooting_delay = 0;

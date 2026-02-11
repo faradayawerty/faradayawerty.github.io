@@ -1,6 +1,6 @@
 function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 	size = 6, lifetime = 1500, color_fill = "yellow", color_outline = "orange",
-	invisible = false, poisoned = false) {
+	invisible = false, poisoned = false, glowColor = null) {
 	let bullets = g.objects.filter((obj) => obj.name == "bullet");
 	if (bullets.length > 300)
 		for (let i = 0; i < bullets.length - 300; i++)
@@ -21,7 +21,8 @@ function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 		color_outline: color_outline,
 		invisible: invisible,
 		can_hit: true,
-		poisoned: poisoned
+		poisoned: poisoned,
+		color_glow: glowColor,
 	};
 	if (b.enemy)
 		b.body.collisionFilter.category = 4;
@@ -139,9 +140,14 @@ function bullet_update(bullet_object, dt) {
 }
 
 function bullet_draw(bullet_object, ctx) {
-	if (bullet_object.data.invisible)
-		return;
-	fillMatterBody(ctx, bullet_object.data.body, bullet_object.data.color_fill);
-	drawMatterBody(ctx, bullet_object.data.body, bullet_object.data
-		.color_outline, 1);
+	if (bullet_object.data.invisible) return;
+	let b = bullet_object.data;
+	ctx.save();
+	if (b.color_glow) {
+		ctx.shadowBlur = 10;
+		ctx.shadowColor = b.color_glow;
+	}
+	fillMatterBody(ctx, b.body, b.color_fill);
+	drawMatterBody(ctx, b.body, b.color_outline, 1);
+	ctx.restore();
 }

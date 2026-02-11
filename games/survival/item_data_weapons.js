@@ -459,10 +459,38 @@ ITEMS_DATA[ITEM_PLASMA_PISTOL] = {
 	name_rus: "Плазменный пистолет",
 	desc_rus: "Компактное плазменное оружие.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#331133";
-		ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.25);
-		ctx.fillStyle = "#ff00ff";
-		ctx.fillRect(x + w * 0.4, y + h * 0.45, w * 0.3, h * 0.1);
+		x = x + 0.05 * w;
+		const bodyColor = "#331133";
+		const energyColor = "cyan";
+		const darkDetail = "#110011";
+		ctx.fillStyle = bodyColor;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.15, y + h * 0.5);
+		ctx.lineTo(x + w * 0.1, y + h * 0.85);
+		ctx.lineTo(x + w * 0.3, y + h * 0.85);
+		ctx.lineTo(x + w * 0.35, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.1, y + h * 0.4);
+		ctx.lineTo(x + w * 0.15, y + h * 0.35);
+		ctx.lineTo(x + w * 0.6, y + h * 0.35);
+		ctx.lineTo(x + w * 0.6, y + h * 0.55);
+		ctx.lineTo(x + w * 0.1, y + h * 0.55);
+		ctx.fill();
+		ctx.fillStyle = darkDetail;
+		ctx.fillRect(x + w * 0.6, y + h * 0.3, w * 0.15, h * 0.32);
+		ctx.fillStyle = bodyColor;
+		ctx.fillRect(x + w * 0.62, y + h * 0.32, w * 0.11, h * 0.28);
+		ctx.fillStyle = darkDetail;
+		ctx.fillRect(x + w * 0.2, y + h * 0.42, w * 0.35, h * 0.06);
+		ctx.fillStyle = energyColor;
+		for (let i = 0; i < 4; i++) {
+			ctx.fillRect(x + w * (0.22 + i * 0.08), y + h * 0.44, w *
+				0.05, h * 0.025);
+		}
+		ctx.fillStyle = darkDetail;
+		ctx.fillRect(x + w * 0.18, y + h * 0.38, w * 0.02, h * 0.02);
+		ctx.fillRect(x + w * 0.55, y + h * 0.38, w * 0.02, h * 0.02);
 	}
 };
 ITEMS_DATA[ITEM_JUNK_CANNON] = {
@@ -553,54 +581,47 @@ ITEMS_DATA[ITEM_SNAKE_STAFF] = {
 	name_rus: "Змеиный посох",
 	desc_rus: "Выпускает непрерывный поток концентрированного яда. Кажется живым.",
 	render: (ctx, x, y, w, h, animstate) => {
-		const woodColor = "#5D2E0C";
-		const vineColor = "#22aa44";
-		const gemColor = "#9933ff";
 		const t = animstate || 0;
+		const snakeGreen = "#22aa44";
+		const coreGreen = "#44ff00";
+		const darkWood = "#1a0f05";
 		ctx.save();
-		ctx.translate(x + w * 0.5, y + h * 0.5);
-		ctx.rotate(-Math.PI / 4);
-		ctx.fillStyle = woodColor;
-		ctx.fillRect(-w * 0.06, -h * 0.4, w * 0.12, h * 0.8);
-		ctx.strokeStyle = "#3d1e08";
-		ctx.lineWidth = 1;
+		ctx.fillStyle = darkWood;
 		ctx.beginPath();
-		ctx.moveTo(-w * 0.02, -h * 0.3);
-		ctx.lineTo(-w * 0.02, h * 0.3);
-		ctx.stroke();
-		ctx.strokeStyle = vineColor;
+		ctx.moveTo(x + w * 0.47, y + h * 0.35);
+		ctx.lineTo(x + w * 0.53, y + h * 0.35);
+		ctx.lineTo(x + w * 0.52, y + h * 0.85);
+		ctx.lineTo(x + w * 0.48, y + h * 0.85);
+		ctx.fill();
+		ctx.strokeStyle = darkWood;
 		ctx.lineWidth = w * 0.04;
 		ctx.lineCap = "round";
 		ctx.beginPath();
-		for (let i = 0; i < 10; i++) {
-			let ty = -h * 0.35 + (i * h * 0.07);
-			let tx = Math.sin(t * 0.1 + i * 0.8) * (w * 0.08);
-			if (i === 0) ctx.moveTo(tx, ty);
-			else ctx.lineTo(tx, ty);
-		}
+		ctx.arc(x + w * 0.4, y + h * 0.3, w * 0.1, 0, Math.PI * 0.8);
 		ctx.stroke();
-		ctx.fillStyle = woodColor;
 		ctx.beginPath();
-		ctx.arc(0, -h * 0.35, w * 0.18, 0, Math.PI, true);
+		ctx.arc(x + w * 0.6, y + h * 0.3, w * 0.1, Math.PI * 0.2, Math
+			.PI);
+		ctx.stroke();
+		const pulse = Math.sin(t * 0.1) * 0.1 + 0.9;
+		ctx.translate(x + w * 0.5, y + h * 0.22);
+		ctx.shadowBlur = w * 0.1 * pulse;
+		ctx.shadowColor = snakeGreen;
+		ctx.fillStyle = snakeGreen;
+		ctx.beginPath();
+		ctx.arc(0, 0, w * 0.08 * pulse, 0, Math.PI * 2);
 		ctx.fill();
-		let pulse = Math.sin(t * 0.15) * 0.15 + 0.85;
-		ctx.shadowBlur = 10 * pulse;
-		ctx.shadowColor = gemColor;
-		ctx.fillStyle = gemColor;
-		ctx.beginPath();
-		for (let i = 0; i < 6; i++) {
-			let angle = (i / 6) * Math.PI * 2;
-			let rx = Math.cos(angle) * (w * 0.1 * pulse);
-			let ry = Math.sin(angle) * (w * 0.1 * pulse);
-			if (i === 0) ctx.moveTo(rx, -h * 0.35 + ry);
-			else ctx.lineTo(rx, -h * 0.35 + ry);
+		ctx.shadowBlur = 0;
+		ctx.fillStyle = coreGreen;
+		ctx.fillRect(-w * 0.01, -h * 0.04, w * 0.02, h * 0.08);
+		for (let i = 0; i < 4; i++) {
+			ctx.rotate((Math.PI * 2) / 4);
+			let dist = w * 0.15 + Math.sin(t * 0.15 + i) * (w * 0.03);
+			ctx.fillStyle = "rgba(68, 255, 0, 0.5)";
+			ctx.beginPath();
+			ctx.arc(dist, 0, w * 0.02, 0, Math.PI * 2);
+			ctx.fill();
 		}
-		ctx.closePath();
-		ctx.fill();
-		ctx.fillStyle = "rgba(255,255,255,0.4)";
-		ctx.beginPath();
-		ctx.arc(-w * 0.03, -h * 0.38, w * 0.03, 0, Math.PI * 2);
-		ctx.fill();
 		ctx.restore();
 	}
 };

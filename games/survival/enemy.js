@@ -390,6 +390,11 @@ function enemy_draw(enemy_object, ctx) {
 	if (e.health <= 0) return;
 	const typeData = ENEMY_TYPES[e.type] || ENEMY_TYPES["regular"];
 	const vis = typeData.visuals || {};
+	ctx.save();
+	if (vis.glowColor) {
+		ctx.shadowBlur = vis.glowBlur || 15;
+		ctx.shadowColor = vis.glowColor;
+	}
 	if (!typeData.only_draw_custom) {
 		fillMatterBody(ctx, e.body, e.color);
 		let outlineW = vis.outline_is_relative ? vis.outline_width * e.w : (vis
@@ -398,6 +403,7 @@ function enemy_draw(enemy_object, ctx) {
 	}
 	if (vis.custom_draw)
 		vis.custom_draw(e, ctx);
+	ctx.restore();
 	let target_object = enemy_get_target_object(enemy_object, -1);
 	if (target_object != null) {
 		let gx = target_object.data.body.position.x - e.body.position.x;
@@ -455,13 +461,13 @@ function enemy_draw(enemy_object, ctx) {
 					4500) {
 					ctx.beginPath();
 					ctx.strokeStyle = e.color;
-					ctx.lineWidth = 0.075 * e.w;
+					ctx.lineWidth = 2 * 0.075 * e.w;
 					ctx.moveTo(targetX, targetY);
 					ctx.lineTo(p.x + 4 * gx, p.y + 4 * gy);
 					ctx.stroke();
 					ctx.beginPath();
 					ctx.strokeStyle = "white";
-					ctx.lineWidth = 0.05 * e.w;
+					ctx.lineWidth = 2 * 0.05 * e.w;
 					ctx.moveTo(targetX, targetY);
 					ctx.lineTo(p.x + 4 * gx, p.y + 4 * gy);
 					ctx.stroke();

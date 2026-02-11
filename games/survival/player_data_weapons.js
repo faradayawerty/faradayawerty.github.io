@@ -1,7 +1,7 @@
 const BALANCE_FACTOR = 1.0;
 
 function weapon_damage_from_tier(n) {
-	return Math.pow(n, 1.5);
+	return Math.pow(1.5, n + 0.25 / n);
 }
 const WEAPON_DEFS = {
 	[ITEM_MUMMY_PISTOLS]: {
@@ -24,7 +24,8 @@ const WEAPON_DEFS = {
 						.random()) * 1.84 * BALANCE_FACTOR *
 					weapon_damage_from_tier(6),
 					false, 6, 1500,
-					"#44bbff", "white"
+					"#44bbff", "white",
+					false, false, null
 				);
 			});
 		}
@@ -49,7 +50,8 @@ const WEAPON_DEFS = {
 					(2.5 + 0.5 * Math.random()) * 3.52 *
 					BALANCE_FACTOR * (1000 / 6500) *
 					weapon_damage_from_tier(6),
-					false, 6, 1500, "#44bbff", "white"
+					false, 6, 1500, "#44bbff", "white",
+					false, false, null
 				);
 		}
 	},
@@ -184,7 +186,7 @@ const WEAPON_DEFS = {
 		chance: 0.005,
 		sound: "data/sfx/red_pistols_1.mp3",
 		vol: 0.1,
-		color: "#5D2E0C",
+		color: "#1a0f05",
 		length: 1.8,
 		width: 0.8,
 		action: (g, p, v, dt) => {

@@ -10,8 +10,8 @@ let ACHIEVEMENT_REGISTRY = {
 			ru: "боссификатор"
 		},
 		desc: {
-			en: "find a bossifier to bossify the enemies",
-			ru: "найдите боссификатор; он позволяет боссифицировать врагов соответствующего типа"
+			en: "find a bossifier to bossify the enemies; it drops from the respective enemy type",
+			ru: "найдите боссификатор; он позволяет боссифицировать врагов соответствующего типа и выпадает с противников этого типа"
 		},
 		req: "shoot 'em up",
 		draw: (ctx, x, y, w, h, p) => {
