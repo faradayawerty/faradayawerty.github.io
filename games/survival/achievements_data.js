@@ -838,9 +838,6 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.strokeStyle = p.c20;
 			ctx.lineWidth = 2;
 			ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
-			ctx.fillStyle = p.c1;
-			ctx.fillRect(x + 0.35 * w, y + 0.4 * h, 0.05 * w, 0.05 * h);
-			ctx.fillRect(x + 0.6 * w, y + 0.4 * h, 0.05 * w, 0.05 * h);
 		}
 	},
 	"big mummy guy": {
@@ -909,107 +906,130 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
 		}
 	},
+
 	"lord of the horns": {
-		grid: {
-			x: 4,
-			y: 6
-		},
-		name: {
-			en: "lord of the horns",
-			ru: "повелитель рогов"
-		},
-		desc: {
-			en: "defeat the boss deer",
-			ru: "победите босса-оленя"
-		},
+		grid: { x: 4, y: 6 },
+		name: { en: "lord of the horns", ru: "повелитель рогов" },
+		desc: { en: "defeat the boss deer", ru: "победите босса-оленя" },
 		req: "huge rainbow guy",
 		draw: (ctx, x, y, w, h, p) => {
+			let cx = x + w * 0.5;
+			let cy = y + h * 0.5;
+			let aw = w * 0.5;
+			// Рога (адаптация animal_deer_draw_horns)
+			ctx.strokeStyle = p.c22;
+			ctx.lineWidth = 0.05 * w;
+			const drawAntler = (side) => {
+				ctx.beginPath();
+				ctx.moveTo(cx + side * 0.25 * aw, cy - 0.25 * aw);
+				ctx.lineTo(cx + side * 0.3 * aw, cy - 0.5 * aw);
+				ctx.lineTo(cx + side * 0.6 * aw, cy - 0.7 * aw);
+				ctx.moveTo(cx + side * 0.3 * aw, cy - 0.5 * aw);
+				ctx.lineTo(cx + side * 0.1 * aw, cy - 0.75 * aw);
+				ctx.stroke();
+			};
+			drawAntler(-1); drawAntler(1);
+			// Тело
 			ctx.fillStyle = p.c6;
-			ctx.fillRect(x + 0.15 * w, y + 0.2 * h, 0.7 * w, 0.6 * h);
+			ctx.fillRect(cx - aw * 0.5, cy - aw * 0.5, aw, aw);
 			ctx.strokeStyle = p.c8;
-			ctx.lineWidth = 3;
-			ctx.strokeRect(x + 0.15 * w, y + 0.2 * h, 0.7 * w, 0.6 * h);
-			ctx.beginPath();
-			ctx.moveTo(x + 0.3 * w, y + 0.2 * h);
-			ctx.lineTo(x + 0.2 * w, y + 0.05 * h);
-			ctx.moveTo(x + 0.7 * w, y + 0.2 * h);
-			ctx.lineTo(x + 0.8 * w, y + 0.05 * h);
-			ctx.stroke();
+			ctx.lineWidth = 2;
+			ctx.strokeRect(cx - aw * 0.5, cy - aw * 0.5, aw, aw);
 		}
 	},
 	"junk master": {
-		grid: {
-			x: 5,
-			y: 6
-		},
-		name: {
-			en: "junk master",
-			ru: "мастер хлама"
-		},
-		desc: {
-			en: "defeat the boss raccoon",
-			ru: "победите босса-енота"
-		},
+		grid: { x: 5, y: 6 },
+		name: { en: "junk master", ru: "мастер хлама" },
+		desc: { en: "defeat the boss raccoon", ru: "победите босса-енота" },
 		req: "huge rainbow guy",
 		draw: (ctx, x, y, w, h, p) => {
+			let cx = x + w * 0.5;
+			let cy = y + h * 0.5;
+			let rw = w * 0.5;
+			let rh = h * 0.5;
+			// Уши
 			ctx.fillStyle = p.c14;
-			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.beginPath();
+			ctx.moveTo(cx - rw * 0.4, cy - rh * 0.5); ctx.lineTo(cx - rw * 0.6, cy - rh * 0.9); ctx.lineTo(cx - rw * 0.1, cy - rh * 0.5);
+			ctx.moveTo(cx + rw * 0.4, cy - rh * 0.5); ctx.lineTo(cx + rw * 0.6, cy - rh * 0.9); ctx.lineTo(cx + rw * 0.1, cy - rh * 0.5);
+			ctx.fill();
+			// Тело и маска
+			ctx.fillStyle = p.c21;
+			ctx.fillRect(cx - rw * 0.5, cy - rh * 0.5, rw, rh);
 			ctx.strokeStyle = p.c0;
-			ctx.lineWidth = 3;
-			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.lineWidth = 2;
+			ctx.strokeRect(cx - rw * 0.5, cy - rh * 0.5, rw, rh);
 			ctx.fillStyle = p.c9;
-			ctx.fillRect(x + 0.25 * w, y + 0.3 * h, 0.5 * w, 0.2 * h);
+			ctx.fillRect(cx - rw * 0.5, cy - rh * 0.25, rw, rh * 0.4);
+			// Глаза босса (красные/белые)
+			ctx.fillStyle = p.c0;
+			ctx.beginPath();
+			ctx.arc(cx - rw * 0.25, cy - rh * 0.05, rw * 0.12, 0, Math.PI * 2);
+			ctx.arc(cx + rw * 0.25, cy - rh * 0.05, rw * 0.12, 0, Math.PI * 2);
+			ctx.fill();
 		}
 	},
 	"venomous king": {
-		grid: {
-			x: 6,
-			y: 4
-		},
-		name: {
-			en: "venomous king",
-			ru: "король яда"
-		},
-		desc: {
-			en: "defeat the boss scorpion",
-			ru: "победите босса-скорпиона"
-		},
+		grid: { x: 6, y: 4 },
+		name: { en: "venomous king", ru: "король яда" },
+		desc: { en: "defeat the boss scorpion", ru: "победите босса-скорпиона" },
 		req: "huge rainbow guy",
 		draw: (ctx, x, y, w, h, p) => {
-			ctx.fillStyle = p.c9;
-			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-			ctx.strokeStyle = p.c2;
-			ctx.lineWidth = 4;
-			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			let cx = x + w * 0.5;
+			let cy = y + h * 0.5;
+			let sw = w * 0.6;
+			// Хвост (упрощенная дуга из оригинала)
+			ctx.strokeStyle = p.c9;
+			ctx.lineWidth = w * 0.05;
 			ctx.beginPath();
-			ctx.arc(x + 0.5 * w, y + 0.7 * h, 0.2 * w, 0, Math.PI,
-			true);
+			ctx.moveTo(cx - sw * 0.3, cy);
+			ctx.quadraticCurveTo(cx - sw * 0.6, cy - sw * 0.6, cx, cy - sw * 0.4);
 			ctx.stroke();
+			// Тело (сегменты)
+			ctx.fillStyle = p.c9;
+			for(let i = 0; i < 3; i++) {
+				ctx.beginPath();
+				ctx.ellipse(cx - sw * 0.2 + i * sw * 0.2, cy, sw * 0.15, sw * 0.25, 0, 0, Math.PI * 2);
+				ctx.fill();
+				ctx.strokeStyle = p.c10;
+				ctx.lineWidth = 1;
+				ctx.stroke();
+			}
+			// Клешни
+			ctx.strokeStyle = p.c9;
+			ctx.beginPath();
+			ctx.moveTo(cx + sw * 0.2, cy - sw * 0.1); ctx.lineTo(cx + sw * 0.5, cy - sw * 0.3);
+			ctx.moveTo(cx + sw * 0.2, cy + sw * 0.1); ctx.lineTo(cx + sw * 0.5, cy + sw * 0.3);
+			ctx.stroke();
+			// Глаза
+			ctx.fillStyle = p.c0;
+			ctx.fillRect(cx + sw * 0.35, cy - sw * 0.1, sw * 0.05, sw * 0.05);
+			ctx.fillRect(cx + sw * 0.35, cy + sw * 0.05, sw * 0.05, sw * 0.05);
 		}
 	},
 	"emerald dragon": {
-		grid: {
-			x: 7,
-			y: 4
-		},
-		name: {
-			en: "emerald serpent",
-			ru: "изумрудный змей"
-		},
-		desc: {
-			en: "defeat the boss giant serpent",
-			ru: "победите босса гигантского змея"
-		},
+		grid: { x: 7, y: 4 },
+		name: { en: "emerald serpent", ru: "изумрудный змей" },
+		desc: { en: "defeat the boss giant serpent", ru: "победите босса гигантского змея" },
 		req: "huge rainbow guy",
 		draw: (ctx, x, y, w, h, p) => {
+			let cx = x + w * 0.5;
+			let cy = y + h * 0.5;
+			// Змейка (адаптация вейва из animal_snake_draw)
 			ctx.fillStyle = p.c9;
-			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-			ctx.strokeStyle = p.c7;
-			ctx.lineWidth = 4;
-			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
-			ctx.fillStyle = p.c2;
-			ctx.fillRect(x + 0.3 * w, y + 0.4 * h, 0.1 * w, 0.1 * h);
-			ctx.fillRect(x + 0.6 * w, y + 0.4 * h, 0.1 * w, 0.1 * h);
+			for (let i = 0; i < 8; i++) {
+				let wave = Math.sin(i * 0.8) * (h * 0.15);
+				let posX = cx + (4 - i) * (w * 0.08);
+				let s = (w * 0.12) * (1 - i * 0.08);
+				ctx.fillRect(posX - s / 2, cy + wave - s / 2, s, s);
+				if (i === 0) { // Глаза на голове
+					ctx.fillStyle = p.c0;
+					ctx.fillRect(posX + s / 4, cy + wave - s / 3, s / 4, s / 4);
+					ctx.fillRect(posX + s / 4, cy + wave + s / 10, s / 4, s / 4);
+					ctx.fillStyle = p.c9;
+				}
+			}
 		}
 	},
+
 };
