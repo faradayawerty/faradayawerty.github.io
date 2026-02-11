@@ -179,7 +179,7 @@ function game_object_create(g, name_, data_, func_update, func_draw,
 			break;
 		}
 	}
-	if(name_ === "bullet") {
+	if (name_ === "bullet") {
 		g.last_bullet_num++;
 		obj.bullet_num = g.last_bullet_num;
 	}
@@ -275,7 +275,8 @@ function game_update(g, dt) {
 				g.objectsInFrame[g.objects[i].name]++;
 			}
 			let updateTime = performance.now();
-			if(g.objects[i].name === "bullet" && g.objects[i].bullet_num < g.last_bullet_num - BULLET_LIMIT)
+			if (g.objects[i].name === "bullet" && g.objects[i].bullet_num < g
+				.last_bullet_num - BULLET_LIMIT)
 				bullet_destroy(g.objects[i]);
 			else
 				g.objects[i].update(g.objects[i], dt);
@@ -409,7 +410,8 @@ function game_draw(g, ctx, alpha) {
 				}
 			}
 			if (doDraw) {
-				if(!(g.objects[i].name === "bullet" && g.objects[i].data.last_bullet_num < g.last_bullet_num - BULLET_LIMIT))
+				if (!(g.objects[i].name === "bullet" && g.objects[i].data
+						.last_bullet_num < g.last_bullet_num - BULLET_LIMIT))
 					g.objects[i].draw(g.objects[i], ctx);
 			}
 			ctx.restore();
