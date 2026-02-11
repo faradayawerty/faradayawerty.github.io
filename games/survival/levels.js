@@ -129,7 +129,7 @@ function levels_spawn_enemies(g, Ox, Oy, player_object, tile =
 }
 
 function levels_spawn_items(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT,
-player_object) {
+	player_object) {
 	let tile_data = TILES[tile];
 	if (tile_data && typeof tile_data.populate_with_items === "function") {
 		tile_data.populate_with_items(g, Ox, Oy, tile);
