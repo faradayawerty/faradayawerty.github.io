@@ -39,8 +39,26 @@ function levels_set(g, level, old_level = null) {
 		config.populate(g, Ox, Oy, level_visited);
 	}
 	if (!level_visited) {
+		if (player_object) {
+			if (!achievement_get(player_object.data.achievements_element.data
+					.achievements, "yummy").done)
+				item_create(g, ITEM_APPLE, Ox + Math.random() * 2500, Oy + Math
+					.random() * 2500, null, tile);
+			if (achievement_get(player_object.data.achievements_element.data
+					.achievements, "pick an item").done && !achievement_get(
+					player_object.data.achievements_element.data.achievements,
+					"get a gun").done)
+				item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math
+					.random() * 2500, null, tile);
+			if (achievement_get(player_object.data.achievements_element.data
+					.achievements, "need for ammo").done && !achievement_get(
+					player_object.data.achievements_element.data.achievements,
+					"shoot 'em up").done)
+				item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math
+					.random() * 2500, null, tile);
+		}
 		if (config.spawn_items !== false) {
-			levels_spawn_items(g, Ox, Oy, tile);
+			levels_spawn_items(g, Ox, Oy, tile, player_object);
 		}
 		if (config.spawn_enemies !== false) {
 			levels_spawn_enemies(g, Ox, Oy, player_object, tile);
@@ -110,7 +128,8 @@ function levels_spawn_enemies(g, Ox, Oy, player_object, tile =
 	}
 }
 
-function levels_spawn_items(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT) {
+function levels_spawn_items(g, Ox, Oy, tile = LEVEL_TILE_DEFAULT,
+player_object) {
 	let tile_data = TILES[tile];
 	if (tile_data && typeof tile_data.populate_with_items === "function") {
 		tile_data.populate_with_items(g, Ox, Oy, tile);

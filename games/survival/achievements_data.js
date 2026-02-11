@@ -570,11 +570,11 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		req: "pick an item",
 		draw: (ctx, x, y, w, h, p) => {
-			ctx.fillStyle = p.c9;
-			ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-			ctx.strokeStyle = p.c10;
-			ctx.lineWidth = 0.05 * w;
-			ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+			ctx.fillStyle = "#000";
+			ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.2);
+			ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.15, h * 0.3);
+			ctx.fillStyle = "#333";
+			ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.05);
 		}
 	},
 	"need for ammo": {
@@ -600,14 +600,22 @@ let ACHIEVEMENT_REGISTRY = {
 		draw: (ctx, x, y, w, h, p) => {
 			let N = 4;
 			for (let i = 0; i < N; i++) {
-				ctx.fillStyle = p.c1;
+				ctx.fillStyle = "yellow";
 				ctx.fillRect(x + i * w / N + 0.25 * w / N, y + 0.25 * h,
 					0.5 * w / N, 0.5 * h);
+				ctx.fillStyle = "orange";
+				ctx.fillRect(x + i * w / N + 0.25 * w / N, y + 0.25 * h,
+					0.5 * w / N, 0.125 * h);
+				ctx.strokeStyle = "orange";
+				ctx.lineWidth = 0.01 * w;
+				ctx.strokeRect(x + i * w / N + 0.25 * w / N, y + 0.25 *
+					h, 0.5 * w / N, 0.5 * h);
 			}
-			ctx.fillStyle = "black";
-			ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-			ctx.strokeStyle = "gray";
-			ctx.strokeRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
+			ctx.fillStyle = "#000";
+			ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.2);
+			ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.15, h * 0.3);
+			ctx.fillStyle = "#333";
+			ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.05);
 		}
 	},
 	"shoot 'em up": {
