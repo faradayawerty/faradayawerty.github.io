@@ -126,7 +126,7 @@ let ACHIEVEMENT_REGISTRY = {
 				ru: "полностью заполните инвентарь предметами; подсказка: используйте Q, чтобы выбросить предмет из инвентаря"
 			}
 		},
-		req: "discovering inventory",
+		req: "pick an item",
 		draw: (ctx, x, y, w, h, p) => {
 			let cols = [p.c9, p.c8, p.c14, p.c11, p.c1];
 			for (let i = 0; i < 5; i++) {
@@ -219,7 +219,7 @@ let ACHIEVEMENT_REGISTRY = {
 				ru: "сядьте в автомобиль, подойдя к нему и нажав F или SPACE"
 			}
 		},
-		req: "first steps",
+		req: "fuel up",
 		draw: (ctx, x, y, w, h, p) => {
 			ctx.save();
 			ctx.translate(x + w * 0.5, y + h * 0.45);
