@@ -87,3 +87,29 @@ function randomNormal() {
 	if (num > 1 || num < 0) return randomNormal();
 	return num;
 }
+const drawMouse = (ctx, mx, my, w, h) => {
+	let mw = 0.28 * w,
+		mh = 0.42 * h;
+	ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+	ctx.beginPath();
+	ctx.roundRect(mx, my, mw, mh, 0.08 * w);
+	ctx.fill();
+	ctx.strokeStyle = "rgba(0,0,0,0.6)";
+	ctx.lineWidth = 2;
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.moveTo(mx, my + mh * 0.4);
+	ctx.lineTo(mx + mw, my + mh * 0.4);
+	ctx.moveTo(mx + mw * 0.5, my);
+	ctx.lineTo(mx + mw * 0.5, my + mh * 0.4);
+	ctx.stroke();
+	ctx.fillStyle = "rgba(255, 0, 0, 0.6)";
+	ctx.beginPath();
+	ctx.roundRect(mx, my, mw * 0.5, mh * 0.4, {
+		tl: 0.08 * w,
+		tr: 0,
+		bl: 0,
+		br: 0
+	});
+	ctx.fill();
+}

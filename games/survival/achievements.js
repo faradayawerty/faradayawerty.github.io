@@ -414,6 +414,11 @@ function get_achievement_palette(done, animstate) {
 		c20: "#ffcc00",
 		c21: "#c2a26b",
 		c22: "#4d3d21",
+		c23: "#884411",
+		c24: "#aa6622",
+		c25: "#ff4422",
+		c26: "#442200",
+		c27: "#33aa11",
 	};
 	if (!done) {
 		p.c0 = "black";
@@ -435,6 +440,11 @@ function get_achievement_palette(done, animstate) {
 		p.c20 = "#111111";
 		p.c21 = "#c2c2c2";
 		p.c22 = "#4d4d4d";
+		p.c23 = "#4d4d4d";
+		p.c24 = "#626262";
+		p.c25 = "#333333";
+		p.c26 = "#4d4d4d";
+		p.c27 = "#222222";
 	}
 	if (animstate !== null) {
 		let r = Math.cos(0.1 * animstate) * 15;

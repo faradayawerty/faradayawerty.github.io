@@ -221,10 +221,299 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		req: "first steps",
 		draw: (ctx, x, y, w, h, p) => {
+			ctx.save();
+			ctx.translate(x + w * 0.5, y + h * 0.45);
+			let cw = w * 0.7;
+			let ch = h * 0.4;
 			ctx.fillStyle = p.c5;
-			ctx.fillRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
-			ctx.strokeStyle = p.c8;
-			ctx.strokeRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = 2;
+			roundRect(ctx, -cw / 2, -ch / 2, cw, ch, 12, true, true);
+			ctx.fillStyle = "#111";
+			let ww = cw * 0.18,
+				wh = ch * 0.15;
+			ctx.fillRect(cw * 0.2, -ch / 2 - wh, ww, wh);
+			ctx.fillRect(cw * 0.2, ch / 2, ww, wh);
+			ctx.fillRect(-cw * 0.35, -ch / 2 - wh, ww, wh);
+			ctx.fillRect(-cw * 0.35, ch / 2, ww, wh);
+			ctx.fillStyle = "#aaddff";
+			ctx.strokeStyle = "#222";
+			ctx.lineWidth = 1;
+			ctx.fillRect(cw * 0.1, -ch * 0.35, cw * 0.15, ch * 0.7);
+			ctx.strokeRect(cw * 0.1, -ch * 0.35, cw * 0.15, ch * 0.7);
+			ctx.restore();
+			ctx.save();
+			let kx = x + 0.1 * w,
+				ky = y + 0.1 * h,
+				kw = 0.26 * w,
+				kh = 0.26 * h;
+			ctx.fillStyle = "#ddd";
+			ctx.fillRect(kx, ky, kw, kh);
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = 2;
+			ctx.strokeRect(kx, ky, kw, kh);
+			ctx.fillStyle = "rgba(0,0,0,0.1)";
+			ctx.fillRect(kx + kw * 0.1, ky + kh * 0.7, kw * 0.8, kh *
+				0.15);
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = 0.04 * w;
+			ctx.lineCap = "square";
+			ctx.beginPath();
+			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
+			ctx.lineTo(kx + 0.3 * kw, ky + 0.75 * kh);
+			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
+			ctx.lineTo(kx + 0.7 * kw, ky + 0.25 * kh);
+			ctx.moveTo(kx + 0.3 * kw, ky + 0.5 * kh);
+			ctx.lineTo(kx + 0.6 * kw, ky + 0.5 * kh);
+			ctx.stroke();
+			ctx.lineWidth = 1;
+			let sx = x + 0.2 * w,
+				sy = y + 0.82 * h,
+				sw = 0.6 * w,
+				sh = 0.12 * h;
+			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+			ctx.fillRect(sx, sy, sw, sh);
+			ctx.strokeRect(sx, sy, sw, sh);
+			let ox = sx + 0.1 * sw;
+			ctx.beginPath();
+			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.5 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ctx.lineTo(ox, sy + 0.7 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
+			ctx.lineTo(ox, sy + 0.5 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox + 0.04 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ctx.moveTo(ox + 0.02 * sw, sy + 0.55 * sh);
+			ctx.lineTo(ox + 0.06 * sw, sy + 0.55 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ctx.moveTo(ox, sy + 0.5 * sh);
+			ctx.lineTo(ox + 0.06 * sw, sy + 0.5 * sh);
+			ctx.stroke();
+			ctx.restore();
+		}
+	},
+	"pick an item": {
+		grid: {
+			x: 2,
+			y: 0
+		},
+		name: {
+			en: "pick an item",
+			ru: "подобрать предмет"
+		},
+		desc: {
+			mobile: {
+				en: "pick up an item by standing close to it and pressing PICK UP",
+				ru: "подберите предмет, подойдя к нему и нажав кнопку PICK UP"
+			},
+			pc: {
+				en: "pick up an item by standing close to it and pressing F or SPACE",
+				ru: "подберите предмет, подойдя к нему и нажав F или SPACE"
+			}
+		},
+		req: "outside the box",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c25;
+			ctx.beginPath();
+			ctx.ellipse(x + 0.5 * w, y + 0.55 * h, 0.24 * w, 0.24 * h,
+				0, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.strokeStyle = "#440000";
+			ctx.lineWidth = 0.03 * w;
+			ctx.stroke();
+			drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y +
+				0.15 * h, p.c26, 0.04 * w);
+			ctx.fillStyle = p.c27;
+			ctx.beginPath();
+			ctx.ellipse(x + 0.6 * w, y + 0.22 * h, 0.1 * w, 0.05 * w, -
+				Math.PI / 4, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+			ctx.beginPath();
+			ctx.ellipse(x + 0.4 * w, y + 0.45 * h, 0.07 * w, 0.07 * w,
+				0, 0, Math.PI * 2);
+			ctx.fill();
+			let kx = x + 0.37 * w,
+				ky = y + 0.4 * h,
+				kw = 0.26 * w,
+				kh = 0.26 * h;
+			ctx.fillStyle = "#ddd";
+			ctx.fillRect(kx, ky, kw, kh);
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = 2;
+			ctx.strokeRect(kx, ky, kw, kh);
+			ctx.fillStyle = "rgba(0,0,0,0.1)";
+			ctx.fillRect(kx + kw * 0.1, ky + kh * 0.7, kw * 0.8, kh *
+				0.15);
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = 0.04 * w;
+			ctx.lineCap = "square";
+			ctx.beginPath();
+			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
+			ctx.lineTo(kx + 0.3 * kw, ky + 0.75 * kh);
+			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
+			ctx.lineTo(kx + 0.7 * kw, ky + 0.25 * kh);
+			ctx.moveTo(kx + 0.3 * kw, ky + 0.5 * kh);
+			ctx.lineTo(kx + 0.6 * kw, ky + 0.5 * kh);
+			ctx.stroke();
+			ctx.lineWidth = 1;
+			let sx = x + 0.2 * w,
+				sy = y + 0.82 * h,
+				sw = 0.6 * w,
+				sh = 0.12 * h;
+			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+			ctx.fillRect(sx, sy, sw, sh);
+			ctx.strokeRect(sx, sy, sw, sh);
+			let ox = sx + 0.1 * sw;
+			ctx.beginPath();
+			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.5 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ctx.lineTo(ox, sy + 0.7 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
+			ctx.lineTo(ox, sy + 0.5 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox + 0.04 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ctx.moveTo(ox + 0.02 * sw, sy + 0.55 * sh);
+			ctx.lineTo(ox + 0.06 * sw, sy + 0.55 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ox += 0.12 * sw;
+			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.3 * sh);
+			ctx.lineTo(ox, sy + 0.7 * sh);
+			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
+			ctx.moveTo(ox, sy + 0.5 * sh);
+			ctx.lineTo(ox + 0.06 * sw, sy + 0.5 * sh);
+			ctx.stroke();
+		}
+	},
+	"yummy": {
+		grid: {
+			x: 2,
+			y: 1
+		},
+		name: {
+			en: "yummy",
+			ru: "вкусняшка"
+		},
+		desc: {
+			mobile: {
+				en: "eat any food by selecting it and pressing USE",
+				ru: "употребите в пищу любую еду, выбрав её и нажав USE"
+			},
+			pc: {
+				en: "eat any food: select it in inventory and left-click on your character",
+				ru: "съешьте любую еду: выберите её в инвентаре, переместите к персонажу и нажмите ЛКМ"
+			}
+		},
+		req: "pick an item",
+		draw: (ctx, x, y, w, h, p) => {
+			drawLine(ctx, x + 0.5 * w, y + 0.6 * h, x + 0.5 * w, y +
+				0.85 * h, "#eeeeee", 0.08 * w);
+			drawCircle(ctx, x + 0.45 * w, y + 0.85 * h, 0.05 * w,
+				"#eeeeee", "#cccccc", 0.01 * w);
+			drawCircle(ctx, x + 0.55 * w, y + 0.85 * h, 0.05 * w,
+				"#eeeeee", "#cccccc", 0.01 * w);
+			ctx.fillStyle = p.c23;
+			ctx.beginPath();
+			ctx.ellipse(x + 0.5 * w, y + 0.4 * h, 0.2 * w, 0.28 * h, 0,
+				0, Math.PI * 2);
+			ctx.fill();
+			ctx.fillStyle = p.c24;
+			ctx.beginPath();
+			ctx.ellipse(x + 0.45 * w, y + 0.35 * h, 0.12 * w, 0.18 * h,
+				0, 0, Math.PI * 2);
+			ctx.fill();
+			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
+		}
+	},
+	"stay hydrated": {
+		grid: {
+			x: 2,
+			y: 2
+		},
+		name: {
+			en: "stay hydrated",
+			ru: "водный баланс"
+		},
+		desc: {
+			mobile: {
+				en: "drink any liquid by selecting it and pressing USE",
+				ru: "выпейте любую жидкость, выбрав её и нажав USE"
+			},
+			pc: {
+				en: "drink any liquid: select it in inventory and left-click on your character",
+				ru: "выпейте любую жидкость: выберите её в инвентаре, поднесите курсор к игроку и нажмите ЛКМ"
+			}
+		},
+		req: "pick an item",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c10;
+			ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
+			ctx.fillStyle = p.c12;
+			ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
+		}
+	},
+	"healthy lifestyle": {
+		grid: {
+			x: 2,
+			y: 3
+		},
+		name: {
+			en: "healthy lifestyle",
+			ru: "здоровый образ жизни"
+		},
+		desc: {
+			mobile: {
+				en: "use a health pack by selecting it and pressing USE",
+				ru: "используйте аптечку, выбрав её и нажав USE"
+			},
+			pc: {
+				en: "use health pack: select it in inventory and left-click on your character",
+				ru: "используйте аптечку: выберите её в инвентаре, поднесите курсор к игроку и нажмите ЛКМ"
+			}
+		},
+		req: "pick an item",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c8;
+			ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+			ctx.fillStyle = p.c13;
+			ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
+			ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
+			ctx.strokeStyle = p.c13;
+			ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
 		}
 	},
 	"fuel up": {
@@ -263,125 +552,7 @@ let ACHIEVEMENT_REGISTRY = {
 				0.7, p.c16, 0.05 * w);
 			ctx.fillStyle = p.c16;
 			ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
-		}
-	},
-	"pick an item": {
-		grid: {
-			x: 2,
-			y: 0
-		},
-		name: {
-			en: "pick an item",
-			ru: "подобрать предмет"
-		},
-		desc: {
-			mobile: {
-				en: "pick up an item by standing close to it and pressing PICK UP",
-				ru: "подберите предмет, подойдя к нему и нажав кнопку PICK UP"
-			},
-			pc: {
-				en: "pick up an item by standing close to it and pressing F or SPACE",
-				ru: "подберите предмет, подойдя к нему и нажав F или SPACE"
-			}
-		},
-		req: "outside the box",
-		draw: (ctx, x, y, w, h, p) => {
-			let N = 4;
-			for (let i = 0; i < N; i++) {
-				ctx.fillStyle = p.c1;
-				ctx.fillRect(x + i * w / N + 0.225 * w / N, y + 0.25 *
-					h, 0.5 * w / N, 0.5 * h);
-				ctx.fillStyle = p.c6;
-				ctx.fillRect(x + i * w / N + 0.225 * w / N, y + 0.25 *
-					h, 0.5 * w / N, 0.125 * h);
-				ctx.strokeStyle = p.c6;
-				ctx.strokeRect(x + i * w / N + 0.225 * w / N, y + 0.25 *
-					h, 0.5 * w / N, 0.5 * h);
-			}
-		}
-	},
-	"yummy": {
-		grid: {
-			x: 2,
-			y: 1
-		},
-		name: {
-			en: "yummy",
-			ru: "вкусняшка"
-		},
-		desc: {
-			mobile: {
-				en: "eat any food by selecting it and pressing USE",
-				ru: "употребите в пищу любую еду, выбрав её и нажав USE"
-			},
-			pc: {
-				en: "eat any food: select it in inventory and left-click on your character",
-				ru: "съешьте любую еду: выберите её в инвентаре, переместите к персонажу и нажмите ЛКМ, либо выберите еду в хотбаре и нажмите ЛКМ по игроку"
-			}
-		},
-		req: "pick an item",
-		draw: (ctx, x, y, w, h, p) => {
-			ctx.fillStyle = p.c10;
-			ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
-			ctx.fillStyle = p.c11;
-			ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
-		}
-	},
-	"stay hydrated": {
-		grid: {
-			x: 2,
-			y: 2
-		},
-		name: {
-			en: "stay hydrated",
-			ru: "водный баланс"
-		},
-		desc: {
-			mobile: {
-				en: "drink any liquid by selecting it and pressing USE",
-				ru: "выпейте любую жидкость, выбрав её и нажав USE"
-			},
-			pc: {
-				en: "drink any liquid: select it in inventory and left-click on your character",
-				ru: "выпейте любую жидкость: выберите её в инвентаре, поднесите курсор к игроку и нажмите ЛКМ"
-			}
-		},
-		req: "pick an item",
-		draw: (ctx, x, y, w, h, p) => {
-			ctx.fillStyle = p.c10;
-			ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
-			ctx.fillStyle = p.c12;
-			ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		}
-	},
-	"healthy lifestyle": {
-		grid: {
-			x: 2,
-			y: 3
-		},
-		name: {
-			en: "healthy lifestyle",
-			ru: "здоровый образ жизни"
-		},
-		desc: {
-			mobile: {
-				en: "use a health pack by selecting it and pressing USE",
-				ru: "используйте аптечку, выбрав её и нажав USE"
-			},
-			pc: {
-				en: "use health pack: select it in inventory and left-click on your character",
-				ru: "используйте аптечку: выберите её в инвентаре, поднесите курсор к игроку и нажмите ЛКМ"
-			}
-		},
-		req: "pick an item",
-		draw: (ctx, x, y, w, h, p) => {
-			ctx.fillStyle = p.c8;
-			ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-			ctx.fillStyle = p.c13;
-			ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
-			ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
-			ctx.strokeStyle = p.c13;
-			ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
+			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
 		}
 	},
 	"get a gun": {
