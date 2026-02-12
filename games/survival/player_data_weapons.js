@@ -33,7 +33,7 @@ const WEAPON_DEFS = {
 	[ITEM_MUMMY_SHOTGUN]: {
 		cooldown: 200,
 		ammo: ITEM_PLASMA,
-		chance: 0.01,
+		chance: 0.001,
 		sound: "data/sfx/red_pistols_1.mp3",
 		vol: 0.125,
 		color: "#D2B48C",
@@ -58,7 +58,7 @@ const WEAPON_DEFS = {
 	[ITEM_SHADOW_STAFF]: {
 		cooldown: 400,
 		ammo: ITEM_PLASMA,
-		chance: 0.01,
+		chance: 0.0025,
 		sound: "data/sfx/plasmagun_1.mp3",
 		vol: 0.3,
 		color: "#1a0a25",
@@ -115,7 +115,7 @@ const WEAPON_DEFS = {
 	[ITEM_ANUBIS_SANDSTORM_STAFF]: {
 		cooldown: 60,
 		ammo: ITEM_RED_PLASMA,
-		chance: 0.005,
+		chance: 0.001,
 		sound: "data/sfx/red_pistols_1.mp3",
 		vol: 0.1,
 		color: "#FFD700",
@@ -156,7 +156,7 @@ const WEAPON_DEFS = {
 	[ITEM_ANUBIS_PUNISHER_ROD]: {
 		cooldown: 400,
 		ammo: ITEM_RED_PLASMA,
-		chance: 0.01,
+		chance: 0.0025,
 		sound: "data/sfx/plasmagun_1.mp3",
 		vol: 0.125,
 		color: "#ffd700",
@@ -216,7 +216,7 @@ const WEAPON_DEFS = {
 	[ITEM_VENOM_DUAL_SHOTGUNS]: {
 		cooldown: 150,
 		ammo: ITEM_VENOM,
-		chance: 0.025,
+		chance: 0.0025,
 		sound: "data/sfx/shotgun_1.mp3",
 		vol: 0.3,
 		color: "#224422",
@@ -342,7 +342,7 @@ const WEAPON_DEFS = {
 	[ITEM_KALASHNIKOV]: {
 		cooldown: 130,
 		ammo: ITEM_AMMO,
-		chance: 0.008,
+		chance: 0.0025,
 		sound: "data/sfx/gunshot_1.mp3",
 		vol: 0.2,
 		color: "#333333",
@@ -388,7 +388,7 @@ const WEAPON_DEFS = {
 	[ITEM_REVOLVER]: {
 		cooldown: 800,
 		ammo: ITEM_AMMO,
-		chance: 0.01,
+		chance: 0.05,
 		sound: "data/sfx/revolver_1.mp3",
 		vol: 0.1,
 		color: "#555555",
@@ -618,7 +618,7 @@ const WEAPON_DEFS = {
 	[ITEM_RED_SHOTGUN]: {
 		cooldown: 500,
 		ammo: ITEM_RED_PLASMA,
-		chance: 0.01,
+		chance: 0.005,
 		sound: "data/sfx/red_pistols_1.mp3",
 		vol: 0.125,
 		color: "#551111",
