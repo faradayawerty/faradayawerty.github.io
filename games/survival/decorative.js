@@ -554,7 +554,7 @@ function decorative_cactus_create(g, x, y) {
 	let outlineColor = "#114411";
 	let branchColor = "#2a882a";
 	let flowerColor = "#ff66aa";
-	bound_create(g, x + 5, y + 145, 20, 20);
+	bound_create(g, x - 2, y + 145, 30, 30);
 	game_object_change_name(g, decorative_rectangle_create(g, x, y + 50, 25,
 		125,
 		bodyColor, outlineColor), "decorative_trunk");
@@ -590,6 +590,6 @@ function decorative_cactus_create(g, x, y) {
 	}
 	if (Math.random() < 0.1) {
 		game_object_change_name(g, decorative_rectangle_create(g, x + 5, y + 40,
-			15, 10, flowerColor, outlineColor), "decorative_flower");
+			15, 10, flowerColor, outlineColor), "decorative_leaves");
 	}
 }
