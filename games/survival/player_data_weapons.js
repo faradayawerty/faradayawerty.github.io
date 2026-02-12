@@ -418,7 +418,7 @@ const WEAPON_DEFS = {
 				25, (3 + 2 * Math.random()) * 4.93 *
 				BALANCE_FACTOR * (
 					1000 / 9000) * 2 * weapon_damage_from_tier(
-				5.25),
+					5.25),
 				false, 6, 1500, mainColor, secondaryColor)
 		}
 	},
