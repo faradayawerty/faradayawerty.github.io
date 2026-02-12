@@ -259,7 +259,7 @@ let ACHIEVEMENT_REGISTRY = {
 				ru: "сядьте в автомобиль, подойдя к нему и нажав F или SPACE"
 			}
 		},
-		req: "fuel up",
+		req: "outside the box",
 		draw: (ctx, x, y, w, h, p) => {
 			ctx.save();
 			ctx.translate(x + w * 0.5, y + h * 0.45);
