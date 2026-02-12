@@ -167,7 +167,8 @@ function car_update(car_object, dt) {
 			p.body.position.x + 0.5 * p.w * Math.cos(theta),
 			p.body.position.y + 0.5 * p.w * Math.sin(theta),
 			dx, dy, 60,
-			1.5 + 18 * Math.random(), false, 12.5, 3500
+			(15 + 10 * Math.random()) * BALANCE_FACTOR *
+			weapon_damage_from_tier(7), false, 12.5, 3500
 		);
 		p.shot_cooldown = 0;
 		audio_play("data/sfx/revolver_1.mp3", 0.3);

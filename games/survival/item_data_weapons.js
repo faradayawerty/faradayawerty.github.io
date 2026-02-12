@@ -149,9 +149,9 @@ ITEMS_DATA[ITEM_KALASHNIKOV] = {
 };
 ITEMS_DATA[ITEM_GREEN_GUN] = {
 	name: "Acid Leech",
-	desc: "Infinite toxic payload fueled by your own energy reserves.",
+	desc: "Infinite toxic payload fueled by your own energy reserves. Can utilize Kinetic Barrier resources.",
 	name_rus: "Кислотная пиявка",
-	desc_rus: "Бесконечный запас токсинов, работающий напрямую от вашей энергии.",
+	desc_rus: "Бесконечный запас токсинов, работающий напрямую от вашей энергии. Может задействовать ресурсы кинетического щита.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const darkGreen = "#0a3311";
 		const acidGreen = "#44ff00";
@@ -627,9 +627,9 @@ ITEMS_DATA[ITEM_SNAKE_STAFF] = {
 };
 ITEMS_DATA[ITEM_MUMMY_SHOTGUN] = {
 	name: "Tomb Breaker",
-	desc: "Rapid-fire ancient shotgun. Powered by blue soul energy.",
+	desc: "Rapid-fire ancient shotgun. Powered by blue soul energy but can utilize plasma.",
 	name_rus: "Разрушитель гробниц",
-	desc_rus: "Скорострельный древний дробовик. Питается синей энергией душ.",
+	desc_rus: "Скорострельный древний дробовик. Питается синей энергией душ, но может задействовать плазму.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const glow = Math.sin(t * 0.15) * 0.5 + 0.5;
@@ -647,9 +647,9 @@ ITEMS_DATA[ITEM_MUMMY_SHOTGUN] = {
 };
 ITEMS_DATA[ITEM_MUMMY_PISTOLS] = {
 	name: "Dual Soul Pistols",
-	desc: "Pair of handguns that fire ghostly blue energy.",
+	desc: "Pair of handguns that fire ghostly blue energy. Can utilize plasma.",
 	name_rus: "Парные призрачные пистолеты",
-	desc_rus: "Пара пистолетов, стреляющих призрачной синей энергией.",
+	desc_rus: "Пара пистолетов, стреляющих призрачной синей энергией. Может задействовать плазму.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const glow = Math.sin(t * 0.15) * 0.5 + 0.5;
@@ -674,9 +674,9 @@ ITEMS_DATA[ITEM_MUMMY_PISTOLS] = {
 };
 ITEMS_DATA[ITEM_SHADOW_STAFF] = {
 	name: "Void Spinner",
-	desc: "Unleashes shadow bolts in all directions.",
+	desc: "Unleashes shadow bolts in all directions. Requires plasma energy.",
 	name_rus: "Теневой посох",
-	desc_rus: "Выпускает теневые заряды во все стороны.",
+	desc_rus: "Выпускает теневые заряды во все стороны. Требует плазменной энергии.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		ctx.save();
@@ -722,9 +722,9 @@ ITEMS_DATA[ITEM_SHADOW_STAFF] = {
 };
 ITEMS_DATA[ITEM_SHADOW_DUAL_SHOTGUNS] = {
 	name: "Abyssal Twins",
-	desc: "Heavy shadow-shot spread.",
+	desc: "Heavy shadow-shot spread. Powered by plasma.",
 	name_rus: "Бездонные близнецы",
-	desc_rus: "Тяжелые теневые дробовики.",
+	desc_rus: "Тяжелые теневые дробовики. Заряжаются плазмой.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const pulse = Math.sin(t * 0.1) * 0.5 + 0.5;
@@ -754,9 +754,9 @@ ITEMS_DATA[ITEM_SHADOW_DUAL_SHOTGUNS] = {
 };
 ITEMS_DATA[ITEM_ANUBIS_SANDSTORM_STAFF] = {
 	name: "Sandstorm Staff",
-	desc: "Summons a devastating golden vortex of sand.",
+	desc: "Summons a devastating golden vortex of sand. Requires red plasma.",
 	name_rus: "Посох песчаной бури",
-	desc_rus: "Призывает разрушительный золотой вихрь песка.",
+	desc_rus: "Призывает разрушительный золотой вихрь песка. Требует красную плазму.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		ctx.fillStyle = "#FFD700";
@@ -779,9 +779,9 @@ ITEMS_DATA[ITEM_ANUBIS_SANDSTORM_STAFF] = {
 };
 ITEMS_DATA[ITEM_ANUBIS_PUNISHER_ROD] = {
 	name: "The Punisher",
-	desc: "A divine heavy firearm. Each shot carries the weight of eternal judgment.",
+	desc: "A divine heavy firearm. Each shot carries the weight of eternal judgment. Powered by red plasma.",
 	name_rus: "Каратель",
-	desc_rus: "Тяжелое божественное орудие. Каждый выстрел несет в себе тяжесть вечного суда.",
+	desc_rus: "Тяжелое божественное орудие. Каждый выстрел несет в себе тяжесть вечного суда. Заряжается от красной плазмы.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const pulse = Math.sin(t * 0.1) * 0.5 + 0.5;
