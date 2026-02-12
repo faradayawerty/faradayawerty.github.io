@@ -61,6 +61,7 @@ const ENEMY_TYPES = {
 		bossifier_item: ITEM_BOSSIFIER_SHOOTING,
 		visuals: {
 			draw_gun: true,
+			draw_gun_boss: true,
 			gun_color: "#331133",
 			gun_width: 0.25,
 			outline_width: 1
@@ -287,6 +288,7 @@ const ENEMY_TYPES = {
 		bossifier_item: ITEM_BOSSIFIER_SWORD,
 		visuals: {
 			draw_gun: false,
+			draw_gun_boss: false,
 			draw_sword: true,
 			sword_color: "#55aa11",
 			outline_width: 1
@@ -641,6 +643,7 @@ const ENEMY_TYPES = {
 		bossifier_item: ITEM_BOSSIFIER_ANUBIS,
 		visuals: {
 			draw_gun: true,
+			draw_gun_boss: false,
 			gun_color: "#ffd700",
 			gun_width: 0.3,
 			custom_draw: (e, ctx) => {
@@ -947,6 +950,7 @@ const ENEMY_TYPES = {
 		delay: 1000,
 		visuals: {
 			draw_gun: false,
+			draw_gun_boss: false,
 			outline_width: 1,
 			custom_draw: (e, ctx) => {
 				animal_deer_draw_horns(ctx, e.body.position.x, e.body
@@ -993,6 +997,7 @@ const ENEMY_TYPES = {
 		delay: 500,
 		visuals: {
 			draw_gun: false,
+			draw_gun_boss: false,
 			outline_width: 2,
 			custom_draw: (e, ctx) => {
 				enemy_raccoon_boss_draw(ctx, e.body.position.x, e.body
