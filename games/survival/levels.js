@@ -41,7 +41,7 @@ function levels_set(g, level, old_level = null) {
 	if (!level_visited) {
 		if (player_object) {
 			if (!achievement_get(player_object.data.achievements_element.data
-					.achievements, "yummy").done)
+					.achievements, "pick an item").done)
 				item_create(g, ITEM_APPLE, Ox + Math.random() * 2500, Oy + Math
 					.random() * 2500, null, tile);
 			if (achievement_get(player_object.data.achievements_element.data
