@@ -82,7 +82,7 @@ const WEAPON_DEFS = {
 	[ITEM_SHADOW_DUAL_SHOTGUNS]: {
 		cooldown: 150,
 		ammo: ITEM_PLASMA,
-		chance: 0.025,
+		chance: 0.0025,
 		sound: "data/sfx/shotgun_1.mp3",
 		vol: 0.3,
 		color: "#0a0a0f",
