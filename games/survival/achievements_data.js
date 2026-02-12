@@ -1,5 +1,45 @@
 let DEBUG_ACHIEVEMENTS_REGISTRY = true;
 let ACHIEVEMENT_REGISTRY = {
+	"zoom": {
+		grid: {
+			x: 0,
+			y: 4
+		},
+		name: {
+			en: "zoom",
+			ru: "приближение"
+		},
+		desc: {
+			en: "use [+] or [-] to change scale",
+			ru: "воспользуйтесь кнопками [+] или [-] для изменения масштаба",
+		},
+		req: "joining in",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.strokeStyle = p.c8;
+			ctx.lineWidth = 0.05 * w;
+			ctx.beginPath();
+			ctx.arc(x + 0.45 * w, y + 0.45 * h, 0.25 * w, 0, Math.PI *
+				2);
+			ctx.stroke();
+			ctx.fillStyle = "rgba(170, 221, 255, 0.3)";
+			ctx.fill();
+			ctx.strokeStyle = p.c4;
+			ctx.lineWidth = 0.08 * w;
+			ctx.lineCap = "round";
+			ctx.beginPath();
+			ctx.moveTo(x + 0.65 * w, y + 0.65 * h);
+			ctx.lineTo(x + 0.85 * w, y + 0.85 * h);
+			ctx.stroke();
+			ctx.strokeStyle = p.c0;
+			ctx.lineWidth = 0.04 * w;
+			ctx.beginPath();
+			ctx.moveTo(x + 0.35 * w, y + 0.45 * h);
+			ctx.lineTo(x + 0.55 * w, y + 0.45 * h);
+			ctx.moveTo(x + 0.45 * w, y + 0.35 * h);
+			ctx.lineTo(x + 0.45 * w, y + 0.55 * h);
+			ctx.stroke();
+		}
+	},
 	"bossifier": {
 		grid: {
 			x: 3,

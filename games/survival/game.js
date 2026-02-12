@@ -217,12 +217,15 @@ function game_update(g, dt) {
 	if (!g.mobile && g.input.touch.length > 0) {
 		g.mobile = true;
 	}
-	if (isKeyDown(g.input, '=', true) && (g.scale < 4 / DPR || !g
+	let get_scale_achievement = false;
+	if ((isKeyDown(g.input, '=', true) || isKeyDown(g.input, '+', true)) && (g
+			.scale < 4 / DPR || !g
 			.camera_target_body)) {
 		if (g.mobile)
 			g.scale = g.scale * Math.pow(4, dt / 1000);
 		else
 			g.scale = g.scale / 0.9375;
+		get_scale_achievement = true;
 	}
 	if (isKeyDown(g.input, '-', true) && (g.scale > 0.25 / DPR || !g
 			.camera_target_body)) {
@@ -230,6 +233,7 @@ function game_update(g, dt) {
 			g.scale = g.scale * Math.pow(4, -dt / 1000);
 		else
 			g.scale = g.scale * 0.9375;
+		get_scale_achievement = true;
 	}
 	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data
 		.ai_controlled);
@@ -238,6 +242,9 @@ function game_update(g, dt) {
 			plr.data.ai_controlled = true;
 			g.camera_target_body = null;
 		}
+		if (get_scale_achievement)
+			achievement_do(plr.data.achievements_element.data.achievements,
+				"zoom", plr.data.achievements_shower_element, false);
 	}
 	else {
 		if (isKeyDown(g.input, ']', true)) {
