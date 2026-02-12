@@ -1,7 +1,7 @@
 const BALANCE_FACTOR = 1.0;
 
 function weapon_damage_from_tier(n) {
-	return Math.pow(1.5, n + 0.25 / n);
+	return Math.pow(1.5, n + 0.5 / n);
 }
 const WEAPON_DEFS = {
 	[ITEM_MUMMY_PISTOLS]: {
@@ -22,7 +22,7 @@ const WEAPON_DEFS = {
 					.w * Math.sin(theta + off), v.tx - v.sx,
 					v.ty - v.sy, 30, (0.4 + 0.8 * Math
 						.random()) * 1.84 * BALANCE_FACTOR *
-					weapon_damage_from_tier(6),
+					weapon_damage_from_tier(5.75),
 					false, 6, 1500,
 					"#44bbff", "white",
 					false, false, null
@@ -49,7 +49,7 @@ const WEAPON_DEFS = {
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 30,
 					(2.5 + 0.5 * Math.random()) * 3.52 *
 					BALANCE_FACTOR * (1000 / 6500) *
-					weapon_damage_from_tier(6),
+					weapon_damage_from_tier(5.75),
 					false, 6, 1500, "#44bbff", "white",
 					false, false, null
 				);
@@ -349,14 +349,22 @@ const WEAPON_DEFS = {
 		length: 1.4,
 		width: 1.1,
 		action: (g, p, v) => {
+			let mainColor = "#ffcc00";
+			let secondaryColor = "black";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "black";
+				secondaryColor = "#ffcc00";
+			}
 			let spread = 25;
 			let dx = (v.tx - v.sx) + (Math.random() - 0.5) * spread;
 			let dy = (v.ty - v.sy) + (Math.random() - 0.5) * spread;
 			bullet_create(
 				g, p.body.position.x, p.body.position.y, dx, dy,
 				22, (0.5 + 0.5 * Math.random()) * 2.14 *
-				BALANCE_FACTOR * weapon_damage_from_tier(4), false,
-				7, 1500, "#ffcc00", "black"
+				BALANCE_FACTOR * weapon_damage_from_tier(5), false,
+				7, 1500, mainColor, secondaryColor
 			);
 		}
 	},
@@ -375,8 +383,8 @@ const WEAPON_DEFS = {
 			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
 				.want_level)];
 			if (Math.floor(tile / 200) === 1) {
-				mainColor = "yellow";
-				secondaryColor = "black";
+				mainColor = "black";
+				secondaryColor = "yellow";
 			}
 			bullet_create(g, p.body.position.x, p.body
 				.position.y, v.tx - v.sx, v.ty - v.sy, 32, 1.2 *
@@ -400,8 +408,8 @@ const WEAPON_DEFS = {
 			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
 				.want_level)];
 			if (Math.floor(tile / 200) === 1) {
-				mainColor = "orange";
-				secondaryColor = "black";
+				mainColor = "black";
+				secondaryColor = "orange";
 			}
 			bullet_create(
 				g, p.body.position.x, p.body.position.y, v.tx - v
@@ -409,7 +417,8 @@ const WEAPON_DEFS = {
 				v.sy,
 				25, (3 + 2 * Math.random()) * 4.93 *
 				BALANCE_FACTOR * (
-					1000 / 9000) * 2 * weapon_damage_from_tier(4),
+					1000 / 9000) * 2 * weapon_damage_from_tier(
+				5.25),
 				false, 6, 1500, mainColor, secondaryColor)
 		}
 	},
@@ -436,7 +445,7 @@ const WEAPON_DEFS = {
 					0.5 *
 					Math
 					.random()) * 1.91 * BALANCE_FACTOR *
-				weapon_damage_from_tier(3), false, 6, 1500,
+				weapon_damage_from_tier(3.25), false, 6, 1500,
 				mainColor, secondaryColor)
 		}
 	},
@@ -456,8 +465,8 @@ const WEAPON_DEFS = {
 			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
 				.want_level)];
 			if (Math.floor(tile / 200) === 1) {
-				mainColor = "yellow";
-				secondaryColor = "black";
+				mainColor = "black";
+				secondaryColor = "yellow";
 			}
 			for (let i = 0; i < Math.random() * 7 + 7; i++)
 				bullet_create(g, p.body.position.x, p.body.position.y, (
@@ -484,8 +493,8 @@ const WEAPON_DEFS = {
 			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
 				.want_level)];
 			if (Math.floor(tile / 200) === 1) {
-				mainColor = "yellow";
-				secondaryColor = "black";
+				mainColor = "black";
+				secondaryColor = "yellow";
 			}
 			bullet_create(g, p.body.position.x, p.body
 				.position.y, (0.95 + 0.1 * Math.random()) * v.tx - v
@@ -536,7 +545,7 @@ const WEAPON_DEFS = {
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
 			.position.y, v.tx - v.sx, v.ty - v.sy, 17.5, (0.75 + 0.5 *
 				Math.random()) * 4.15 * BALANCE_FACTOR * (1000 / 2500) *
-			weapon_damage_from_tier(3),
+			weapon_damage_from_tier(3.25),
 			false, 12.5, 1500,
 			"cyan", "blue")
 	},

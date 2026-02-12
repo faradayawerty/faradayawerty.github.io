@@ -3,7 +3,7 @@ function enemy_health_from_tier(n) {
 }
 
 function enemy_damage_from_tier(n) {
-	return 0.05 * n;
+	return 0.5 * Math.tanh(0.1 * n);
 }
 const ENEMY_TYPES = {
 	"regular": {
@@ -108,9 +108,9 @@ const ENEMY_TYPES = {
 		name_rus: "пустынный житель",
 		requires: "regular",
 		weight: 2,
-		health: enemy_health_from_tier(3),
+		health: enemy_health_from_tier(2.75),
 		speed: 5.5,
-		damage: enemy_damage_from_tier(3),
+		damage: enemy_damage_from_tier(3.25),
 		w: 30,
 		h: 30,
 		color: "#c2a26b",
@@ -119,6 +119,7 @@ const ENEMY_TYPES = {
 		delay: 400,
 		bossifier_item: ITEM_BOSSIFIER_DESERT,
 		theme: THEME_DESERT,
+		max_minions: 4,
 		visuals: {
 			glowColor: "black",
 			draw_gun: false,
@@ -184,9 +185,9 @@ const ENEMY_TYPES = {
 		name_rus: "стреляющий красный зомби",
 		requires: "shooting",
 		weight: 3,
-		health: enemy_health_from_tier(4),
+		health: enemy_health_from_tier(3),
 		speed: 8,
-		damage: enemy_damage_from_tier(4),
+		damage: enemy_damage_from_tier(3),
 		w: 30,
 		h: 30,
 		color: "#999999",
@@ -194,6 +195,7 @@ const ENEMY_TYPES = {
 		range: 400,
 		delay: 200,
 		bossifier_item: ITEM_BOSSIFIER_RED,
+		max_minions: 3,
 		visuals: {
 			draw_gun: true,
 			draw_gun_boss: true,
@@ -365,6 +367,7 @@ const ENEMY_TYPES = {
 		delay: 1000,
 		theme: THEME_DESERT,
 		bossifier_item: ITEM_BOSSIFIER_MUMMY,
+		max_minions: 3,
 		visuals: {
 			glowColor: "black",
 			draw_gun: true,
@@ -561,9 +564,9 @@ const ENEMY_TYPES = {
 		name_rus: "пустынная тень",
 		requires: "mummy",
 		weight: 3,
-		health: enemy_health_from_tier(6),
+		health: enemy_health_from_tier(6.25),
 		speed: 6.5,
-		damage: enemy_damage_from_tier(6),
+		damage: enemy_damage_from_tier(6.25),
 		w: 30,
 		h: 30,
 		color: "rgba(10, 10, 10, 0.6)",
