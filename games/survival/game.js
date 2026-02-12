@@ -670,6 +670,8 @@ function game_object_make_savable(obj) {
 					[0, 0, 0, 0, 0, 0, 0, 0, 0],
 					[0, 0, 0, 0, 0, 0, 0, 0, 0],
 					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
+					[0, 0, 0, 0, 0, 0, 0, 0, 0],
 				],
 				achievements: []
 			}
@@ -763,11 +765,14 @@ function game_load(g) {
 					let plr = g.objects[iplayer];
 					for (let i = 0; i < plr.data.inventory_element.data
 						.items.length; i++) {
-						for (let j = 0; j < plr.data.inventory_element
-							.data.items[i].length; j++)
-							plr.data.inventory_element.data.items[i][
-								j
-							] = obj.data.items[i][j];
+						if (obj.data.items[i] !== undefined) {
+							for (let j = 0; j < plr.data
+								.inventory_element
+								.data.items[i].length; j++)
+								if (obj.data.items[i][j] !== undefined)
+									plr.data.inventory_element.data
+									.items[i][j] = obj.data.items[i][j];
+						}
 					}
 					try {
 						for (let i = 0; i < obj.data.achievements
@@ -876,10 +881,14 @@ function game_autoload(g) {
 				let plr = g.objects[iplayer];
 				for (let row = 0; row < plr.data.inventory_element.data.items
 					.length; row++) {
-					for (let col = 0; col < plr.data.inventory_element.data
-						.items[row].length; col++) {
-						plr.data.inventory_element.data.items[row][col] = obj
-							.data.items[row][col];
+					if (obj.data.items[row] !== undefined) {
+						for (let col = 0; col < plr.data.inventory_element.data
+							.items[row].length; col++) {
+							if (obj.data.items[row][col] !== undefined)
+								plr.data.inventory_element.data.items[row][
+									col
+								] = obj.data.items[row][col];
+						}
 					}
 				}
 				try {

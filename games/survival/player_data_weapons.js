@@ -329,8 +329,8 @@ const WEAPON_DEFS = {
 			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
 				.want_level)];
 			if (Math.floor(tile / 200) === 1) {
-				mainColor = "yellow";
-				secondaryColor = "black";
+				mainColor = "black";
+				secondaryColor = "yellow";
 			}
 			bullet_create(g, p.body.position.x, p.body
 				.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25 *
