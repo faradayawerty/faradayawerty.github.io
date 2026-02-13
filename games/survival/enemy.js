@@ -224,6 +224,40 @@ function enemy_get_target_object(enemy_object, dt) {
 	return target_object;
 }
 
+function enemy_get_separation_vector(enemy_object) {
+	let e = enemy_object.data;
+	let separationX = 0;
+	let separationY = 0;
+	let neighbors = 0;
+	let enemies = enemy_object.game.collections["enemy"] || [];
+	let minDist = e.w;
+	if (!e.boss)
+		minDist = e.w * 3.125;
+	for (let i = 0; i < enemies.length; i++) {
+		let other = enemies[i];
+		if (other === enemy_object || other.destroyed) continue;
+		let dx = e.body.position.x - other.data.body.position.x;
+		let dy = e.body.position.y - other.data.body.position.y;
+		let distanceSq = dx * dx + dy * dy;
+		if (distanceSq < minDist * minDist && distanceSq > 0) {
+			let distance = Math.sqrt(distanceSq);
+			separationX += (dx / distance) * (minDist - distance);
+			separationY += (dy / distance) * (minDist - distance);
+			neighbors++;
+		}
+	}
+	if (neighbors > 0) {
+		return {
+			x: separationX / neighbors,
+			y: separationY / neighbors
+		};
+	}
+	return {
+		x: 0,
+		y: 0
+	};
+}
+
 function enemy_update(enemy_object, dt) {
 	let e = enemy_object.data;
 	let typeData = ENEMY_TYPES[e.type] || ENEMY_TYPES["regular"];
@@ -271,6 +305,15 @@ function enemy_update(enemy_object, dt) {
 			enemy_object, dt, target_object, vars);
 		if (e.is_minion && typeData.minion_behaviour) typeData.minion_behaviour(
 			enemy_object, dt, target_object, vars);
+		let sep = enemy_get_separation_vector(enemy_object);
+		vars.dx += sep.x * 0.4;
+		vars.dy += sep.y * 0.4;
+		let final_v = Math.sqrt(vars.dx * vars.dx + vars.dy * vars.dy);
+		let max_s = e.speed * 1.15;
+		if (final_v > max_s) {
+			vars.dx = (vars.dx / final_v) * max_s;
+			vars.dy = (vars.dy / final_v) * max_s;
+		}
 		let v_sq = vars.dx * vars.dx + vars.dy * vars.dy;
 		if (v_sq > 0) {
 			Matter.Body.setVelocity(e.body, {
