@@ -1,7 +1,7 @@
 const BALANCE_FACTOR = 1.0;
 
 function weapon_damage_from_tier(n) {
-	return Math.pow(1.5, n + 0.5 / n);
+	return Math.pow(1.5, n + 0.25 / n);
 }
 const WEAPON_DEFS = {
 	[ITEM_MUMMY_PISTOLS]: {

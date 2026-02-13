@@ -17,7 +17,7 @@ Object.keys(ENEMY_TYPES).forEach(type => {
 			desc: `Forces a ${enemyTypeEng} enemy into its boss form.` +
 				salt,
 			name_rus: `Боссификатор: ${enemyTypeRus}`,
-			desc_rus: `Превращает противника типа ${enemyTypeRus} в босса.` +
+			desc_rus: `Превращает противника типа «${enemyTypeRus}» в босса.` +
 				saltRus,
 			render: (ctx, x, y, w, h, animstate) =>
 				item_draw_bossifier_icon(ctx, x, y, w, h, animstate,

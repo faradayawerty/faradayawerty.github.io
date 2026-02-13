@@ -21,6 +21,7 @@ const ENEMY_TYPES = {
 		range: 400,
 		delay: 1000,
 		bossifier_item: ITEM_BOSSIFIER_REGULAR,
+		max_minions: 2,
 		visuals: {
 			draw_gun: false,
 			outline_width: 1
@@ -59,6 +60,7 @@ const ENEMY_TYPES = {
 		range: 400,
 		delay: 1000,
 		bossifier_item: ITEM_BOSSIFIER_SHOOTING,
+		max_minions: 4,
 		visuals: {
 			draw_gun: true,
 			draw_gun_boss: true,
