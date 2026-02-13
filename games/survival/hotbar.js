@@ -222,8 +222,7 @@ function hotbar_draw(hotbar_object, ctx) {
 	ctx.beginPath();
 	ctx.arc(bx + bw / 2, by + bh * 0.1, bw * 0.2, Math.PI, 0);
 	ctx.stroke();
-	ctx.fillStyle = (!isMobile && hb.hovered_btn === 'inv') ? "#ffffcc" :
-		"yellow";
+	ctx.fillStyle = "yellow";
 	ctx.fillRect(bx + bw * 0.2, by + bh * 0.4, bw * 0.1, bh * 0.2);
 	ctx.fillRect(bx + bw * 0.7, by + bh * 0.4, bw * 0.1, bh * 0.2);
 	ctx.strokeStyle = "black";
@@ -234,8 +233,7 @@ function hotbar_draw(hotbar_object, ctx) {
 		ay = btn_ach_y + s * 0.25;
 	let aw = s * 0.5,
 		ah = s * 0.5;
-	ctx.fillStyle = (!isMobile && hb.hovered_btn === 'ach') ? "#fff2cc" :
-		"gold";
+	ctx.fillStyle = "gold";
 	ctx.beginPath();
 	ctx.moveTo(ax, ay);
 	ctx.lineTo(ax + aw, ay);
@@ -243,8 +241,7 @@ function hotbar_draw(hotbar_object, ctx) {
 	ctx.lineTo(ax + aw * 0.2, ay + ah * 0.6);
 	ctx.closePath();
 	ctx.fill();
-	ctx.strokeStyle = (!isMobile && hb.hovered_btn === 'ach') ? "white" :
-		"orange";
+	ctx.strokeStyle = "orange";
 	ctx.lineWidth = s * 0.03;
 	ctx.stroke();
 	ctx.fillRect(ax + aw * 0.4, ay + ah * 0.6, aw * 0.2, ah * 0.3);
@@ -253,6 +250,95 @@ function hotbar_draw(hotbar_object, ctx) {
 	ctx.arc(ax, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
 	ctx.arc(ax + aw, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
 	ctx.stroke();
+	if (!isMobile && hb.hovered_btn) {
+		let lang = hotbar_object.game.settings.language;
+		let title = "";
+		let description = "";
+		if (hb.hovered_btn === 'menu') {
+			if (lang === "русский") {
+				title = "Меню";
+				description =
+					"Здесь можно сохранить или загрузить игру, изменить настройки. Советую заглянуть в них, если хочешь адаптировать игру под себя.";
+			}
+			else {
+				title = "Menu";
+				description =
+					"Here you can save or load the game and change settings. Check them out if you want to customize the game.";
+			}
+		}
+		else if (hb.hovered_btn === 'inv') {
+			if (lang === "русский") {
+				title = "Инвентарь";
+				description =
+					"Сюда попадают подобранные предметы. Открыв инвентарь, нажмите на предмет, чтобы переместить его в другую ячейку или воспользоваться им. Нажмите Q или ПКМ, чтобы выбросить предмет.";
+			}
+			else {
+				title = "Inventory";
+				description =
+					"All picked up items go here. Click an item to move it or use it. Press Q or Right-Click to drop an item.";
+			}
+		}
+		else if (hb.hovered_btn === 'ach') {
+			if (lang === "русский") {
+				title = "Достижения";
+				description =
+					"Твой гайд в мир игры. Почаще поглядывай сюда, если запутаешься.";
+			}
+			else {
+				title = "Achievements";
+				description =
+					"Your guide to the game world. Take a look here if you ever feel lost.";
+			}
+		}
+		if (title !== "") {
+			ctx.save();
+			let scale = get_scale();
+			let mx = hotbar_object.game.input.mouse.x / scale;
+			let my = hotbar_object.game.input.mouse.y / scale;
+			let W = 750;
+			let H = 400;
+			let fontsize = 32;
+			let screenW = window.innerWidth / scale;
+			let screenH = window.innerHeight / scale;
+			let x = mx + 20;
+			let y = my + 20;
+			if (x + W > screenW) x -= W;
+			if (y + H > screenH) y -= H;
+			if (x < 0) x = 10;
+			if (y < 0) y = 10;
+			ctx.globalAlpha = 0.9;
+			ctx.fillStyle = "black";
+			ctx.strokeStyle = "gray";
+			ctx.lineWidth = 2;
+			ctx.fillRect(x, y, W, H);
+			ctx.strokeRect(x, y, W, H);
+			ctx.globalAlpha = 1.0;
+			ctx.fillStyle = "yellow";
+			ctx.font = `bold ${fontsize - 2}px Arial`;
+			ctx.textAlign = "left";
+			ctx.textBaseline = "top";
+			ctx.fillText(title, x + 10, y + 20);
+			ctx.fillStyle = "white";
+			ctx.font = `${fontsize}px Arial`;
+			let words = description.split(' ');
+			let line = "";
+			let lineY = y + 75;
+			let charlim = 40;
+			for (let n = 0; n < words.length; n++) {
+				let testLine = line + words[n] + " ";
+				if (testLine.length > charlim) {
+					ctx.fillText(line, x + 10, lineY);
+					line = words[n] + " ";
+					lineY += fontsize * 1.2;
+				}
+				else {
+					line = testLine;
+				}
+			}
+			ctx.fillText(line, x + 10, lineY);
+			ctx.restore();
+		}
+	}
 }
 
 function hotbar_update(hotbar_element, dt) {

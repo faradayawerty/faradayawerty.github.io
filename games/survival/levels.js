@@ -1,4 +1,5 @@
 let DEBUG_LEVEL = false;
+let SPAWN_MONEY = true;
 
 function levels_set(g, level, old_level = null) {
 	let [level_x, level_y] = level.split("x").map(Number);
@@ -44,6 +45,12 @@ function levels_set(g, level, old_level = null) {
 					.achievements, "pick an item").done)
 				item_create(g, ITEM_APPLE, Ox + Math.random() * 2500, Oy + Math
 					.random() * 2500, null, tile);
+			if (!achievement_get(player_object.data.achievements_element.data
+					.achievements, "pick an item").done && SPAWN_MONEY) {
+				item_create(g, ITEM_MONEY, Ox + Math.random() * 2500, Oy + Math
+					.random() * 2500, null, tile);
+				SPAWN_MONEY = false;
+			}
 			if (achievement_get(player_object.data.achievements_element.data
 					.achievements, "pick an item").done && !achievement_get(
 					player_object.data.achievements_element.data.achievements,

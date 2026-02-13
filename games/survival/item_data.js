@@ -11,9 +11,9 @@ let ITEMS_DATA = {
 	},
 	[ITEM_MONEY]: {
 		name: "Money",
-		desc: "Can be used for trading.",
+		desc: "Useless paper scraps in a world without shops.",
 		name_rus: "Деньги",
-		desc_rus: "Можно использовать для торговли.",
+		desc_rus: "Просто крашеная бумага. Зомби не дают сдачи.",
 		render: (ctx, x, y, w, h) => {
 			ctx.fillStyle = "#11ff55";
 			ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
