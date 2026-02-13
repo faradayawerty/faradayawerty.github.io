@@ -123,7 +123,7 @@ let ITEMS_DATA = {
 		name: "Old Shoe",
 		desc: "The sole is falling off.",
 		name_rus: "Старый ботинок",
-		desc_rus: "Подошва вот-зат отвалится.",
+		desc_rus: "Подошва вот-вот отвалится.",
 		render: (ctx, x, y, w, h) => {
 			ctx.fillStyle = "#553311";
 			ctx.fillRect(x + 0.2 * w, y + 0.6 * h, 0.6 * w, 0.2 * h);

@@ -76,7 +76,7 @@ function collisions_handle_pair(g, self, other, dt) {
 			let speed = Math.sqrt(vel.x * vel.x + vel.y * vel.y);
 			if ((!sData.boss && speed > 0.9 * oData.max_speed) || (oData
 					.is_tank && speed > 0.1 * oData.max_speed)) {
-				sData.health -= 10 * sData.damage * dt;
+				sData.health -= 100 * sData.damage * dt;
 				sData.hit_by_player = true;
 			}
 		}
