@@ -380,6 +380,7 @@ function menu_update(m, dt, input) {
 			m.buttons = m.main_menu_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
+			m.shown = false;
 			DEATH_MESSAGE = "☠️ игрок мёртв";
 		}
 		else if (m.buttons[m.iselected] == "language") {
