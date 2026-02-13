@@ -206,6 +206,8 @@
 				menu1.shown = !menu1.shown;
 				game1.want_hide_inventory = true;
 			}
+			if (menu1.shown)
+				menu1.death_message = game1.want_death_message;
 			if (game1.want_menu) {
 				menu1.shown = true;
 			}

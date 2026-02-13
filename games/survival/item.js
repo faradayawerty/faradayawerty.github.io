@@ -82,33 +82,22 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 	let chance_drink = 1;
 	let chance_fuel = 1;
 	if (enemy_type != null) {
-		chance_fuel = 10;
-		chance_ammo = 30;
+		chance_fuel = 5;
+		chance_ammo = 25;
 		chance_health = 0;
-		chance_shield = 5;
-		chance_food = 15;
-		chance_drink = 15;
+		chance_shield = 15;
+		chance_food = 10;
+		chance_drink = 10;
 		if (enemy_type == "shooting") {
-			chance_health = 10;
-			chance_shield = 10;
+			chance_health = 5;
 		}
 		if (enemy_type == "sword") {
-			chance_health = 25;
-			chance_shield = 15;
-		}
-		if (enemy_type == "desert") {
+			chance_health = 15;
+			chance_food = 0;
 			chance_drink = 0;
 		}
-		if (enemy_type == "mummy") {
+		if (["desert", "mummy", "shadow", "anubis"].includes(enemy_type)) {
 			chance_drink = 0;
-		}
-		if (enemy_type == "shadow") {
-			chance_drink = 0;
-			chance_shield = 15;
-		}
-		if (enemy_type == "anubis") {
-			chance_drink = 0;
-			chance_shield = 15;
 		}
 	}
 	else if (car_type !== null) {

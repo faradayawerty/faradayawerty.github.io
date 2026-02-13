@@ -23,6 +23,7 @@ function inventory_create(g, attached_to_object = null) {
 		attached_to_object: attached_to_object,
 		animation_state: 0,
 		_touch_lock: false,
+		_cross_pc_held: false,
 		close_button: {
 			x: 0,
 			y: 0,
@@ -275,6 +276,7 @@ function inventory_update(inventory_element, dt) {
 	if (inv.was_left_down === undefined) inv.was_left_down = false;
 	if (inv.was_right_down === undefined) inv.was_right_down = false;
 	if (inv._cross_held === undefined) inv._cross_held = false;
+	if (inv._cross_pc_held === undefined) inv._cross_pc_held = false;
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 	let is_clicked = false;
@@ -318,7 +320,7 @@ function inventory_update(inventory_element, dt) {
 			freeTouch)) {
 		return;
 	}
-	if (inv._cross_held) return;
+	if (inv._cross_held || inv._cross_pc_held) return;
 	if (!game.mobile && is_clicked_right) {
 		if (inv.imove !== -1 && inv.jmove !== -1) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
@@ -435,6 +437,7 @@ function inventory_closing_cross_update(inventory_element, mx, my, is_clicked,
 	freeTouch) {
 	let inv = inventory_element.data;
 	let game = inventory_element.game;
+	let input = game.input;
 	if (!inv.close_button) inv.close_button = {
 		x: 0,
 		y: 0,
@@ -456,11 +459,17 @@ function inventory_closing_cross_update(inventory_element, mx, my, is_clicked,
 		}
 	}
 	else {
-		if (is_clicked && btn.is_hovered) {
-			inventory_element.shown = false;
-			inv.imove = -1;
-			inv.jmove = -1;
-			return true;
+		if (input.mouse.leftButtonPressed && btn.is_hovered) {
+			inv._cross_pc_held = true;
+		}
+		if (!input.mouse.leftButtonPressed && inv._cross_pc_held) {
+			inv._cross_pc_held = false;
+			if (btn.is_hovered) {
+				inventory_element.shown = false;
+				inv.imove = -1;
+				inv.jmove = -1;
+				return true;
+			}
 		}
 	}
 	return false;

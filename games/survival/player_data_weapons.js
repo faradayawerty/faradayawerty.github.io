@@ -1,7 +1,7 @@
 const BALANCE_FACTOR = 1.0;
 
 function weapon_damage_from_tier(n) {
-	return Math.pow(1.5, n + 0.25 / n);
+	return Math.pow(1.5, n);
 }
 const WEAPON_DEFS = {
 	[ITEM_MUMMY_PISTOLS]: {
@@ -753,6 +753,13 @@ const WEAPON_DEFS = {
 				p.health -= 0.0255 * dt;
 				p.hunger -= 0.0125 * dt;
 				p.thirst -= 0.0125 * dt;
+				if (p.health <= 0) {
+					DEATH_MESSAGE =
+						"☠️ The Acid Leech sapped player's remaining energy";
+					if (g.settings.language === "русский")
+						DEATH_MESSAGE =
+						"☠️ «Кислотная Пиявка» истощила игрока";
+				}
 			}
 		}
 	},

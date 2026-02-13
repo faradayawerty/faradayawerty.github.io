@@ -42,6 +42,7 @@ function game_create(input_, engine_, audios_) {
 		is_player_shooting: false,
 		last_bullet_num: 0,
 		collections: {},
+		want_death_message: "You have died.",
 		settings: {
 			language: "english",
 			auto_aim: false,

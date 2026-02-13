@@ -1,5 +1,5 @@
 function enemy_health_from_tier(n) {
-	return 1000 * Math.pow(1.5, n);
+	return 1000 * Math.pow(1.5, n - 0.25 / n);
 }
 
 function enemy_damage_from_tier(n) {
@@ -121,7 +121,7 @@ const ENEMY_TYPES = {
 		delay: 400,
 		bossifier_item: ITEM_BOSSIFIER_DESERT,
 		theme: THEME_DESERT,
-		max_minions: 4,
+		max_minions: 2,
 		visuals: {
 			glowColor: "black",
 			draw_gun: false,
@@ -145,8 +145,8 @@ const ENEMY_TYPES = {
 						true,
 						e.w * 0.15,
 						1500,
+						"#aa4400",
 						"#ffcc00",
-						"orange"
 					);
 					e.shooting_delay = 0;
 				}
@@ -161,7 +161,7 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		on_boss_death: (obj, target) => {
-			if (3 * Math.random() < 1)
+			if (8 * Math.random() < 1)
 				item_create(obj.game, ITEM_REVOLVER, obj.data.body
 					.position.x, obj
 					.data.body.position.y, false, false);
@@ -577,6 +577,7 @@ const ENEMY_TYPES = {
 		delay: 1000,
 		theme: THEME_DESERT,
 		bossifier_item: ITEM_BOSSIFIER_SHADOW,
+		max_minions: 3,
 		behaviour: (obj, dt, target, vars) => {
 			let e = obj.data;
 			if (e.boss) return;

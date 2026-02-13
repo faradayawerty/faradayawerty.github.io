@@ -68,7 +68,7 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		width = width * 0.67;
 		height = height * 0.67;
 	}
-	let max_health_random = config.health * (1 + 0.5 * Math.random());
+	let max_health_random = config.health * (1 + 0.25 * Math.random());
 	let e = {
 		health: max_health_random * ENEMY_HEALTH_COEFFICIENT,
 		max_health: max_health_random * ENEMY_HEALTH_COEFFICIENT,
@@ -340,7 +340,7 @@ function enemy_update(enemy_object, dt) {
 			if (p_close && !p_close.data.ai_controlled) audio_play(sound);
 			for (let i = 0; i < dropData.N; i++) {
 				let theta = 2 * Math.PI * Math.random();
-				if ((3 * Math.random() < 1 && !e.boss || Math.random() < 0.75 &&
+				if ((2 * Math.random() < 1 && !e.boss || Math.random() < 0.75 &&
 						e.boss) && DROP_ITEMS)
 					item_spawn(enemy_object.game, e.body.position.x + 50 * Math
 						.cos(theta), e.body.position.y + 50 * Math.sin(theta), e

@@ -123,6 +123,24 @@ function player_destroy(player_object) {
 }
 
 function player_die(player_object) {
+	let g = player_object.game;
+	let p = player_object.data;
+	console.log(p.hunger);
+	if (p.hunger <= 0 && p.thirst <= 0) {
+		DEATH_MESSAGE = "☠️ the player couldn't find anything to eat or drink";
+		if (g.settings.language === "русский")
+			DEATH_MESSAGE = "☠️ игрок не смог найти питьё и пропитание";
+	}
+	else if (p.hunger <= 0) {
+		DEATH_MESSAGE = "☠️ the player starved to death";
+		if (g.settings.language === "русский")
+			DEATH_MESSAGE = "☠️ игрок погиб от голода";
+	}
+	else if (p.thirst <= 0) {
+		DEATH_MESSAGE = "☠️ the player died of thirst";
+		if (g.settings.language === "русский")
+			DEATH_MESSAGE = "☠️ игрок умер от жажды";
+	}
 	player_object.game.input.mouse.leftButtonPressed = false;
 	player_object.game.deaths += 1;
 	if (player_object.data.ai_controlled || player_object.game.settings
@@ -153,7 +171,6 @@ function player_die(player_object) {
 				player_object.game.objects[i].data.max_hunger);
 		}
 	}
-	let g = player_object.game;
 	g.kills_for_boss = Math.min(32, g.kills_for_boss + 6);
 	player_destroy(player_object);
 }

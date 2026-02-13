@@ -335,26 +335,37 @@ ITEMS_DATA[ITEM_MINIGUN] = {
 			mh = h * 0.25;
 		let mx = x + w * 0.05,
 			my = y + h * 0.45;
+		ctx.fillStyle = "#000000";
+		ctx.strokeStyle = "#000000";
+		ctx.lineWidth = h * 0.06;
+		ctx.lineJoin = "round";
+		let padding = w * 0.015;
+		ctx.fillRect(mx - padding, my - padding, mw * 0.3 + padding * 2,
+			mh * 1.2 + padding * 2);
+		ctx.fillRect(mx + mw * 0.3 - padding, my + mh * 0.1 - padding,
+			mw * 0.7 + padding * 2, mh * 0.8 + padding * 2);
+		ctx.beginPath();
+		ctx.moveTo(mx + mw * 0.1, my);
+		ctx.lineTo(mx + mw * 0.1, my - mh * 0.4);
+		ctx.lineTo(mx + mw * 0.5, my - mh * 0.4);
+		ctx.lineTo(mx + mw * 0.5, my + mh * 0.1);
+		ctx.stroke();
 		ctx.fillStyle = "#113377";
 		ctx.fillRect(mx, my, mw * 0.3, mh * 1.2);
 		ctx.fillStyle = "#2255aa";
-		ctx.fillRect(mx + mw * 0.3, my + mh * 0.1, mw * 0.7, mh *
-			0.8);
+		ctx.fillRect(mx + mw * 0.3, my + mh * 0.1, mw * 0.7, mh * 0.8);
 		ctx.fillStyle = "#0a1f44";
-		ctx.fillRect(mx + mw * 0.3, my + mh * 0.3, mw * 0.7, mh *
-			0.1);
-		ctx.fillRect(mx + mw * 0.3, my + mh * 0.6, mw * 0.7, mh *
-			0.1);
+		ctx.fillRect(mx + mw * 0.3, my + mh * 0.3, mw * 0.7, mh * 0.1);
+		ctx.fillRect(mx + mw * 0.3, my + mh * 0.6, mw * 0.7, mh * 0.1);
 		ctx.fillStyle = "#113377";
-		ctx.fillRect(mx + mw * 0.6, my + mh * 0.1, mw * 0.06, mh *
-			0.8);
+		ctx.fillRect(mx + mw * 0.6, my + mh * 0.1, mw * 0.06, mh * 0.8);
 		ctx.fillRect(mx + mw * 0.94, my + mh * 0.1, mw * 0.06, mh *
 			0.8);
 		ctx.strokeStyle = "#113377";
 		ctx.lineWidth = h * 0.03;
+		ctx.lineJoin = "miter";
 		ctx.beginPath();
 		ctx.moveTo(mx + mw * 0.1, my);
-		ctx.lineTo(mx + mw * 0.1, my - mh * 0.4);
 		ctx.lineTo(mx + mw * 0.1, my - mh * 0.4);
 		ctx.lineTo(mx + mw * 0.5, my - mh * 0.4);
 		ctx.lineTo(mx + mw * 0.5, my + mh * 0.1);

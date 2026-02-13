@@ -1,4 +1,8 @@
+let DEATH_MESSAGE = "default death message";
+
 function drawButton(ctx, x, y, text) {
+	if (text === "DEATH")
+		text = DEATH_MESSAGE;
 	ctx.font = "36px sans";
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);

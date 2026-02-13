@@ -24,7 +24,7 @@ function collisions_handle_pair(g, self, other, dt) {
 		if (sData.enemy) {
 			if (oName === "player") {
 				collisions_apply_damage_to_player(oData, sData.damage, dt,
-					"bullet");
+					"bullet", g);
 			}
 		}
 		else {
@@ -53,7 +53,7 @@ function collisions_handle_pair(g, self, other, dt) {
 			if (oName === "rocket" && sData.enemy === oData.enemy) return;
 			if (oName === "player" && sData.enemy) {
 				collisions_apply_damage_to_player(oData, sData.damage, dt,
-					"rocket");
+					"rocket", g);
 			}
 			else {
 				const isFromPlayer = !sData.enemy;
@@ -67,7 +67,8 @@ function collisions_handle_pair(g, self, other, dt) {
 	}
 	if (sName === "enemy") {
 		if (oName === "player") {
-			collisions_apply_damage_to_player(oData, sData.damage, dt, "enemy");
+			collisions_apply_damage_to_player(oData, sData.damage, dt, "enemy",
+				g);
 		}
 		if (oName === "car") {
 			oData.health -= (oData.is_tank ? 0.0625 : 1) * sData.damage * dt;
@@ -85,7 +86,7 @@ function collisions_handle_pair(g, self, other, dt) {
 	}
 }
 
-function collisions_apply_damage_to_player(p, damage, dt, source) {
+function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 	if (p.immunity > 0) return;
 	let totalDmg = damage * dt;
 	if (p.shield_blue_health > 0) {
@@ -119,6 +120,24 @@ function collisions_apply_damage_to_player(p, damage, dt, source) {
 			hotbar_get_selected_item(p.hotbar_element) == ITEM_HORN) k = 0.001;
 	}
 	p.health -= k * totalDmg;
+	if (p.health <= 0) {
+		if (source === "enemy") {
+			DEATH_MESSAGE = "☠️ the player has been infected";
+			if (g.settings.language === "русский")
+				DEATH_MESSAGE = "☠️ игрок был заражён";
+		}
+		if (source === "bullet") {
+			DEATH_MESSAGE = "☠️ the player was killed by a bullet";
+			if (g.settings.language === "русский")
+				DEATH_MESSAGE = "☠️ игрок был подстрелен";
+		}
+		if (source === "rocket") {
+			DEATH_MESSAGE = "☠️ the player was killed by a rocket";
+			if (g.settings.language === "русский")
+				DEATH_MESSAGE =
+				"☠️ игрок был подстрелен самонаводящейся ракетой";
+		}
+	}
 }
 
 function collisions_apply_damage_to_object(g, obj, damage, dt, isFromPlayer) {

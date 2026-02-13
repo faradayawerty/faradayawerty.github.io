@@ -7,7 +7,9 @@ function hotbar_create(g, inv, attached_to_object = null) {
 		animation_state: 0,
 		mouse_over: false,
 		has_shield_button: false,
-		did_want_menu: false
+		did_want_menu: false,
+		leftButtonClickable: false,
+		hovered_btn: null
 	};
 	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update,
 		hotbar_draw, hotbar_destroy);
@@ -49,6 +51,8 @@ function hotbar_draw(hotbar_object, ctx) {
 	let start_x = 40;
 	if (hotbar_object.game.mobile) {
 		hb.slot_size = 97;
+		s = hb.slot_size;
+		step = s * 1.05;
 	}
 	for (let i = 0; i < hb.row.length; i++) {
 		ctx.globalAlpha = 0.9;
@@ -58,16 +62,34 @@ function hotbar_draw(hotbar_object, ctx) {
 		item_icon_draw(ctx, hb.row[i], start_x + step * i, start_y, s, s, hb
 			.animation_state);
 	}
-	if (hotbar_object.game.mobile) {
-		const drawButtonBg = (x, y_off) => {
+	const drawButtonBg = (x, y_off, type) => {
+		if (!hotbar_object.game.mobile && hb.hovered_btn === type) {
+			ctx.fillStyle = "#6699ff";
+		}
+		else {
 			ctx.fillStyle = "#4477ff";
-			ctx.globalAlpha = 0.8;
-			ctx.fillRect(x, y_off, s, s);
-			ctx.globalAlpha = 1.0;
-		};
+		}
+		ctx.globalAlpha = 0.8;
+		ctx.fillRect(x, y_off, s, s);
+		ctx.globalAlpha = 1.0;
+		if (!hotbar_object.game.mobile && hb.hovered_btn === type) {
+			ctx.strokeStyle = "white";
+			ctx.lineWidth = 2;
+			ctx.strokeRect(x, y_off, s, s);
+		}
+	};
+	let p = hb.attached_to_object.data;
+	let isMobile = hotbar_object.game.mobile;
+	let btn_menu_x, btn_menu_y, btn_inv_x, btn_inv_y, btn_ach_x, btn_ach_y;
+	if (isMobile) {
 		let col_res_x = start_x + step * hb.row.length;
 		let col_sys_x = col_res_x + step;
-		let p = hb.attached_to_object.data;
+		btn_menu_x = col_sys_x;
+		btn_menu_y = start_y;
+		btn_inv_x = col_sys_x;
+		btn_inv_y = start_y + step;
+		btn_ach_x = col_sys_x;
+		btn_ach_y = start_y + step * 2;
 		const drawIndicator = (ix, iy, val, max, colorEmpty, colorFull,
 			itemKey) => {
 			ctx.save();
@@ -131,58 +153,106 @@ function hotbar_draw(hotbar_object, ctx) {
 			drawIndicator(col_res_x, start_y + step * 3, sVal, sMax, "#444444",
 				sColor, sIcon);
 		}
-		drawButtonBg(col_sys_x, start_y);
+	}
+	else {
+		let offset_x = start_x + step * hb.row.length + (step * 0.5);
+		btn_menu_x = offset_x;
+		btn_menu_y = start_y;
+		btn_inv_x = offset_x + step;
+		btn_inv_y = start_y;
+		btn_ach_x = offset_x + step * 2;
+		btn_ach_y = start_y;
+	}
+	drawButtonBg(btn_menu_x, btn_menu_y, 'menu');
+	ctx.save();
+	if (isMobile) {
 		ctx.fillStyle = "white";
 		let barW = s * 0.5;
 		let barH = s * 0.08;
-		let barX = col_sys_x + (s - barW) / 2;
-		ctx.fillRect(barX, start_y + s * 0.3, barW, barH);
-		ctx.fillRect(barX, start_y + s * 0.48, barW, barH);
-		ctx.fillRect(barX, start_y + s * 0.66, barW, barH);
-		drawButtonBg(col_sys_x, start_y + step);
-		let pad = s * 0.2;
-		let bw = s - pad * 2;
-		let bh = s - pad * 2;
-		let bx = col_sys_x + pad;
-		let by = (start_y + step) + pad;
-		ctx.fillStyle = "#a52a2a";
-		ctx.fillRect(bx, by + bh * 0.2, bw, bh * 0.8);
-		ctx.fillStyle = "#8b4513";
-		ctx.fillRect(bx, by + bh * 0.1, bw, bh * 0.4);
-		ctx.strokeStyle = "#8b4513";
-		ctx.lineWidth = s * 0.05;
+		let barX = btn_menu_x + (s - barW) / 2;
+		ctx.fillRect(barX, btn_menu_y + s * 0.3, barW, barH);
+		ctx.fillRect(barX, btn_menu_y + s * 0.48, barW, barH);
+		ctx.fillRect(barX, btn_menu_y + s * 0.66, barW, barH);
+	}
+	else {
+		let centerX = btn_menu_x + s / 2;
+		let centerY = btn_menu_y + s / 2;
+		let coreRadius = s * 0.22;
+		let toothDepth = s * 0.08;
+		let toothWidth = s * 0.12;
+		let innerRadius = s * 0.08;
+		let teethCount = 8;
+		ctx.fillStyle = "white";
+		for (let i = 0; i < teethCount; i++) {
+			let angle = (i * 2 * Math.PI) / teethCount;
+			ctx.save();
+			ctx.translate(centerX, centerY);
+			ctx.rotate(angle);
+			ctx.fillRect(-toothWidth / 2, -coreRadius - toothDepth, toothWidth,
+				toothDepth + 2);
+			ctx.restore();
+		}
 		ctx.beginPath();
-		ctx.arc(bx + bw / 2, by + bh * 0.1, bw * 0.2, Math.PI, 0);
-		ctx.stroke();
-		ctx.fillStyle = "yellow";
-		ctx.fillRect(bx + bw * 0.2, by + bh * 0.4, bw * 0.1, bh * 0.2);
-		ctx.fillRect(bx + bw * 0.7, by + bh * 0.4, bw * 0.1, bh * 0.2);
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = s * 0.02;
-		ctx.strokeRect(bx, by + bh * 0.2, bw, bh * 0.8);
-		drawButtonBg(col_sys_x, start_y + step * 2);
-		let ax = col_sys_x + s * 0.25;
-		let ay = (start_y + step * 2) + s * 0.25;
-		let aw = s * 0.5;
-		let ah = s * 0.5;
-		ctx.fillStyle = "gold";
-		ctx.beginPath();
-		ctx.moveTo(ax, ay);
-		ctx.lineTo(ax + aw, ay);
-		ctx.lineTo(ax + aw * 0.8, ay + ah * 0.6);
-		ctx.lineTo(ax + aw * 0.2, ay + ah * 0.6);
-		ctx.closePath();
+		ctx.arc(centerX, centerY, coreRadius, 0, Math.PI * 2);
 		ctx.fill();
-		ctx.strokeStyle = "orange";
-		ctx.lineWidth = s * 0.03;
-		ctx.stroke();
-		ctx.fillRect(ax + aw * 0.4, ay + ah * 0.6, aw * 0.2, ah * 0.3);
-		ctx.fillRect(ax + aw * 0.2, ay + ah * 0.8, aw * 0.6, ah * 0.2);
+		ctx.globalCompositeOperation = 'destination-out';
 		ctx.beginPath();
-		ctx.arc(ax, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
-		ctx.arc(ax + aw, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
+		ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.globalCompositeOperation = 'source-over';
+		ctx.strokeStyle = "rgba(0,0,0,0.2)";
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
 		ctx.stroke();
 	}
+	ctx.restore();
+	drawButtonBg(btn_inv_x, btn_inv_y, 'inv');
+	let pad = s * 0.2;
+	let bw = s - pad * 2,
+		bh = s - pad * 2;
+	let bx = btn_inv_x + pad,
+		by = btn_inv_y + pad;
+	ctx.fillStyle = "#a52a2a";
+	ctx.fillRect(bx, by + bh * 0.2, bw, bh * 0.8);
+	ctx.fillStyle = "#8b4513";
+	ctx.fillRect(bx, by + bh * 0.1, bw, bh * 0.4);
+	ctx.strokeStyle = "#8b4513";
+	ctx.lineWidth = s * 0.05;
+	ctx.beginPath();
+	ctx.arc(bx + bw / 2, by + bh * 0.1, bw * 0.2, Math.PI, 0);
+	ctx.stroke();
+	ctx.fillStyle = (!isMobile && hb.hovered_btn === 'inv') ? "#ffffcc" :
+		"yellow";
+	ctx.fillRect(bx + bw * 0.2, by + bh * 0.4, bw * 0.1, bh * 0.2);
+	ctx.fillRect(bx + bw * 0.7, by + bh * 0.4, bw * 0.1, bh * 0.2);
+	ctx.strokeStyle = "black";
+	ctx.lineWidth = s * 0.02;
+	ctx.strokeRect(bx, by + bh * 0.2, bw, bh * 0.8);
+	drawButtonBg(btn_ach_x, btn_ach_y, 'ach');
+	let ax = btn_ach_x + s * 0.25,
+		ay = btn_ach_y + s * 0.25;
+	let aw = s * 0.5,
+		ah = s * 0.5;
+	ctx.fillStyle = (!isMobile && hb.hovered_btn === 'ach') ? "#fff2cc" :
+		"gold";
+	ctx.beginPath();
+	ctx.moveTo(ax, ay);
+	ctx.lineTo(ax + aw, ay);
+	ctx.lineTo(ax + aw * 0.8, ay + ah * 0.6);
+	ctx.lineTo(ax + aw * 0.2, ay + ah * 0.6);
+	ctx.closePath();
+	ctx.fill();
+	ctx.strokeStyle = (!isMobile && hb.hovered_btn === 'ach') ? "white" :
+		"orange";
+	ctx.lineWidth = s * 0.03;
+	ctx.stroke();
+	ctx.fillRect(ax + aw * 0.4, ay + ah * 0.6, aw * 0.2, ah * 0.3);
+	ctx.fillRect(ax + aw * 0.2, ay + ah * 0.8, aw * 0.6, ah * 0.2);
+	ctx.beginPath();
+	ctx.arc(ax, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
+	ctx.arc(ax + aw, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
+	ctx.stroke();
 }
 
 function hotbar_update(hotbar_element, dt) {
@@ -198,6 +268,7 @@ function hotbar_update(hotbar_element, dt) {
 	if (isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
 	if (isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
 	hb.mouse_over = false;
+	hb.hovered_btn = null;
 	let pointsToCheck = [];
 	if (!isScreenTouched(input)) {
 		pointsToCheck.push({
@@ -221,6 +292,17 @@ function hotbar_update(hotbar_element, dt) {
 		]) !== -1;
 		if (hasShieldInInv) hb.has_shield_button = true;
 	}
+	let isMobile = hotbar_element.game.mobile;
+	let pcActionTriggered = false;
+	if (!isMobile) {
+		if (input.mouse.leftButtonPressed) {
+			hb.leftButtonClickable = true;
+		}
+		else if (hb.leftButtonClickable) {
+			pcActionTriggered = true;
+			hb.leftButtonClickable = false;
+		}
+	}
 	for (let pt of pointsToCheck) {
 		let s = hb.slot_size;
 		let step = s * 1.05;
@@ -228,46 +310,84 @@ function hotbar_update(hotbar_element, dt) {
 		let start_x = 40;
 		for (let i = 0; i < hb.row.length; i++) {
 			let sx = start_x + step * i;
-			if ((hotbar_element.game.mobile || input.mouse.leftButtonPressed) &&
+			if ((isMobile || input.mouse.leftButtonPressed) &&
 				doRectsCollide(pt.x, pt.y, 0, 0, sx, start_y, s, s)) {
 				hb.mouse_over = true;
 				hb.iselected = i;
 			}
 		}
-		if (hotbar_element.game.mobile) {
+		let b_menu_x, b_menu_y, b_inv_x, b_inv_y, b_ach_x, b_ach_y;
+		if (isMobile) {
 			let col_res_x = start_x + step * hb.row.length;
 			let col_sys_x = col_res_x + step;
-			if (doRectsCollide(pt.x, pt.y, 0, 0, col_sys_x, start_y, s, s) && !
-				hb.did_want_menu) {
-				hotbar_element.game.want_menu = true;
-				hb.did_want_menu = true;
+			b_menu_x = col_sys_x;
+			b_menu_y = start_y;
+			b_inv_x = col_sys_x;
+			b_inv_y = start_y + step;
+			b_ach_x = col_sys_x;
+			b_ach_y = start_y + step * 2;
+		}
+		else {
+			let offset_x = start_x + step * hb.row.length + (step * 0.5);
+			b_menu_x = offset_x;
+			b_menu_y = start_y;
+			b_inv_x = offset_x + step;
+			b_inv_y = start_y;
+			b_ach_x = offset_x + step * 2;
+			b_ach_y = start_y;
+		}
+		if (doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s, s) ||
+			doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s, s) ||
+			doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s, s)) {
+			hb.mouse_over = true;
+		}
+		if (!isMobile) {
+			if (doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s, s)) hb
+				.hovered_btn = 'menu';
+			if (doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s, s)) hb
+				.hovered_btn = 'inv';
+			if (doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s, s)) hb
+				.hovered_btn = 'ach';
+		}
+		let isAction = isMobile ? isScreenTouched(input) : pcActionTriggered;
+		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s,
+				s)) {
+			if (isMobile) {
+				if (!hb.did_want_menu) {
+					hotbar_element.game.want_menu = true;
+					hb.did_want_menu = true;
+				}
 			}
 			else {
-				hb.did_want_menu = false;
+				hotbar_element.game.want_menu = true;
 			}
-			if (doRectsCollide(pt.x, pt.y, 0, 0, col_sys_x, start_y + step, s,
-					s)) {
-				if (inv_el && !inv_el._mob_toggle_lock) {
-					let ash = hotbar_element.game.gui_elements.find(e => e
-						.name == "achievements shower");
-					achievement_do(hb.attached_to_object.data
-						.achievements_element.data.achievements,
-						"discovering inventory", ash);
-					inv_el.shown = !inv_el.shown;
-					inv_el._mob_toggle_lock = true;
-				}
+		}
+		else if (isMobile) {
+			hb.did_want_menu = false;
+		}
+		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s,
+				s)) {
+			if (inv_el && !inv_el._mob_toggle_lock) {
+				let ash = hotbar_element.game.gui_elements.find(e => e.name ==
+					"achievements shower");
+				achievement_do(hb.attached_to_object.data.achievements_element
+					.data.achievements, "discovering inventory", ash);
+				inv_el.shown = !inv_el.shown;
+				if (isMobile) inv_el._mob_toggle_lock = true;
 			}
-			if (doRectsCollide(pt.x, pt.y, 0, 0, col_sys_x, start_y + step * 2,
-					s, s)) {
-				let ach_el = hb.attached_to_object.data.achievements_element;
-				if (ach_el) {
-					let ash = hotbar_element.game.gui_elements.find(e => e
-						.name == "achievements shower");
-					achievement_do(ach_el.data.achievements, "achievements",
-						ash);
-					ach_el.shown = true;
-				}
+		}
+		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s,
+				s)) {
+			let ach_el = hb.attached_to_object.data.achievements_element;
+			if (ach_el) {
+				let ash = hotbar_element.game.gui_elements.find(e => e.name ==
+					"achievements shower");
+				achievement_do(ach_el.data.achievements, "achievements", ash);
+				ach_el.shown = true;
 			}
+		}
+		if (isMobile) {
+			let col_res_x = start_x + step * hb.row.length;
 			let player = hb.attached_to_object;
 			let overFood = doRectsCollide(pt.x, pt.y, 0, 0, col_res_x, start_y,
 				s, s);
@@ -278,6 +398,7 @@ function hotbar_update(hotbar_element, dt) {
 			let overShield = hb.has_shield_button && doRectsCollide(pt.x, pt.y,
 				0, 0, col_res_x, start_y + step * 3, s, s);
 			if (overHealth || overWater || overFood || overShield) {
+				hb.mouse_over = true;
 				anyPointOverConsumeButtons = true;
 				if (!hb._consume_lock) {
 					if (overFood) {
@@ -312,13 +433,15 @@ function hotbar_update(hotbar_element, dt) {
 			}
 		}
 	}
-	if (inv_el && inv_el._mob_toggle_lock) {
+	if (inv_el && inv_el._mob_toggle_lock && isMobile) {
 		let stillTouchingInv = false;
 		let s = hb.slot_size;
-		let col_sys_x = 40 + (s * 1.05) * (hb.row.length + 1);
+		let step = s * 1.05;
+		let start_x = 40;
+		let check_x = start_x + step * (hb.row.length + 1);
+		let check_y = 40 + step;
 		for (let pt of pointsToCheck) {
-			if (doRectsCollide(pt.x, pt.y, 0, 0, col_sys_x, 40 + s * 1.05, s,
-					s))
+			if (doRectsCollide(pt.x, pt.y, 0, 0, check_x, check_y, s, s))
 				stillTouchingInv = true;
 		}
 		if (!stillTouchingInv) inv_el._mob_toggle_lock = false;

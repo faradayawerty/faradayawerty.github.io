@@ -19,6 +19,7 @@ function menu_create() {
 		want_debug: false,
 		want_save: false,
 		want_load: false,
+		death_message: "DEATH",
 		want_indicators: {
 			"show player health": true,
 			"show player hunger": true,
@@ -56,6 +57,7 @@ function menu_create() {
 			"load game",
 		],
 		menu_respawn_buttons: [
+			"~DEATH",
 			"respawn and continue game",
 		],
 		settings_buttons: [
@@ -239,12 +241,14 @@ function menu_update(m, dt, input) {
 	}
 	m.pressed_this_frame = isKeyDown(input, 'enter', true) ||
 		isMouseLeftButtonPressed(input) || (isScreenTouched(input));
-	if ((isKeyDown(input, 's', true) || isKeyDown(input, 'ArrowDown', true)) &&
+	if ((isKeyDown(input, 'о', true) || isKeyDown(input, 'j', true) ||
+			isKeyDown(input, 'ArrowDown', true)) &&
 		m.iselected < m.buttons.length - 1) {
 		m.iselected += 1;
 	}
-	else if ((isKeyDown(input, 'w', true) || isKeyDown(input, 'ArrowUp',
-			true)) && m.iselected > 0) {
+	else if ((isKeyDown(input, 'л', true) || isKeyDown(input, 'k', true) ||
+			isKeyDown(input, 'ArrowUp',
+				true)) && m.iselected > 0) {
 		m.iselected -= 1;
 	}
 	else if (isMouseRightButtonPressed(input) && m.buttons[m.iselected] ==
@@ -264,6 +268,9 @@ function menu_update(m, dt, input) {
 			m.main_menu_buttons[0] = "continue game";
 			m.want_player_respawn = true;
 			menu1.buttons = menu1.main_menu_buttons;
+			DEATH_MESSAGE = "☠️ the player is dead";
+			if (m.want_language === "русский")
+				DEATH_MESSAGE = "☠️ игрок мёртв";
 		}
 		else if (m.buttons[m.iselected] == "start new game") {
 			m.shown = false;
@@ -365,12 +372,15 @@ function menu_update(m, dt, input) {
 			m.buttons = m.main_menu_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
+			m.shown = false;
+			DEATH_MESSAGE = "☠️ the player is dead";
 		}
 		else if (m.buttons[m.iselected] == "русский") {
 			m.want_language = "русский";
 			m.buttons = m.main_menu_buttons;
 			if (!isScreenTouched(input))
 				m.iselected = 0;
+			DEATH_MESSAGE = "☠️ игрок мёртв";
 		}
 		else if (m.buttons[m.iselected] == "language") {
 			if (m.want_language == "русский")

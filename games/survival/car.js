@@ -12,8 +12,8 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 		height = 110;
 	let c = {
 		type: type,
-		health: 75,
-		max_health: 100,
+		health: 750,
+		max_health: 1000,
 		fuel: (fuel !== null) ? fuel : Math.max(0, 200 * Math.random() -
 			150),
 		max_fuel: 200,
@@ -40,22 +40,22 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	};
 	switch (type) {
 		case "tank":
-			c.max_health = 1000;
-			c.max_fuel = 4000;
+			c.max_health = 10000;
+			c.max_fuel = 40000;
 			c.speed = 15;
 			c.max_speed = 15;
 			break;
 		case "police":
-			c.max_health = 500;
+			c.max_health = 5000;
 			c.max_speed = 32;
 			c.speed = 32;
 			break;
 		case "fireman":
-			c.max_health = 300;
+			c.max_health = 3000;
 			c.w = 240;
 			break;
 		case "ambulance":
-			c.max_health = 200;
+			c.max_health = 2000;
 			break;
 		case "taxi":
 			c.max_speed = 28;

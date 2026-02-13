@@ -43,6 +43,8 @@ function achievements_create(g) {
 		icon_size: 60,
 		animstate: 0,
 		cross_width: 40,
+		_cross_held: false,
+		_cross_pc_held: false,
 		achievements: achievementsList
 	};
 	return game_gui_element_create(g, "achievements", ach, achievements_update,
@@ -60,6 +62,7 @@ function achievements_update(ae, dt) {
 	let input = ae.game.input;
 	let scale = get_scale();
 	if (ae.data._cross_held === undefined) ae.data._cross_held = false;
+	if (ae.data._cross_pc_held === undefined) ae.data._cross_pc_held = false;
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 	let freeTouch = null;
@@ -71,33 +74,12 @@ function achievements_update(ae, dt) {
 			my = freeTouch.y / scale;
 		}
 	}
-	let points = [];
-	if (ae.game.mobile) {
-		if (freeTouch) {
-			points.push({
-				x: mx,
-				y: my
-			});
-		}
-	}
-	else if (input.mouse.leftButtonPressed) {
-		points.push({
-			x: mx,
-			y: my
-		});
-	}
 	let crossX = ae.data.offset_x + ae.data.width - ae.data.cross_width;
 	let crossY = ae.data.offset_y;
-	let is_over_cross = false;
-	for (let pt of points) {
-		if (doRectsCollide(pt.x, pt.y, 0, 0, crossX, crossY, ae.data
-				.cross_width, ae.data.cross_width)) {
-			is_over_cross = true;
-			break;
-		}
-	}
+	let is_over_cross = doRectsCollide(mx, my, 0, 0, crossX, crossY, ae.data
+		.cross_width, ae.data.cross_width);
 	if (ae.game.mobile) {
-		if (is_over_cross) {
+		if (is_over_cross && freeTouch) {
 			ae.data._cross_held = true;
 		}
 		else if (freeTouch && !is_over_cross) {
@@ -110,10 +92,15 @@ function achievements_update(ae, dt) {
 		}
 	}
 	else {
-		if (is_over_cross && !ae.data.was_left_down && input.mouse
-			.leftButtonPressed) {
-			ae.shown = false;
-			return;
+		if (input.mouse.leftButtonPressed && is_over_cross) {
+			ae.data._cross_pc_held = true;
+		}
+		if (!input.mouse.leftButtonPressed && ae.data._cross_pc_held) {
+			ae.data._cross_pc_held = false;
+			if (is_over_cross) {
+				ae.shown = false;
+				return;
+			}
 		}
 	}
 	ae.data.was_left_down = input.mouse.leftButtonPressed;
@@ -135,22 +122,28 @@ function achievements_draw(ae, ctx) {
 	let cross_width = ae.data.cross_width;
 	let cx = ae.data.offset_x + ae.data.width - cross_width;
 	let cy = ae.data.offset_y;
-	ctx.fillStyle = "#444444";
+	let mx = ae.game.input.mouse.x / scale;
+	let my = ae.game.input.mouse.y / scale;
+	let is_over = doRectsCollide(mx, my, 0, 0, cx, cy, cross_width,
+		cross_width);
+	ctx.fillStyle = is_over ? "#882222" : "#444444";
 	ctx.fillRect(cx, cy, cross_width, cross_width);
 	ctx.strokeStyle = "white";
 	ctx.strokeRect(cx, cy, cross_width, cross_width);
 	let p = 0.2 * cross_width;
-	drawLine(ctx, cx + p, cy + p, cx + cross_width - p, cy + cross_width - p,
-		"white", 3);
-	drawLine(ctx, cx + p, cy + cross_width - p, cx + cross_width - p, cy + p,
-		"white", 3);
+	ctx.beginPath();
+	ctx.strokeStyle = is_over ? "#ffaaaa" : "white";
+	ctx.lineWidth = 3;
+	ctx.moveTo(cx + p, cy + p);
+	ctx.lineTo(cx + cross_width - p, cy + cross_width - p);
+	ctx.moveTo(cx + p, cy + cross_width - p);
+	ctx.lineTo(cx + cross_width - p, cy + p);
+	ctx.stroke();
 	let startX = ae.data.offset_x + 0.5 * ae.data.x;
 	let startY = ae.data.offset_y + 0.5 * ae.data.y;
 	let w = ae.data.icon_size;
 	let h = ae.data.icon_size;
 	let spacing = 2.0;
-	let mx = ae.game.input.mouse.x / scale;
-	let my = ae.game.input.mouse.y / scale;
 	let hoveredAchKey = null;
 	if (DEBUG_ACHIEVEMENTS)
 		ae.game.debug_console.unshift(

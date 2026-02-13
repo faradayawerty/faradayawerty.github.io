@@ -1262,8 +1262,8 @@ let ACHIEVEMENT_REGISTRY = {
 			y: 4
 		},
 		name: {
-			en: "emerald serpent",
-			ru: "изумрудный змей"
+			en: "nightshade serpent",
+			ru: "змей ночного света",
 		},
 		desc: {
 			en: "defeat the boss giant serpent",
