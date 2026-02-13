@@ -140,9 +140,7 @@ function player_die(player_object) {
 		player_object.game.saved_achievements = player_object.data
 			.achievements_element.data.achievements.filter((ach) => ach.done);
 	}
-	if (!player_object.data.ai_controlled || player_object.game.objects.filter((
-			obj) => obj.name == "player" && obj != player_object).length < 1)
-		player_object.game.want_respawn_menu = true;
+	player_object.game.want_respawn_menu = true;
 	for (let i = 0; i < player_object.game.objects.length; i++) {
 		if (player_object.game.objects[i].name == "enemy" && !player_object.game
 			.objects[i].destroyed) {

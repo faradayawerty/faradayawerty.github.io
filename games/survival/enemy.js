@@ -476,8 +476,8 @@ function enemy_boss_exists(g) {
 
 function enemy_boss_distance_to_player(g, x, y) {
 	let player_object = game_object_find_closest(g, x, y, "player", 20000);
-	let boss_objects = g.objects.filter((obj) => obj.name == "enemy" && !obj
-		.destroyed && obj.data.boss);
+	let enemies = g.collections["enemy"] || [];
+	let boss_objects = enemies.filter((obj) => !obj.destroyed && obj.data.boss);
 	if (boss_objects.length < 1 || !player_object)
 		return -1;
 	let boss_closest = boss_objects[0];

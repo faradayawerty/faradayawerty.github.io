@@ -286,8 +286,16 @@ function game_update(g, dt) {
 			}
 		}
 	}
-	g.objects = g.objects.filter((obj) => !obj.destroyed);
-	g.gui_elements = g.gui_elements.filter((elem) => !elem.destroyed);
+	for (let i = g.objects.length - 1; i >= 0; i--) {
+		if (g.objects[i].destroyed) {
+			g.objects.splice(i, 1);
+		}
+	}
+	for (let i = g.gui_elements.length - 1; i >= 0; i--) {
+		if (g.gui_elements[i].destroyed) {
+			g.gui_elements.splice(i, 1);
+		}
+	}
 	for (let i = 0; i < g.objects.length; i++) {
 		if (!g.objects[i].destroyed) {
 			if (g.objects[i].data) {
@@ -985,8 +993,19 @@ function game_draw_dps(g, ctx) {
 }
 
 function game_object_find_closest(g, x, y, name, radius, filter_func = null) {
-	if (name === "player" && g.player_object && !g.player_object.destroyed)
-		return g.player_object;
+	if (name === "player" && g.player_object && !g.player_object.destroyed && g
+		.player_object.data && g.player_object.data.body) {
+		let p_pos = g.player_object.data.body.position;
+		let dx = p_pos.x - x;
+		let dy = p_pos.y - y;
+		let dist_sq = dx * dx + dy * dy;
+		if (radius < 0 || dist_sq <= radius * radius) {
+			return g.player_object;
+		}
+		else {
+			return null;
+		}
+	}
 	let closest = null;
 	let min_dist_sq = (radius >= 0) ? (radius * radius) : Infinity;
 	let bounds = {
