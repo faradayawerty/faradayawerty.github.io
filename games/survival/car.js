@@ -173,11 +173,6 @@ function car_update(car_object, dt) {
 		p.shot_cooldown = 0;
 		audio_play("data/sfx/revolver_1.mp3", 0.3);
 	}
-	let closest_animal = game_object_find_closest(car_object.game, p.body
-		.position.x, p.body.position.y, "animal", 400);
-	if (closest_animal && Matter.Collision.collides(p.body, closest_animal.data
-			.body) != null)
-		closest_animal.data.health -= 0.75 * dt;
 	if (p.health <= 0) {
 		let N = Math.random() * 4 - 1;
 		for (let i = 0; i < N; i++) {

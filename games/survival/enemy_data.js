@@ -8,7 +8,7 @@ function enemy_damage_from_tier(n) {
 const ENEMY_TYPES = {
 	"regular": {
 		name_eng: "regular zombie",
-		name_rus: "обыкновенный зомби",
+		name_rus: "заражённый",
 		requires: null,
 		weight: 1,
 		health: enemy_health_from_tier(1),
@@ -46,7 +46,7 @@ const ENEMY_TYPES = {
 	},
 	"shooting": {
 		name_eng: "shooting zombie",
-		name_rus: "стреляющий зомби",
+		name_rus: "заражённый военный",
 		requires: "regular",
 		weight: 2,
 		health: enemy_health_from_tier(2),
@@ -105,7 +105,7 @@ const ENEMY_TYPES = {
 	},
 	"desert": {
 		name_eng: "desert dweller",
-		name_rus: "пустынный житель",
+		name_rus: "пустынный заражённый",
 		requires: "regular",
 		weight: 2,
 		health: enemy_health_from_tier(2.75),
@@ -182,7 +182,7 @@ const ENEMY_TYPES = {
 	},
 	"shooting red": {
 		name_eng: "shooting red zombie",
-		name_rus: "стреляющий красный зомби",
+		name_rus: "заражённый биоробот",
 		requires: "shooting",
 		weight: 3,
 		health: enemy_health_from_tier(3),
@@ -269,7 +269,7 @@ const ENEMY_TYPES = {
 	},
 	"sword": {
 		name_eng: "zombie with a sword",
-		name_rus: "зомби с мечом",
+		name_rus: "бамбуковый заражённый",
 		requires: "shooting red",
 		weight: 4,
 		health: enemy_health_from_tier(5.25),
@@ -492,7 +492,7 @@ const ENEMY_TYPES = {
 	},
 	"shooting rocket": {
 		name_eng: "zombie with a rocket launcher",
-		name_rus: "зомби с ракетницей",
+		name_rus: "заражённый военный биоробот",
 		requires: "sword",
 		weight: 5,
 		health: enemy_health_from_tier(6),

@@ -732,7 +732,7 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		desc: {
 			en: "kill one yellow enemy",
-			ru: "убейте одного желтого врага"
+			ru: "убейте одного противника с мечом"
 		},
 		req: "big red guy",
 		draw: (ctx, x, y, w, h, p) => {

@@ -278,33 +278,6 @@ function enemy_update(enemy_object, dt) {
 				y: vars.dy
 			});
 		}
-		if (target_object.data.health && Matter.Collision.collides(e.body,
-				target_object.data.body)) {
-			let t = target_object.data;
-			if (target_object.name == "player") {
-				if (t.shield_blue_health > 0) t.shield_blue_health -= e.damage *
-					dt;
-				else if (t.shield_green_health > 0) t.shield_green_health -=
-					0.25 * e.damage * dt;
-				else if (t.shield_shadow_health > 0) t.shield_shadow_health -=
-					0.25 * e.damage * dt;
-				else if (t.shield_rainbow_health > 0) t.shield_rainbow_health -=
-					0.10 * e.damage * dt;
-				else if (t.shield_anubis_health > 0) t.shield_anubis_health -=
-					0.10 * e.damage * dt;
-				else if (t.immunity <= 0) t.health -= e.damage * dt;
-			}
-			if (target_object.name == "car") {
-				t.health -= (t.is_tank ? 0.0625 : 1) * e.damage * dt;
-				let carSpeed = Matter.Vector.magnitude(Matter.Body.getVelocity(t
-					.body));
-				if ((!e.boss && carSpeed > 0.9 * t.max_speed) || (t.is_tank &&
-						carSpeed > 0.1 * t.max_speed)) {
-					e.health -= 10 * e.damage * dt;
-					e.hit_by_player = true;
-				}
-			}
-		}
 		if (e.boss) {
 			if (e.spawn_minion_delay >= 4000) {
 				let max_minions = typeData.max_minions || 10;
@@ -519,8 +492,7 @@ function enemy_boss_distance_to_player(g, x, y) {
 }
 
 function enemy_count_minions(enemy_object) {
-	let l = (enemy_object.game.objects.filter((obj) => obj.name == "enemy" &&
-		obj.data.type == enemy_object.data.type &&
-		obj.data.is_minion));
-	return l.length;
+	let enemies = enemy_object.game.collections["enemy"] || [];
+	return enemies.filter(obj => obj.data.type == enemy_object.data.type && obj
+		.data.is_minion).length;
 }

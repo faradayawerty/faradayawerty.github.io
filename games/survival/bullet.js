@@ -23,7 +23,7 @@ function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 	if (b.enemy)
 		b.body.collisionFilter.category = 4;
 	else
-		b.body.collisionFilter.mask = -5;
+		b.body.collisionFilter.mask = 0xFFFFFFFF;
 	Matter.Composite.add(g.engine.world, b.body);
 	let vel = Matter.Vector.create(b.speed * dx / d, b.speed * dy / d);
 	Matter.Body.setVelocity(b.body, vel);
@@ -43,94 +43,32 @@ function bullet_destroy(bullet_object) {
 function bullet_update(bullet_object, dt) {
 	if (bullet_object.destroyed)
 		return;
-	if (bullet_object.data.lifetime < 0) {
+	let b = bullet_object.data;
+	if (b.lifetime < 0) {
 		bullet_destroy(bullet_object);
 		return;
 	}
 	else {
-		bullet_object.data.lifetime -= dt;
+		b.lifetime -= dt;
 	}
-	for (let i = 0; i < bullet_object.game.objects.length; i++) {
-		if (!bullet_object.game.objects[i].data.body)
-			continue;
-		if ((bullet_object.game.objects[i].name == "enemy" ||
-				bullet_object.game.objects[i].name == "car" ||
-				bullet_object.game.objects[i].name == "trashcan" ||
-				bullet_object.game.objects[i].name == "animal" ||
-				(bullet_object.game.objects[i].name == "rocket" && bullet_object
-					.game.objects[i].data.enemy)) &&
-			Matter.Collision.collides(bullet_object.data.body, bullet_object
-				.game.objects[i].data.body) != null) {
-			if (bullet_object.game.objects[i].name == "car" && bullet_object
-				.game.objects[i].data.is_tank && !bullet_object.game.objects[i]
-				.data.enemy) {
-				bullet_object.game.objects[i].data.health -= 0.0125 *
-					bullet_object.data.damage * dt;
-			}
-			else if (bullet_object.game.objects[i].name == "enemy" && !
-				bullet_object.data.enemy) {
-				let damage_dealt = bullet_object.data.damage * dt;
-				bullet_object.game.objects[i].data.health -= damage_dealt;
-				if (!bullet_object.data.enemy) {
-					let g = bullet_object.game;
-					let w = g.current_weapon;
-					if (!g.dps_history[w]) {
-						g.dps_history[w] = [];
-					}
-					g.dps_history[w].push({
-						dmg: damage_dealt,
-						time: Date.now()
-					});
-				}
-				bullet_object.game.objects[i].data.hit_by_player = true;
-			}
-			else if (bullet_object.game.objects[i].name != "enemy") {
-				bullet_object.game.objects[i].data.health -= bullet_object.data
-					.damage * dt;
-			}
-		}
+	if (bullet_object.bullet_num < bullet_object.game.last_bullet_num -
+		BULLET_LIMIT) {
+		bullet_destroy(bullet_object);
+		return;
 	}
-	bullet_object.game.player_object = game_object_find_closest(bullet_object
-		.game,
-		bullet_object.data.body.position.x, bullet_object.data.body.position
-		.y, "player", 100);
-	if (bullet_object.data.enemy && bullet_object.game.player_object &&
-		Matter.Collision.collides(bullet_object.data.body, bullet_object.game
-			.player_object.data.body) != null) {
-		if (bullet_object.game.player_object.data.shield_blue_health > 0) {
-			bullet_object.game.player_object.data.shield_blue_health -= 0.95 *
-				bullet_object.data.damage * dt;
-		}
-		else if (bullet_object.game.player_object.data.shield_green_health >
-			0) {
-			bullet_object.game.player_object.data.shield_green_health -= 0.75 *
-				bullet_object.data.damage * dt;
-		}
-		else if (bullet_object.game.player_object.data.shield_shadow_health >
-			0) {
-			bullet_object.game.player_object.data.shield_shadow_health -= 0.75 *
-				bullet_object.data.damage * dt;
-		}
-		else if (bullet_object.game.player_object.data.shield_rainbow_health >
-			0) {
-			bullet_object.game.player_object.data.shield_rainbow_health -=
-				0.55 * bullet_object.data.damage * dt;
-		}
-		else if (bullet_object.game.player_object.data.shield_anubis_health >
-			0) {
-			bullet_object.game.player_object.data.shield_anubis_health -=
-				0.55 * bullet_object.data.damage * dt;
-		}
-		else if (bullet_object.game.player_object.data.immunity <= 0) {
-			let k = 1.0;
-			if (bullet_object.game.player_object.data.sword_protection) {
-				k = 0.05;
-				if (hotbar_get_selected_item(bullet_object.game.player_object
-						.data.hotbar_element) == ITEM_HORN)
-					k = 0.001;
+	if (!b.enemy && bullet_object.name === "bullet") {
+		let start = b.body.positionPrev;
+		let end = b.body.position;
+		let bodies = Matter.Composite.allBodies(bullet_object.game.engine
+			.world);
+		let collisions = Matter.Query.ray(bodies, start, end);
+		for (let i = 0; i < collisions.length; i++) {
+			let target = collisions[i].body.gameObject;
+			if (target && target.name === "rocket" && target.data.enemy) {
+				target.data.health -= 10;
+				bullet_destroy(bullet_object);
+				return;
 			}
-			bullet_object.game.player_object.data.health -= k * bullet_object
-				.data.damage * dt;
 		}
 	}
 }

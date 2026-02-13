@@ -1,6 +1,8 @@
 var GLOBAL_VOLUME = 80;
 const AUDIO_CACHE = {};
 const AUDIO_CHANNELS = {};
+const LAST_PLAYED = {};
+const MIN_PLAY_INTERVAL = 60;
 
 function audio_create(path, volume = 0.75) {
 	return new Promise((resolve) => {
@@ -106,6 +108,11 @@ async function audio_init() {
 }
 
 function audio_play(path, volume = null) {
+	const now = Date.now();
+	if (LAST_PLAYED[path] && (now - LAST_PLAYED[path] < MIN_PLAY_INTERVAL)) {
+		return;
+	}
+	LAST_PLAYED[path] = now;
 	let master = AUDIO_CACHE[path];
 	if (!master) {
 		console.warn(`[Audio Missing]: ${path}. Экстренная загрузка...`);
@@ -129,9 +136,7 @@ function audio_play(path, volume = null) {
 	const channel = pool.nodes[pool.index];
 	try {
 		channel.pause();
-		if (channel.readyState >= 1) {
-			channel.currentTime = 0;
-		}
+		channel.currentTime = 0;
 		let baseVol = volume !== null ? volume : parseFloat(master.dataset
 			.baseVolume);
 		channel.volume = baseVol * (GLOBAL_VOLUME / 100);

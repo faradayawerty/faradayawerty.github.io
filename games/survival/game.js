@@ -41,6 +41,7 @@ function game_create(input_, engine_, audios_) {
 		current_weapon: 0,
 		is_player_shooting: false,
 		last_bullet_num: 0,
+		collections: {},
 		settings: {
 			language: "english",
 			auto_aim: false,
@@ -99,6 +100,7 @@ function game_create(input_, engine_, audios_) {
 		all_enemies_are_bosses: false,
 		mobile: false
 	};
+	collisions_init(g);
 	return g;
 }
 
@@ -146,6 +148,12 @@ function game_object_create(g, name_, data_, func_update, func_draw,
 		destroy: func_destroy,
 		persistent: true,
 		destroyed: false
+	};
+	if (!g.collections[name_])
+		g.collections[name_] = [];
+	g.collections[name_].push(obj);
+	if (obj.data && obj.data.body) {
+		obj.data.body.gameObject = obj;
 	};
 	const weights = {
 		"bound": 1,
@@ -235,8 +243,10 @@ function game_update(g, dt) {
 			g.scale = g.scale * 0.9375;
 		get_scale_achievement = true;
 	}
-	let plr = g.objects.find((obj) => obj.name == "player" && !obj.data
-		.ai_controlled);
+	let plr = (g.player_object && !g.player_object.destroyed) ?
+		g.player_object :
+		(g.collections["player"] ? g.collections["player"].find(p => !p.data
+			.ai_controlled) : null);
 	if (plr) {
 		if (isKeyDown(g.input, ']', true)) {
 			plr.data.ai_controlled = true;
@@ -261,6 +271,18 @@ function game_update(g, dt) {
 			g.offset_y -= dt;
 		if (isKeyDown(g.input, 's', false))
 			g.offset_y += dt;
+	}
+	for (let i = 0; i < g.objects.length; i++) {
+		let obj = g.objects[i];
+		if (obj.destroyed) {
+			if (g.collections[obj.name]) {
+				let list = g.collections[obj.name];
+				let idx = list.indexOf(obj);
+				if (idx !== -1) {
+					list.splice(idx, 1);
+				}
+			}
+		}
 	}
 	g.objects = g.objects.filter((obj) => !obj.destroyed);
 	g.gui_elements = g.gui_elements.filter((elem) => !elem.destroyed);
@@ -466,6 +488,7 @@ function game_destroy_all_objects(g) {
 		g.objects[i].destroy(g.objects[i]);
 	Matter.Composite.clear(g.engine.world);
 	g.objects = [];
+	g.collections = {};
 }
 
 function game_destroy_all_gui_elements(g) {
@@ -513,30 +536,6 @@ function game_destroy_level(g, old_level = null) {
 			}
 			g.objects[i].destroy(g.objects[i]);
 		}
-}
-
-function game_object_find_closest(g, x, y, name, radius, filter_func = null) {
-	let pos = Matter.Vector.create(x, y);
-	let closest = null;
-	for (let i = 0; i < g.objects.length; i++) {
-		if (g.objects[i].destroyed || !g.objects[i].data.body)
-			continue;
-		let obj = null;
-		if (g.objects[i].name == name) {
-			if (filter_func && !filter_func(g.objects[i]))
-				continue;
-			obj = g.objects[i];
-		}
-		else
-			continue;
-		if (radius >= 0 && !closest && dist(obj.data.body.position, pos) <
-			radius)
-			closest = obj;
-		if (closest && dist(obj.data.body.position, pos) < dist(closest.data
-				.body.position, pos))
-			closest = obj;
-	}
-	return closest;
 }
 
 function game_objects_arrange(g) {
@@ -981,4 +980,37 @@ function game_draw_dps(g, ctx) {
 			`Weapon ${w} | DPS: ${g.current_dps} | AVG: ${s.avg} | MAX: ${s.max} | MED: ${s.median}`;
 		g.debug_console.unshift(log);
 	}
+}
+
+function game_object_find_closest(g, x, y, name, radius, filter_func = null) {
+	if (name === "player" && g.player_object && !g.player_object.destroyed)
+		return g.player_object;
+	let closest = null;
+	let min_dist_sq = (radius >= 0) ? (radius * radius) : Infinity;
+	let bounds = {
+		min: {
+			x: x - radius,
+			y: y - radius
+		},
+		max: {
+			x: x + radius,
+			y: y + radius
+		}
+	};
+	let bodies = Matter.Query.region(Matter.Composite.allBodies(g.engine.world),
+		bounds);
+	for (let i = 0; i < bodies.length; i++) {
+		let body = bodies[i];
+		let obj = body.gameObject;
+		if (!obj || obj.destroyed || obj.name !== name) continue;
+		if (filter_func && !filter_func(obj)) continue;
+		let dx = body.position.x - x;
+		let dy = body.position.y - y;
+		let d_sq = dx * dx + dy * dy;
+		if (d_sq < min_dist_sq) {
+			min_dist_sq = d_sq;
+			closest = obj;
+		}
+	}
+	return closest;
 }

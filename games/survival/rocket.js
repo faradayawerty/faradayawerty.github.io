@@ -23,7 +23,7 @@ function rocket_create(g, x, y, dx, dy, w, target_object, damage, health,
 	if (r.enemy)
 		r.body.collisionFilter.category = 4;
 	else
-		r.body.collisionFilter.mask = -5;
+		r.body.collisionFilter.mask = 0xFFFFFFFF;
 	return game_object_create(g, "rocket", r, rocket_update, rocket_draw,
 		rocket_destroy);
 }
@@ -53,72 +53,6 @@ function rocket_update(rocket_object, dt) {
 		return;
 	}
 	if (r.bounce_ticks > 0) r.bounce_ticks--;
-	for (let i = 0; i < rocket_object.game.objects.length; i++) {
-		let obj = rocket_object.game.objects[i];
-		if (!obj.data.body || obj === rocket_object) continue;
-		if (obj.name == "rocket") {
-			if (r.enemy && obj.data.enemy) continue;
-			if (!r.enemy && !obj.data.enemy) continue;
-		}
-		if (r.enemy && obj.name == "enemy") continue;
-		if ((obj.name == "enemy" || obj.name == "car" || obj.name ==
-				"trashcan" ||
-				obj.name == "animal" || obj.name == "rocket") &&
-			Matter.Collision.collides(r.body, obj.data.body) != null) {
-			if (obj.name == "car") {
-				if (obj.data.is_tank && !r.enemy) {
-					obj.data.health -= 0.0125 * r.damage * dt;
-				}
-				else {
-					obj.data.health -= r.damage * dt;
-				}
-			}
-			else if (obj.name == "enemy" && !r.enemy) {
-				let damage_dealt = r.damage * dt;
-				obj.data.health -= damage_dealt;
-				obj.data.hit_by_player = true;
-				let g = rocket_object.game;
-				let w = g.current_weapon;
-				if (!g.dps_history[w]) g.dps_history[w] = [];
-				g.dps_history[w].push({
-					dmg: damage_dealt,
-					time: Date.now()
-				});
-			}
-			else {
-				obj.data.health -= r.damage * dt;
-			}
-			r.health -= 10 * r.damage * dt;
-			r.target_object = null;
-			r.bounce_ticks = 10;
-		}
-	}
-	if (r.enemy) {
-		let player_obj = game_object_find_closest(rocket_object.game, r.body
-			.position.x, r.body.position.y, "player", 1500);
-		if (player_obj && Matter.Collision.collides(r.body, player_obj.data
-				.body) != null) {
-			let player = player_obj.data;
-			if (player.shield_blue_health > 0) player.shield_blue_health -=
-				0.95 * r.damage * dt;
-			else if (player.shield_green_health > 0) player
-				.shield_green_health -= 0.75 * r.damage * dt;
-			else if (player.shield_shadow_health > 0) player
-				.shield_shadow_health -= 0.75 * r.damage * dt;
-			else if (player.shield_rainbow_health > 0) player
-				.shield_rainbow_health -= 0.55 * r.damage * dt;
-			else if (player.shield_anubis_health > 0) player
-				.shield_anubis_health -= 0.55 * r.damage * dt;
-			else if (player.immunity <= 0) {
-				let k = (player.sword_protection || player.sword_visible) ?
-					0.25 : 1.0;
-				player.health -= k * r.damage * dt;
-			}
-			r.health -= 10 * r.damage * dt;
-			r.target_object = null;
-			r.bounce_ticks = 10;
-		}
-	}
 	if (r.bounce_ticks <= 0) {
 		if (!r.target_object) {
 			if (r.enemy) {

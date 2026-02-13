@@ -91,7 +91,7 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 	}
 	let iplayer = game_object_create(g, "player", p, player_update, player_draw,
 		player_destroy);
-	g.player_object = null;
+	g.player_object = g.objects[iplayer];
 	if (respawn) {
 		p.health = 0.15 * p.max_health;
 		p.hunger = 0.35 * p.max_hunger;
@@ -451,25 +451,22 @@ function player_update(player_object, dt) {
 		let targetX = shootDir.x;
 		let targetY = shootDir.y;
 		if (player_object.game.settings.auto_aim) {
-			let enemy_rockets = player_object.game.objects.filter(obj =>
-				obj.name === "rocket" && obj.data && obj.data.enemy === true
+			let nearest_enemy = game_object_find_closest(
+				player_object.game,
+				p.body.position.x,
+				p.body.position.y,
+				"rocket",
+				800,
+				(obj) => obj.data && obj.data.enemy === true
 			);
-			let nearest_enemy = null;
-			let min_dist = 800;
-			enemy_rockets.forEach(rocket => {
-				let dx = rocket.data.body.position.x - p.body.position
-					.x;
-				let dy = rocket.data.body.position.y - p.body.position
-					.y;
-				let dist = Math.sqrt(dx * dx + dy * dy);
-				if (dist < min_dist) {
-					min_dist = dist;
-					nearest_enemy = rocket;
-				}
-			});
 			if (!nearest_enemy) {
-				nearest_enemy = game_object_find_closest(player_object.game, p
-					.body.position.x, p.body.position.y, "enemy", 800);
+				nearest_enemy = game_object_find_closest(
+					player_object.game,
+					p.body.position.x,
+					p.body.position.y,
+					"enemy",
+					800
+				);
 			}
 			if (nearest_enemy) {
 				let dx = nearest_enemy.data.body.position.x - p.body.position.x;
@@ -482,8 +479,8 @@ function player_update(player_object, dt) {
 				}
 				let mag = Math.sqrt(dx * dx + dy * dy);
 				if (mag > 0) {
-					targetX = dx / mag * 1000;
-					targetY = dy / mag * 1000;
+					targetX = (dx / mag) * 1000;
+					targetY = (dy / mag) * 1000;
 				}
 			}
 		}
