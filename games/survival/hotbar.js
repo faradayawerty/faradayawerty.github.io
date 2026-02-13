@@ -282,12 +282,12 @@ function hotbar_draw(hotbar_object, ctx) {
 			if (lang === "русский") {
 				title = "Достижения";
 				description =
-					"Ваш гайд в мир игры. Почаще поглядывайте сюда, чтобы не запутаться.";
+					"Ваш гайд в мир игры. Почаще поглядывайте сюда, чтобы не запутаться. Получить информацию о достижении можно наведя на его иконку курсор.";
 			}
 			else {
 				title = "Achievements";
 				description =
-					"Your guide to the game world. Take a look here if you ever feel lost.";
+					"Your guide to the game world. Take a look here if you ever feel lost. Hover over the achievement to get the information on it.";
 			}
 		}
 		if (title !== "") {
