@@ -74,7 +74,7 @@ function inventory_draw(inventory_element, ctx) {
 		}
 	}
 	if (game.mobile && inv.imove !== -1) {
-		let btnW = 120,
+		let btnW = 180,
 			btnH = 50,
 			gap = 20;
 		let startY = INVENTORY_Y + (inv.slot_size * 1.05) * inv.items.length +
@@ -101,8 +101,11 @@ function inventory_draw(inventory_element, ctx) {
 			ctx.fillText(text, x + w / 2, y + h / 2);
 			ctx.restore();
 		};
-		drawStyledBtn(startX, startY, btnW, btnH, "USE", "#228822");
-		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, "DROP",
+		let isRus = game.settings.language === "русский";
+		let useText = isRus ? "ИСПОЛЬЗОВАТЬ" : "USE";
+		let dropText = isRus ? "ВЫБРОСИТЬ" : "DROP";
+		drawStyledBtn(startX, startY, btnW, btnH, useText, "#228822");
+		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, dropText,
 			"#882222");
 	}
 	inventory_close_button_draw(inventory_element, ctx);
@@ -277,6 +280,8 @@ function inventory_update(inventory_element, dt) {
 	if (inv.was_right_down === undefined) inv.was_right_down = false;
 	if (inv._cross_held === undefined) inv._cross_held = false;
 	if (inv._cross_pc_held === undefined) inv._cross_pc_held = false;
+	if (inv._use_pressed === undefined) inv._use_pressed = false;
+	if (inv._drop_pressed === undefined) inv._drop_pressed = false;
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
 	let is_clicked = false;
@@ -300,7 +305,33 @@ function inventory_update(inventory_element, dt) {
 				inventory_element.shown = false;
 				inv.imove = -1;
 				inv.jmove = -1;
+				inv.iselected = -1;
+				inv.jselected = -1;
 				return;
+			}
+			if (inv._use_pressed) {
+				inv._use_pressed = false;
+				if (inv.imove !== -1 && inv.jmove !== -1) {
+					let id = inv.items[inv.imove][inv.jmove];
+					if (id > 0) {
+						player_item_consume(player_object, id, false);
+						inv.imove = -1;
+						inv.jmove = -1;
+						inv.iselected = -1;
+						inv.jselected = -1;
+					}
+				}
+			}
+			if (inv._drop_pressed) {
+				inv._drop_pressed = false;
+				if (inv.imove !== -1 && inv.jmove !== -1) {
+					inventory_drop_item(inventory_element, inv.imove, inv
+						.jmove);
+					inv.imove = -1;
+					inv.jmove = -1;
+					inv.iselected = -1;
+					inv.jselected = -1;
+				}
 			}
 			inv.active_touch_id = null;
 		}
@@ -326,32 +357,31 @@ function inventory_update(inventory_element, dt) {
 			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
 			inv.imove = -1;
 			inv.jmove = -1;
+			inv.iselected = -1;
+			inv.jselected = -1;
 			return;
 		}
 	}
-	let btnW = 120,
+	let btnW = 180,
 		btnH = 50,
 		gap = 20;
 	let startY = INVENTORY_Y + (inv.slot_size * 1.05) * inv.items.length + 20;
 	let startX = 40;
-	if (game.mobile && inv.imove !== -1 && is_clicked) {
-		if (doRectsCollide(mx, my, 0, 0, startX, startY, btnW, btnH)) {
-			let id = inv.items[inv.imove][inv.jmove];
-			if (id > 0) {
-				player_item_consume(player_object, id, false);
-				if (inv.imove !== -1 && inv.items[inv.imove][inv.jmove] === 0) {
-					inv.imove = -1;
-					inv.jmove = -1;
-				}
+	if (game.mobile && inv.imove !== -1) {
+		if (freeTouch) {
+			if (doRectsCollide(mx, my, 0, 0, startX, startY, btnW, btnH)) {
+				inv._use_pressed = true;
+				inv._drop_pressed = false;
 			}
-			return;
-		}
-		if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY, btnW,
-				btnH)) {
-			inventory_drop_item(inventory_element, inv.imove, inv.jmove);
-			inv.imove = -1;
-			inv.jmove = -1;
-			return;
+			else if (doRectsCollide(mx, my, 0, 0, startX + btnW + gap, startY,
+					btnW, btnH)) {
+				inv._drop_pressed = true;
+				inv._use_pressed = false;
+			}
+			else {
+				inv._use_pressed = false;
+				inv._drop_pressed = false;
+			}
 		}
 	}
 	let slot_hit = false;
@@ -375,6 +405,8 @@ function inventory_update(inventory_element, dt) {
 						if (inv.imove === i && inv.jmove === j) {
 							inv.imove = -1;
 							inv.jmove = -1;
+							inv.iselected = -1;
+							inv.jselected = -1;
 						}
 						else {
 							let temp = inv.items[i][j];
@@ -382,6 +414,8 @@ function inventory_update(inventory_element, dt) {
 							inv.items[inv.imove][inv.jmove] = temp;
 							inv.imove = -1;
 							inv.jmove = -1;
+							inv.iselected = -1;
+							inv.jselected = -1;
 						}
 					}
 				}
@@ -390,6 +424,8 @@ function inventory_update(inventory_element, dt) {
 					if (inv.imove === i && inv.jmove === j) {
 						inv.imove = -1;
 						inv.jmove = -1;
+						inv.iselected = -1;
+						inv.jselected = -1;
 					}
 				}
 			}
@@ -407,6 +443,8 @@ function inventory_update(inventory_element, dt) {
 			if (dI === inv.imove) {
 				inv.imove = -1;
 				inv.jmove = -1;
+				inv.iselected = -1;
+				inv.jselected = -1;
 			}
 		}
 	}
@@ -468,6 +506,8 @@ function inventory_closing_cross_update(inventory_element, mx, my, is_clicked,
 				inventory_element.shown = false;
 				inv.imove = -1;
 				inv.jmove = -1;
+				inv.iselected = -1;
+				inv.jselected = -1;
 				return true;
 			}
 		}

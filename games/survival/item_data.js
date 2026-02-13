@@ -197,5 +197,24 @@ let ITEMS_DATA = {
 			ctx.fillRect(x + 0.5 * w, y + 0.1 * h, 0.4 * w, 0.4 * h);
 			ctx.fillRect(x + 0.1 * w, y + 0.5 * h, 0.4 * w, 0.4 * h);
 		}
-	}
+	},
+	[ITEM_DIARY]: {
+		name: "Survivor's Diary",
+		desc: "A tattered notebook filled with sketches and observations.",
+		name_rus: "Дневник выжившего",
+		desc_rus: "Потрепанная тетрадь, полная набросков и наблюдений.",
+		render: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#5d4037";
+			ctx.fillRect(x + 0.2 * w, y + 0.15 * h, 0.6 * w, 0.7 * h);
+			ctx.fillStyle = "#3e2723";
+			ctx.fillRect(x + 0.2 * w, y + 0.15 * h, 0.1 * w, 0.7 * h);
+			ctx.strokeStyle = "#d7ccc8";
+			ctx.lineWidth = 1;
+			for (let i = 0; i < 3; i++) {
+				drawLine(ctx, x + 0.35 * w, y + (0.3 + i * 0.15) * h,
+					x + 0.7 * w, y + (0.3 + i * 0.15) * h, "#d7ccc8"
+				);
+			}
+		}
+	},
 };

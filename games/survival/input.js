@@ -180,7 +180,7 @@ function touchHandler(touch, joystick, ctx, e) {
 function initializeTouchInput(touch, joystick, ctx) {
 	window.addEventListener('touchstart', function(e) {
 		let regions = getButtonRegions(ctx);
-		let deadZoneHeight = window.innerHeight * 0.5;
+		let deadZoneHeight = window.innerHeight * 0.75;
 		for (let i = 0; i < e.changedTouches.length; i++) {
 			let t = e.changedTouches[i];
 			let tx = (t.clientX - ctx.canvas.offsetLeft);

@@ -55,7 +55,7 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		laser_direction: 0,
 		shooting_laser: false,
 		laser_sound_has_played: false,
-		last_melee_angle_sound: 0
+		last_melee_angle_sound: 0,
 	};
 	p.achievements_element = g.gui_elements[achievements_create(g)];
 	p.achievements_shower_element = g.gui_elements[achievements_shower_create(g,
@@ -99,6 +99,8 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 	}
 	p.inventory_element.data.attached_to_object = g.objects[iplayer];
 	p.hotbar_element.data.attached_to_object = g.objects[iplayer];
+	p.story_note_element = g.gui_elements[story_note_create(g)];
+	p.story_note_element.shown = false;
 	return iplayer;
 }
 
@@ -252,6 +254,7 @@ function player_update(player_object, dt) {
 			"shoot 'em up").done)
 		can_lose_hunger_or_thirst = true;
 	if (p.thirst > 0 && !(p.achievements_element.shown && p.thirst < 0.33 * p
+			.max_thirst) && !(p.story_note_element.shown && p.thirst < 0.33 * p
 			.max_thirst) && !(p.inventory_element.shown && p.thirst < 0.33 * p
 			.max_thirst) && !p.car_object && can_lose_hunger_or_thirst) {
 		if (p.shield_green_health > 0)
@@ -262,7 +265,9 @@ function player_update(player_object, dt) {
 			p.thirst = Math.max(0, p.thirst - 0.001 * dt);
 	}
 	if (p.thirst <= 0) p.health -= 0.01 * dt;
-	if (p.hunger > 0 && !(p.achievements_element.shown && p.hunger < 0.11 * p
+	if (p.hunger > 0 && !(p.story_note_element.shown && p.thirst < 0.33 * p
+			.max_hunger) && !(p.achievements_element.shown && p.hunger < 0.11 *
+			p
 			.max_hunger) && !(p.inventory_element.shown && p.hunger < 0.11 * p
 			.max_hunger) && !p.car_object && can_lose_hunger_or_thirst) {
 		if (p.shield_green_health > 0)
@@ -299,6 +304,7 @@ function player_update(player_object, dt) {
 	if (p.inventory_element.shown || p.achievements_element.shown) {
 		p.hotbar_element.shown = false;
 		p.achievements_shower_element.shown = false;
+		p.story_note_element.shown = false;
 	}
 	else {
 		p.achievements_shower_element.shown = true;
@@ -309,6 +315,7 @@ function player_update(player_object, dt) {
 		p.achievements_shower_element.shown = true;
 	}
 	if (player_object.game.want_hide_inventory) {
+		p.story_note_element.shown = false;
 		p.inventory_element.shown = false;
 		p.hotbar_element.shown = true;
 		p.achievements_element.shown = false;
@@ -986,4 +993,20 @@ function player_handle_melee(g, p, v, dt, rotSpeed, dmgMax, dmgMin, angleLimit,
 		}
 	}
 	p.sword_visible = p.sword_protection = true;
+}
+
+function player_show_note(p, title, content) {
+	let noteElement = p.story_note_element;
+	if (!noteElement) return false;
+	if (!noteElement.shown) {
+		let data = noteElement.data;
+		data.title = title;
+		data.content = content;
+		data.pages = [];
+		data.current_page = 0;
+		data._ignore_first_click = true;
+		noteElement.shown = true;
+		p.inventory_element.shown = false;
+		return true;
+	}
 }
