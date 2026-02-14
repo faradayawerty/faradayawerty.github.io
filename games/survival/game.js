@@ -43,6 +43,7 @@ function game_create(input_, engine_, audios_) {
 		last_bullet_num: 0,
 		collections: {},
 		want_death_message: "You have died.",
+		important_items: [],
 		settings: {
 			language: "english",
 			auto_aim: false,
@@ -251,7 +252,7 @@ function game_update(g, dt) {
 		(g.collections["player"] ? g.collections["player"].find(p => !p.data
 			.ai_controlled) : null);
 	if (plr) {
-		if (isKeyDown(g.input, ']', true)) {
+		if (false && isKeyDown(g.input, ']', true)) {
 			plr.data.ai_controlled = true;
 			g.camera_target_body = null;
 		}
@@ -718,7 +719,8 @@ function game_save(g) {
 		boss_kills: g.boss_kills,
 		deaths: g.deaths,
 		visited_levels: g.visited_levels,
-		assigned_tiles: g.assigned_tiles
+		assigned_tiles: g.assigned_tiles,
+		important_items: g.important_items
 	};
 	objs.push(state_object);
 	for (let i = 0; i < g.objects.length; i++) {
@@ -768,6 +770,8 @@ function game_load(g) {
 					g.deaths = obj.deaths;
 					g.visited_levels = obj.visited_levels;
 					g.assigned_tiles = obj.assigned_tiles;
+					g.important_items = obj.important_items ? obj
+						.important_items : [];
 				}
 				if (obj.name == "player") {
 					let iplayer = player_create(g, obj.data.x, obj.data
@@ -857,7 +861,8 @@ function game_autosave(g) {
 		boss_kills: g.boss_kills,
 		deaths: g.deaths,
 		visited_levels: g.visited_levels,
-		assigned_tiles: g.assigned_tiles
+		assigned_tiles: g.assigned_tiles,
+		important_items: g.important_items
 	};
 	objs.push(state_object);
 	for (let i = 0; i < g.objects.length; i++) {
@@ -884,6 +889,8 @@ function game_autoload(g) {
 				g.deaths = obj.deaths;
 				g.visited_levels = obj.visited_levels;
 				g.assigned_tiles = obj.assigned_tiles;
+				g.important_items = obj.important_items ? obj.important_items :
+					[];
 			}
 			if (obj.name == "player") {
 				let iplayer = player_create(g, obj.data.x, obj.data.y, false,

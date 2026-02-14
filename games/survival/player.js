@@ -300,7 +300,12 @@ function player_update(player_object, dt) {
 			"outside the box", p.achievements_shower_element);
 	}
 	if (p.ai_controlled) return;
-	if (p.inventory_element.shown) p.achievements_element.shown = false;
+	if (p.inventory_element.shown)
+		p.achievements_element.shown = false;
+	if (!p.inventory_element.shown) {
+		p.inventory_element.data.imove = -1;
+		p.inventory_element.data.jmove = -1;
+	}
 	if (p.inventory_element.shown || p.achievements_element.shown) {
 		p.hotbar_element.shown = false;
 		p.achievements_shower_element.shown = false;

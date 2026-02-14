@@ -279,6 +279,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		item = ITEM_VENOM;
 	if (enemy_type == "raccoon")
 		item = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
+	if (Math.random() < 0.0001 && LEVEL_TILES_SUBURBAN_ZONE.includes(tile))
+		item = ITEM_DIARY;
 	item_create(g, item, x, y);
 }
 

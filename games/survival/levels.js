@@ -58,7 +58,7 @@ function levels_set(g, level, old_level = null) {
 				item_create(g, ITEM_GUN, Ox + Math.random() * 2500, Oy + Math
 					.random() * 2500, null, tile);
 			if (achievement_get(player_object.data.achievements_element.data
-					.achievements, "need for ammo").done && !achievement_get(
+					.achievements, "get a gun").done && !achievement_get(
 					player_object.data.achievements_element.data.achievements,
 					"shoot 'em up").done)
 				item_create(g, ITEM_AMMO, Ox + Math.random() * 2500, Oy + Math

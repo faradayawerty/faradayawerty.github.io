@@ -217,4 +217,26 @@ let ITEMS_DATA = {
 			}
 		}
 	},
+	[ITEM_SURVIVOR_NOTE]: {
+		name: "Survivor's Note",
+		desc: "A crumpled piece of paper with shaky handwriting.",
+		name_rus: "Записка выжившего",
+		desc_rus: "Скомканный клочок бумаги с неразборчивым почерком.",
+		render: (ctx, x, y, w, h) => {
+			ctx.fillStyle = "#f5f5f5";
+			ctx.fillRect(x + 0.15 * w, y + 0.1 * h, 0.7 * w, 0.8 * h);
+			ctx.strokeStyle = "#bdbdbd";
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(x + 0.15 * w, y + 0.5 * h);
+			ctx.lineTo(x + 0.85 * w, y + 0.4 * h);
+			ctx.stroke();
+			for (let i = 0; i < 4; i++) {
+				drawLine(ctx, x + 0.25 * w, y + (0.25 + i * 0.15) * h,
+					x + 0.75 * w, y + (0.25 + i * 0.15) * h,
+					"#424242"
+				);
+			}
+		},
+	}
 };

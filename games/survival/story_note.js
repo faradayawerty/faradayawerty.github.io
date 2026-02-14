@@ -153,11 +153,13 @@ function story_note_draw(ne, ctx) {
 	ctx.textAlign = "left";
 	let lines = data.pages[data.current_page] || [];
 	for (let i = 0; i < lines.length; i++) {
-		let line = lines[i].trim();
+		let lineObj = lines[i];
+		let line = (typeof lineObj === 'string') ? lineObj : lineObj.text;
+		let isLastLine = (typeof lineObj === 'object' && lineObj
+			.isLastInParagraph) || line === "";
 		let lineY = rect.y + 140 + (i * lineHeight);
-		let words = line.split(' ');
-		let isLastLine = (i === lines.length - 1);
-		if (isLastLine || words.length === 1) {
+		let words = line.split(' ').filter(w => w.length > 0);
+		if (isLastLine || words.length <= 1) {
 			ctx.fillText(line, rect.x + padding, lineY);
 		}
 		else {
@@ -221,25 +223,49 @@ function drawStyledArrow(ctx, x, y, size, direction, isHovered, alpha) {
 }
 
 function wrapStoryTextPaginated(ctx, text, maxWidth, maxHeight, lineHeight) {
-	let words = text.split(' ');
 	let pages = [];
-	let lines = [];
-	let line = '';
+	let currentLines = [];
 	let maxLinesPerPage = Math.floor(maxHeight / lineHeight);
-	for (let n = 0; n < words.length; n++) {
-		let testLine = line + words[n] + ' ';
-		if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-			lines.push(line);
-			line = words[n] + ' ';
-			if (lines.length >= maxLinesPerPage) {
-				pages.push(lines);
-				lines = [];
+	let paragraphs = text.split('\n');
+	for (let p = 0; p < paragraphs.length; p++) {
+		let paragraph = paragraphs[p];
+		if (paragraph.trim() === '') {
+			currentLines.push("");
+			if (currentLines.length >= maxLinesPerPage) {
+				pages.push(currentLines);
+				currentLines = [];
+			}
+			continue;
+		}
+		let words = paragraph.split(' ');
+		let line = '';
+		for (let n = 0; n < words.length; n++) {
+			let testLine = line + words[n] + ' ';
+			let metrics = ctx.measureText(testLine);
+			if (metrics.width > maxWidth && n > 0) {
+				currentLines.push(line.trim());
+				line = words[n] + ' ';
+				if (currentLines.length >= maxLinesPerPage) {
+					pages.push(currentLines);
+					currentLines = [];
+				}
+			}
+			else {
+				line = testLine;
 			}
 		}
-		else line = testLine;
+		currentLines.push({
+			text: line.trim(),
+			isLastInParagraph: true
+		});
+		if (currentLines.length >= maxLinesPerPage) {
+			pages.push(currentLines);
+			currentLines = [];
+		}
 	}
-	lines.push(line);
-	pages.push(lines);
+	if (currentLines.length > 0) {
+		pages.push(currentLines);
+	}
 	return pages;
 }
 

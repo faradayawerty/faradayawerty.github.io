@@ -712,6 +712,9 @@ ITEMS_DATA[ITEM_SHADOW_STAFF] = {
 		const radius = w * 0.15;
 		const circumference = 2 * Math.PI * radius;
 		const dashLen = circumference / 8;
+		ctx.save();
+		ctx.shadowBlur = w * 0.15;
+		ctx.shadowColor = "rgba(170, 0, 255, 0.6)";
 		ctx.strokeStyle = "#4400ff";
 		ctx.lineWidth = w * 0.02;
 		ctx.setLineDash([dashLen, dashLen]);
@@ -719,6 +722,7 @@ ITEMS_DATA[ITEM_SHADOW_STAFF] = {
 		ctx.arc(0, 0, radius, 0, Math.PI * 2);
 		ctx.stroke();
 		ctx.setLineDash([]);
+		ctx.restore();
 		const pulse = Math.sin(t * 0.1) * 0.05 + 0.95;
 		ctx.shadowBlur = w * 0.08;
 		ctx.shadowColor = "#8800ff";
