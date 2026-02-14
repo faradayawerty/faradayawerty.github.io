@@ -48,7 +48,7 @@ function trashcan_update(self, dt) {
 		}
 		if (Math.random() < 0.25)
 			item_spawn(self.game, p.body.position.x, p.body.position.y, null,
-				LEVEL_TILE_RESIDENTIAL_T_SOUTH, null);
+				LEVEL_TILE_RESIDENTIAL_T_SOUTH, null, "trashcan");
 		if (Math.random() < 0.25 && !self.game.important_items.includes(
 				ITEM_SURVIVOR_NOTE)) {
 			item_create(self.game, ITEM_SURVIVOR_NOTE, p.body.position.x, p.body

@@ -1,7 +1,8 @@
 let DEBUG_ITEM = false;
 let BOSSIFIER_GRAY_CACHE = null;
 
-function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
+function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
+	context = null) {
 	let available_guns = [ITEM_GUN];
 	let available_ammos = [ITEM_AMMO];
 	let available_health = [ITEM_HEALTH];
@@ -279,8 +280,11 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null) {
 		item = ITEM_VENOM;
 	if (enemy_type == "raccoon")
 		item = ITEMS_JUNK[Math.floor(Math.random() * ITEMS_JUNK.length)];
-	if (Math.random() < 0.0001 && LEVEL_TILES_SUBURBAN_ZONE.includes(tile))
+	if (Math.random() < 0.25 && LEVEL_TILES_SUBURBAN_ZONE.includes(tile) && !g
+		.important_items.includes(ITEM_DIARY) && context !== "trashcan") {
 		item = ITEM_DIARY;
+		g.important_items.push(ITEM_DIARY);
+	}
 	item_create(g, item, x, y);
 }
 
