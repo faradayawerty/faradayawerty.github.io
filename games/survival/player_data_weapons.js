@@ -1,7 +1,7 @@
 const BALANCE_FACTOR = 1.0;
 
 function weapon_damage_from_tier(n) {
-	return Math.pow(1.5, n);
+	return Math.pow(1.25, n);
 }
 const WEAPON_DEFS = {
 	[ITEM_MUMMY_PISTOLS]: {
@@ -473,7 +473,7 @@ const WEAPON_DEFS = {
 						0.95 + 0.1 * Math.random()) * v.tx - v.sx, (
 						0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
 					.random() * 10 + 10, (0.06 + 0.16 * Math.random()) *
-					4.74 * BALANCE_FACTOR * weapon_damage_from_tier(2),
+					6.74 * BALANCE_FACTOR * weapon_damage_from_tier(2),
 					false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
@@ -501,7 +501,7 @@ const WEAPON_DEFS = {
 				.sx, (
 					0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
 				.random() * 10 + 10, (0.1 + 0.1 * Math.random()) *
-				5.15 *
+				7.15 *
 				BALANCE_FACTOR * weapon_damage_from_tier(2),
 				false, 6, 1500, mainColor, secondaryColor);
 		}

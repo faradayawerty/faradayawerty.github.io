@@ -1,5 +1,5 @@
 function enemy_health_from_tier(n) {
-	return 1000 * Math.pow(1.5, n - 0.25 / n);
+	return 1000 * Math.pow(1.25, n);
 }
 
 function enemy_damage_from_tier(n) {
