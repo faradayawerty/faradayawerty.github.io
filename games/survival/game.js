@@ -129,6 +129,7 @@ function game_new(g, force_clean = false) {
 	g.boss_kills = 0;
 	g.deaths = 0;
 	g.kills_for_boss = 10;
+	g.important_items = [];
 }
 
 function game_object_create(g, name_, data_, func_update, func_draw,

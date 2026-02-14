@@ -368,7 +368,7 @@ function player_update(player_object, dt) {
 	let use_triggered = player_object.game.mobile ?
 		isKeyDown(player_object.game.input, 'c', true) :
 		player_object.game.input.mouse.leftButtonPressed;
-	if (use_triggered) {
+	if (use_triggered && !p.story_note_element.shown) {
 		if (!p.hotbar_element.shown || !is_clicking_hotbar) {
 			let item = hotbar_get_selected_item(p.hotbar_element);
 			if (item > 0) {
@@ -469,15 +469,19 @@ function player_update(player_object, dt) {
 		);
 		if (p.auto_weapon_timer > 0) p.auto_weapon_timer -= dt;
 		else p.last_auto_weapon = 0;
-		let shooting = (!player_object.game.mobile && player_object.game.input
-				.mouse.leftButtonPressed && !is_clicking_hotbar) ||
+		let shooting = (!player_object.game.mobile && (player_object.game.input
+				.mouse.leftButtonPressed || isKeyDown(player_object.game
+					.input, 'е', false) || isKeyDown(player_object.game
+					.input, 't', false)) && !is_clicking_hotbar) ||
 			(player_object.game.mobile && (player_object.game.input.joystick
 				.left.dx ** 2 + player_object.game.input.joystick.left.dy **
 				2 > 0.01));
 		let shootDir = getShootDir(player_object.game.input);
 		let targetX = shootDir.x;
 		let targetY = shootDir.y;
-		if (player_object.game.settings.auto_aim) {
+		if (player_object.game.settings.auto_aim || isKeyDown(player_object.game
+				.input, 'е', false) || isKeyDown(player_object.game.input, 't',
+				false)) {
 			let nearest_enemy = game_object_find_closest(
 				player_object.game,
 				p.body.position.x,
@@ -514,7 +518,8 @@ function player_update(player_object, dt) {
 		let l_js = player_object.game.input.joystick.left;
 		let leftStickActive = (l_js.dx ** 2 + l_js.dy ** 2 > 0.01);
 		let currentSelectedItem = hb.row[hb.iselected];
-		if (leftStickActive && !p.achievements_element.shown &&
+		if (leftStickActive && !p.achievements_element.shown && !p
+			.story_note_element.shown &&
 			!ITEMS_GUNS.includes(currentSelectedItem) &&
 			!ITEMS_MELEE.includes(currentSelectedItem)) {
 			let bestWp = player_get_best_weapon_with_ammo(player_object);
@@ -526,7 +531,8 @@ function player_update(player_object, dt) {
 				p.auto_weapon_timer = 100;
 			}
 		}
-		if (shooting && !p.achievements_element.shown) {
+		if (shooting && !p.achievements_element.shown && !p.story_note_element
+			.shown) {
 			player_shoot(player_object, dt, null, targetX, targetY);
 			if (!inventory_has_item(p.inventory_element, ITEM_AMMO) &&
 				hotbar_get_selected_item(p.hotbar_element) == ITEM_GUN)
