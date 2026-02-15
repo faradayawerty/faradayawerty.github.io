@@ -92,17 +92,17 @@ let ACHIEVEMENT_REGISTRY = {
 			y: 1
 		},
 		name: {
-			en: "what an achievement",
-			ru: "вот это достижение"
+			en: "what should I do?",
+			ru: "что мне делать?"
 		},
 		desc: {
 			mobile: {
-				en: "open achievements menu using the gold cup button",
-				ru: "откройте меню достижений, нажав на кнопку с кубком"
+				en: "open tasks menu using the gold cup button",
+				ru: "откройте меню заданий, нажав на кнопку с кубком"
 			},
 			pc: {
-				en: "open achievements menu using J or R",
-				ru: "откройте меню достижений, нажав J или R"
+				en: "open tasks menu using J or R",
+				ru: "откройте меню заданий, нажав J или R"
 			}
 		},
 		req: "joining in",

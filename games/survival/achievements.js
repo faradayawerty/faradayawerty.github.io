@@ -267,7 +267,7 @@ function achievements_shower_draw(ashe, ctx) {
 		if (isMob) {
 			let fontSize = 36;
 			let line1 = (ashe.game.settings.language == "русский") ?
-				"Получено достижение" : "Achievement get";
+				"Выполнено задание" : "Task finished";
 			let line2 = (ashe.game.settings.language == "русский") ? achData
 				.name_rus + "!" : ach + "!";
 			let line3 = (ashe.game.settings.language == "русский") ?
@@ -279,9 +279,9 @@ function achievements_shower_draw(ashe, ctx) {
 				"rgba(255,255,255,0.7)");
 		}
 		else {
-			let text = "achievement get: " + ach + "! " + helpText + " to view";
+			let text = "task finished: " + ach + "! " + helpText + " to view";
 			if (ashe.game.settings.language == "русский") {
-				text = "получено достижение: " + achData.name_rus + "! " +
+				text = "выполнено задание: " + achData.name_rus + "! " +
 					helpTextRus;
 			}
 			drawText(ctx, x + 1.25 * baseSize, y + 0.6 * baseSize, text, 20);
@@ -332,11 +332,11 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 	let name = "";
 	let desc = "";
 	if (isHidden) {
-		name = (ae.game.settings.language == "русский") ? "Скрытое достижение" :
-			"Hidden Achievement";
+		name = (ae.game.settings.language == "русский") ? "Скрытая задача" :
+			"Hidden task";
 		desc = (ae.game.settings.language == "русский") ?
-			"Новые достижения открываются по мере получения других достижений. Используйте достижения как гайд в мир игры. Ваша цель - получить все достижения." :
-			"New achievements are unlocked as you earn others. Use achievements as a guide to the game world. Your goal is to collect them all.";
+			"Новые задачи открываются по мере выполнения других задач. Используйте задачи как гайд в мир игры. Ваша цель - выполнить все задания." :
+			"New tasks are unlocked as you earn others. Use tasks as a guide to the game world. Your goal is to do them all.";
 	}
 	else {
 		name = (ae.game.settings.language == "русский") ? achData.name_rus :

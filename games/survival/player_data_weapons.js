@@ -22,6 +22,7 @@ const WEAPON_DEFS = {
 					.w * Math.sin(theta + off), v.tx - v.sx,
 					v.ty - v.sy, 30, (0.4 + 0.8 * Math
 						.random()) * 1.84 * BALANCE_FACTOR *
+					1000 / 435 *
 					weapon_damage_from_tier(5.75),
 					false, 6, 1500,
 					"#44bbff", "white",
@@ -48,7 +49,7 @@ const WEAPON_DEFS = {
 					.position.y + 2 * p.w * Math.sin(theta - (0.5 * N -
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 30,
 					(2.5 + 0.5 * Math.random()) * 3.52 *
-					BALANCE_FACTOR * (1000 / 6500) *
+					BALANCE_FACTOR * 1000 / 544 * (1000 / 6500) *
 					weapon_damage_from_tier(5.75),
 					false, 6, 1500, "#44bbff", "white",
 					false, false, null
@@ -71,7 +72,8 @@ const WEAPON_DEFS = {
 				bullet_create(
 					g, p.body.position.x, p.body.position.y,
 					Math.cos(angle), Math.sin(angle),
-					10, 2.0 * 166.6 * BALANCE_FACTOR * (1000 /
+					10, 2.0 * 166.6 * BALANCE_FACTOR * 1000 / 141 *
+					(1000 /
 						150000) * weapon_damage_from_tier(7), false,
 					12, 1200, "#4400ff", "black"
 				);
@@ -102,7 +104,7 @@ const WEAPON_DEFS = {
 					(0.92 + 0.16 * Math.random()) * v.ty - v.sy,
 					14 + 6 * Math.random(),
 					(5 + 10 * Math.random()) * 4.85 *
-					BALANCE_FACTOR * (1000 / 85000) *
+					BALANCE_FACTOR * 1000 / 369 * (1000 / 85000) *
 					weapon_damage_from_tier(7),
 					false, 8, 900, "#8800ff", "black", false, true
 				);
@@ -143,7 +145,7 @@ const WEAPON_DEFS = {
 					g, startX, startY, Math.cos(streamAngle), Math
 					.sin(streamAngle),
 					speed, (10 + 15 * Math.random()) * 4.52 *
-					BALANCE_FACTOR * (1000 / 150000) *
+					BALANCE_FACTOR * 1000 / 500 * (1000 / 150000) *
 					weapon_damage_from_tier(8),
 					false, Math.random() * 3 + 4, 700 + Math
 					.random() * 300, mainColor, secondaryColor,
@@ -172,7 +174,8 @@ const WEAPON_DEFS = {
 					Math.cos(finalAngle), Math.sin(
 						finalAngle),
 					17.5, (0.75 + 0.5 * Math.random()) *
-					29.4 * BALANCE_FACTOR * (1000 / 10000) *
+					29.4 * BALANCE_FACTOR * 1000 / 209 * (
+						1000 / 10000) *
 					weapon_damage_from_tier(8),
 					false, 12.5, 1500, "red", "gold"
 				);
@@ -203,7 +206,8 @@ const WEAPON_DEFS = {
 					g, startX, startY, Math.cos(streamAngle), Math
 					.sin(streamAngle),
 					speed, (10 + 15 * Math.random()) * 4.44 *
-					BALANCE_FACTOR * 1.5 * (1000 / 200000) *
+					BALANCE_FACTOR * 1000 / 569 * 1.5 * (1000 /
+						200000) *
 					weapon_damage_from_tier(11),
 					false, Math.random() * 3 + 4, 700 + Math
 					.random() * 300,
@@ -236,7 +240,7 @@ const WEAPON_DEFS = {
 					(0.92 + 0.16 * Math.random()) * v.ty - v.sy,
 					14 + 6 * Math.random(),
 					(5 + 10 * Math.random()) * 0.24 *
-					BALANCE_FACTOR * (1000 / 4000) *
+					BALANCE_FACTOR * 1000 / 340 * (1000 / 4000) *
 					weapon_damage_from_tier(11) * 0.75,
 					false, 8, 900, "lime", "green", false, true
 				);
@@ -335,7 +339,8 @@ const WEAPON_DEFS = {
 			bullet_create(g, p.body.position.x, p.body
 				.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25 *
 				5.49 *
-				BALANCE_FACTOR * weapon_damage_from_tier(1),
+				BALANCE_FACTOR * 1000 / 90 *
+				weapon_damage_from_tier(1),
 				false, 6, 1500, mainColor, secondaryColor)
 		}
 	},
@@ -363,7 +368,8 @@ const WEAPON_DEFS = {
 			bullet_create(
 				g, p.body.position.x, p.body.position.y, dx, dy,
 				22, (0.5 + 0.5 * Math.random()) * 2.14 *
-				BALANCE_FACTOR * weapon_damage_from_tier(5), false,
+				BALANCE_FACTOR * 1000 / 193 *
+				weapon_damage_from_tier(5), false,
 				7, 1500, mainColor, secondaryColor
 			);
 		}
@@ -389,7 +395,8 @@ const WEAPON_DEFS = {
 			bullet_create(g, p.body.position.x, p.body
 				.position.y, v.tx - v.sx, v.ty - v.sy, 32, 1.2 *
 				5.68 *
-				BALANCE_FACTOR * weapon_damage_from_tier(1),
+				BALANCE_FACTOR * 1000 / 175 *
+				weapon_damage_from_tier(1),
 				false, 6, 1500, mainColor, secondaryColor)
 		}
 	},
@@ -416,7 +423,7 @@ const WEAPON_DEFS = {
 				.sx, v.ty -
 				v.sy,
 				25, (3 + 2 * Math.random()) * 4.93 *
-				BALANCE_FACTOR * (
+				BALANCE_FACTOR * 1000 / 93 * (
 					1000 / 9000) * 2 * weapon_damage_from_tier(
 					5.25),
 				false, 6, 1500, mainColor, secondaryColor)
@@ -444,7 +451,7 @@ const WEAPON_DEFS = {
 				.position.y, v.tx - v.sx, v.ty - v.sy, 20, (0.25 +
 					0.5 *
 					Math
-					.random()) * 1.91 * BALANCE_FACTOR *
+					.random()) * 1.91 * BALANCE_FACTOR * 1000 / 76 *
 				weapon_damage_from_tier(3.25), false, 6, 1500,
 				mainColor, secondaryColor)
 		}
@@ -473,7 +480,8 @@ const WEAPON_DEFS = {
 						0.95 + 0.1 * Math.random()) * v.tx - v.sx, (
 						0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
 					.random() * 10 + 10, (0.06 + 0.16 * Math.random()) *
-					6.74 * BALANCE_FACTOR * weapon_damage_from_tier(2),
+					6.74 * BALANCE_FACTOR * 1000 / 182 *
+					weapon_damage_from_tier(2),
 					false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
@@ -502,7 +510,8 @@ const WEAPON_DEFS = {
 					0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
 				.random() * 10 + 10, (0.1 + 0.1 * Math.random()) *
 				7.15 *
-				BALANCE_FACTOR * weapon_damage_from_tier(2),
+				BALANCE_FACTOR * 1000 / 328 *
+				weapon_damage_from_tier(2),
 				false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
@@ -525,7 +534,7 @@ const WEAPON_DEFS = {
 					Math.cos(finalAngle), Math.sin(
 						finalAngle), 25,
 					(15 + 15 * Math.random()) * 0.01 *
-					BALANCE_FACTOR * 10 *
+					BALANCE_FACTOR * 1000 / 155 * 10 *
 					weapon_damage_from_tier(10),
 					false, 45);
 			});
@@ -544,7 +553,8 @@ const WEAPON_DEFS = {
 		width: 2.25,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
 			.position.y, v.tx - v.sx, v.ty - v.sy, 17.5, (0.75 + 0.5 *
-				Math.random()) * 4.15 * BALANCE_FACTOR * (1000 / 2500) *
+				Math.random()) * 4.15 * BALANCE_FACTOR * 1000 / 70 * (
+				1000 / 2500) *
 			weapon_damage_from_tier(3.25),
 			false, 12.5, 1500,
 			"cyan", "blue")
@@ -595,6 +605,7 @@ const WEAPON_DEFS = {
 					.w * Math.sin(theta + off), v.tx - v.sx,
 					v.ty - v.sy, 30, (0.4 + 0.8 * Math
 						.random()) * 2.04 * BALANCE_FACTOR *
+					1000 / 579 *
 					weapon_damage_from_tier(5),
 					false, 6, 1500, mainColor,
 					secondaryColor);
@@ -650,7 +661,7 @@ const WEAPON_DEFS = {
 					.position.y + 2 * p.w * Math.sin(theta - (0.5 * N -
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 30,
 					(2.5 + 0.5 * Math.random()) * 0.62 *
-					BALANCE_FACTOR * (1000 / 400) *
+					BALANCE_FACTOR * 1000 / 705 * (1000 / 400) *
 					weapon_damage_from_tier(5),
 					false, 6, 1500, mainColor, secondaryColor);
 		}
@@ -682,7 +693,7 @@ const WEAPON_DEFS = {
 							.y, 1.5 * p.w, 60 * p.w, p
 							.laser_direction)) {
 						let damage_dealt = 0.33 * dt * 0.2 *
-							BALANCE_FACTOR * 20 *
+							BALANCE_FACTOR * 1000 / 1326 * 20 *
 							weapon_damage_from_tier(9);
 						obj.data.health -= damage_dealt;
 						obj.data.hit_by_player = true;
@@ -706,7 +717,8 @@ const WEAPON_DEFS = {
 		swordLength: 100,
 		action: (g, p, v, dt) => {
 			player_handle_melee(g, p, v, dt, 0.02, 10.0 * 1.04 *
-				BALANCE_FACTOR * 2 * weapon_damage_from_tier(6),
+				BALANCE_FACTOR * 1000 / 2000 * 2 *
+				weapon_damage_from_tier(6),
 				7.0, Math.PI / 8, 1500, 500);
 		}
 	},
@@ -717,8 +729,8 @@ const WEAPON_DEFS = {
 		swordLength: 100,
 		action: (g, p, v, dt) => {
 			player_handle_melee(g, p, v, dt, 0.04, 80.0 *
-				BALANCE_FACTOR * (1000 / 25000) *
-				weapon_damage_from_tier(10), 60.0, Math.PI / 4,
+				BALANCE_FACTOR * (1000.0 / 8000) *
+				weapon_damage_from_tier(10), 0, Math.PI / 4,
 				15000, 5000);
 		}
 	},
@@ -743,7 +755,8 @@ const WEAPON_DEFS = {
 					0.975 + 0.05 * Math.random()) * v.tx - v.sx, (
 					0.975 + 0.05 * Math.random()) * v.ty - v.sy,
 				Math.random() * 10 + 20, (1.5 + 0.375 * Math
-					.random()) * 1.04 * BALANCE_FACTOR *
+					.random()) * 1.04 * BALANCE_FACTOR * 1000 /
+				323 *
 				weapon_damage_from_tier(6),
 				false, 6, 1500, mainColor, secondaryColor);
 			if (p.shield_green_health > 0) {
@@ -792,21 +805,21 @@ const WEAPON_DEFS = {
 				c2 = "white";
 				sfx = "red_pistols_1";
 				chance = 0.001;
-				dmgBase = 2.0 * 0.2 * BALANCE_FACTOR *
+				dmgBase = 2.0 * 0.2 * BALANCE_FACTOR * 2 *
 					weapon_damage_from_tier(9);
 			}
 			else if (ammoType === ITEM_RED_PLASMA) {
 				c1 = "red";
 				c2 = "pink";
 				sfx = "red_pistols_1";
-				dmgBase = 1.75 * 0.2 * BALANCE_FACTOR *
+				dmgBase = 1.75 * 0.2 * BALANCE_FACTOR * 2 *
 					weapon_damage_from_tier(9);
 			}
 			else if (ammoType === ITEM_PLASMA) {
 				c1 = "cyan";
 				c2 = "blue";
 				sfx = "red_pistols_1";
-				dmgBase = 1.5 * 0.2 * BALANCE_FACTOR *
+				dmgBase = 1.5 * 0.2 * BALANCE_FACTOR * 2 *
 					weapon_damage_from_tier(9);
 			}
 			if (ammoType !== ITEM_ROCKET || ammoType ===
@@ -830,7 +843,7 @@ const WEAPON_DEFS = {
 							off) * p.h * 1.75, v.tx - v.sx,
 						v.ty - v.sy, 0.15 * p.w, null, (
 							0.8 + 1.6 * Math.random()) *
-						0.2 * BALANCE_FACTOR *
+						0.2 * BALANCE_FACTOR * 2 *
 						weapon_damage_from_tier(9), p
 						.max_health,
 						false, 20);
@@ -853,6 +866,6 @@ const WEAPON_DEFS = {
 		width: 1.0,
 		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
 			.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25 *
-			BALANCE_FACTOR)
+			BALANCE_FACTOR * 2)
 	},
 };

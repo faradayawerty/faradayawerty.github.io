@@ -19,6 +19,7 @@ function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 		can_hit: true,
 		poisoned: poisoned,
 		color_glow: glowColor,
+		damaged: false
 	};
 	if (b.enemy)
 		b.body.collisionFilter.category = 4;
@@ -44,6 +45,12 @@ function bullet_update(bullet_object, dt) {
 	if (bullet_object.destroyed)
 		return;
 	let b = bullet_object.data;
+	let g = bullet_object.game;
+	if (b.damaged && b.body && b.body.collisionFilter.mask !== 0) {
+		b.body.collisionFilter.mask = 0;
+		b.body.collisionFilter.category = 0;
+		b.body.isSensor = true;
+	}
 	if (b.lifetime < 0) {
 		bullet_destroy(bullet_object);
 		return;
@@ -51,22 +58,41 @@ function bullet_update(bullet_object, dt) {
 	else {
 		b.lifetime -= dt;
 	}
-	if (bullet_object.bullet_num < bullet_object.game.last_bullet_num -
-		BULLET_LIMIT) {
+	if (bullet_object.bullet_num < g.last_bullet_num - BULLET_LIMIT) {
 		bullet_destroy(bullet_object);
 		return;
 	}
-	if (!b.enemy && bullet_object.name === "bullet") {
-		let start = b.body.positionPrev;
-		let end = b.body.position;
-		let bodies = Matter.Composite.allBodies(bullet_object.game.engine
-			.world);
-		let collisions = Matter.Query.ray(bodies, start, end);
-		for (let i = 0; i < collisions.length; i++) {
-			let target = collisions[i].body.gameObject;
-			if (target && target.name === "rocket" && target.data.enemy) {
-				target.data.health -= 10;
-				bullet_destroy(bullet_object);
+	if (b.damaged) return;
+	let start = b.body.positionPrev;
+	let end = b.body.position;
+	let bodies = Matter.Composite.allBodies(g.engine.world);
+	let collisions = Matter.Query.ray(bodies, start, end);
+	for (let i = 0; i < collisions.length; i++) {
+		let targetBody = collisions[i].body;
+		let target = targetBody.gameObject;
+		if (!target || target.destroyed) continue;
+		if (b.enemy) {
+			if (target.name === "player") {
+				collisions_apply_damage_to_player(target.data, b.damage, dt,
+					"bullet", g);
+				b.damaged = true;
+				return;
+			}
+		}
+		else {
+			const validTargets = ["enemy", "car", "trashcan", "animal",
+				"rocket"
+			];
+			if (validTargets.includes(target.name)) {
+				if (target.name === "rocket" && !target.data.enemy) continue;
+				collisions_apply_damage_to_object(g, target, b.damage, dt,
+					true);
+				b.damaged = true;
+				if (target.name === "rocket") {
+					target.data.health -= b.damage * dt;
+					target.data.target_object = null;
+					target.data.bounce_ticks = 10;
+				}
 				return;
 			}
 		}

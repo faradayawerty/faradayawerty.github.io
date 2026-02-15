@@ -38,8 +38,8 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		}
 	}
 	const config = ENEMY_TYPES[type] || ENEMY_TYPES["regular"];
-	let width = config.w * 1.1;
-	let height = config.h * 1.1;
+	let width = config.w * 1.65;
+	let height = config.h * 1.65;
 	let boss = make_boss || g.all_enemies_are_bosses;
 	let player_object = game_object_find_closest(g, x, y, "player", 4000);
 	if (player_object) {
@@ -356,27 +356,77 @@ function enemy_draw(enemy_object, ctx) {
 	if (e.health <= 0) return;
 	const typeData = ENEMY_TYPES[e.type] || ENEMY_TYPES["regular"];
 	const vis = typeData.visuals || {};
+	let t = Date.now() * 0.008;
+	let speed = Math.sqrt(e.body.velocity.x ** 2 + e.body.velocity.y ** 2);
+	let bob = (speed > 0.5) ? Math.abs(Math.cos(t)) * (e.h * 0.08) : Math.sin(
+		Date.now() * 0.002) * (e.h * 0.03);
+	let walk = (speed > 0.5) ? Math.sin(t) * (e.h * 0.15) : 0;
+	let target_object = enemy_get_target_object(enemy_object, -1);
+	let angle = 0;
+	let gx = 0,
+		gy = 0,
+		g = 0.001;
+	if (target_object) {
+		gx = target_object.data.body.position.x - e.body.position.x;
+		gy = target_object.data.body.position.y - e.body.position.y;
+		g = Math.sqrt(gx * gx + gy * gy) || 0.001;
+		angle = Math.atan2(gy, gx);
+	}
+	else if (speed > 0.1) {
+		angle = Math.atan2(e.body.velocity.y, e.body.velocity.x);
+	}
 	ctx.save();
+	if (vis.custom_draw && !vis.custom_draw_above)
+		vis.custom_draw(e, ctx);
 	if (vis.glowColor) {
 		ctx.shadowBlur = vis.glowBlur || 15;
 		ctx.shadowColor = vis.glowColor;
 	}
 	if (!typeData.only_draw_custom) {
-		fillMatterBody(ctx, e.body, e.color);
+		ctx.fillStyle = "rgba(0,0,0,0.4)";
+		ctx.beginPath();
+		ctx.roundRect(e.body.position.x - e.w * 0.25, e.body.position.y + e.h *
+			0.25 + walk, e.w * 0.18, e.h * 0.35, e.w * 0.05);
+		ctx.roundRect(e.body.position.x + e.w * 0.07, e.body.position.y + e.h *
+			0.25 - walk, e.w * 0.18, e.h * 0.35, e.w * 0.05);
+		ctx.fill();
 		let outlineW = vis.outline_is_relative ? vis.outline_width * e.w : (vis
 			.outline_width || 1);
-		drawMatterBody(ctx, e.body, e.color_outline, outlineW);
+		ctx.fillStyle = e.color;
+		ctx.strokeStyle = e.color_outline || "white";
+		ctx.lineWidth = outlineW;
+		ctx.beginPath();
+		ctx.roundRect(e.body.position.x - e.w * 0.35, e.body.position.y - e.h *
+			0.3 + bob, e.w * 0.7, e.h * 0.7, e.w * 0.1);
+		ctx.fill();
+		ctx.stroke();
+		ctx.save();
+		ctx.translate(e.body.position.x, e.body.position.y - e.h * 0.5 + bob);
+		ctx.fillStyle = e.color;
+		ctx.beginPath();
+		ctx.roundRect(-e.w * 0.25, -e.h * 0.25, e.w * 0.5, e.h * 0.4, e.w *
+			0.1);
+		ctx.fill();
+		ctx.stroke();
+		let ec = typeData.eye_color || "red";
+		ctx.fillStyle = ec;
+		ctx.shadowBlur = e.boss ? 15 : 8;
+		ctx.shadowColor = ec;
+		let lookX = Math.cos(angle) * (e.w * 0.05);
+		let lookY = Math.sin(angle) * (e.h * 0.02);
+		ctx.beginPath();
+		ctx.arc(-e.w * 0.1 + lookX, -e.h * 0.05 + lookY, e.w * 0.04, 0, Math
+			.PI * 2);
+		ctx.arc(e.w * 0.1 + lookX, -e.h * 0.05 + lookY, e.w * 0.04, 0, Math.PI *
+			2);
+		ctx.fill();
+		ctx.shadowBlur = 0;
+		ctx.restore();
 	}
-	if (vis.custom_draw)
-		vis.custom_draw(e, ctx);
 	ctx.restore();
-	let target_object = enemy_get_target_object(enemy_object, -1);
 	if (target_object != null) {
-		let gx = target_object.data.body.position.x - e.body.position.x;
-		let gy = target_object.data.body.position.y - e.body.position.y;
-		let g = Math.sqrt(gx * gx + gy * gy) || 0.001;
-		let px = e.body.position.x - 0.45 * e.w;
-		let py = e.body.position.y - 0.45 * e.h;
+		let bodyCenterY = e.body.position.y + bob;
+		let handOffset = e.w * 0.35;
 		if ((vis.draw_gun && !e.boss || vis.draw_gun_boss && e.boss) && g <
 			1.25 * e.shooting_range) {
 			ctx.strokeStyle = vis.gun_color || "#331133";
@@ -395,59 +445,77 @@ function enemy_draw(enemy_object, ctx) {
 			if (useCenter) {
 				gunPoints.push({
 					x: e.body.position.x,
-					y: e.body.position.y
+					y: bodyCenterY
 				});
 			}
 			else if (useDouble) {
 				gunPoints.push({
-					x: px,
-					y: py
+					x: e.body.position.x - handOffset,
+					y: bodyCenterY
 				});
 				gunPoints.push({
-					x: px + e.w,
-					y: py
+					x: e.body.position.x + handOffset,
+					y: bodyCenterY
 				});
 			}
 			else {
 				gunPoints.push({
-					x: px,
-					y: py
+					x: e.body.position.x - handOffset,
+					y: bodyCenterY
 				});
 			}
-			let k = 1;
 			gunPoints.forEach(p => {
+				ctx.save();
+				ctx.strokeStyle = e.color;
+				ctx.lineWidth = e.w * 0.12;
+				ctx.lineCap = "round";
 				ctx.beginPath();
 				ctx.moveTo(p.x, p.y);
-				let targetX = p.x + k * e.w * gx / g;
-				let targetY = p.y + k * (e.type.includes("rocket") || e
-					.type.includes("laser") ? e.h : e.w) * gy / g;
+				let handX = p.x + (e.w * 0.15) * gx / g;
+				let handY = p.y + (e.w * 0.15) * gy / g;
+				ctx.lineTo(handX, handY);
+				ctx.stroke();
+				ctx.restore();
+				ctx.beginPath();
+				ctx.moveTo(handX, handY);
+				let gunLen = (e.type.includes("rocket") || e.type
+					.includes("laser") ? e.h * 0.8 : e.w * 0.6);
+				let targetX = handX + gunLen * gx / g;
+				let targetY = handY + gunLen * gy / g;
 				ctx.lineTo(targetX, targetY);
 				ctx.stroke();
 				if (vis.laser_beam && e.boss && e.shooting_delay < -
 					4500) {
+					ctx.save();
 					ctx.beginPath();
 					ctx.strokeStyle = e.color;
-					ctx.lineWidth = 2 * 0.075 * e.w;
+					ctx.lineWidth = 0.15 * e.w;
 					ctx.moveTo(targetX, targetY);
 					ctx.lineTo(p.x + 4 * gx, p.y + 4 * gy);
 					ctx.stroke();
 					ctx.beginPath();
 					ctx.strokeStyle = "white";
-					ctx.lineWidth = 2 * 0.05 * e.w;
+					ctx.lineWidth = 0.1 * e.w;
 					ctx.moveTo(targetX, targetY);
 					ctx.lineTo(p.x + 4 * gx, p.y + 4 * gy);
 					ctx.stroke();
+					ctx.restore();
 				}
 			});
 		}
 		if (vis.draw_sword && g < 0.33 * e.shooting_range && !e.is_minion) {
+			ctx.save();
 			ctx.strokeStyle = vis.sword_color || "#55aa11";
 			ctx.lineWidth = 0.25 * e.w;
+			ctx.lineCap = "butt";
+			let sx = e.body.position.x - handOffset;
+			let sy = bodyCenterY;
 			ctx.beginPath();
-			ctx.moveTo(px, py);
-			ctx.lineTo(px + Math.cos(e.sword_rotation) * 2 * e.w, py + Math.sin(
-				e.sword_rotation) * 2 * e.w);
+			ctx.moveTo(sx, sy);
+			ctx.lineTo(sx + Math.cos(e.sword_rotation) * 1.5 * e.w, sy + Math
+				.sin(e.sword_rotation) * 1.5 * e.w);
 			ctx.stroke();
+			ctx.restore();
 		}
 	}
 	if (enemy_object.game.settings.indicators["show enemy hunger"]) {
@@ -465,6 +533,11 @@ function enemy_draw(enemy_object, ctx) {
 		ctx.fillStyle = "lime";
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
 			e.w * e.health / e.max_health, e.h * 0.05);
+	}
+	if (vis.custom_draw && vis.custom_draw_above) {
+		ctx.save();
+		vis.custom_draw(e, ctx);
+		ctx.restore();
 	}
 }
 

@@ -1,8 +1,8 @@
 let DEBUG_PLAYER = false;
 
 function player_create(g, x, y, respawn = false, ai_controlled = false) {
-	let width = 40,
-		height = 40;
+	let width = 60,
+		height = 60;
 	let p = {
 		old_health: 100,
 		health: 100,
@@ -617,26 +617,202 @@ function player_draw(player_object, ctx) {
 	if (p.immunity % 350 > 175) return;
 	if (p.car_object) return;
 	let g = player_object.game;
-	let selected_item = (p.last_auto_weapon > 0) ?
-		p.last_auto_weapon :
+	let selected_item = (p.last_auto_weapon > 0) ? p.last_auto_weapon :
 		hotbar_get_selected_item(p.hotbar_element);
 	let cfg = WEAPON_DEFS[selected_item];
-	fillMatterBody(ctx, p.body, g.settings.player_color);
-	drawMatterBody(ctx, p.body, "white");
-	const drawStatBar = (val, max, offset, color) => {
-		ctx.fillStyle = "red";
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y -
-			offset * p.h, p.w, p.h * 0.05);
-		ctx.fillStyle = color;
-		ctx.fillRect(p.body.position.x - p.w / 2, p.body.position.y -
-			offset * p.h, p.w * Math.max(val, 0) / max, p.h * 0.05);
+	let posX = p.body.position.x;
+	let posY = p.body.position.y;
+	let pw = p.w,
+		ph = p.h;
+	let t = Date.now() * 0.008;
+	let speed = Math.sqrt(p.body.velocity.x ** 2 + p.body.velocity.y ** 2);
+	let bob = (speed > 0.5) ? Math.abs(Math.cos(t)) * (ph * 0.08) : Math.sin(
+		Date.now() * 0.002) * (ph * 0.03);
+	if (p.last_draw_angle === undefined) p.last_draw_angle = 0;
+	let angle = p.last_draw_angle;
+	let mx, my, cx = 0,
+		cy = 0;
+	if (p.ai_controlled) {
+		let target = game_object_find_closest(g, posX, posY, "enemy", 1000);
+		mx = target ? target.data.body.position.x : posX + 1;
+		my = target ? target.data.body.position.y : posY;
+		cx = posX;
+		cy = posY;
+		let targetAngle = Math.atan2(my - cy, mx - cx);
+		if (!isNaN(targetAngle)) angle = targetAngle;
+	}
+	else if (g.input.touch && g.input.touch.length > 0) {
+		let jx = g.input.joystick.left.dx;
+		let jy = g.input.joystick.left.dy;
+		if ((jx !== 0 || jy !== 0) && !isNaN(jx) && !isNaN(jy)) {
+			angle = Math.atan2(jy, jx);
+			p.last_draw_angle = angle;
+		}
+	}
+	else {
+		mx = g.input.mouse.x;
+		my = g.input.mouse.y;
+		cx = 0.5 * window.innerWidth;
+		cy = 0.5 * window.innerHeight;
+		let mouseAngle = Math.atan2(my - cy, mx - cx);
+		if (!isNaN(mouseAngle)) angle = mouseAngle;
+		p.last_draw_angle = angle;
+	}
+	let dirX = Math.cos(angle),
+		dirY = Math.sin(angle);
+	let bodyY = posY - ph * 0.3 + bob;
+	let headY = posY - ph * 0.65 + bob;
+	ctx.save();
+	ctx.save();
+	ctx.strokeStyle = g.settings.player_color;
+	ctx.lineWidth = pw * 0.015;
+	for (let i = 0; i < 45; i++) {
+		ctx.beginPath();
+		let hX = posX - pw * 0.22 + (i * pw * 0.44 / 45);
+		let seed = i * 543.21;
+		let hLen = ph * 0.15 + Math.abs(Math.sin(seed)) * ph * 0.2;
+		let hAngle = (i / 45) * Math.PI + Math.PI;
+		ctx.moveTo(hX, headY + ph * 0.1);
+		ctx.lineTo(hX + Math.cos(hAngle) * (pw * 0.2), headY - hLen);
+		ctx.stroke();
+	}
+	ctx.restore();
+	ctx.strokeStyle = "black";
+	ctx.lineWidth = 1;
+	ctx.fillStyle = "#111";
+	let walk = (speed > 0.5) ? Math.sin(t) * (ph * 0.15) : 0;
+	ctx.beginPath();
+	ctx.roundRect(posX - pw * 0.25, posY + ph * 0.25 + walk, pw * 0.18, ph *
+		0.35, pw * 0.05);
+	ctx.roundRect(posX + pw * 0.07, posY + ph * 0.25 - walk, pw * 0.18, ph *
+		0.35, pw * 0.05);
+	ctx.fill();
+	ctx.stroke();
+	ctx.fillStyle = g.settings.player_color;
+	ctx.beginPath();
+	ctx.roundRect(posX - pw * 0.35, bodyY, pw * 0.7, ph * 0.8, pw * 0.08);
+	ctx.fill();
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.moveTo(posX, bodyY);
+	ctx.lineTo(posX, bodyY + ph * 0.8);
+	ctx.stroke();
+	ctx.fillStyle = "#d2b48c";
+	ctx.beginPath();
+	ctx.roundRect(posX - pw * 0.25, headY, pw * 0.5, ph * 0.4, pw * 0.12);
+	ctx.fill();
+	ctx.stroke();
+	ctx.fillStyle = "white";
+	let eyeX = posX + dirX * (pw * 0.05);
+	let eyeY = headY + ph * 0.18 + dirY * (ph * 0.03);
+	ctx.beginPath();
+	ctx.arc(eyeX - pw * 0.1, eyeY, pw * 0.06, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(eyeX + pw * 0.1, eyeY, pw * 0.06, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.fillStyle = "black";
+	let irisOff = pw * 0.04;
+	ctx.beginPath();
+	ctx.arc(eyeX - pw * 0.1 + dirX * irisOff, eyeY + dirY * irisOff, pw * 0.03,
+		0, Math.PI * 2);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(eyeX + pw * 0.1 + dirX * irisOff, eyeY + dirY * irisOff, pw * 0.03,
+		0, Math.PI * 2);
+	ctx.fill();
+	const ARM_L = pw * 0.55;
+	const drawRigidArm = (endX, endY, side) => {
+		let shX = posX + (pw * 0.3 * side);
+		let shY = bodyY + ph * 0.3;
+		ctx.save();
+		ctx.strokeStyle = "#222";
+		ctx.lineWidth = pw * 0.11;
+		ctx.lineCap = "round";
+		ctx.beginPath();
+		ctx.moveTo(shX, shY);
+		ctx.lineTo(endX, endY);
+		ctx.stroke();
+		ctx.fillStyle = "#111";
+		ctx.beginPath();
+		ctx.arc(endX, endY, pw * 0.065, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 1;
+		ctx.stroke();
+		ctx.restore();
 	};
-	if (g.settings.indicators["show player health"]) drawStatBar(p.health, p
-		.max_health, 0.9, "lime");
-	if (g.settings.indicators["show player thirst"]) drawStatBar(p.thirst, p
-		.max_thirst, 0.8, "cyan");
-	if (g.settings.indicators["show player hunger"]) drawStatBar(p.hunger, p
-		.max_hunger, 0.7, "orange");
+	if (g.settings.player_draw_gun && cfg && !cfg.isMelee && !cfg
+		.doNotDrawGun) {
+		let gunW = (cfg.width || 1) * 0.18 * pw;
+		let gl = (cfg.length || 0.8) * pw * 0.75;
+		let col = cfg.dynamicColor ? cfg.dynamicColor(p) : (cfg.color ||
+			"black");
+		ctx.lineCap = "butt";
+		if (cfg.hasSecondary) {
+			let lx = (posX + pw * 0.3 * -1) + dirX * ARM_L;
+			let ly = (bodyY + ph * 0.3) + dirY * ARM_L;
+			ctx.strokeStyle = col;
+			ctx.lineWidth = gunW;
+			ctx.beginPath();
+			ctx.moveTo(lx, ly);
+			ctx.lineTo(lx + dirX * gl, ly + dirY * gl);
+			ctx.stroke();
+			drawRigidArm(lx, ly, -1);
+			let rx = (posX + pw * 0.3 * 1) + dirX * ARM_L;
+			let ry = (bodyY + ph * 0.3) + dirY * ARM_L;
+			ctx.beginPath();
+			ctx.moveTo(rx, ry);
+			ctx.lineTo(rx + dirX * gl, ry + dirY * gl);
+			ctx.stroke();
+			drawRigidArm(rx, ry, 1);
+		}
+		else {
+			let hx = posX + dirX * ARM_L,
+				hy = (bodyY + ph * 0.3) + dirY * ARM_L;
+			ctx.strokeStyle = col;
+			ctx.lineWidth = gunW;
+			ctx.beginPath();
+			ctx.moveTo(hx, hy);
+			ctx.lineTo(hx + dirX * gl, hy + dirY * gl);
+			ctx.stroke();
+			drawRigidArm(hx, hy, -1);
+			drawRigidArm(hx + dirX * (gl * 0.4), hy + dirY * (gl * 0.4), 1);
+		}
+	}
+	else if (p.sword_visible) {
+		let hx = posX + dirX * ARM_L,
+			hy = (bodyY + ph * 0.3) + dirY * ARM_L;
+		let swLen = 80,
+			col = "#55aa11",
+			swW = 0.18 * pw;
+		if (selected_item === ITEM_HORN) col = "brown";
+		if (selected_item === ITEM_STICK) {
+			col = "brown";
+			swLen = 50;
+			swW = 0.1 * pw;
+		}
+		let sdx = Math.cos(p.sword_direction),
+			sdy = Math.sin(p.sword_direction);
+		ctx.strokeStyle = col;
+		ctx.lineWidth = swW;
+		ctx.lineCap = "round";
+		ctx.beginPath();
+		ctx.moveTo(hx, hy);
+		ctx.lineTo(hx + sdx * swLen, hy + sdy * swLen);
+		ctx.stroke();
+		drawRigidArm(hx, hy, -1);
+		drawRigidArm(hx, hy, 1);
+		p.sword_visible = false;
+	}
+	else if (selected_item > 0) {
+		let hx = posX + dirX * ARM_L,
+			hy = (bodyY + ph * 0.3) + dirY * ARM_L;
+		item_icon_draw(ctx, selected_item, hx - 0.2 * pw, hy - 0.2 * ph, 0.4 *
+			pw, 0.4 * ph, p.item_animstate);
+		drawRigidArm(hx, hy, -1);
+		drawRigidArm(hx, hy, 1);
+	}
 	if (p.shooting_laser) {
 		let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15, 2));
 		let gre = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) +
@@ -648,121 +824,42 @@ function player_draw(player_object, ctx) {
 			ctx.beginPath();
 			ctx.lineWidth = width;
 			ctx.strokeStyle = strokeCol;
-			let gx = p.w * 60 * Math.cos(p.laser_direction);
-			let gy = p.w * 60 * Math.sin(p.laser_direction);
-			let gLen = Math.sqrt(gx * gx + gy * gy) || 1;
-			let px = p.body.position.x + 1.7 * p.w * (gx / gLen);
-			let py = p.body.position.y + 1.7 * p.w * (gy / gLen);
-			ctx.moveTo(px, py);
-			ctx.lineTo(px + gx, py + gy);
+			let lx = pw * 60 * Math.cos(p.laser_direction),
+				ly = pw * 60 * Math.sin(p.laser_direction);
+			let startX = posX + dirX * ARM_L,
+				startY = bodyY + ph * 0.3 + dirY * ARM_L;
+			ctx.moveTo(startX, startY);
+			ctx.lineTo(startX + lx, startY + ly);
 			ctx.stroke();
 		};
-		drawLaserLine(p.w * 0.65, laserColor);
-		drawLaserLine(p.w * 0.45, "white");
+		drawLaserLine(pw * 0.65, laserColor);
+		drawLaserLine(pw * 0.45, "white");
 		p.shooting_laser = false;
 	}
-	if (g.settings.player_draw_gun && cfg && !cfg.isMelee && !cfg
-		.doNotDrawGun) {
-		let mx, my, cx = 0,
-			cy = 0;
-		if (p.ai_controlled) {
-			let target = game_object_find_closest(g, p.body.position.x, p.body
-				.position.y, "enemy", 1000);
-			mx = target ? target.data.body.position.x : p.body.position.x + 1;
-			my = target ? target.data.body.position.y : p.body.position.y;
-			cx = p.body.position.x;
-			cy = p.body.position.y;
-		}
-		else if (g.mobile) {
-			mx = g.input.joystick.left.dx || g.input.joystick.right.dx || -1;
-			my = g.input.joystick.left.dy || g.input.joystick.right.dy || 1;
-		}
-		else {
-			mx = g.input.mouse.x;
-			my = g.input.mouse.y;
-			cx = 0.5 * window.innerWidth;
-			cy = 0.5 * window.innerHeight;
-		}
-		let gx = mx - cx,
-			gy = my - cy,
-			dist = Math.sqrt(gx * gx + gy * gy) || 1;
-		let lw = (cfg.width || 1) * 0.25 * p.w;
-		let gl = cfg.length || 0.8;
-		let strokeColor = cfg.dynamicColor ? cfg.dynamicColor(p) : (cfg.color ||
-			"black");
-		const renderGunPath = (startX, startY) => {
-			ctx.strokeStyle = strokeColor;
-			ctx.lineWidth = lw;
-			ctx.beginPath();
-			ctx.moveTo(startX, startY);
-			ctx.lineTo(startX + gl * p.w * gx / dist, startY + gl * p.h *
-				gy / dist);
-			ctx.stroke();
-		};
-		let px = (selected_item === ITEM_LASER_GUN) ? p.body.position.x : p.body
-			.position.x - 0.45 * p.w;
-		let py = (selected_item === ITEM_LASER_GUN) ? p.body.position.y : p.body
-			.position.y - 0.45 * p.h;
-		if (cfg.hasSecondary) {
-			renderGunPath(p.body.position.x + 0.55 * p.w, p.body.position.y -
-				0.45 * p.h);
-		}
-		renderGunPath(px, py);
-		if (cfg.renderExtra) cfg.renderExtra(ctx, p, {
-			gx,
-			gy,
-			dist
-		}, {
-			px,
-			py
-		}, lw, gl);
-		ctx.lineWidth = 2;
-	}
-	else if (p.sword_visible) {
-		let px = p.body.position.x - p.w * 0.45;
-		let py = p.body.position.y - p.h * 0.45;
-		let swLen = 100;
-		let col = "#55aa11";
-		let swWidth = 0.25 * p.w;
-		if (selected_item === ITEM_HORN)
-			col = "brown";
-		if (selected_item === ITEM_STICK) {
-			col = "brown";
-			swLen = 0.5 * (50 + 75);
-			swWidth = 0.5 * 0.25 * p.w;
-		}
-		ctx.beginPath();
-		ctx.strokeStyle = col;
-		ctx.lineWidth = swWidth;
-		ctx.moveTo(px, py);
-		let dx = Math.cos(p.sword_direction) * swLen;
-		let dy = Math.sin(p.sword_direction) * swLen;
-		ctx.lineTo(px + dx, py + dy);
-		ctx.stroke();
-		if (selected_item === ITEM_HORN) {
-			drawLine(ctx, px + 0.4 * dx, py + 0.4 * dy, px + 0.95 * dx - 0.25 *
-				dy, py + 0.95 * dy + 0.25 * dx, "brown", p.w * 0.2);
-			drawLine(ctx, px + 0.3 * dx, py + 0.3 * dy, px + 0.85 * dx + 0.25 *
-				dy, py + 0.85 * dy - 0.25 * dx, "brown", p.w * 0.2);
-		}
-		p.sword_visible = false;
-	}
-	else if (selected_item > 0) {
-		item_icon_draw(ctx, selected_item, p.body.position.x - 0.25 * p.w, p
-			.body.position.y - 0.25 * p.h, 0.5 * p.w, 0.5 * p.h, p
-			.item_animstate);
-	}
+	ctx.restore();
+	const drawStat = (val, max, offset, color) => {
+		ctx.fillStyle = "red";
+		ctx.fillRect(posX - pw / 2, posY - offset * ph, pw, ph * 0.05);
+		ctx.fillStyle = color;
+		ctx.fillRect(posX - pw / 2, posY - offset * ph, pw * Math.max(val,
+			0) / max, ph * 0.05);
+	};
+	if (g.settings.indicators["show player health"]) drawStat(p.health, p
+		.max_health, 0.9, "lime");
+	if (g.settings.indicators["show player thirst"]) drawStat(p.thirst, p
+		.max_thirst, 0.8, "cyan");
+	if (g.settings.indicators["show player hunger"]) drawStat(p.hunger, p
+		.max_hunger, 0.7, "orange");
 	const renderShield = (health, max, fill, stroke) => {
 		if (health <= 0) return;
 		ctx.fillStyle = "gray";
-		ctx.fillRect(p.body.position.x - 1.25 * p.w, p.body.position.y -
-			1.85 * p.h, 2.5 * p.w, p.h * 0.05);
+		ctx.fillRect(posX - 1.25 * pw, posY - 1.85 * ph, 2.5 * pw, ph *
+			0.05);
 		ctx.fillStyle = fill;
-		ctx.fillRect(p.body.position.x - 1.25 * p.w, p.body.position.y -
-			1.85 * p.h, 2.5 * p.w * health / max, p.h * 0.05);
+		ctx.fillRect(posX - 1.25 * pw, posY - 1.85 * ph, 2.5 * pw * health /
+			max, ph * 0.05);
 		ctx.globalAlpha = 0.25;
-		drawCircle(ctx, p.body.position.x, p.body.position.y, 62.5, fill,
-			stroke, 0.05 * p.w);
+		drawCircle(ctx, posX, posY, 1.5 * pw, fill, stroke, 0.05 * pw);
 		ctx.globalAlpha = 1.0;
 	};
 	renderShield(p.shield_blue_health, p.shield_blue_health_max, "#1177aa",
@@ -778,10 +875,10 @@ function player_draw(player_object, ctx) {
 		let gre = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) +
 			Math.sin(0.1 * p.item_animstate)) * 15, 2));
 		let b = Math.floor(Math.pow(Math.sin(0.1 * p.item_animstate) * 15, 2));
-		let rColor = "#" + r.toString(16).padStart(2, '0') + gre.toString(16)
+		let rCol = "#" + r.toString(16).padStart(2, '0') + gre.toString(16)
 			.padStart(2, '0') + b.toString(16).padStart(2, '0');
-		renderShield(p.shield_rainbow_health, p.shield_rainbow_health_max,
-			rColor, "white");
+		renderShield(p.shield_rainbow_health, p.shield_rainbow_health_max, rCol,
+			"white");
 	}
 }
 

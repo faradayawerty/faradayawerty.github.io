@@ -1,15 +1,15 @@
 function animal_create(g, x, y, type = "deer") {
 	let config = {
 		"raccoon": {
-			w: 20,
-			h: 20,
+			w: 30,
+			h: 30,
 			hp: 30,
 			speed: 8.5
 		},
 		"deer": {
-			w: 27.5,
-			h: 27.5,
-			hp: 50,
+			w: 45,
+			h: 45,
+			hp: 60,
 			speed: 6.25
 		},
 		"snake": {
@@ -55,6 +55,9 @@ function animal_create(g, x, y, type = "deer") {
 		},
 		is_minion: true
 	};
+	if (type === "deer") {
+		Matter.Body.setInertia(a.body, Infinity);
+	}
 	Matter.Composite.add(g.engine.world, a.body);
 	return game_object_create(
 		g,
@@ -154,21 +157,146 @@ function animal_update(ao, dt) {
 	}
 }
 
-function animal_deer_draw_horns(ctx, x, y, w) {
-	ctx.strokeStyle = "brown";
-	ctx.lineWidth = 0.1 * w;
-	drawLine(ctx, x - 0.5 * w, y - 0.5 * w, x - 0.525 * w, y - 0.75 * w,
-		"brown", 0.1 * w);
-	drawLine(ctx, x - 0.525 * w, y - 0.75 * w, x - 0.95 * w, y - 1 * w, "brown",
-		0.1 * w);
-	drawLine(ctx, x - 0.525 * w, y - 0.75 * w, x - 0.475 * w, y - 1.05 * w,
-		"brown", 0.1 * w);
-	drawLine(ctx, x + 0.5 * w, y - 0.5 * w, x + 0.525 * w, y - 0.75 * w,
-		"brown", 0.1 * w);
-	drawLine(ctx, x + 0.525 * w, y - 0.75 * w, x + 0.95 * w, y - 1 * w, "brown",
-		0.1 * w);
-	drawLine(ctx, x + 0.525 * w, y - 0.75 * w, x + 0.475 * w, y - 1.05 * w,
-		"brown", 0.1 * w);
+function drawLine(ctx, x1, y1, x2, y2, color, width) {
+	ctx.strokeStyle = color;
+	ctx.lineWidth = width;
+	ctx.lineCap = "round";
+	ctx.beginPath();
+	ctx.moveTo(x1, y1);
+	ctx.lineTo(x2, y2);
+	ctx.stroke();
+	ctx.strokeStyle = "rgba(0,0,0,0.3)";
+	ctx.lineWidth = 1;
+	ctx.stroke();
+}
+
+function animal_deer_draw(ctx, x, y, w, h, body) {
+	const time = Date.now() * 0.005;
+	const isMoving = Math.abs(body.velocity.x) > 0.1 || Math.abs(body.velocity
+		.y) > 0.1;
+	const flip = body.velocity.x < 0 ? -1 : 1;
+	const cMain = "#3d2511";
+	const cDark = "#1a0f07";
+	const cLight = "#8b6b4d";
+	const cHorn = "#f2d291";
+	const cHoof = "#000000";
+	ctx.save();
+	ctx.translate(x, y);
+	ctx.scale(flip, 1);
+	const legWalk = isMoving ? Math.sin(time * 1.5) : 0;
+	const legDist = w * 0.3;
+	drawComplexLeg(ctx, -legDist, h * 0.1, legWalk, cDark, cHoof, w, h);
+	drawComplexLeg(ctx, legDist * 0.6, h * 0.1, -legWalk, cDark, cHoof, w, h);
+	ctx.fillStyle = cMain;
+	ctx.strokeStyle = cDark;
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.rect(-w * 0.5, -h * 0.35, w, h * 0.65);
+	ctx.fill();
+	ctx.stroke();
+	ctx.strokeStyle = "rgba(0,0,0,0.2)";
+	ctx.beginPath();
+	ctx.moveTo(-w * 0.1, -h * 0.2);
+	ctx.lineTo(-w * 0.1, h * 0.15);
+	ctx.stroke();
+	ctx.save();
+	ctx.translate(w * 0.45, -h * 0.25);
+	const neckShake = isMoving ? Math.sin(time * 2.5) * 0.05 : 0;
+	ctx.rotate(neckShake);
+	ctx.fillStyle = cMain;
+	ctx.beginPath();
+	ctx.moveTo(-w * 0.2, h * 0.5);
+	ctx.lineTo(w * 0.1, h * 0.5);
+	ctx.lineTo(w * 0.15, -h * 0.1);
+	ctx.lineTo(-w * 0.15, -h * 0.1);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+	ctx.translate(w * 0.05, -h * 0.1);
+	ctx.save();
+	ctx.translate(0, -h * 0.1);
+	drawHorns(ctx, cHorn, w, h);
+	ctx.restore();
+	ctx.fillStyle = cMain;
+	ctx.beginPath();
+	ctx.moveTo(-w * 0.15, -h * 0.15);
+	ctx.lineTo(w * 0.05, -h * 0.12);
+	ctx.lineTo(w * 0.3, h * 0.05);
+	ctx.lineTo(w * 0.3, h * 0.15);
+	ctx.lineTo(w * 0.05, h * 0.2);
+	ctx.lineTo(-w * 0.15, h * 0.1);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+	ctx.strokeStyle = cDark;
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.moveTo(w * 0.02, h * -0.02);
+	ctx.lineTo(w * 0.15, h * 0.03);
+	ctx.stroke();
+	ctx.fillStyle = "#fff";
+	ctx.beginPath();
+	ctx.moveTo(w * 0.05, h * 0.03);
+	ctx.lineTo(w * 0.14, h * 0.06);
+	ctx.lineTo(w * 0.06, h * 0.08);
+	ctx.closePath();
+	ctx.fill();
+	ctx.fillStyle = "#000";
+	ctx.beginPath();
+	ctx.arc(w * 0.09, h * 0.05, 1.5, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.fillStyle = cDark;
+	ctx.beginPath();
+	ctx.arc(w * 0.26, h * 0.1, 1.5, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.restore();
+	drawComplexLeg(ctx, -legDist * 0.5, h * 0.15, -legWalk, cMain, cHoof, w, h);
+	drawComplexLeg(ctx, legDist * 0.6, h * 0.15, legWalk, cMain, cHoof, w, h);
+	ctx.restore();
+}
+
+function drawComplexLeg(ctx, x, y, phase, color, hoofColor, w, h) {
+	ctx.save();
+	ctx.translate(x, y);
+	const knee = Math.sin(phase) * 0.4;
+	const foot = Math.cos(phase) * 0.2;
+	ctx.strokeStyle = color;
+	ctx.lineWidth = w * 0.15;
+	ctx.lineCap = "square";
+	ctx.beginPath();
+	ctx.moveTo(0, 0);
+	const kX = knee * w * 0.3;
+	const kY = h * 0.35;
+	ctx.lineTo(kX, kY);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.lineWidth = w * 0.11;
+	ctx.moveTo(kX, kY);
+	const fX = kX + foot * w * 0.2;
+	const fY = h * 0.6;
+	ctx.lineTo(fX, fY);
+	ctx.stroke();
+	ctx.fillStyle = hoofColor;
+	ctx.fillRect(fX - w * 0.07, fY, w * 0.14, h * 0.1);
+	ctx.restore();
+}
+
+function drawHorns(ctx, color, w, h) {
+	ctx.strokeStyle = color;
+	ctx.lineWidth = w * 0.06;
+	ctx.lineCap = "round";
+	[-1, 1].forEach(side => {
+		ctx.beginPath();
+		ctx.moveTo(side * w * 0.05, 0);
+		ctx.quadraticCurveTo(side * w * 0.4, -h * 0.5, side * w * 0.2, -
+			h * 0.8);
+		ctx.stroke();
+		ctx.lineWidth = w * 0.035;
+		ctx.beginPath();
+		ctx.moveTo(side * w * 0.25, -h * 0.4);
+		ctx.lineTo(side * w * 0.5, -h * 0.55);
+		ctx.stroke();
+	});
 }
 
 function animal_raccoon_draw(ctx, x, y, w, h, a) {
@@ -228,8 +356,10 @@ function animal_draw(ao, ctx) {
 	else if (a.type === "scorpion") {
 		animal_scorpion_draw(ctx, x, y, a.w, a.h, angle);
 	}
+	else if (a.type === "deer") {
+		animal_deer_draw(ctx, x, y, a.w, a.h, a.body);
+	}
 	else {
-		animal_deer_draw_horns(ctx, x, y, a.w);
 		fillMatterBody(ctx, a.body, "#aa8844");
 		drawMatterBody(ctx, a.body, "white", 0.05 * a.w);
 	}
@@ -459,4 +589,94 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 			.color_gradient + i + 1) * 5);
 		ctx.stroke();
 	}
+}
+
+function animal_deer_boss_render(ctx, x, y, w, h, e) {
+	const flip = e.body.velocity.x < 0 ? -1 : 1;
+	const isMoving = Math.abs(e.body.velocity.x) > 0.1 || Math.abs(e.body
+		.velocity.y) > 0.1;
+	const time = Date.now() * 0.005;
+	const cMain = e.color || "#3d2511";
+	const cDark = "#1a0f07";
+	const cHorn = "#f2d291";
+	const cEye = e.eye_color || "red";
+	ctx.save();
+	ctx.translate(x, y);
+	ctx.scale(flip, 1);
+	const legW = w * 0.15;
+	const legH = h * 0.5;
+	const walkCycle = isMoving ? Math.sin(time * 2) * 0.3 : 0;
+	ctx.fillStyle = cMain;
+	ctx.strokeStyle = cDark;
+	ctx.lineWidth = 2;
+	[-0.3, 0.3].forEach((pos, i) => {
+		ctx.save();
+		ctx.translate(pos * w, h * 0.2);
+		ctx.rotate(i % 2 === 0 ? walkCycle : -walkCycle);
+		ctx.beginPath();
+		ctx.rect(-legW / 2, 0, legW, legH);
+		ctx.fill();
+		ctx.stroke();
+		ctx.fillStyle = "black";
+		ctx.fillRect(-legW / 2, legH, legW, h * 0.1);
+		ctx.restore();
+	});
+	ctx.fillStyle = cMain;
+	ctx.beginPath();
+	ctx.rect(-w * 0.5, -h * 0.35, w, h * 0.7);
+	ctx.fill();
+	ctx.stroke();
+	ctx.save();
+	ctx.translate(w * 0.4, -h * 0.2);
+	ctx.rotate(-Math.PI / 4 + (isMoving ? Math.sin(time * 3) * 0.05 : 0));
+	ctx.beginPath();
+	ctx.rect(0, -h * 0.15, w * 0.4, h * 0.3);
+	ctx.fill();
+	ctx.stroke();
+	ctx.translate(w * 0.4, 0);
+	ctx.rotate(Math.PI / 4);
+	ctx.beginPath();
+	ctx.moveTo(-w * 0.15, -h * 0.15);
+	ctx.lineTo(w * 0.2, -h * 0.1);
+	ctx.lineTo(w * 0.3, h * 0.05);
+	ctx.lineTo(w * 0.25, h * 0.15);
+	ctx.lineTo(-w * 0.15, h * 0.2);
+	ctx.closePath();
+	ctx.fill();
+	ctx.stroke();
+	ctx.strokeStyle = cHorn;
+	ctx.lineWidth = w * 0.05;
+	[-1, 1].forEach(side => {
+		ctx.save();
+		ctx.translate(0, -h * 0.1);
+		ctx.beginPath();
+		ctx.moveTo(0, 0);
+		ctx.quadraticCurveTo(side * w * 0.4, -h * 0.6, side * w * 0.2, -
+			h * 0.9);
+		ctx.stroke();
+		ctx.lineWidth = w * 0.02;
+		ctx.beginPath();
+		ctx.moveTo(side * w * 0.2, -h * 0.4);
+		ctx.lineTo(side * w * 0.5, -h * 0.6);
+		ctx.moveTo(side * w * 0.15, -h * 0.6);
+		ctx.lineTo(side * w * 0.4, -h * 0.8);
+		ctx.stroke();
+		ctx.restore();
+	});
+	ctx.fillStyle = cEye;
+	ctx.shadowBlur = 10;
+	ctx.shadowColor = cEye;
+	ctx.beginPath();
+	ctx.moveTo(w * 0.05, 0);
+	ctx.lineTo(w * 0.18, h * 0.05);
+	ctx.lineTo(w * 0.05, h * 0.08);
+	ctx.closePath();
+	ctx.fill();
+	ctx.shadowBlur = 0;
+	ctx.fillStyle = "black";
+	ctx.beginPath();
+	ctx.arc(w * 0.25, h * 0.08, w * 0.02, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.restore();
+	ctx.restore();
 }

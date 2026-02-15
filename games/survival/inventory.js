@@ -55,14 +55,14 @@ function inventory_draw(inventory_element, ctx) {
 			ctx.save();
 			ctx.globalAlpha = 0.9;
 			if (inv.imove === i && inv.jmove === j)
-				ctx.fillStyle = "orange";
+				ctx.fillStyle = "#ff9d00";
 			else if (inv.iselected === i && inv.jselected === j)
-				ctx.fillStyle = "cyan";
+				ctx.fillStyle = "#00f2ff";
 			else
-				ctx.fillStyle = "blue";
+				ctx.fillStyle = "#4d4dff";
 			ctx.fillRect(sx, sy, inv.slot_size, inv.slot_size);
 			if (i === 0) {
-				ctx.strokeStyle = "#3ee";
+				ctx.strokeStyle = "#00ffff";
 				ctx.lineWidth = inv.slot_size * 0.0125;
 				ctx.strokeRect(sx, sy, inv.slot_size, inv.slot_size);
 			}

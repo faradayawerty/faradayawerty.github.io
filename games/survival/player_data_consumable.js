@@ -1,8 +1,39 @@
 const ITEM_BEHAVIORS = {
 	[ITEM_DIARY]: {
 		action: (p, player_obj) => {
-			const title = "Дневник выжившего";
-			const text = [
+			const isEn = player_obj.game.settings.language ===
+				"english";
+			const title = isEn ? "Survivor's Diary" :
+				"Дневник выжившего";
+			const textEn = [
+				"Entry One. They say a person gets used to anything. They're lying. You can't get used ",
+				"to the fact that in the mornings you no longer hear the hum of cars or children's ",
+				"shouts in the yard. Now the morning smells of burning and wet concrete. The city ",
+				"hasn't died—it's been gutted, left to rot under a gray sky. We've become shadows ",
+				"in a world we once built for living, not for hiding.\n\n",
+				"Entry Five. I saw a woman today in the window of a luxury boutique. She was ",
+				"just standing there, among the mannequins, in a torn silk dress. Her face... ",
+				"or rather, what was left of it, was turned toward the sun. She wasn't snarling. ",
+				"She just froze, as if trying to remember what it was like to be beautiful. ",
+				"I walked past, clutching a rusty piece of rebar. My compassion burned out ",
+				"along with the last working power plant.\n\n",
+				"Entry Eleven. My wallet is still in my pocket. Inside are family photos and a ",
+				"stack of bills that could have bought a car a month ago. Now, they won't even ",
+				"get you a dried bread crust. It's strange how quickly civilization crumbled ",
+				"like cheap plaster. We saved money, made plans, worried about traffic jams... ",
+				"What idiots we were.\n\n",
+				"Entry Fourteen. The nights have grown colder. They are more active in the dark. ",
+				"I sit in the basement, listening to water dripping outside the door, praying ",
+				"to all the gods I used to mock. The scariest thing isn't the dead. The scariest ",
+				"thing is when you catch your reflection in a puddle and realize there's just ",
+				"as much life left in your eyes as there is in theirs. We just haven't fallen yet.\n\n",
+				"If someone finds this notebook—it means I've finally found my silence. Don't ",
+				"look for heroes. There are none here. Only those who know how to run fast and ",
+				"shut their mouths in time remain. Don't trust the lights on the horizon. ",
+				"Lights attract more than just people.\n\n",
+				"Goodbye. And if you can, don't forget the taste of warm bread."
+			].join('');
+			const textRu = [
 				"Запись первая. Говорят, человек привыкает ко всему. Врут. Нельзя привыкнуть ",
 				"к тому, что по утрам ты больше не слышишь шума машин или криков детей во ",
 				"дворе. Теперь утро пахнет гарью и мокрым бетоном. Город не умер — его ",
@@ -31,14 +62,31 @@ const ITEM_BEHAVIORS = {
 				"Огни привлекают не только людей.\n\n",
 				"Прощайте. И, если сможете, не забывайте вкус горячего хлеба."
 			].join('');
-			player_show_note(p, title, text);
+			player_show_note(p, title, isEn ? textEn : textRu);
 			return false;
 		}
 	},
 	[ITEM_SURVIVOR_NOTE]: {
 		action: (p, player_obj) => {
-			const title = "Помятая записка";
-			const text = [
+			const isEn = player_obj.game.settings.language ===
+				"english";
+			const title = isEn ? "Crumpled Note" : "Помятая записка";
+			const textEn = [
+				"Today I found an old shoe in a pile of trash. Just one. The second one probably ",
+				"stayed rotting somewhere on the other side of the city along with its owner. ",
+				"I used to just walk past, but now... I looked at the sole and thought about ",
+				"how this person was going somewhere. Maybe on a date? Or to a job they hated?\n\n",
+				"It's amazing how quickly the world turned into a junkyard of memories. We ",
+				"collect tin cans and rejoice at a sip of clean water as if it were a treasure. ",
+				"And yet, once, the scariest thing in life was forgetting to charge your phone ",
+				"or losing your wallet.\n\n",
+				"Now my wallet is full of paper that isn't worth even a single bullet. The ",
+				"hardest part isn't the hunger or the dead outside the wall. The hardest part ",
+				"is when night falls, and in this cursed silence, you start to remember the ",
+				"taste of warm bread and your mother's voice.I hope someone finds this note. ",
+				"Just so they know—we were here. We were alive."
+			].join('');
+			const textRu = [
 				"Сегодня я нашел в куче мусора старый ботинок. Один. Второй, наверное, ",
 				"так и остался гнить где-то на другом конце города вместе с владельцем. ",
 				"Раньше я бы просто прошел мимо, но сейчас... я смотрел на подошву и ",
@@ -55,7 +103,7 @@ const ITEM_BEHAVIORS = {
 				"записку кто-нибудь найдет. Просто чтобы знать — мы здесь были. ",
 				"Мы были живыми."
 			].join('');
-			player_show_note(p, title, text);
+			player_show_note(p, title, isEn ? textEn : textRu);
 			return false;
 		}
 	},

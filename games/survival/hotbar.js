@@ -56,7 +56,7 @@ function hotbar_draw(hotbar_object, ctx) {
 	}
 	for (let i = 0; i < hb.row.length; i++) {
 		ctx.globalAlpha = 0.9;
-		ctx.fillStyle = (hb.iselected == i) ? "cyan" : "blue";
+		ctx.fillStyle = (hb.iselected == i) ? "#00f2ff" : "#4d4dff";
 		ctx.fillRect(start_x + step * i, start_y, s, s);
 		ctx.globalAlpha = 1.0;
 		item_icon_draw(ctx, hb.row[i], start_x + step * i, start_y, s, s, hb
@@ -280,14 +280,14 @@ function hotbar_draw(hotbar_object, ctx) {
 		}
 		else if (hb.hovered_btn === 'ach') {
 			if (lang === "русский") {
-				title = "Достижения";
+				title = "Задания";
 				description =
-					"Ваш гайд в мир игры. Почаще поглядывайте сюда, чтобы не запутаться. Получить информацию о достижении можно наведя на его иконку курсор.";
+					"Ваш гайд в мир игры. Почаще поглядывайте сюда, чтобы не запутаться. Получить информацию о задании можно наведя на его иконку курсор.";
 			}
 			else {
-				title = "Achievements";
+				title = "Tasks";
 				description =
-					"Your guide to the game world. Take a look here if you ever feel lost. Hover over the achievement to get the information on it.";
+					"Your guide to the game world. Take a look here if you ever feel lost. Hover over the task to get the information on it.";
 			}
 		}
 		if (title !== "") {
