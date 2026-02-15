@@ -19,6 +19,7 @@ function menu_create() {
 		want_debug: false,
 		want_save: false,
 		want_load: false,
+		want_ui_scale: 100,
 		death_message: "DEATH",
 		want_indicators: {
 			"show player health": true,
@@ -61,6 +62,7 @@ function menu_create() {
 			"respawn and continue game",
 		],
 		settings_buttons: [
+			"ui scale",
 			"player color",
 			"player draw gun",
 			"automatic aim",
@@ -128,6 +130,10 @@ function menu_create() {
 			}
 			if (data.volume !== undefined)
 				GLOBAL_VOLUME = data.volume;
+			if (data.want_ui_scale !== undefined)
+				m.want_ui_scale = data.want_ui_scale;
+			else
+				m.want_ui_scale = 100;
 			console.log("Загруженные настройки:", data);
 		}
 		catch (e) {
@@ -195,6 +201,9 @@ function menu_draw(ctx, m) {
 		else if (m.buttons[i] == "volume")
 			text = menu_translate(m.want_language, text) + ": " +
 			GLOBAL_VOLUME + "%";
+		else if (m.buttons[i] == "ui scale")
+			text = menu_translate(m.want_language, text) + ": " +
+			m.want_ui_scale + "%";
 		else
 			text = menu_translate(m.want_language, text);
 		if (text.length > 0 && text[0] == "~")
@@ -218,6 +227,7 @@ function menu_update(m, dt, input) {
 			changed = true;
 		}
 	}
+	let is_right_click = isMouseRightButtonPressed(input);
 	let would_be_able_to_touch_button = false;
 	for (let i = 0; i < m.buttons.length; i++)
 		if ((!m.mobile && doRectsCollide(input.mouse.x / get_scale(), input
@@ -251,11 +261,17 @@ function menu_update(m, dt, input) {
 				true)) && m.iselected > 0) {
 		m.iselected -= 1;
 	}
-	else if (isMouseRightButtonPressed(input) && m.buttons[m.iselected] ==
-		"volume") {
+	else if (is_right_click && m.buttons[m.iselected] == "volume") {
 		GLOBAL_VOLUME = GLOBAL_VOLUME - 10;
 		if (GLOBAL_VOLUME < 0)
 			GLOBAL_VOLUME = 100;
+		changed = true;
+	}
+	else if (is_right_click && m.buttons[m.iselected] == "ui scale") {
+		m.want_ui_scale = m.want_ui_scale - 10;
+		if (m.want_ui_scale < 50)
+			m.want_ui_scale = 200;
+		changed = true;
 	}
 	else if (m.pressed_previous_frame && !m.pressed_this_frame) {
 		m.iselected = m.iselected_last_frame;
@@ -313,6 +329,11 @@ function menu_update(m, dt, input) {
 			GLOBAL_VOLUME = GLOBAL_VOLUME + 10;
 			if (GLOBAL_VOLUME > 100)
 				GLOBAL_VOLUME = 0;
+		}
+		else if (m.buttons[m.iselected] == "ui scale") {
+			m.want_ui_scale = m.want_ui_scale + 10;
+			if (m.want_ui_scale > 200)
+				m.want_ui_scale = 50;
 		}
 		else if (m.buttons[m.iselected] == "indicators") {
 			m.buttons = m.indicators_settings;
@@ -453,6 +474,8 @@ function menu_translate(lang, str) {
 			str = "индикаторы";
 		else if (str == "volume")
 			str = "громкость";
+		else if (str == "ui scale")
+			str = "масштаб интерфейса";
 		else if (str == "back to settings")
 			str = "назад к настройкам";
 		else if (str == "enemies spawn")
@@ -539,7 +562,8 @@ function menu_save_settings(m) {
 		want_auto_aim: m.want_auto_aim,
 		want_indicators: m.want_indicators,
 		want_auto_pickup: m.want_auto_pickup,
-		volume: GLOBAL_VOLUME
+		volume: GLOBAL_VOLUME,
+		want_ui_scale: m.want_ui_scale
 	};
 	localStorage.setItem("game_settings", JSON.stringify(settings));
 }

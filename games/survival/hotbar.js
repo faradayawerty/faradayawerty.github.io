@@ -507,7 +507,7 @@ function hotbar_update(hotbar_element, dt) {
 			hb.did_want_menu = false;
 		}
 		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s,
-			s)) {
+				s)) {
 			if (inv_el && !inv_el._mob_toggle_lock) {
 				let ash = hotbar_element.game.gui_elements.find(e => e.name ==
 					"achievements shower");
@@ -518,7 +518,7 @@ function hotbar_update(hotbar_element, dt) {
 			}
 		}
 		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s,
-			s)) {
+				s)) {
 			let ach_el = hb.attached_to_object.data.achievements_element;
 			if (ach_el) {
 				let ash = hotbar_element.game.gui_elements.find(e => e.name ==
@@ -533,7 +533,7 @@ function hotbar_update(hotbar_element, dt) {
 				let player = hb.attached_to_object;
 				if (overFood) {
 					let item = inventory_has_item_from_list(inv_el,
-					ITEMS_FOODS);
+						ITEMS_FOODS);
 					if (item !== -1) player_item_consume(player, item, true);
 				}
 				else if (overWater) {

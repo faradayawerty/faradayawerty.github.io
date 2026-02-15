@@ -98,7 +98,9 @@
 		let DEBUG_INDEX = false;
 
 		function get_scale() {
-			return Math.min(window.innerWidth / 1200, window.innerHeight / 1200);
+			let k = game1.mobile ? 1200 : 1500;
+			k /= menu1.want_ui_scale / 100;
+			return Math.min(window.innerWidth / k, window.innerHeight / k);
 		}
 
 		function resize() {
