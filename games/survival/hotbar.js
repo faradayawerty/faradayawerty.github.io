@@ -78,9 +78,39 @@ function hotbar_draw(hotbar_object, ctx) {
 			ctx.strokeRect(x, y_off, s, s);
 		}
 	};
+	const drawIndicator = (ix, iy, val, max, colorEmpty, colorFull, itemKey,
+		type) => {
+		if (!hotbar_object.game.mobile && hb.hovered_btn === type) {
+			ctx.fillStyle = "#6699ff";
+			ctx.globalAlpha = 0.8;
+			ctx.fillRect(ix, iy, s, s);
+		}
+		ctx.save();
+		ctx.globalAlpha = 0.6;
+		ctx.fillStyle = colorEmpty;
+		ctx.fillRect(ix, iy, s, s);
+		let ratio = Math.max(0, Math.min(1, val / max));
+		ctx.fillStyle = colorFull;
+		let fillH = s * ratio;
+		ctx.fillRect(ix, iy + (s - fillH), s, fillH);
+		ctx.strokeStyle = (hb.hovered_btn === type) ? "white" :
+			"rgba(255,255,255,0.4)";
+		ctx.lineWidth = 2;
+		ctx.strokeRect(ix, iy, s, s);
+		let iconPadding = s * 0.2;
+		let iconSize = s - iconPadding * 2;
+		if (ITEMS_DATA[itemKey] && ITEMS_DATA[itemKey].render) {
+			ctx.globalAlpha = 0.85;
+			ITEMS_DATA[itemKey].render(ctx, ix + iconPadding, iy +
+				iconPadding, iconSize, iconSize, 0.25 * hb
+				.animation_state);
+		}
+		ctx.restore();
+	};
 	let p = hb.attached_to_object.data;
 	let isMobile = hotbar_object.game.mobile;
 	let btn_menu_x, btn_menu_y, btn_inv_x, btn_inv_y, btn_ach_x, btn_ach_y;
+	let res_x_base, res_y_base, res_step_x, res_step_y;
 	if (isMobile) {
 		let col_res_x = start_x + step * hb.row.length;
 		let col_sys_x = col_res_x + step;
@@ -90,69 +120,10 @@ function hotbar_draw(hotbar_object, ctx) {
 		btn_inv_y = start_y + step;
 		btn_ach_x = col_sys_x;
 		btn_ach_y = start_y + step * 2;
-		const drawIndicator = (ix, iy, val, max, colorEmpty, colorFull,
-			itemKey) => {
-			ctx.save();
-			ctx.globalAlpha = 0.6;
-			ctx.fillStyle = colorEmpty;
-			ctx.fillRect(ix, iy, s, s);
-			let ratio = Math.max(0, Math.min(1, val / max));
-			ctx.fillStyle = colorFull;
-			let fillH = s * ratio;
-			ctx.fillRect(ix, iy + (s - fillH), s, fillH);
-			ctx.strokeStyle = "rgba(255,255,255,0.4)";
-			ctx.lineWidth = 2;
-			ctx.strokeRect(ix, iy, s, s);
-			let iconPadding = s * 0.2;
-			let iconSize = s - iconPadding * 2;
-			if (ITEMS_DATA[itemKey] && ITEMS_DATA[itemKey].render) {
-				ctx.globalAlpha = 0.85;
-				ITEMS_DATA[itemKey].render(ctx, ix + iconPadding, iy +
-					iconPadding, iconSize, iconSize, 0.25 * hb
-					.animation_state);
-			}
-			ctx.restore();
-		};
-		drawIndicator(col_res_x, start_y, p.hunger, p.max_hunger, "#331100",
-			"#ff8800", ITEM_APPLE);
-		drawIndicator(col_res_x, start_y + step, p.thirst, p.max_thirst,
-			"#001144", "#1177dd", ITEM_WATER);
-		drawIndicator(col_res_x, start_y + step * 2, p.health, p.max_health,
-			"#880000", "#22ff22", ITEM_HEALTH);
-		if (hb.has_shield_button) {
-			let sVal = 0,
-				sMax = 100,
-				sIcon = ITEM_SHIELD_GRAY,
-				sColor = "#00ffff";
-			if (p.shield_rainbow_health > 0) {
-				sVal = p.shield_rainbow_health;
-				sMax = p.shield_rainbow_health_max;
-				sIcon = ITEM_SHIELD_RAINBOW;
-				let r = Math.floor(Math.pow(Math.cos(0.025 * hb
-					.animation_state) * 15, 2));
-				let g = Math.floor(Math.pow(0.7 * (Math.cos(0.025 * hb
-					.animation_state) + Math.sin(0.025 * hb
-					.animation_state)) * 15, 2));
-				let b = Math.floor(Math.pow(Math.sin(0.025 * hb
-					.animation_state) * 15, 2));
-				sColor = "#" + r.toString(16).padStart(2, '0') + g.toString(16)
-					.padStart(2, '0') + b.toString(16).padStart(2, '0');
-			}
-			else if (p.shield_green_health > 0) {
-				sVal = p.shield_green_health;
-				sMax = p.shield_green_health_max;
-				sIcon = ITEM_SHIELD_GREEN;
-				sColor = "lime";
-			}
-			else if (p.shield_blue_health > 0) {
-				sVal = p.shield_blue_health;
-				sMax = p.shield_blue_health_max;
-				sIcon = ITEM_SHIELD;
-				sColor = "#00ffff";
-			}
-			drawIndicator(col_res_x, start_y + step * 3, sVal, sMax, "#444444",
-				sColor, sIcon);
-		}
+		res_x_base = col_res_x;
+		res_y_base = start_y;
+		res_step_x = 0;
+		res_step_y = step;
 	}
 	else {
 		let offset_x = start_x + step * hb.row.length + (step * 0.5);
@@ -162,6 +133,62 @@ function hotbar_draw(hotbar_object, ctx) {
 		btn_inv_y = start_y;
 		btn_ach_x = offset_x + step * 2;
 		btn_ach_y = start_y;
+		res_x_base = offset_x + step * 3.5;
+		res_y_base = start_y;
+		res_step_x = step;
+		res_step_y = 0;
+	}
+	drawIndicator(res_x_base, res_y_base, p.hunger, p.max_hunger, "#331100",
+		"#ff8800", ITEM_APPLE, 'food');
+	drawIndicator(res_x_base + res_step_x, res_y_base + res_step_y, p.thirst, p
+		.max_thirst, "#001144", "#1177dd", ITEM_WATER, 'water');
+	drawIndicator(res_x_base + res_step_x * 2, res_y_base + res_step_y * 2, p
+		.health, p.max_health, "#880000", "#22ff22", ITEM_HEALTH, 'health');
+	if (hb.has_shield_button) {
+		let sVal = 0,
+			sMax = 100,
+			sIcon = ITEM_SHIELD_GRAY,
+			sColor = "#00ffff";
+		if (p.shield_rainbow_health > 0) {
+			sVal = p.shield_rainbow_health;
+			sMax = p.shield_rainbow_health_max;
+			sIcon = ITEM_SHIELD_RAINBOW;
+			let r = Math.floor(Math.pow(Math.cos(0.025 * hb.animation_state) *
+				15, 2));
+			let g = Math.floor(Math.pow(0.7 * (Math.cos(0.025 * hb
+				.animation_state) + Math.sin(0.025 * hb
+				.animation_state)) * 15, 2));
+			let b = Math.floor(Math.pow(Math.sin(0.025 * hb.animation_state) *
+				15, 2));
+			sColor = "#" + r.toString(16).padStart(2, '0') + g.toString(16)
+				.padStart(2, '0') + b.toString(16).padStart(2, '0');
+		}
+		else if (p.shield_shadow_health > 0) {
+			sVal = p.shield_shadow_health;
+			sMax = p.shield_shadow_health_max;
+			sIcon = ITEM_SHADOW_SHIELD;
+			sColor = "#330066";
+		}
+		else if (p.shield_anubis_health > 0) {
+			sVal = p.shield_anubis_health;
+			sMax = p.shield_anubis_health_max;
+			sIcon = ITEM_ANUBIS_REGEN_SHIELD;
+			sColor = "#ffcc00";
+		}
+		else if (p.shield_green_health > 0) {
+			sVal = p.shield_green_health;
+			sMax = p.shield_green_health_max;
+			sIcon = ITEM_SHIELD_GREEN;
+			sColor = "lime";
+		}
+		else if (p.shield_blue_health > 0) {
+			sVal = p.shield_blue_health;
+			sMax = p.shield_blue_health_max;
+			sIcon = ITEM_SHIELD;
+			sColor = "#00ffff";
+		}
+		drawIndicator(res_x_base + res_step_x * 3, res_y_base + res_step_y * 3,
+			sVal, sMax, "#444444", sColor, sIcon, 'shield');
 	}
 	drawButtonBg(btn_menu_x, btn_menu_y, 'menu');
 	ctx.save();
@@ -255,57 +282,59 @@ function hotbar_draw(hotbar_object, ctx) {
 		let title = "";
 		let description = "";
 		if (hb.hovered_btn === 'menu') {
-			if (lang === "русский") {
-				title = "Меню";
-				description =
-					"Здесь можно сохранить или загрузить игру, изменить настройки. Советую заглянуть в них, чтобы адаптировать игру под себя.";
-			}
-			else {
-				title = "Menu";
-				description =
-					"Here you can save or load the game and change settings. Check them out if you want to customize the game.";
-			}
+			title = (lang === "русский") ? "Меню" : "Menu";
+			description = (lang === "русский") ?
+				"Здесь можно сохранить или загрузить игру, изменить настройки." :
+				"Here you can save or load the game and change settings.";
 		}
 		else if (hb.hovered_btn === 'inv') {
-			if (lang === "русский") {
-				title = "Инвентарь";
-				description =
-					"Сюда попадают подобранные предметы. Открыв инвентарь, нажмите на предмет, чтобы переместить его в другую ячейку или воспользоваться им. Нажмите Q или ПКМ, чтобы выбросить предмет.";
-			}
-			else {
-				title = "Inventory";
-				description =
-					"All picked up items go here. Click an item to move it or use it. Press Q or Right-Click to drop an item.";
-			}
+			title = (lang === "русский") ? "Инвентарь" : "Inventory";
+			description = (lang === "русский") ?
+				"Сюда попадают подобранные предметы. Нажмите на предмет, чтобы переместить или использовать его." :
+				"All picked up items go here. Click an item to move it or use it.";
 		}
 		else if (hb.hovered_btn === 'ach') {
-			if (lang === "русский") {
-				title = "Задания";
-				description =
-					"Ваш гайд в мир игры. Почаще поглядывайте сюда, чтобы не запутаться. Получить информацию о задании можно наведя на его иконку курсор.";
-			}
-			else {
-				title = "Tasks";
-				description =
-					"Your guide to the game world. Take a look here if you ever feel lost. Hover over the task to get the information on it.";
-			}
+			title = (lang === "русский") ? "Задания" : "Tasks";
+			description = (lang === "русский") ?
+				"Ваш гайд в мир игры. Почаще поглядывайте сюда, чтобы не запутаться." :
+				"Your guide to the game world. Take a look here if you ever feel lost.";
+		}
+		else if (hb.hovered_btn === 'food') {
+			title = (lang === "русский") ? "Еда" : "Food";
+			description = (lang === "русский") ?
+				"Нажмите, чтобы съесть что-нибудь из инвентаря." :
+				"Click to eat something from your inventory.";
+		}
+		else if (hb.hovered_btn === 'water') {
+			title = (lang === "русский") ? "Вода" : "Water";
+			description = (lang === "русский") ? "Нажмите, чтобы выпить воды." :
+				"Click to drink water.";
+		}
+		else if (hb.hovered_btn === 'health') {
+			title = (lang === "русский") ? "Здоровье" : "Health";
+			description = (lang === "русский") ?
+				"Нажмите, чтобы использовать аптечку." :
+				"Click to use a medkit.";
+		}
+		else if (hb.hovered_btn === 'shield') {
+			title = (lang === "русский") ? "Щит" : "Shield";
+			description = (lang === "русский") ?
+				"Нажмите, чтобы использовать щит." : "Click to use a shield.";
 		}
 		if (title !== "") {
 			ctx.save();
 			let scale = get_scale();
 			let mx = hotbar_object.game.input.mouse.x / scale;
 			let my = hotbar_object.game.input.mouse.y / scale;
-			let W = 750;
-			let H = 400;
-			let fontsize = 32;
+			let W = 500,
+				H = 200,
+				fontsize = 24;
 			let screenW = window.innerWidth / scale;
 			let screenH = window.innerHeight / scale;
-			let x = mx + 20;
-			let y = my + 20;
+			let x = mx + 20,
+				y = my + 20;
 			if (x + W > screenW) x -= W;
 			if (y + H > screenH) y -= H;
-			if (x < 0) x = 10;
-			if (y < 0) y = 10;
 			ctx.globalAlpha = 0.9;
 			ctx.fillStyle = "black";
 			ctx.strokeStyle = "gray";
@@ -314,22 +343,19 @@ function hotbar_draw(hotbar_object, ctx) {
 			ctx.strokeRect(x, y, W, H);
 			ctx.globalAlpha = 1.0;
 			ctx.fillStyle = "yellow";
-			ctx.font = `bold ${fontsize - 2}px Arial`;
-			ctx.textAlign = "left";
-			ctx.textBaseline = "top";
-			ctx.fillText(title, x + 10, y + 20);
+			ctx.font = `bold ${fontsize}px Arial`;
+			ctx.fillText(title, x + 10, y + 30);
 			ctx.fillStyle = "white";
-			ctx.font = `${fontsize}px Arial`;
-			let words = description.split(' ');
-			let line = "";
-			let lineY = y + 75;
-			let charlim = 40;
+			ctx.font = `${fontsize - 4}px Arial`;
+			let words = description.split(' '),
+				line = "",
+				lineY = y + 70;
 			for (let n = 0; n < words.length; n++) {
 				let testLine = line + words[n] + " ";
-				if (testLine.length > charlim) {
+				if (testLine.length > 35) {
 					ctx.fillText(line, x + 10, lineY);
 					line = words[n] + " ";
-					lineY += fontsize * 1.2;
+					lineY += fontsize;
 				}
 				else {
 					line = testLine;
@@ -346,8 +372,7 @@ function hotbar_update(hotbar_element, dt) {
 	let input = hotbar_element.game.input;
 	let scale = get_scale();
 	hb.animation_state += 0.02 * dt;
-	if (hb.attached_to_object.data.ai_controlled)
-		hotbar_element.shown = false;
+	if (hb.attached_to_object.data.ai_controlled) hotbar_element.shown = false;
 	for (let i = 0; i < 9; i++) {
 		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
 	}
@@ -371,38 +396,38 @@ function hotbar_update(hotbar_element, dt) {
 		}
 	}
 	let inv_el = hb.attached_to_object.data.inventory_element;
-	let anyPointOverConsumeButtons = false;
 	if (inv_el) {
 		let hasShieldInInv = inventory_has_item_from_list(inv_el, [ITEM_SHIELD,
-			ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW
+			ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW, ITEM_SHADOW_SHIELD,
+			ITEM_ANUBIS_REGEN_SHIELD
 		]) !== -1;
 		if (hasShieldInInv) hb.has_shield_button = true;
 	}
 	let isMobile = hotbar_element.game.mobile;
 	let pcActionTriggered = false;
 	if (!isMobile) {
-		if (input.mouse.leftButtonPressed) {
-			hb.leftButtonClickable = true;
-		}
+		if (input.mouse.leftButtonPressed) hb.leftButtonClickable = true;
 		else if (hb.leftButtonClickable) {
 			pcActionTriggered = true;
 			hb.leftButtonClickable = false;
 		}
 	}
+	let anyPointOverConsumeButtons = false;
 	for (let pt of pointsToCheck) {
-		let s = hb.slot_size;
-		let step = s * 1.05;
-		let start_y = 40;
-		let start_x = 40;
+		let s = hb.slot_size,
+			step = s * 1.05,
+			start_y = 40,
+			start_x = 40;
 		for (let i = 0; i < hb.row.length; i++) {
 			let sx = start_x + step * i;
-			if ((isMobile || input.mouse.leftButtonPressed) &&
-				doRectsCollide(pt.x, pt.y, 0, 0, sx, start_y, s, s)) {
+			if ((isMobile || input.mouse.leftButtonPressed) && doRectsCollide(pt
+					.x, pt.y, 0, 0, sx, start_y, s, s)) {
 				hb.mouse_over = true;
 				hb.iselected = i;
 			}
 		}
-		let b_menu_x, b_menu_y, b_inv_x, b_inv_y, b_ach_x, b_ach_y;
+		let b_menu_x, b_menu_y, b_inv_x, b_inv_y, b_ach_x, b_ach_y, r_x, r_y,
+			r_sx, r_sy;
 		if (isMobile) {
 			let col_res_x = start_x + step * hb.row.length;
 			let col_sys_x = col_res_x + step;
@@ -412,6 +437,10 @@ function hotbar_update(hotbar_element, dt) {
 			b_inv_y = start_y + step;
 			b_ach_x = col_sys_x;
 			b_ach_y = start_y + step * 2;
+			r_x = col_res_x;
+			r_y = start_y;
+			r_sx = 0;
+			r_sy = step;
 		}
 		else {
 			let offset_x = start_x + step * hb.row.length + (step * 0.5);
@@ -421,19 +450,45 @@ function hotbar_update(hotbar_element, dt) {
 			b_inv_y = start_y;
 			b_ach_x = offset_x + step * 2;
 			b_ach_y = start_y;
+			r_x = offset_x + step * 3.5;
+			r_y = start_y;
+			r_sx = step;
+			r_sy = 0;
 		}
-		if (doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s, s) ||
-			doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s, s) ||
-			doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s, s)) {
+		if (doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s, s)) {
 			hb.mouse_over = true;
+			hb.hovered_btn = 'menu';
 		}
-		if (!isMobile) {
-			if (doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s, s)) hb
-				.hovered_btn = 'menu';
-			if (doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s, s)) hb
-				.hovered_btn = 'inv';
-			if (doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s, s)) hb
-				.hovered_btn = 'ach';
+		if (doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s, s)) {
+			hb.mouse_over = true;
+			hb.hovered_btn = 'inv';
+		}
+		if (doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s, s)) {
+			hb.mouse_over = true;
+			hb.hovered_btn = 'ach';
+		}
+		let overFood = doRectsCollide(pt.x, pt.y, 0, 0, r_x, r_y, s, s);
+		let overWater = doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx, r_y + r_sy,
+			s, s);
+		let overHealth = doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx * 2, r_y +
+			r_sy * 2, s, s);
+		let overShield = hb.has_shield_button && doRectsCollide(pt.x, pt.y, 0,
+			0, r_x + r_sx * 3, r_y + r_sy * 3, s, s);
+		if (overFood) {
+			hb.mouse_over = true;
+			hb.hovered_btn = 'food';
+		}
+		if (overWater) {
+			hb.mouse_over = true;
+			hb.hovered_btn = 'water';
+		}
+		if (overHealth) {
+			hb.mouse_over = true;
+			hb.hovered_btn = 'health';
+		}
+		if (overShield) {
+			hb.mouse_over = true;
+			hb.hovered_btn = 'shield';
 		}
 		let isAction = isMobile ? isScreenTouched(input) : pcActionTriggered;
 		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s,
@@ -452,7 +507,7 @@ function hotbar_update(hotbar_element, dt) {
 			hb.did_want_menu = false;
 		}
 		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s,
-				s)) {
+			s)) {
 			if (inv_el && !inv_el._mob_toggle_lock) {
 				let ash = hotbar_element.game.gui_elements.find(e => e.name ==
 					"achievements shower");
@@ -463,7 +518,7 @@ function hotbar_update(hotbar_element, dt) {
 			}
 		}
 		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s,
-				s)) {
+			s)) {
 			let ach_el = hb.attached_to_object.data.achievements_element;
 			if (ach_el) {
 				let ash = hotbar_element.game.gui_elements.find(e => e.name ==
@@ -472,67 +527,49 @@ function hotbar_update(hotbar_element, dt) {
 				ach_el.shown = true;
 			}
 		}
-		if (isMobile) {
-			let col_res_x = start_x + step * hb.row.length;
-			let player = hb.attached_to_object;
-			let overFood = doRectsCollide(pt.x, pt.y, 0, 0, col_res_x, start_y,
-				s, s);
-			let overWater = doRectsCollide(pt.x, pt.y, 0, 0, col_res_x,
-				start_y + step, s, s);
-			let overHealth = doRectsCollide(pt.x, pt.y, 0, 0, col_res_x,
-				start_y + step * 2, s, s);
-			let overShield = hb.has_shield_button && doRectsCollide(pt.x, pt.y,
-				0, 0, col_res_x, start_y + step * 3, s, s);
-			if (overHealth || overWater || overFood || overShield) {
-				hb.mouse_over = true;
-				anyPointOverConsumeButtons = true;
-				if (!hb._consume_lock) {
-					if (overFood) {
-						let item = inventory_has_item_from_list(inv_el,
-							ITEMS_FOODS);
-						if (item !== -1) player_item_consume(player, item,
-							true);
-					}
-					else if (overWater) {
-						let item = inventory_has_item_from_list(inv_el,
-							ITEMS_DRINKS);
-						if (item !== -1) player_item_consume(player, item,
-							true);
-					}
-					else if (overHealth) {
-						let item = inventory_has_item_from_list(inv_el, [
-							ITEM_HEALTH_GREEN, ITEM_HEALTH
-						]);
-						if (item !== -1) player_item_consume(player, item,
-							true);
-					}
-					else if (overShield) {
-						let item = inventory_has_item_from_list(inv_el, [
-							ITEM_SHIELD, ITEM_SHIELD_GREEN,
-							ITEM_SHIELD_RAINBOW
-						]);
-						if (item !== -1) player_item_consume(player, item,
-							true);
-					}
-					hb._consume_lock = true;
+		if (isAction && (overHealth || overWater || overFood || overShield)) {
+			anyPointOverConsumeButtons = true;
+			if (!hb._consume_lock) {
+				let player = hb.attached_to_object;
+				if (overFood) {
+					let item = inventory_has_item_from_list(inv_el,
+					ITEMS_FOODS);
+					if (item !== -1) player_item_consume(player, item, true);
 				}
+				else if (overWater) {
+					let item = inventory_has_item_from_list(inv_el,
+						ITEMS_DRINKS);
+					if (item !== -1) player_item_consume(player, item, true);
+				}
+				else if (overHealth) {
+					let item = inventory_has_item_from_list(inv_el, [
+						ITEM_HEALTH_GREEN, ITEM_HEALTH
+					]);
+					if (item !== -1) player_item_consume(player, item, true);
+				}
+				else if (overShield) {
+					let item = inventory_has_item_from_list(inv_el, [
+						ITEM_SHIELD, ITEM_SHIELD_GREEN,
+						ITEM_SHIELD_RAINBOW, ITEM_SHADOW_SHIELD,
+						ITEM_ANUBIS_REGEN_SHIELD
+					]);
+					if (item !== -1) player_item_consume(player, item, true);
+				}
+				hb._consume_lock = true;
 			}
 		}
 	}
+	if (!anyPointOverConsumeButtons) hb._consume_lock = false;
 	if (inv_el && inv_el._mob_toggle_lock && isMobile) {
 		let stillTouchingInv = false;
-		let s = hb.slot_size;
-		let step = s * 1.05;
-		let start_x = 40;
-		let check_x = start_x + step * (hb.row.length + 1);
-		let check_y = 40 + step;
 		for (let pt of pointsToCheck) {
+			let s = hb.slot_size,
+				step = s * 1.05,
+				check_x = 40 + step * (hb.row.length + 1),
+				check_y = 40 + step;
 			if (doRectsCollide(pt.x, pt.y, 0, 0, check_x, check_y, s, s))
 				stillTouchingInv = true;
 		}
 		if (!stillTouchingInv) inv_el._mob_toggle_lock = false;
-	}
-	if (!anyPointOverConsumeButtons) {
-		hb._consume_lock = false;
 	}
 }
