@@ -31,6 +31,12 @@ function inventory_create(g, attached_to_object = null) {
 			size: 40,
 			is_hovered: false
 		},
+		sort_button: {
+			x: 0,
+			y: 0,
+			size: 40,
+			is_hovered: false
+		}
 	};
 	return game_gui_element_create(g, "inventory", inv, inventory_update,
 		inventory_draw, inventory_destroy);
@@ -110,6 +116,7 @@ function inventory_draw(inventory_element, ctx) {
 			INV_COLS.btn_drop);
 	}
 	inventory_close_button_draw(inventory_element, ctx);
+	inventory_sort_button_draw(inventory_element, ctx);
 	if (!game.mobile && inv.imove > -1 && inv.jmove > -1) {
 		let curX = inv.last_active_mx || 0;
 		let curY = inv.last_active_my || 0;
@@ -268,6 +275,46 @@ function inventory_close_button_update(inventory_element, mx, my, is_clicked) {
 	return false;
 }
 
+function inventory_get_item_weight(id) {
+	if (id === 0) return 500;
+	if (ITEMS_GUNS.includes(id) || ITEMS_MELEE.includes(id)) return 1;
+	if (ITEMS_FOODS.includes(id)) return 2;
+	if (ITEMS_DRINKS.includes(id)) return 3;
+	if (id === ITEM_HEALTH || id === ITEM_HEALTH_GREEN) return 4;
+	if (id === ITEM_SHIELD || id === ITEM_SHIELD_GREEN || id ===
+		ITEM_SHIELD_RAINBOW ||
+		id === ITEM_SHIELD_GRAY || id === ITEM_SHADOW_SHIELD || id ===
+		ITEM_ANUBIS_REGEN_SHIELD) return 5;
+	if (id === ITEM_FUEL) return 6;
+	if (ITEMS_AMMOS.includes(id)) return 1000;
+	return 10;
+}
+
+function inventory_sort(inventory_element) {
+	let inv = inventory_element.data;
+	let all_slots = [];
+	for (let i = 0; i < inv.items.length; i++) {
+		for (let j = 0; j < inv.items[i].length; j++) {
+			all_slots.push(inv.items[i][j]);
+		}
+	}
+	all_slots.sort((a, b) => {
+		let wa = inventory_get_item_weight(a);
+		let wb = inventory_get_item_weight(b);
+		if (wa === 1 && wb === 1) return 0;
+		if (wa === 1000 && wb === 1000) return a - b;
+		if (wa !== wb) return wa - wb;
+		return a - b;
+	});
+	let idx = 0;
+	for (let i = 0; i < inv.items.length; i++) {
+		for (let j = 0; j < inv.items[i].length; j++) {
+			inv.items[i][j] = all_slots[idx];
+			idx++;
+		}
+	}
+}
+
 function inventory_update(inventory_element, dt) {
 	if (inventory_element.data.attached_to_object.data.ai_controlled)
 		inventory_element.shown = false;
@@ -350,6 +397,9 @@ function inventory_update(inventory_element, dt) {
 	inv.animation_state += 0.02 * dt;
 	if (inventory_closing_cross_update(inventory_element, mx, my, is_clicked,
 			freeTouch)) {
+		return;
+	}
+	if (inventory_sort_button_update(inventory_element, mx, my, is_clicked)) {
 		return;
 	}
 	if (inv._cross_held || inv._cross_pc_held) return;
@@ -471,6 +521,50 @@ function inventory_close_button_draw(inventory_element, ctx) {
 	ctx.lineTo(btn.x + cs * 0.25, btn.y + cs * 0.75);
 	ctx.stroke();
 	ctx.restore();
+}
+
+function inventory_sort_button_draw(inventory_element, ctx) {
+	let inv = inventory_element.data;
+	if (!inv.sort_button) return;
+	let btn = inv.sort_button;
+	let cs = btn.size;
+	ctx.save();
+	ctx.fillStyle = btn.is_hovered ? INV_COLS.close_hover : INV_COLS.close_bg;
+	ctx.fillRect(btn.x, btn.y, cs, cs);
+	ctx.strokeStyle = INV_COLS.close_icon;
+	ctx.lineWidth = 2;
+	ctx.strokeRect(btn.x, btn.y, cs, cs);
+	ctx.beginPath();
+	ctx.strokeStyle = btn.is_hovered ? INV_COLS.close_icon_hover : INV_COLS
+		.close_icon;
+	ctx.moveTo(btn.x + cs * 0.2, btn.y + cs * 0.3);
+	ctx.lineTo(btn.x + cs * 0.8, btn.y + cs * 0.3);
+	ctx.moveTo(btn.x + cs * 0.2, btn.y + cs * 0.5);
+	ctx.lineTo(btn.x + cs * 0.7, btn.y + cs * 0.5);
+	ctx.moveTo(btn.x + cs * 0.2, btn.y + cs * 0.7);
+	ctx.lineTo(btn.x + cs * 0.5, btn.y + cs * 0.7);
+	ctx.stroke();
+	ctx.restore();
+}
+
+function inventory_sort_button_update(inventory_element, mx, my, is_clicked) {
+	let inv = inventory_element.data;
+	if (!inv.sort_button) inv.sort_button = {
+		x: 0,
+		y: 0,
+		size: inv.cross_size || 40,
+		is_hovered: false
+	};
+	let btn = inv.sort_button;
+	btn.x = 40 + (inv.slot_size * 1.05) * inv.items[0].length + 15;
+	btn.y = INVENTORY_Y + btn.size + 10;
+	btn.is_hovered = doRectsCollide(mx, my, 0, 0, btn.x, btn.y, btn.size, btn
+		.size);
+	if (btn.is_hovered && is_clicked) {
+		inventory_sort(inventory_element);
+		return true;
+	}
+	return false;
 }
 
 function inventory_closing_cross_update(inventory_element, mx, my, is_clicked,
