@@ -8,6 +8,7 @@ let DEBUG_AMOUNTS = false;
 let INTEROLATION = true;
 let SHOW_DPS = false;
 let BULLET_LIMIT = 200;
+let SAVES_COUNT = 10;
 
 function game_create(input_, engine_, audios_) {
 	let g = {
@@ -847,6 +848,11 @@ function game_load(g) {
 }
 
 function game_autosave(g) {
+	if (SAVES_COUNT < 10 && false) {
+		SAVES_COUNT++;
+		return;
+	}
+	SAVES_COUNT = 0;
 	if (!game_has_player(g)) {
 		console.log('Автосохранение невозможно - нет игрока.');
 		return;

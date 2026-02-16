@@ -348,7 +348,7 @@ function item_draw(item_object, ctx) {
 	let px = item.body.position.x;
 	let py = item.body.position.y;
 	item_icon_draw(ctx, item.id, px - 20, py - 20, 40, 40, item
-	.animation_state);
+		.animation_state);
 	let player = g.player_object || (g.collections && g.collections["player"] ?
 		g.collections["player"][0] : null);
 	if (player && player.data && player.data.achievements_element && player.data
@@ -376,7 +376,7 @@ function item_draw(item_object, ctx) {
 				];
 				let isWeapon = weaponIDs.includes(item.id);
 				let keyText = "[F]";
-				let actionText = isRus ? "НАЖМИ " : "PRESS ";
+				let actionText = isRus ? "НАЖМИТЕ " : "PRESS ";
 				let fullText = actionText + keyText;
 				ctx.textAlign = "center";
 				ctx.textBaseline = "middle";

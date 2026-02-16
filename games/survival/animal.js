@@ -3,25 +3,25 @@ function animal_create(g, x, y, type = "deer") {
 		"raccoon": {
 			w: 25,
 			h: 25,
-			hp: 30,
+			hp: 300,
 			speed: 8.5
 		},
 		"deer": {
 			w: 45,
 			h: 45,
-			hp: 100,
+			hp: 1000,
 			speed: 6.25
 		},
 		"snake": {
 			w: 75,
 			h: 7,
-			hp: 60,
+			hp: 600,
 			speed: 4.5
 		},
 		"scorpion": {
 			w: 22.5,
 			h: 10,
-			hp: 20,
+			hp: 200,
 			speed: 5.0
 		}
 	};
