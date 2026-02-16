@@ -32,13 +32,13 @@ function menu_create() {
 			"show rocket health": false
 		},
 		want_auto_pickup: {
-			"automatically pickup food and drinks": true,
-			"automatically pickup fuel": true,
-			"automatically pickup health": true,
-			"automatically pickup ammo": true,
-			"automatically pickup weapons": true,
-			"automatically pickup shields": true,
-			"automatically pickup bossifiers": true
+			"automatically pickup food and drinks": false,
+			"automatically pickup fuel": false,
+			"automatically pickup health": false,
+			"automatically pickup ammo": false,
+			"automatically pickup weapons": false,
+			"automatically pickup shields": false,
+			"automatically pickup bossifiers": false
 		},
 		iselected: 0,
 		iselected_last_frame: 0,

@@ -9,19 +9,19 @@ function animal_create(g, x, y, type = "deer") {
 		"deer": {
 			w: 45,
 			h: 45,
-			hp: 60,
+			hp: 100,
 			speed: 6.25
 		},
 		"snake": {
 			w: 75,
 			h: 7,
-			hp: 20,
+			hp: 60,
 			speed: 4.5
 		},
 		"scorpion": {
 			w: 22.5,
 			h: 10,
-			hp: 60,
+			hp: 20,
 			speed: 5.0
 		}
 	};

@@ -502,7 +502,7 @@ const ENEMY_TYPES = {
 		on_death: (obj, target) => {
 			if (target?.name == "player") achievement_do(target.data
 				.achievements_element.data.achievements,
-				"ancient curse", target.data
+				"ancient mummy", target.data
 				.achievements_shower_element);
 		},
 		on_boss_death: (obj, target) => {

@@ -344,8 +344,63 @@ function item_update(item_object, dt) {
 
 function item_draw(item_object, ctx) {
 	let item = item_object.data;
-	item_icon_draw(ctx, item.id, item.body.position.x - 20, item.body.position
-		.y - 20, 40, 40, item_object.data.animation_state);
+	let g = item_object.game;
+	let px = item.body.position.x;
+	let py = item.body.position.y;
+	item_icon_draw(ctx, item.id, px - 20, py - 20, 40, 40, item
+	.animation_state);
+	let player = g.player_object || (g.collections && g.collections["player"] ?
+		g.collections["player"][0] : null);
+	if (player && player.data && player.data.achievements_element && player.data
+		.achievements_element.data) {
+		let achievements = player.data.achievements_element.data.achievements;
+		let pickAchievement = achievements.find(a => a.name === "pick an item");
+		let hasPickAchievement = pickAchievement && pickAchievement.done;
+		if (!hasPickAchievement) {
+			let dx = px - player.data.body.position.x;
+			let dy = py - player.data.body.position.y;
+			let dist = Math.sqrt(dx * dx + dy * dy);
+			let maxDist = 500;
+			let minDist = 100;
+			if (dist < maxDist) {
+				ctx.save();
+				let distanceAlpha = 1 - (dist - minDist) / (maxDist - minDist);
+				distanceAlpha = Math.max(0, Math.min(1, distanceAlpha));
+				let bounce = Math.sin(item.animation_state * 0.25) * 12;
+				ctx.translate(px, py - 85 + bounce);
+				let isRus = (g.settings.language === "русский");
+				let weaponIDs = [
+					ITEM_GUN, ITEM_SHOTGUN, ITEM_MINIGUN,
+					ITEM_PLASMA_LAUNCHER, ITEM_SWORD, ITEM_RED_PISTOLS,
+					ITEM_RED_SHOTGUN, ITEM_GREEN_GUN, ITEM_ROCKET_LAUNCHER
+				];
+				let isWeapon = weaponIDs.includes(item.id);
+				let keyText = "[F]";
+				let actionText = isRus ? "НАЖМИ " : "PRESS ";
+				let fullText = actionText + keyText;
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.font = "bold 34px Arial, sans-serif";
+				ctx.lineJoin = "round";
+				ctx.lineCap = "round";
+				ctx.strokeStyle = "rgba(0, 0, 0, " + distanceAlpha + ")";
+				ctx.lineWidth = 7;
+				ctx.strokeText(fullText, 0, 0);
+				ctx.fillStyle = "rgba(255, 220, 0, " + distanceAlpha + ")";
+				ctx.fillText(fullText, 0, 0);
+				ctx.beginPath();
+				ctx.moveTo(-12, 22);
+				ctx.lineTo(0, 37);
+				ctx.lineTo(12, 22);
+				ctx.fillStyle = "rgba(255, 220, 0, " + distanceAlpha + ")";
+				ctx.fill();
+				ctx.strokeStyle = "rgba(0, 0, 0, " + distanceAlpha + ")";
+				ctx.lineWidth = 2;
+				ctx.stroke();
+				ctx.restore();
+			}
+		}
+	}
 }
 
 function item_icon_draw(ctx, id, x, y, w, h, animstate = null) {
