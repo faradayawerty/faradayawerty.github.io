@@ -41,6 +41,10 @@ function collisions_handle_pair(g, self, other, dt) {
 			if (COLLISION_TARGETS_BULLET.includes(oName)) {
 				if (sName === "trashbullet" && oName === "rocket") return;
 				if (oName === "rocket" && !oData.enemy) return;
+				if (oName === "enemy" || oName === "animal") {
+					blood_splash_create(g, oData.body.position.x, oData.body
+						.position.y, 6, 3, "#bc0000", 1.0);
+				}
 				collisions_apply_damage_to_object(g, other, sData.damage, dt,
 					true);
 				sData.damaged = true;
@@ -64,6 +68,10 @@ function collisions_handle_pair(g, self, other, dt) {
 			}
 			else {
 				const isFromPlayer = !sData.enemy;
+				if (oName === "enemy" || oName === "animal") {
+					blood_splash_create(g, oData.body.position.x, oData.body
+						.position.y, 12, 5, "#bc0000", 1.2);
+				}
 				collisions_apply_damage_to_object(g, other, sData.damage, dt,
 					isFromPlayer);
 			}
@@ -84,12 +92,16 @@ function collisions_handle_pair(g, self, other, dt) {
 			let maxSpeed = oData.max_speed || 1;
 			if ((!sData.boss && speedSq > 0.81 * maxSpeed * maxSpeed) || (oData
 					.is_tank && speedSq > 0.01 * maxSpeed * maxSpeed)) {
+				blood_splash_create(g, sData.body.position.x, sData.body
+					.position.y, 10, 4, "#bc0000", 1.3);
 				sData.health -= 100 * sData.damage * dt;
 				sData.hit_by_player = true;
 			}
 		}
 	}
 	else if (sName === "car" && oName === "animal") {
+		blood_splash_create(g, oData.body.position.x, oData.body.position.y, 12,
+			5, "#8a0303", 1.5);
 		oData.health -= 0.75 * dt;
 	}
 }
@@ -118,6 +130,8 @@ function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 		p.shield_anubis_health -= (source === "enemy" ? 0.10 : 0.55) * totalDmg;
 		return;
 	}
+	blood_splash_create(g, p.body.position.x, p.body.position.y, 8, 4,
+		"#bc0000", 1.0);
 	let k = 1.0;
 	if (source === "rocket") {
 		k = (p.sword_protection || p.sword_visible) ? 0.25 : 1.0;
