@@ -1,3 +1,4 @@
+const CW = COLORS_DEFAULT.weapons;
 ITEMS_DATA[ITEM_VENOM_SHOTGUN] = {
 	name: "Venom Shotgun",
 	desc: "Fires bursts of concentrated toxin.",
@@ -6,11 +7,13 @@ ITEMS_DATA[ITEM_VENOM_SHOTGUN] = {
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const pulse = Math.sin(t * 0.1) * 0.5 + 0.5;
-		ctx.fillStyle = "#333";
+		ctx.fillStyle = CW.common.metal;
 		ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.2);
-		ctx.fillStyle = "#5d2e0c";
+		ctx.fillStyle = CW.common.wood_dark;
 		ctx.fillRect(x + w * 0.1, y + h * 0.5, w * 0.2, h * 0.2);
-		ctx.fillStyle = `rgb(0, ${150 + pulse * 105}, 0)`;
+		const c = CW.venom.liquid_base;
+		ctx.fillStyle =
+			`rgb(${c[0]}, ${c[1] + pulse * CW.venom.liquid_pulse}, ${c[2]})`;
 		ctx.fillRect(x + w * 0.3, y + h * 0.38, w * 0.4, h * 0.05);
 		ctx.beginPath();
 		ctx.arc(x + w * 0.75, y + h * 0.4, 2, 0, Math.PI * 2);
@@ -25,12 +28,14 @@ ITEMS_DATA[ITEM_ACID_SMG] = {
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const pulse = Math.sin(t * 0.2) * 0.5 + 0.5;
-		ctx.fillStyle = "#444";
+		ctx.fillStyle = CW.common.gray_dark;
 		ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.5, h * 0.2);
 		ctx.fillRect(x + w * 0.25, y + h * 0.6, w * 0.1, h * 0.2);
-		ctx.fillStyle = `rgb(0, ${100 + pulse * 155}, 0)`;
+		const c = CW.venom.liquid_smg_base;
+		ctx.fillStyle =
+			`rgb(${c[0]}, ${c[1] + pulse * CW.venom.liquid_smg_pulse}, ${c[2]})`;
 		ctx.fillRect(x + w * 0.45, y + h * 0.5, w * 0.12, h * 0.3);
-		ctx.fillStyle = "#222";
+		ctx.fillStyle = CW.common.metal_dark;
 		ctx.fillRect(x + w * 0.7, y + h * 0.45, w * 0.1, h * 0.1);
 	}
 };
@@ -44,20 +49,22 @@ ITEMS_DATA[ITEM_VENOM_DUAL_SHOTGUNS] = {
 		const pulse = Math.sin(t * 0.2) * 0.5 + 0.5;
 		let drawHighTechShotgun = (px, py, scale) => {
 			ctx.save();
-			ctx.fillStyle = "#1a1a1a";
+			ctx.fillStyle = CW.common.black_soft;
 			ctx.fillRect(px, py, w * 0.5 * scale, h * 0.12 * scale);
 			ctx.fillRect(px - w * 0.05 * scale, py, w * 0.1 * scale,
 				h * 0.25 * scale);
-			ctx.fillStyle = "#444";
+			ctx.fillStyle = CW.common.gray_dark;
 			ctx.fillRect(px + w * 0.1 * scale, py - h * 0.02 *
 				scale, w * 0.3 * scale, h * 0.05 * scale);
-			ctx.fillStyle = "rgba(0, 255, 0, 0.2)";
+			ctx.fillStyle = CW.venom.vial_bg;
 			ctx.fillRect(px + w * 0.15 * scale, py + h * 0.08 *
 				scale, w * 0.3 * scale, h * 0.08 * scale);
-			ctx.fillStyle = `rgb(0, ${150 + pulse * 105}, 0)`;
+			const c = CW.venom.liquid_base;
+			ctx.fillStyle =
+				`rgb(${c[0]}, ${c[1] + pulse * CW.venom.liquid_pulse}, ${c[2]})`;
 			ctx.fillRect(px + w * 0.16 * scale, py + h * 0.1 *
 				scale, w * 0.28 * scale, h * 0.05 * scale);
-			ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+			ctx.fillStyle = CW.common.white_gloss;
 			ctx.fillRect(px + w * 0.16 * scale, py + h * 0.09 *
 				scale, w * 0.2 * scale, h * 0.02 * scale);
 			ctx.restore();
@@ -67,51 +74,51 @@ ITEMS_DATA[ITEM_VENOM_DUAL_SHOTGUNS] = {
 	}
 };
 ITEMS_DATA[ITEM_STONE] = {
-		name: "Stone",
-		desc: "A heavy stone. Can be thrown at enemies.",
-		name_rus: "Камень",
-		desc_rus: "Тяжелый камень. Можно запустить во врага.",
-		render: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#888888";
-			ctx.beginPath();
-			ctx.moveTo(x + 0.3 * w, y + 0.3 * h);
-			ctx.lineTo(x + 0.7 * w, y + 0.2 * h);
-			ctx.lineTo(x + 0.8 * w, y + 0.6 * h);
-			ctx.lineTo(x + 0.5 * w, y + 0.8 * h);
-			ctx.lineTo(x + 0.2 * w, y + 0.5 * h);
-			ctx.closePath();
-			ctx.fill();
-			ctx.strokeStyle = "#666666";
-			ctx.lineWidth = 2;
-			ctx.stroke();
-		}
-	},
-	ITEMS_DATA[ITEM_STICK] = {
-		name: "Stick",
-		desc: "A simple wooden stick. Better than nothing.",
-		name_rus: "Палка",
-		desc_rus: "Простая деревянная палка. Лучше, чем ничего.",
-		render: (ctx, x, y, w, h) => {
-			ctx.save();
-			ctx.translate(x + w * 0.5, y + h * 0.5);
-			ctx.rotate(Math.PI / 4);
-			ctx.fillStyle = "#8B4513";
-			ctx.fillRect(-w * 0.05, -h * 0.4, w * 0.1, h * 0.8);
-			ctx.strokeStyle = "#5D2E0C";
-			ctx.lineWidth = 1;
-			ctx.strokeRect(-w * 0.05, -h * 0.4, w * 0.1, h * 0.8);
-			ctx.restore();
-		}
-	};
+	name: "Stone",
+	desc: "A heavy stone. Can be thrown at enemies.",
+	name_rus: "Камень",
+	desc_rus: "Тяжелый камень. Можно запустить во врага.",
+	render: (ctx, x, y, w, h) => {
+		ctx.fillStyle = CW.common.gray;
+		ctx.beginPath();
+		ctx.moveTo(x + 0.3 * w, y + 0.3 * h);
+		ctx.lineTo(x + 0.7 * w, y + 0.2 * h);
+		ctx.lineTo(x + 0.8 * w, y + 0.6 * h);
+		ctx.lineTo(x + 0.5 * w, y + 0.8 * h);
+		ctx.lineTo(x + 0.2 * w, y + 0.5 * h);
+		ctx.closePath();
+		ctx.fill();
+		ctx.strokeStyle = CW.special.stone_stroke;
+		ctx.lineWidth = 2;
+		ctx.stroke();
+	}
+};
+ITEMS_DATA[ITEM_STICK] = {
+	name: "Stick",
+	desc: "A simple wooden stick. Better than nothing.",
+	name_rus: "Палка",
+	desc_rus: "Простая деревянная палка. Лучше, чем ничего.",
+	render: (ctx, x, y, w, h) => {
+		ctx.save();
+		ctx.translate(x + w * 0.5, y + h * 0.5);
+		ctx.rotate(Math.PI / 4);
+		ctx.fillStyle = CW.special.stick_main;
+		ctx.fillRect(-w * 0.05, -h * 0.4, w * 0.1, h * 0.8);
+		ctx.strokeStyle = CW.special.stick_stroke;
+		ctx.lineWidth = 1;
+		ctx.strokeRect(-w * 0.05, -h * 0.4, w * 0.1, h * 0.8);
+		ctx.restore();
+	}
+};
 ITEMS_DATA[ITEM_KALASHNIKOV] = {
 	name: "Kalashnikov rifle",
 	desc: "Reliable desert classic. High fire rate, distinctive yellow muzzle flash.",
 	name_rus: "Автомат Калашникова",
 	desc_rus: "Надежная классика пустыни. Высокая скорострельность и узнаваемая вспышка.",
 	render: (ctx, x, y, w, h) => {
-		const wood = "#8B4513";
-		const metal = "#333";
-		const lightMetal = "#555";
+		const wood = CW.common.wood;
+		const metal = CW.common.metal;
+		const lightMetal = CW.common.metal_light;
 		ctx.fillStyle = wood;
 		ctx.save();
 		ctx.translate(x + w * 0.33, y + h * 0.5);
@@ -138,10 +145,8 @@ ITEMS_DATA[ITEM_KALASHNIKOV] = {
 		ctx.fillRect(x + w * 0.55, y + h * 0.48, w * 0.15, h *
 			0.06);
 		ctx.fillStyle = metal;
-		ctx.fillRect(x + w * 0.55, y + h * 0.45, w * 0.35, h *
-			0.03);
-		ctx.fillRect(x + w * 0.55, y + h * 0.42, w * 0.12, h *
-			0.03);
+		ctx.fillRect(x + w * 0.55, y + h * 0.45, w * 0.35, h * 0.03);
+		ctx.fillRect(x + w * 0.55, y + h * 0.42, w * 0.12, h * 0.03);
 		ctx.fillRect(x + w * 0.88, y + h * 0.4, w * 0.02, h * 0.06);
 		ctx.fillStyle = lightMetal;
 		ctx.fillRect(x + w * 0.4, y + h * 0.46, w * 0.08, h * 0.02);
@@ -153,10 +158,10 @@ ITEMS_DATA[ITEM_GREEN_GUN] = {
 	name_rus: "Кислотная пиявка",
 	desc_rus: "Бесконечный запас токсинов, работающий напрямую от вашей энергии. Может задействовать ресурсы кинетического щита.",
 	render: (ctx, x, y, w, h, animstate) => {
-		const darkGreen = "#0a3311";
-		const acidGreen = "#44ff00";
-		const midGreen = "#117733";
-		const tentacleColor = "#22aa44";
+		const darkGreen = CW.venom.dark;
+		const acidGreen = CW.venom.acid;
+		const midGreen = CW.venom.mid;
+		const tentacleColor = CW.venom.tentacle;
 		const t_anim = 2 * (animstate || 0);
 		ctx.fillStyle = darkGreen;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.2, h * 0.15);
@@ -204,11 +209,11 @@ ITEMS_DATA[ITEM_REVOLVER] = {
 	name_rus: "Револьвер",
 	desc_rus: "Классический шестизарядник. Надежный и убойный.",
 	render: (ctx, x, y, w, h) => {
-		const silver = "#A0A0A0";
-		const lightSilver = "#D3D3D3";
-		const gripRubber = "#2A2A2A";
-		const gripWood = "#8B2323";
-		const darkMetal = "#444";
+		const silver = CW.common.silver;
+		const lightSilver = CW.common.silver_light;
+		const gripRubber = CW.common.metal_dark;
+		const gripWood = CW.special.sword_handle;
+		const darkMetal = CW.common.gray_dark;
 		ctx.fillStyle = gripRubber;
 		ctx.beginPath();
 		ctx.moveTo(x + w * 0.22, y + h * 0.55);
@@ -222,7 +227,7 @@ ITEMS_DATA[ITEM_REVOLVER] = {
 			0.18);
 		ctx.fillStyle = silver;
 		ctx.fillRect(x + w * 0.2, y + h * 0.42, w * 0.35, h * 0.18);
-		ctx.fillStyle = "#888";
+		ctx.fillStyle = CW.common.gray;
 		ctx.fillRect(x + w * 0.38, y + h * 0.43, w * 0.22, h *
 			0.16);
 		ctx.fillStyle = darkMetal;
@@ -234,10 +239,10 @@ ITEMS_DATA[ITEM_REVOLVER] = {
 		ctx.fillRect(x + w * 0.6, y + h * 0.43, w * 0.32, h * 0.12);
 		ctx.fillStyle = lightSilver;
 		ctx.fillRect(x + w * 0.6, y + h * 0.43, w * 0.32, h * 0.03);
-		ctx.fillStyle = "#222";
+		ctx.fillStyle = CW.common.metal_dark;
 		ctx.fillRect(x + w * 0.22, y + h * 0.38, w * 0.06, h *
 			0.04);
-		ctx.fillStyle = "#00FF00";
+		ctx.fillStyle = COLORS_DEFAULT.player.lime;
 		ctx.fillRect(x + w * 0.88, y + h * 0.38, w * 0.03, h *
 			0.03);
 		ctx.strokeStyle = silver;
@@ -253,20 +258,20 @@ ITEMS_DATA[ITEM_DESERT_EAGLE] = {
 	name_rus: "Дезерт Игл",
 	desc_rus: "Крупнокалиберная ручная пушка. Огромная убойная сила и сильная отдача.",
 	render: (ctx, x, y, w, h) => {
-		const silver = "#aaa";
-		const darkSilver = "#777";
-		const grip = "#222";
-		ctx.strokeStyle = darkSilver;
+		const silver = CW.common.silver_dark;
+		const darkSilver = CW.common.metal_light;
+		const grip = CW.common.metal_dark;
+		ctx.strokeStyle = silver;
 		ctx.lineWidth = w * 0.03;
 		ctx.strokeRect(x + w * 0.35, y + h * 0.55, w * 0.15, h *
 			0.1);
 		ctx.fillStyle = grip;
 		ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.2, h * 0.35);
-		ctx.fillStyle = silver;
+		ctx.fillStyle = CW.common.silver_bright;
 		ctx.fillRect(x + w * 0.15, y + h * 0.35, w * 0.7, h * 0.22);
-		ctx.fillStyle = "#ccc";
+		ctx.fillStyle = CW.common.silver_light;
 		ctx.fillRect(x + w * 0.15, y + h * 0.35, w * 0.7, h * 0.05);
-		ctx.fillStyle = darkSilver;
+		ctx.fillStyle = silver;
 		ctx.fillRect(x + w * 0.75, y + h * 0.3, w * 0.05, h * 0.05);
 	}
 };
@@ -276,11 +281,11 @@ ITEMS_DATA[ITEM_ROCKET_LAUNCHER] = {
 	name_rus: "Установка «Ищейка»",
 	desc_rus: "Выпускает высокоскоростные самонаводящиеся снаряды.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#111133";
+		ctx.fillStyle = CW.special.rocket_body;
 		ctx.fillRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.45);
-		ctx.fillStyle = "#000";
+		ctx.fillStyle = CW.common.black;
 		ctx.fillRect(x + w * 0.3, y + h * 0.3, w * 0.4, h * 0.1);
-		ctx.fillStyle = "red";
+		ctx.fillStyle = CW.special.rocket_eye;
 		ctx.beginPath();
 		ctx.arc(x + w * 0.8, y + h * 0.52, w * 0.1, 0, Math.PI * 2);
 		ctx.fill();
@@ -292,11 +297,11 @@ ITEMS_DATA[ITEM_ROCKET_SHOTGUN] = {
 	name_rus: "Самонаводящаяся дробь",
 	desc_rus: "Разбрасывает микро-ракеты, захватывающие тепловые сигнатуры.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#111133";
+		ctx.fillStyle = CW.special.rocket_body;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.25);
-		ctx.fillStyle = "#333";
+		ctx.fillStyle = CW.common.metal;
 		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.4, h * 0.15);
-		ctx.fillStyle = "orange";
+		ctx.fillStyle = CW.special.rocket_alt;
 		ctx.fillRect(x + w * 0.7, y + h * 0.35, w * 0.1, h * 0.1);
 	}
 };
@@ -306,10 +311,10 @@ ITEMS_DATA[ITEM_GUN] = {
 	name_rus: "Пистолет",
 	desc_rus: "Стандартный 9-мм пистолет.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#000";
+		ctx.fillStyle = CW.common.black;
 		ctx.fillRect(x + w * 0.2, y + h * 0.4, w * 0.6, h * 0.2);
 		ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.15, h * 0.3);
-		ctx.fillStyle = "#333";
+		ctx.fillStyle = CW.common.metal;
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.05);
 	}
 };
@@ -319,9 +324,9 @@ ITEMS_DATA[ITEM_SHOTGUN] = {
 	name_rus: "Дробовик",
 	desc_rus: "Мощное оружие для ближнего боя.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#773311";
+		ctx.fillStyle = CW.common.wood_alt;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.25);
-		ctx.fillStyle = "#333";
+		ctx.fillStyle = CW.common.metal;
 		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.4, h * 0.15);
 	}
 };
@@ -335,8 +340,8 @@ ITEMS_DATA[ITEM_MINIGUN] = {
 			mh = h * 0.25;
 		let mx = x + w * 0.05,
 			my = y + h * 0.45;
-		ctx.fillStyle = "#000000";
-		ctx.strokeStyle = "#000000";
+		ctx.fillStyle = CW.common.black;
+		ctx.strokeStyle = CW.common.black;
 		ctx.lineWidth = h * 0.06;
 		ctx.lineJoin = "round";
 		let padding = w * 0.015;
@@ -350,18 +355,18 @@ ITEMS_DATA[ITEM_MINIGUN] = {
 		ctx.lineTo(mx + mw * 0.5, my - mh * 0.4);
 		ctx.lineTo(mx + mw * 0.5, my + mh * 0.1);
 		ctx.stroke();
-		ctx.fillStyle = "#113377";
+		ctx.fillStyle = CW.special.minigun_blue;
 		ctx.fillRect(mx, my, mw * 0.3, mh * 1.2);
-		ctx.fillStyle = "#2255aa";
+		ctx.fillStyle = CW.special.minigun_blue_light;
 		ctx.fillRect(mx + mw * 0.3, my + mh * 0.1, mw * 0.7, mh * 0.8);
-		ctx.fillStyle = "#0a1f44";
+		ctx.fillStyle = CW.special.minigun_blue_dark;
 		ctx.fillRect(mx + mw * 0.3, my + mh * 0.3, mw * 0.7, mh * 0.1);
 		ctx.fillRect(mx + mw * 0.3, my + mh * 0.6, mw * 0.7, mh * 0.1);
-		ctx.fillStyle = "#113377";
+		ctx.fillStyle = CW.special.minigun_blue;
 		ctx.fillRect(mx + mw * 0.6, my + mh * 0.1, mw * 0.06, mh * 0.8);
 		ctx.fillRect(mx + mw * 0.94, my + mh * 0.1, mw * 0.06, mh *
 			0.8);
-		ctx.strokeStyle = "#113377";
+		ctx.strokeStyle = CW.special.minigun_blue;
 		ctx.lineWidth = h * 0.03;
 		ctx.lineJoin = "miter";
 		ctx.beginPath();
@@ -378,11 +383,11 @@ ITEMS_DATA[ITEM_PLASMA_LAUNCHER] = {
 	name_rus: "Плазмомет",
 	desc_rus: "Стреляет нестабильными сферами плазмы.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#331133";
+		ctx.fillStyle = CW.energy.plasma_dark;
 		ctx.fillRect(x + w * 0.05, y + h * 0.3, w * 0.9, h * 0.45);
-		ctx.fillStyle = "#000";
+		ctx.fillStyle = CW.common.black;
 		ctx.fillRect(x + w * 0.3, y + h * 0.3, w * 0.4, h * 0.1);
-		ctx.fillStyle = "cyan";
+		ctx.fillStyle = CW.energy.plasma;
 		ctx.beginPath();
 		ctx.arc(x + w * 0.8, y + h * 0.52, w * 0.1, 0, Math.PI * 2);
 		ctx.fill();
@@ -400,11 +405,11 @@ ITEMS_DATA[ITEM_RED_PISTOLS] = {
 				scale);
 			ctx.fillRect(px, py + h * 0.05 * scale, w * 0.1 *
 				scale, h * 0.18 * scale);
-			ctx.fillStyle = "rgba(255,255,255,0.2)";
+			ctx.fillStyle = CW.common.white_transp;
 			ctx.fillRect(px + w * 0.05 * scale, py, w * 0.25 *
 				scale, h * 0.04 * scale);
 		};
-		let mainColor = "#dd1111";
+		let mainColor = CW.special.red_main;
 		drawSinglePistol(x + w * 0.15, y + h * 0.25, 1.2,
 			mainColor);
 		drawSinglePistol(x + w * 0.45, y + h * 0.55, 1.2,
@@ -417,9 +422,9 @@ ITEMS_DATA[ITEM_RED_SHOTGUN] = {
 	name_rus: "Красный дробовик",
 	desc_rus: "Улучшенная модель с кучной стрельбой.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#dd1111";
+		ctx.fillStyle = CW.special.red_main;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.25);
-		ctx.fillStyle = "#333";
+		ctx.fillStyle = CW.common.metal;
 		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.4, h * 0.15);
 	}
 };
@@ -435,13 +440,13 @@ ITEMS_DATA[ITEM_RAINBOW_PISTOLS] = {
 				scale);
 			ctx.fillRect(px, py + h * 0.05 * scale, w * 0.1 *
 				scale, h * 0.18 * scale);
-			ctx.fillStyle = "rgba(255,255,255,0.2)";
+			ctx.fillStyle = CW.common.white_transp;
 			ctx.fillRect(px + w * 0.05 * scale, py, w * 0.25 *
 				scale, h * 0.04 * scale);
 		};
-		let mainColor = "purple";
+		let mainColor = COLORS_DEFAULT.enemies.laser.rainbow[6];
 		if (animstate != null) {
-			let hue = (animstate * 10) % 360;
+			let hue = (animstate * 4) % 360;
 			mainColor = `hsl(${hue}, 70%, 50%)`;
 		}
 		drawSinglePistol(x + w * 0.15, y + h * 0.25, 1.2,
@@ -456,11 +461,11 @@ ITEMS_DATA[ITEM_LASER_GUN] = {
 	name_rus: "Лазерная пушка",
 	desc_rus: "Высокоточный энергетический луч.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "purple";
+		ctx.fillStyle = CW.energy.laser_main;
 		ctx.fillRect(x + w * 0.1, y + h * 0.35, w * 0.7, h * 0.3);
-		ctx.fillStyle = "#ff00ff";
+		ctx.fillStyle = CW.energy.laser_accent;
 		ctx.fillRect(x + w * 0.8, y + h * 0.35, w * 0.1, h * 0.3);
-		ctx.fillStyle = "white";
+		ctx.fillStyle = CW.energy.laser_line;
 		ctx.fillRect(x + w * 0.2, y + h * 0.45, w * 0.5, h * 0.1);
 	}
 };
@@ -471,9 +476,9 @@ ITEMS_DATA[ITEM_PLASMA_PISTOL] = {
 	desc_rus: "Компактное плазменное оружие.",
 	render: (ctx, x, y, w, h) => {
 		x = x + 0.05 * w;
-		const bodyColor = "#331133";
-		const energyColor = "cyan";
-		const darkDetail = "#110011";
+		const bodyColor = CW.energy.plasma_dark;
+		const energyColor = CW.energy.plasma;
+		const darkDetail = CW.energy.plasma_vdark;
 		ctx.fillStyle = bodyColor;
 		ctx.beginPath();
 		ctx.moveTo(x + w * 0.15, y + h * 0.5);
@@ -510,19 +515,19 @@ ITEMS_DATA[ITEM_JUNK_CANNON] = {
 	name_rus: "Хламотрон",
 	desc_rus: "Превращает мусор в смертоносные снаряды.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#444";
+		ctx.fillStyle = CW.special.junk_body;
 		ctx.fillRect(x + 0.1 * w, y + 0.4 * h, 0.8 * w, 0.25 * h);
-		ctx.fillStyle = "#222";
+		ctx.fillStyle = CW.common.metal_dark;
 		ctx.fillRect(x + 0.2 * w, y + 0.6 * h, 0.15 * w, 0.2 * h);
-		ctx.fillStyle = "#556677";
+		ctx.fillStyle = CW.special.junk_alt;
 		ctx.beginPath();
 		ctx.arc(x + 0.5 * w, y + 0.35 * h, 0.2 * w, 0, Math.PI,
 			true);
 		ctx.fill();
-		ctx.strokeStyle = "blue";
+		ctx.strokeStyle = CW.special.junk_stroke;
 		ctx.lineWidth = 3;
 		drawLine(ctx, x + 0.4 * w, y + 0.3 * h, x + 0.4 * w, y +
-			0.65 * h, "blue");
+			0.65 * h, CW.special.junk_stroke);
 	}
 };
 ITEMS_DATA[ITEM_SWORD] = {
@@ -534,8 +539,8 @@ ITEMS_DATA[ITEM_SWORD] = {
 		ctx.save();
 		ctx.translate(x + w * 0.5, y + h * 0.5);
 		ctx.rotate(Math.PI / 4);
-		let bladeColor = "#55aa11";
-		let strokeColor = "#bbaa11";
+		let bladeColor = CW.special.sword_blade;
+		let strokeColor = CW.special.sword_stroke;
 		let bW = 0.14 * w;
 		let bH = 0.65 * h;
 		let hW = 0.1 * w;
@@ -546,20 +551,21 @@ ITEMS_DATA[ITEM_SWORD] = {
 		ctx.strokeStyle = strokeColor;
 		ctx.lineWidth = 0.03 * w;
 		ctx.strokeRect(-bW / 2, guardY - bH, bW, bH);
-		ctx.strokeStyle = "rgba(0,0,0,0.25)";
+		ctx.strokeStyle = CW.special.sword_lines;
 		for (let i = 1; i < 4; i++) {
 			let nodeY = (guardY - bH) + (i * bH * 0.25);
 			drawLine(ctx, -bW / 2, nodeY, bW / 2, nodeY,
-				"rgba(0,0,0,0.25)", 1.5);
+				CW.special.sword_lines, 1.5);
 		}
-		ctx.fillStyle = "rgba(255,255,255,0.2)";
+		ctx.fillStyle = CW.common.white_transp;
 		ctx.fillRect(-bW * 0.2, guardY - bH * 0.9, bW * 0.25, bH *
 			0.8);
-		ctx.fillStyle = "#443311";
+		ctx.fillStyle = CW.special.sword_handle;
 		ctx.fillRect(-hW / 2, guardY, hW, hH);
 		ctx.strokeStyle = "rgba(0,0,0,0.4)";
 		ctx.strokeRect(-hW / 2, guardY, hW, hH);
-		drawCircle(ctx, 0, guardY, 0.12 * w, "#332211", strokeColor,
+		drawCircle(ctx, 0, guardY, 0.12 * w, CW.special.sword_guard,
+			strokeColor,
 			0.02 * w);
 		for (let i = 1; i < 4; i++) {
 			let ry = guardY + (i * hH * 0.25);
@@ -593,9 +599,9 @@ ITEMS_DATA[ITEM_SNAKE_STAFF] = {
 	desc_rus: "Выпускает непрерывный поток концентрированного яда. Кажется живым.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
-		const snakeGreen = "#22aa44";
-		const coreGreen = "#44ff00";
-		const darkWood = "#1a0f05";
+		const snakeGreen = CW.venom.tentacle;
+		const coreGreen = CW.venom.acid;
+		const darkWood = COLORS_DEFAULT.entities.animals.deer.dark;
 		ctx.save();
 		ctx.fillStyle = darkWood;
 		ctx.beginPath();
@@ -645,12 +651,12 @@ ITEMS_DATA[ITEM_MUMMY_SHOTGUN] = {
 		const t = animstate || 0;
 		const glow = Math.sin(t * 0.15) * 0.5 + 0.5;
 		ctx.save();
-		ctx.fillStyle = "#D2B48C";
+		ctx.fillStyle = CW.energy.soul_bg;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.25);
-		ctx.fillStyle = "#8b7355";
+		ctx.fillStyle = CW.energy.soul_outline;
 		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.4, h * 0.15);
 		ctx.shadowBlur = w * 0.12 * glow;
-		ctx.shadowColor = "#00ffff";
+		ctx.shadowColor = CW.energy.soul_glow;
 		ctx.fillStyle = `rgb(0, ${180 + glow * 75}, 255)`;
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.5, h * 0.07);
 		ctx.restore();
@@ -672,13 +678,13 @@ ITEMS_DATA[ITEM_MUMMY_PISTOLS] = {
 			ctx.fillRect(px, py + h * 0.05 * scale, w * 0.1 * scale,
 				h * 0.18 * scale);
 			ctx.shadowBlur = w * 0.1 * glow;
-			ctx.shadowColor = "#00ffff";
+			ctx.shadowColor = CW.energy.soul_glow;
 			ctx.fillStyle = `rgb(0, ${150 + glow * 105}, 255)`;
 			ctx.fillRect(px + w * 0.05 * scale, py, w * 0.25 *
 				scale, h * 0.04 * scale);
 			ctx.restore();
 		};
-		let mainColor = "#D2B48C";
+		let mainColor = CW.energy.soul_bg;
 		drawSinglePistol(x + w * 0.15, y + h * 0.25, 1.2, mainColor);
 		drawSinglePistol(x + w * 0.45, y + h * 0.55, 1.2, mainColor);
 	}
@@ -691,14 +697,14 @@ ITEMS_DATA[ITEM_SHADOW_STAFF] = {
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		ctx.save();
-		ctx.fillStyle = "#1a0a25";
+		ctx.fillStyle = CW.energy.void_body;
 		ctx.beginPath();
 		ctx.moveTo(x + w * 0.48, y + h * 0.35);
 		ctx.lineTo(x + w * 0.52, y + h * 0.35);
 		ctx.lineTo(x + w * 0.51, y + h * 0.85);
 		ctx.lineTo(x + w * 0.49, y + h * 0.85);
 		ctx.fill();
-		ctx.strokeStyle = "#1a0a25";
+		ctx.strokeStyle = CW.energy.void_body;
 		ctx.lineWidth = w * 0.035;
 		ctx.lineCap = "round";
 		ctx.beginPath();
@@ -714,8 +720,8 @@ ITEMS_DATA[ITEM_SHADOW_STAFF] = {
 		const dashLen = circumference / 8;
 		ctx.save();
 		ctx.shadowBlur = w * 0.15;
-		ctx.shadowColor = "rgba(170, 0, 255, 0.6)";
-		ctx.strokeStyle = "#4400ff";
+		ctx.shadowColor = CW.energy.void_glow;
+		ctx.strokeStyle = CW.energy.void_core;
 		ctx.lineWidth = w * 0.02;
 		ctx.setLineDash([dashLen, dashLen]);
 		ctx.beginPath();
@@ -725,12 +731,12 @@ ITEMS_DATA[ITEM_SHADOW_STAFF] = {
 		ctx.restore();
 		const pulse = Math.sin(t * 0.1) * 0.05 + 0.95;
 		ctx.shadowBlur = w * 0.08;
-		ctx.shadowColor = "#8800ff";
-		ctx.fillStyle = "#000";
+		ctx.shadowColor = COLORS_DEFAULT.ui.achievements.palette.purple;
+		ctx.fillStyle = CW.common.black;
 		ctx.beginPath();
 		ctx.arc(0, 0, w * 0.07 * pulse, 0, Math.PI * 2);
 		ctx.fill();
-		ctx.fillStyle = "#ff00ff";
+		ctx.fillStyle = CW.energy.void_accent;
 		ctx.fillRect(-w * 0.015, -h * 0.015, w * 0.03, h * 0.03);
 		ctx.restore();
 	}
@@ -745,20 +751,21 @@ ITEMS_DATA[ITEM_SHADOW_DUAL_SHOTGUNS] = {
 		const pulse = Math.sin(t * 0.1) * 0.5 + 0.5;
 		let drawVoidShotgun = (px, py, scale) => {
 			ctx.save();
-			ctx.fillStyle = "#0a0a0f";
+			ctx.fillStyle = CW.energy.void_vdark;
 			ctx.fillRect(px, py, w * 0.5 * scale, h * 0.12 * scale);
 			ctx.fillRect(px - w * 0.05 * scale, py, w * 0.1 * scale,
 				h * 0.25 * scale);
-			ctx.fillStyle = "#220044";
+			ctx.fillStyle = CW.energy.void_purple;
 			ctx.fillRect(px + w * 0.1 * scale, py - h * 0.02 *
 				scale, w * 0.3 * scale, h * 0.05 * scale);
 			ctx.shadowBlur = w * 0.05 * pulse;
-			ctx.shadowColor = "#8800ff";
+			ctx.shadowColor = COLORS_DEFAULT.ui.achievements.palette
+				.purple;
 			ctx.fillStyle =
 				`rgb(${100 + pulse * 50}, 0, ${200 + pulse * 55})`;
 			ctx.fillRect(px + w * 0.15 * scale, py + h * 0.08 *
 				scale, w * 0.3 * scale, h * 0.06 * scale);
-			ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+			ctx.fillStyle = CW.common.white_transp;
 			ctx.fillRect(px + w * 0.2 * scale, py + h * 0.09 *
 				scale, w * 0.05 * scale, h * 0.04 * scale);
 			ctx.restore();
@@ -774,9 +781,9 @@ ITEMS_DATA[ITEM_ANUBIS_SANDSTORM_STAFF] = {
 	desc_rus: "Призывает разрушительный золотой вихрь песка. Требует красную плазму.",
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
-		ctx.fillStyle = "#FFD700";
+		ctx.fillStyle = CW.special.anubis_gold;
 		ctx.fillRect(x + w * 0.47, y + h * 0.2, w * 0.06, h * 0.7);
-		ctx.fillStyle = "#FFA500";
+		ctx.fillStyle = CW.special.anubis_orange;
 		ctx.beginPath();
 		ctx.moveTo(x + w * 0.5, y + h * 0.1);
 		ctx.lineTo(x + w * 0.65, y + h * 0.25);
@@ -787,7 +794,7 @@ ITEMS_DATA[ITEM_ANUBIS_SANDSTORM_STAFF] = {
 			let s = w * 0.03;
 			let px = x + w * 0.5 + Math.cos(t * 0.1 + i) * (w * 0.2);
 			let py = y + h * 0.25 + Math.sin(t * 0.1 + i) * (h * 0.15);
-			ctx.fillStyle = "rgba(255, 165, 0, 0.6)";
+			ctx.fillStyle = CW.special.anubis_orange_transp;
 			ctx.fillRect(px, py, s, s);
 		}
 	}
@@ -800,10 +807,10 @@ ITEMS_DATA[ITEM_ANUBIS_PUNISHER_ROD] = {
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const pulse = Math.sin(t * 0.1) * 0.5 + 0.5;
-		const gold = "#FFD700";
-		const dark = "#1A1A1A";
-		const red = "#FF0000";
-		const lightGold = "rgba(255, 255, 255, 0.3)";
+		const gold = CW.special.anubis_gold;
+		const dark = CW.common.black_soft;
+		const red = CW.special.red_glow;
+		const lightGold = CW.common.white_gloss;
 		ctx.save();
 		ctx.fillStyle = dark;
 		ctx.fillRect(x + w * 0.14, y + h * 0.53, w * 0.08, h * 0.2);

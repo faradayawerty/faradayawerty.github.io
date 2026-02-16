@@ -1,13 +1,15 @@
+let COLORS_CARS = COLORS_DEFAULT.cars;
+
 function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	"default", health = null, fuel = null) {
 	if (type === "default" && Math.random() < 0.01)
 		type = "taxi";
 	if (g.objects["shooting laser"] && Math.random() < 0.25) is_tank = true;
 	if (is_tank) type = "tank";
-	if (type === "police") color_ = "#222";
-	if (type === "fireman") color_ = "#b22222";
-	if (type === "ambulance") color_ = "#f0f0f0";
-	if (type === "taxi") color_ = "#f7b500";
+	if (type === "police") color_ = COLORS_CARS.types.police.body;
+	if (type === "fireman") color_ = COLORS_CARS.types.fireman.body;
+	if (type === "ambulance") color_ = COLORS_CARS.types.ambulance.body;
+	if (type === "taxi") color_ = COLORS_CARS.types.taxi.body;
 	let width = 200,
 		height = 110;
 	let c = {
@@ -114,16 +116,16 @@ function drawIndicators(car_object, ctx, p) {
 	let barWidth = 0.5 * p.h;
 	if (car_object.game.settings.indicators["show car health"] && p.health >
 		0) {
-		ctx.fillStyle = "red";
+		ctx.fillStyle = COLORS_CARS.ui.health_bg;
 		ctx.fillRect(px - barWidth / 2, py - 0.25 * p.h, barWidth, 2);
-		ctx.fillStyle = "lime";
+		ctx.fillStyle = COLORS_CARS.ui.health_fill;
 		ctx.fillRect(px - barWidth / 2, py - 0.25 * p.h, barWidth * (p.health /
 			p.max_health), 2);
 	}
 	if (car_object.game.settings.indicators["show car fuel"]) {
-		ctx.fillStyle = "red";
+		ctx.fillStyle = COLORS_CARS.ui.fuel_bg;
 		ctx.fillRect(px - barWidth / 2, py - 0.2 * p.h, barWidth, 2);
-		ctx.fillStyle = "gray";
+		ctx.fillStyle = COLORS_CARS.ui.fuel_fill;
 		ctx.fillRect(px - barWidth / 2, py - 0.2 * p.h, barWidth * (p.fuel / p
 			.max_fuel), 2);
 	}
@@ -195,21 +197,21 @@ function car_draw(car_object, ctx) {
 	let w = p.w;
 	let h = p.h;
 	ctx.fillStyle = p.color;
-	ctx.strokeStyle = "#000";
+	ctx.strokeStyle = COLORS_CARS.common.outline;
 	ctx.lineWidth = 2;
 	roundRect(ctx, -w / 2, -h / 2, w, h, 15, true, true);
 	if (p.type === "police") {
-		ctx.fillStyle = "#005ecb";
+		ctx.fillStyle = COLORS_CARS.types.police.stripe;
 		ctx.fillRect(-w / 2, -h * 0.15, w, h * 0.3);
-		ctx.fillStyle = "#fff";
+		ctx.fillStyle = COLORS_CARS.types.police.line;
 		ctx.fillRect(-w / 2, -h * 0.02, w, h * 0.04);
 	}
 	if (p.type === "ambulance") {
-		ctx.fillStyle = "#d32f2f";
+		ctx.fillStyle = COLORS_CARS.types.ambulance.stripe;
 		ctx.fillRect(-w / 2, -h * 0.1, w, h * 0.2);
 	}
 	if (p.type === "taxi") {
-		ctx.fillStyle = "#000";
+		ctx.fillStyle = COLORS_CARS.types.taxi.checkers;
 		let checkerSize = 12;
 		for (let i = 0; i < 5; i++) {
 			ctx.fillRect(-w / 2 + 30 + (i * checkerSize * 2), -h / 2 + 2,
@@ -223,34 +225,34 @@ function car_draw(car_object, ctx) {
 		}
 	}
 	if (!p.is_tank) {
-		ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+		ctx.fillStyle = COLORS_CARS.common.shadow;
 		ctx.fillRect(-w / 2, -h / 2, w * 0.1, h);
-		ctx.fillStyle = "#aaddff";
-		ctx.strokeStyle = "#222";
+		ctx.fillStyle = COLORS_CARS.common.glass;
+		ctx.strokeStyle = COLORS_CARS.common.glass_outline;
 		ctx.lineWidth = 1;
 		ctx.fillRect(w * 0.1, -h * 0.4, w * 0.15, h * 0.8);
 		ctx.strokeRect(w * 0.1, -h * 0.4, w * 0.15, h * 0.8);
-		ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+		ctx.fillStyle = COLORS_CARS.common.glass_reflection;
 		ctx.fillRect(w * 0.12, -h * 0.3, w * 0.03, h * 0.2);
 	}
 	if (p.is_tank) {
-		ctx.fillStyle = "#1a1a1a";
+		ctx.fillStyle = COLORS_CARS.tank.tracks;
 		let trackW = w * 1.05;
 		let trackH = h * 0.25;
 		ctx.fillRect(-trackW / 2, -h / 2 - trackH * 0.5, trackW, trackH);
 		ctx.fillRect(-trackW / 2, h / 2 - trackH * 0.5, trackW, trackH);
-		ctx.strokeStyle = "#333";
+		ctx.strokeStyle = COLORS_CARS.tank.track_lines;
 		ctx.lineWidth = 2;
 		for (let i = 0; i < 10; i++) {
 			let tx = -trackW / 2 + (i * (trackW / 9));
 			drawLine(ctx, tx, -h / 2 - trackH * 0.5, tx, -h / 2 + trackH * 0.5,
-				"#333", 2);
+				COLORS_CARS.tank.track_lines, 2);
 			drawLine(ctx, tx, h / 2 - trackH * 0.5, tx, h / 2 + trackH * 0.5,
-				"#333", 2);
+				COLORS_CARS.tank.track_lines, 2);
 		}
 	}
 	else {
-		ctx.fillStyle = "#111";
+		ctx.fillStyle = COLORS_CARS.common.wheels;
 		let wheelW = w * 0.2,
 			wheelH = h * 0.15;
 		ctx.fillRect(w * 0.2, -h / 2 - wheelH, wheelW, wheelH);
@@ -271,11 +273,11 @@ function car_draw(car_object, ctx) {
 			.atan2(gy, gx) - p.body.angle;
 		ctx.save();
 		ctx.rotate(towerAngle);
-		ctx.fillStyle = "#222";
-		ctx.strokeStyle = "#000";
+		ctx.fillStyle = COLORS_CARS.tank.barrel;
+		ctx.strokeStyle = COLORS_CARS.common.outline;
 		ctx.fillRect(0, -8, w * 0.7, 16);
 		ctx.strokeRect(0, -8, w * 0.7, 16);
-		ctx.fillStyle = "black";
+		ctx.fillStyle = COLORS_CARS.tank.muzzle;
 		ctx.fillRect(w * 0.6, -12, w * 0.12, 24);
 		ctx.fillStyle = p.color;
 		ctx.beginPath();
@@ -285,7 +287,7 @@ function car_draw(car_object, ctx) {
 		ctx.restore();
 	}
 	if (p.type === "fireman") {
-		ctx.strokeStyle = "#ddd";
+		ctx.strokeStyle = COLORS_CARS.types.fireman.ladder;
 		ctx.lineWidth = 3;
 		let ladderStep = 18;
 		for (let i = 0; i < 6; i++) {
@@ -299,8 +301,8 @@ function car_draw(car_object, ctx) {
 	}
 	if (["police", "fireman", "ambulance"].includes(p.type)) {
 		let is_alt = Math.floor(p.siren_timer / 200) % 2 === 0;
-		let s_color = is_alt ? "#ff0000" : (p.type === "police" ? "#0000ff" :
-			"#ffaa00");
+		let s_color = is_alt ? COLORS_CARS.common.siren_red : COLORS_CARS.types[
+			p.type].siren_alt;
 		ctx.fillStyle = s_color;
 		ctx.beginPath();
 		ctx.arc(0, 0, 12, 0, Math.PI * 2);
@@ -310,9 +312,9 @@ function car_draw(car_object, ctx) {
 		ctx.globalAlpha = 1.0;
 	}
 	else if (p.type === "taxi") {
-		ctx.fillStyle = "#000";
+		ctx.fillStyle = COLORS_CARS.types.taxi.sign_bg;
 		ctx.fillRect(-15, -25, 30, 50);
-		ctx.fillStyle = "#ffcc00";
+		ctx.fillStyle = COLORS_CARS.types.taxi.sign_text;
 		ctx.fillRect(-10, -20, 20, 40);
 	}
 	ctx.restore();

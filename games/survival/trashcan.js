@@ -64,8 +64,8 @@ function trashcan_draw(self, ctx) {
 	ctx.save();
 	ctx.translate(p.body.position.x, p.body.position.y);
 	ctx.rotate(p.body.angle);
-	ctx.fillStyle = "#555555";
-	ctx.strokeStyle = "#333333";
+	ctx.fillStyle = COLORS_DEFAULT.trashcan.fill;
+	ctx.strokeStyle = COLORS_DEFAULT.trashcan.stroke;
 	ctx.lineWidth = 2;
 	roundRect(ctx, -p.w / 2, -p.h / 2, p.w, p.h, 5, true, true);
 	ctx.beginPath();

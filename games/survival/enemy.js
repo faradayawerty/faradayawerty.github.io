@@ -132,8 +132,8 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	}
 	if (make_minion) {
 		e.damage = 0.5 * e.damage;
-		e.health = 0.25 * e.max_health;
-		e.max_health = 0.25 * e.max_health;
+		e.health = 0.5 * e.max_health;
+		e.max_health = 0.5 * e.max_health;
 		e.hunger = 0.05 * e.max_hunger;
 		e.max_hunger = 0.05 * e.max_hunger;
 		if (config.is_snake) {
@@ -519,18 +519,19 @@ function enemy_draw(enemy_object, ctx) {
 		}
 	}
 	if (enemy_object.game.settings.indicators["show enemy hunger"]) {
-		ctx.fillStyle = "red";
+		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.hunger_bg;
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
 			e.w, e.h * 0.05);
-		ctx.fillStyle = "orange";
+		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.hunger_fill;
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
 			e.w * e.hunger / e.max_hunger, e.h * 0.05);
 	}
 	if (enemy_object.game.settings.indicators["show enemy health"]) {
-		ctx.fillStyle = "red";
+		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.health_bg;
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
 			e.w, e.h * 0.05);
 		ctx.fillStyle = "lime";
+		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.health_fill;
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
 			e.w * e.health / e.max_health, e.h * 0.05);
 	}

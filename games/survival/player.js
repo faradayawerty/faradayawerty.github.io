@@ -421,7 +421,9 @@ function player_update(player_object, dt) {
 					(ITEMS_GUNS.concat(ITEMS_MELEE).includes(id) &&
 						player_object.game.settings.auto_pickup[
 							"automatically pickup weapons"]) ||
-					([ITEM_SHIELD, ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW]
+					([ITEM_SHIELD, ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW,
+							ITEM_SHADOW_SHIELD, ITEM_ANUBIS_REGEN_SHIELD
+						]
 						.includes(id) && player_object.game.settings
 						.auto_pickup["automatically pickup shields"]) ||
 					([ITEM_HEALTH, ITEM_HEALTH_GREEN].includes(id) &&
@@ -617,6 +619,7 @@ function player_draw(player_object, ctx) {
 	if (p.immunity % 350 > 175) return;
 	if (p.car_object) return;
 	let g = player_object.game;
+	let c = COLORS_DEFAULT;
 	let selected_item = (p.last_auto_weapon > 0) ? p.last_auto_weapon :
 		hotbar_get_selected_item(p.hotbar_element);
 	let cfg = WEAPON_DEFS[selected_item];
@@ -664,7 +667,7 @@ function player_draw(player_object, ctx) {
 	let headY = posY - ph * 0.65 + bob;
 	ctx.save();
 	ctx.save();
-	ctx.strokeStyle = g.settings.player_color;
+	ctx.strokeStyle = g.settings.player_color || c.player.hair_default;
 	ctx.lineWidth = pw * 0.015;
 	for (let i = 0; i < 45; i++) {
 		ctx.beginPath();
@@ -677,9 +680,9 @@ function player_draw(player_object, ctx) {
 		ctx.stroke();
 	}
 	ctx.restore();
-	ctx.strokeStyle = "black";
+	ctx.strokeStyle = c.player.outline;
 	ctx.lineWidth = 1;
-	ctx.fillStyle = "#111";
+	ctx.fillStyle = c.player.shoes;
 	let walk = (speed > 0.5) ? Math.sin(t) * (ph * 0.15) : 0;
 	ctx.beginPath();
 	ctx.roundRect(posX - pw * 0.25, posY + ph * 0.25 + walk, pw * 0.18, ph *
@@ -688,7 +691,7 @@ function player_draw(player_object, ctx) {
 		0.35, pw * 0.05);
 	ctx.fill();
 	ctx.stroke();
-	ctx.fillStyle = g.settings.player_color;
+	ctx.fillStyle = g.settings.player_color || c.player.blue;
 	ctx.beginPath();
 	ctx.roundRect(posX - pw * 0.35, bodyY, pw * 0.7, ph * 0.8, pw * 0.08);
 	ctx.fill();
@@ -697,12 +700,12 @@ function player_draw(player_object, ctx) {
 	ctx.moveTo(posX, bodyY);
 	ctx.lineTo(posX, bodyY + ph * 0.8);
 	ctx.stroke();
-	ctx.fillStyle = "#d2b48c";
+	ctx.fillStyle = c.player.skin;
 	ctx.beginPath();
 	ctx.roundRect(posX - pw * 0.25, headY, pw * 0.5, ph * 0.4, pw * 0.12);
 	ctx.fill();
 	ctx.stroke();
-	ctx.fillStyle = "white";
+	ctx.fillStyle = c.player.eye_white;
 	let eyeX = posX + dirX * (pw * 0.05);
 	let eyeY = headY + ph * 0.18 + dirY * (ph * 0.03);
 	ctx.beginPath();
@@ -711,7 +714,7 @@ function player_draw(player_object, ctx) {
 	ctx.beginPath();
 	ctx.arc(eyeX + pw * 0.1, eyeY, pw * 0.06, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.fillStyle = "black";
+	ctx.fillStyle = c.player.eye_iris;
 	let irisOff = pw * 0.04;
 	ctx.beginPath();
 	ctx.arc(eyeX - pw * 0.1 + dirX * irisOff, eyeY + dirY * irisOff, pw * 0.03,
@@ -726,18 +729,18 @@ function player_draw(player_object, ctx) {
 		let shX = posX + (pw * 0.3 * side);
 		let shY = bodyY + ph * 0.3;
 		ctx.save();
-		ctx.strokeStyle = "#222";
+		ctx.strokeStyle = c.player.arm_sleeve;
 		ctx.lineWidth = pw * 0.11;
 		ctx.lineCap = "round";
 		ctx.beginPath();
 		ctx.moveTo(shX, shY);
 		ctx.lineTo(endX, endY);
 		ctx.stroke();
-		ctx.fillStyle = "#111";
+		ctx.fillStyle = c.player.arm_hand;
 		ctx.beginPath();
 		ctx.arc(endX, endY, pw * 0.065, 0, Math.PI * 2);
 		ctx.fill();
-		ctx.strokeStyle = "black";
+		ctx.strokeStyle = c.player.outline;
 		ctx.lineWidth = 1;
 		ctx.stroke();
 		ctx.restore();
@@ -747,7 +750,7 @@ function player_draw(player_object, ctx) {
 		let gunW = (cfg.width || 1) * 0.18 * pw;
 		let gl = (cfg.length || 0.8) * pw * 0.75;
 		let col = cfg.dynamicColor ? cfg.dynamicColor(p) : (cfg.color ||
-			"black");
+			c.weapons.common.black);
 		ctx.lineCap = "butt";
 		if (cfg.hasSecondary) {
 			let lx = (posX + pw * 0.3 * -1) + dirX * ARM_L;
@@ -784,11 +787,11 @@ function player_draw(player_object, ctx) {
 		let hx = posX + dirX * ARM_L,
 			hy = (bodyY + ph * 0.3) + dirY * ARM_L;
 		let swLen = 80,
-			col = "#55aa11",
+			col = c.weapons.special.sword_blade,
 			swW = 0.18 * pw;
-		if (selected_item === ITEM_HORN) col = "brown";
+		if (selected_item === ITEM_HORN) col = c.weapons.common.wood;
 		if (selected_item === ITEM_STICK) {
-			col = "brown";
+			col = c.weapons.common.wood;
 			swLen = 50;
 			swW = 0.1 * pw;
 		}
@@ -826,33 +829,33 @@ function player_draw(player_object, ctx) {
 			ctx.strokeStyle = strokeCol;
 			let lx = pw * 60 * Math.cos(p.laser_direction),
 				ly = pw * 60 * Math.sin(p.laser_direction);
-			let startX = posX + dirX * ARM_L,
-				startY = bodyY + ph * 0.3 + dirY * ARM_L;
+			let startX = posX + 3.5 * dirX * ARM_L,
+				startY = bodyY + ph * 0.3 + 3.5 * dirY * ARM_L;
 			ctx.moveTo(startX, startY);
 			ctx.lineTo(startX + lx, startY + ly);
 			ctx.stroke();
 		};
 		drawLaserLine(pw * 0.65, laserColor);
-		drawLaserLine(pw * 0.45, "white");
+		drawLaserLine(pw * 0.45, c.player.laser_glow);
 		p.shooting_laser = false;
 	}
 	ctx.restore();
 	const drawStat = (val, max, offset, color) => {
-		ctx.fillStyle = "red";
+		ctx.fillStyle = c.player.indicator_bg;
 		ctx.fillRect(posX - pw / 2, posY - offset * ph, pw, ph * 0.05);
 		ctx.fillStyle = color;
 		ctx.fillRect(posX - pw / 2, posY - offset * ph, pw * Math.max(val,
 			0) / max, ph * 0.05);
 	};
 	if (g.settings.indicators["show player health"]) drawStat(p.health, p
-		.max_health, 0.9, "lime");
+		.max_health, 0.9, c.player.indicator_health);
 	if (g.settings.indicators["show player thirst"]) drawStat(p.thirst, p
-		.max_thirst, 0.8, "cyan");
+		.max_thirst, 0.8, c.player.indicator_thirst);
 	if (g.settings.indicators["show player hunger"]) drawStat(p.hunger, p
-		.max_hunger, 0.7, "orange");
+		.max_hunger, 0.7, c.player.indicator_hunger);
 	const renderShield = (health, max, fill, stroke) => {
 		if (health <= 0) return;
-		ctx.fillStyle = "gray";
+		ctx.fillStyle = c.player.indicator_shield_bg;
 		ctx.fillRect(posX - 1.25 * pw, posY - 1.85 * ph, 2.5 * pw, ph *
 			0.05);
 		ctx.fillStyle = fill;
@@ -862,14 +865,18 @@ function player_draw(player_object, ctx) {
 		drawCircle(ctx, posX, posY, 1.5 * pw, fill, stroke, 0.05 * pw);
 		ctx.globalAlpha = 1.0;
 	};
-	renderShield(p.shield_blue_health, p.shield_blue_health_max, "#1177aa",
-		"#113377");
-	renderShield(p.shield_green_health, p.shield_green_health_max, "lime",
-		"#117733");
-	renderShield(p.shield_shadow_health, p.shield_shadow_health_max, "#1a0033",
-		"#8800ff");
-	renderShield(p.shield_anubis_health, p.shield_anubis_health_max, "#cc0000",
-		"#FFD700");
+	renderShield(p.shield_blue_health, p.shield_blue_health_max, c.player
+		.shield_blue_fill,
+		c.player.shield_blue_stroke);
+	renderShield(p.shield_green_health, p.shield_green_health_max, c.items
+		.shield_kinetic.fill,
+		c.items.shield_kinetic.outline);
+	renderShield(p.shield_shadow_health, p.shield_shadow_health_max, c.items
+		.shield_shadow.fill,
+		c.items.shield_shadow.outline);
+	renderShield(p.shield_anubis_health, p.shield_anubis_health_max, c.items
+		.aegis.body,
+		c.items.aegis.gold);
 	if (p.shield_rainbow_health > 0) {
 		let r = Math.floor(Math.pow(Math.cos(0.1 * p.item_animstate) * 15, 2));
 		let gre = Math.floor(Math.pow(0.7 * (Math.cos(0.1 * p.item_animstate) +
@@ -878,7 +885,7 @@ function player_draw(player_object, ctx) {
 		let rCol = "#" + r.toString(16).padStart(2, '0') + gre.toString(16)
 			.padStart(2, '0') + b.toString(16).padStart(2, '0');
 		renderShield(p.shield_rainbow_health, p.shield_rainbow_health_max, rCol,
-			"white");
+			c.player.laser_glow);
 	}
 }
 

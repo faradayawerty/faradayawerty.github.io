@@ -1,3 +1,4 @@
+const INV_COLS = COLORS_DEFAULT.ui.inventory;
 let INVENTORY_X = 40;
 let INVENTORY_Y = 40;
 
@@ -55,14 +56,14 @@ function inventory_draw(inventory_element, ctx) {
 			ctx.save();
 			ctx.globalAlpha = 0.9;
 			if (inv.imove === i && inv.jmove === j)
-				ctx.fillStyle = "#ff9d00";
+				ctx.fillStyle = INV_COLS.cell_move;
 			else if (inv.iselected === i && inv.jselected === j)
-				ctx.fillStyle = "#00f2ff";
+				ctx.fillStyle = INV_COLS.cell_selected;
 			else
-				ctx.fillStyle = "#4d4dff";
+				ctx.fillStyle = INV_COLS.cell_bg;
 			ctx.fillRect(sx, sy, inv.slot_size, inv.slot_size);
 			if (i === 0) {
-				ctx.strokeStyle = "#00ffff";
+				ctx.strokeStyle = INV_COLS.cell_hotbar_outline;
 				ctx.lineWidth = inv.slot_size * 0.0125;
 				ctx.strokeRect(sx, sy, inv.slot_size, inv.slot_size);
 			}
@@ -91,10 +92,10 @@ function inventory_draw(inventory_element, ctx) {
 			else {
 				ctx.fillRect(x, y, w, h);
 			}
-			ctx.strokeStyle = "white";
+			ctx.strokeStyle = INV_COLS.btn_outline;
 			ctx.lineWidth = 2;
 			ctx.strokeRect(x, y, w, h);
-			ctx.fillStyle = "white";
+			ctx.fillStyle = INV_COLS.btn_text;
 			ctx.font = "bold 18px Arial";
 			ctx.textAlign = "center";
 			ctx.textBaseline = "middle";
@@ -104,9 +105,9 @@ function inventory_draw(inventory_element, ctx) {
 		let isRus = game.settings.language === "русский";
 		let useText = isRus ? "ИСПОЛЬЗОВАТЬ" : "USE";
 		let dropText = isRus ? "ВЫБРОСИТЬ" : "DROP";
-		drawStyledBtn(startX, startY, btnW, btnH, useText, "#228822");
+		drawStyledBtn(startX, startY, btnW, btnH, useText, INV_COLS.btn_use);
 		drawStyledBtn(startX + btnW + gap, startY, btnW, btnH, dropText,
-			"#882222");
+			INV_COLS.btn_drop);
 	}
 	inventory_close_button_draw(inventory_element, ctx);
 	if (!game.mobile && inv.imove > -1 && inv.jmove > -1) {
@@ -222,16 +223,16 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	if (y < 0) y = 10;
 	ctx.save();
 	ctx.globalAlpha = 0.9;
-	ctx.fillStyle = "black";
-	ctx.strokeStyle = "gray";
+	ctx.fillStyle = INV_COLS.popup_bg;
+	ctx.strokeStyle = INV_COLS.popup_border;
 	ctx.lineWidth = 2;
 	ctx.fillRect(x, y, W, H);
 	ctx.strokeRect(x, y, W, H);
 	ctx.globalAlpha = 1.0;
-	ctx.fillStyle = "yellow";
+	ctx.fillStyle = INV_COLS.popup_title;
 	ctx.font = `bold ${fontsize - 2}px Arial`;
 	ctx.fillText(name, x + 10, y + 30);
-	ctx.fillStyle = "white";
+	ctx.fillStyle = INV_COLS.popup_text;
 	ctx.font = `${fontsize}px Arial`;
 	let words = desc.split(' ');
 	let line = "";
@@ -456,13 +457,14 @@ function inventory_close_button_draw(inventory_element, ctx) {
 	let btn = inv.close_button;
 	let cs = btn.size;
 	ctx.save();
-	ctx.fillStyle = btn.is_hovered ? "#882222" : "#444444";
+	ctx.fillStyle = btn.is_hovered ? INV_COLS.close_hover : INV_COLS.close_bg;
 	ctx.fillRect(btn.x, btn.y, cs, cs);
-	ctx.strokeStyle = "white";
+	ctx.strokeStyle = INV_COLS.close_icon;
 	ctx.lineWidth = 2;
 	ctx.strokeRect(btn.x, btn.y, cs, cs);
 	ctx.beginPath();
-	ctx.strokeStyle = btn.is_hovered ? "#ffaaaa" : "white";
+	ctx.strokeStyle = btn.is_hovered ? INV_COLS.close_icon_hover : INV_COLS
+		.close_icon;
 	ctx.moveTo(btn.x + cs * 0.25, btn.y + cs * 0.25);
 	ctx.lineTo(btn.x + cs * 0.75, btn.y + cs * 0.75);
 	ctx.moveTo(btn.x + cs * 0.75, btn.y + cs * 0.25);

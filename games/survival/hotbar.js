@@ -1,3 +1,5 @@
+const HB_COLS = COLORS_DEFAULT.ui.hotbar;
+
 function hotbar_create(g, inv, attached_to_object = null) {
 	let hb = {
 		iselected: 0,
@@ -55,37 +57,42 @@ function hotbar_draw(hotbar_object, ctx) {
 		step = s * 1.05;
 	}
 	for (let i = 0; i < hb.row.length; i++) {
+		ctx.save();
 		ctx.globalAlpha = 0.9;
-		ctx.fillStyle = (hb.iselected == i) ? "#00f2ff" : "#4d4dff";
+		ctx.fillStyle = (hb.iselected == i) ? HB_COLS.cell_selected : HB_COLS
+			.cell_bg;
 		ctx.fillRect(start_x + step * i, start_y, s, s);
 		ctx.globalAlpha = 1.0;
 		item_icon_draw(ctx, hb.row[i], start_x + step * i, start_y, s, s, hb
 			.animation_state);
+		ctx.restore();
 	}
 	const drawButtonBg = (x, y_off, type) => {
+		ctx.save();
 		if (!hotbar_object.game.mobile && hb.hovered_btn === type) {
-			ctx.fillStyle = "#6699ff";
+			ctx.fillStyle = HB_COLS.button_hover;
 		}
 		else {
-			ctx.fillStyle = "#4477ff";
+			ctx.fillStyle = HB_COLS.button_bg;
 		}
 		ctx.globalAlpha = 0.8;
 		ctx.fillRect(x, y_off, s, s);
 		ctx.globalAlpha = 1.0;
 		if (!hotbar_object.game.mobile && hb.hovered_btn === type) {
-			ctx.strokeStyle = "white";
+			ctx.strokeStyle = HB_COLS.button_outline;
 			ctx.lineWidth = 2;
 			ctx.strokeRect(x, y_off, s, s);
 		}
+		ctx.restore();
 	};
 	const drawIndicator = (ix, iy, val, max, colorEmpty, colorFull, itemKey,
 		type) => {
+		ctx.save();
 		if (!hotbar_object.game.mobile && hb.hovered_btn === type) {
-			ctx.fillStyle = "#6699ff";
+			ctx.fillStyle = HB_COLS.button_hover;
 			ctx.globalAlpha = 0.8;
 			ctx.fillRect(ix, iy, s, s);
 		}
-		ctx.save();
 		ctx.globalAlpha = 0.6;
 		ctx.fillStyle = colorEmpty;
 		ctx.fillRect(ix, iy, s, s);
@@ -93,8 +100,9 @@ function hotbar_draw(hotbar_object, ctx) {
 		ctx.fillStyle = colorFull;
 		let fillH = s * ratio;
 		ctx.fillRect(ix, iy + (s - fillH), s, fillH);
-		ctx.strokeStyle = (hb.hovered_btn === type) ? "white" :
-			"rgba(255,255,255,0.4)";
+		ctx.strokeStyle = (hb.hovered_btn === type) ? HB_COLS
+			.button_outline :
+			HB_COLS.indicator_outline;
 		ctx.lineWidth = 2;
 		ctx.strokeRect(ix, iy, s, s);
 		let iconPadding = s * 0.2;
@@ -138,17 +146,20 @@ function hotbar_draw(hotbar_object, ctx) {
 		res_step_x = step;
 		res_step_y = 0;
 	}
-	drawIndicator(res_x_base, res_y_base, p.hunger, p.max_hunger, "#331100",
-		"#ff8800", ITEM_APPLE, 'food');
+	drawIndicator(res_x_base, res_y_base, p.hunger, p.max_hunger, HB_COLS
+		.resources.hunger_empty,
+		HB_COLS.resources.hunger_full, ITEM_APPLE, 'food');
 	drawIndicator(res_x_base + res_step_x, res_y_base + res_step_y, p.thirst, p
-		.max_thirst, "#001144", "#1177dd", ITEM_WATER, 'water');
+		.max_thirst, HB_COLS.resources.thirst_empty, HB_COLS.resources
+		.thirst_full, ITEM_WATER, 'water');
 	drawIndicator(res_x_base + res_step_x * 2, res_y_base + res_step_y * 2, p
-		.health, p.max_health, "#880000", "#22ff22", ITEM_HEALTH, 'health');
+		.health, p.max_health, HB_COLS.resources.health_empty, HB_COLS
+		.resources.health_full, ITEM_HEALTH, 'health');
 	if (hb.has_shield_button) {
 		let sVal = 0,
 			sMax = 100,
 			sIcon = ITEM_SHIELD_GRAY,
-			sColor = "#00ffff";
+			sColor = HB_COLS.resources.shield_default;
 		if (p.shield_rainbow_health > 0) {
 			sVal = p.shield_rainbow_health;
 			sMax = p.shield_rainbow_health_max;
@@ -185,15 +196,16 @@ function hotbar_draw(hotbar_object, ctx) {
 			sVal = p.shield_blue_health;
 			sMax = p.shield_blue_health_max;
 			sIcon = ITEM_SHIELD;
-			sColor = "#00ffff";
+			sColor = HB_COLS.resources.shield_default;
 		}
 		drawIndicator(res_x_base + res_step_x * 3, res_y_base + res_step_y * 3,
-			sVal, sMax, "#444444", sColor, sIcon, 'shield');
+			sVal, sMax, HB_COLS.resources.shield_empty, sColor, sIcon,
+			'shield');
 	}
 	drawButtonBg(btn_menu_x, btn_menu_y, 'menu');
 	ctx.save();
+	ctx.fillStyle = HB_COLS.button_outline;
 	if (isMobile) {
-		ctx.fillStyle = "white";
 		let barW = s * 0.5;
 		let barH = s * 0.08;
 		let barX = btn_menu_x + (s - barW) / 2;
@@ -209,7 +221,6 @@ function hotbar_draw(hotbar_object, ctx) {
 		let toothWidth = s * 0.12;
 		let innerRadius = s * 0.08;
 		let teethCount = 8;
-		ctx.fillStyle = "white";
 		for (let i = 0; i < teethCount; i++) {
 			let angle = (i * 2 * Math.PI) / teethCount;
 			ctx.save();
@@ -240,27 +251,30 @@ function hotbar_draw(hotbar_object, ctx) {
 		bh = s - pad * 2;
 	let bx = btn_inv_x + pad,
 		by = btn_inv_y + pad;
-	ctx.fillStyle = "#a52a2a";
+	ctx.save();
+	ctx.fillStyle = HB_COLS.icons.inv_bag;
 	ctx.fillRect(bx, by + bh * 0.2, bw, bh * 0.8);
-	ctx.fillStyle = "#8b4513";
+	ctx.fillStyle = HB_COLS.icons.inv_flap;
 	ctx.fillRect(bx, by + bh * 0.1, bw, bh * 0.4);
-	ctx.strokeStyle = "#8b4513";
+	ctx.strokeStyle = HB_COLS.icons.inv_flap;
 	ctx.lineWidth = s * 0.05;
 	ctx.beginPath();
 	ctx.arc(bx + bw / 2, by + bh * 0.1, bw * 0.2, Math.PI, 0);
 	ctx.stroke();
-	ctx.fillStyle = "yellow";
+	ctx.fillStyle = HB_COLS.icons.inv_buckle;
 	ctx.fillRect(bx + bw * 0.2, by + bh * 0.4, bw * 0.1, bh * 0.2);
 	ctx.fillRect(bx + bw * 0.7, by + bh * 0.4, bw * 0.1, bh * 0.2);
 	ctx.strokeStyle = "black";
 	ctx.lineWidth = s * 0.02;
 	ctx.strokeRect(bx, by + bh * 0.2, bw, bh * 0.8);
+	ctx.restore();
 	drawButtonBg(btn_ach_x, btn_ach_y, 'ach');
 	let ax = btn_ach_x + s * 0.25,
 		ay = btn_ach_y + s * 0.25;
 	let aw = s * 0.5,
 		ah = s * 0.5;
-	ctx.fillStyle = "gold";
+	ctx.save();
+	ctx.fillStyle = HB_COLS.icons.ach_cup;
 	ctx.beginPath();
 	ctx.moveTo(ax, ay);
 	ctx.lineTo(ax + aw, ay);
@@ -268,7 +282,7 @@ function hotbar_draw(hotbar_object, ctx) {
 	ctx.lineTo(ax + aw * 0.2, ay + ah * 0.6);
 	ctx.closePath();
 	ctx.fill();
-	ctx.strokeStyle = "orange";
+	ctx.strokeStyle = HB_COLS.icons.ach_outline;
 	ctx.lineWidth = s * 0.03;
 	ctx.stroke();
 	ctx.fillRect(ax + aw * 0.4, ay + ah * 0.6, aw * 0.2, ah * 0.3);
@@ -277,6 +291,7 @@ function hotbar_draw(hotbar_object, ctx) {
 	ctx.arc(ax, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
 	ctx.arc(ax + aw, ay + ah * 0.3, s * 0.1, 0, Math.PI * 2);
 	ctx.stroke();
+	ctx.restore();
 	if (!isMobile && hb.hovered_btn) {
 		let lang = hotbar_object.game.settings.language;
 		let title = "";
@@ -336,16 +351,16 @@ function hotbar_draw(hotbar_object, ctx) {
 			if (x + W > screenW) x -= W;
 			if (y + H > screenH) y -= H;
 			ctx.globalAlpha = 0.9;
-			ctx.fillStyle = "black";
-			ctx.strokeStyle = "gray";
+			ctx.fillStyle = HB_COLS.tooltip_bg;
+			ctx.strokeStyle = HB_COLS.tooltip_border;
 			ctx.lineWidth = 2;
 			ctx.fillRect(x, y, W, H);
 			ctx.strokeRect(x, y, W, H);
 			ctx.globalAlpha = 1.0;
-			ctx.fillStyle = "yellow";
+			ctx.fillStyle = HB_COLS.tooltip_title;
 			ctx.font = `bold ${fontsize}px Arial`;
 			ctx.fillText(title, x + 10, y + 30);
-			ctx.fillStyle = "white";
+			ctx.fillStyle = HB_COLS.tooltip_text;
 			ctx.font = `${fontsize - 4}px Arial`;
 			let words = description.split(' '),
 				line = "",

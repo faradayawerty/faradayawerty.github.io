@@ -1,5 +1,6 @@
 function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
-	size = 6, lifetime = 1500, color_fill = "yellow", color_outline = "orange",
+	size = 6, lifetime = 1500, color_fill = COLORS_DEFAULT.bullets.default_fill,
+	color_outline = COLORS_DEFAULT.bullets.default_outline,
 	invisible = false, poisoned = false, glowColor = null) {
 	let width = size,
 		height = size;

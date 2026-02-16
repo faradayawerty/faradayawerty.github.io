@@ -1,5 +1,7 @@
+const E_COLS = COLORS_DEFAULT.enemies;
+
 function enemy_health_from_tier(n) {
-	return 500 * Math.pow(1.25, n);
+	return 1000 * Math.pow(1.25, n);
 }
 
 function enemy_damage_from_tier(n) {
@@ -10,15 +12,15 @@ const ENEMY_TYPES = {
 		name_eng: "regular zombie",
 		name_rus: "заражённый",
 		requires: null,
-		eye_color: "red",
+		eye_color: E_COLS.regular.eye,
 		weight: 1,
 		health: enemy_health_from_tier(1),
 		speed: 7,
 		damage: enemy_damage_from_tier(1),
 		w: 30,
 		h: 30,
-		color: "green",
-		outline: "white",
+		color: E_COLS.regular.body,
+		outline: E_COLS.regular.outline,
 		range: 400,
 		delay: 1000,
 		bossifier_item: ITEM_BOSSIFIER_REGULAR,
@@ -42,7 +44,7 @@ const ENEMY_TYPES = {
 				target.data.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "green";
+			ctx.fillStyle = E_COLS.regular.body;
 			ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.2, h * 0.2);
 		},
 	},
@@ -51,14 +53,14 @@ const ENEMY_TYPES = {
 		name_rus: "заражённый военный",
 		requires: "regular",
 		weight: 2,
-		eye_color: "red",
+		eye_color: E_COLS.shooting.eye,
 		health: enemy_health_from_tier(2),
 		speed: 5,
 		damage: enemy_damage_from_tier(2),
 		w: 30,
 		h: 30,
-		color: "#335544",
-		outline: "white",
+		color: E_COLS.shooting.body,
+		outline: E_COLS.shooting.outline,
 		range: 400,
 		delay: 1000,
 		bossifier_item: ITEM_BOSSIFIER_SHOOTING,
@@ -66,7 +68,7 @@ const ENEMY_TYPES = {
 		visuals: {
 			draw_gun: true,
 			draw_gun_boss: true,
-			gun_color: "#331133",
+			gun_color: E_COLS.shooting.gun,
 			gun_width: 0.25,
 			outline_width: 1
 		},
@@ -76,7 +78,10 @@ const ENEMY_TYPES = {
 				if (e.shooting_delay >= 1000) {
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, vars.dx, vars.dy, 10, e.damage,
-						true, e.w * 0.2, 2000, "blue", "white");
+						true, e.w * 0.2, 2000, COLORS_DEFAULT
+						.enemies.shooting.bullet_fill,
+						COLORS_DEFAULT.enemies.shooting
+						.bullet_outline);
 					e.shooting_delay = 0;
 				}
 				vars.dx = 0;
@@ -100,9 +105,9 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#335544";
+			ctx.fillStyle = E_COLS.shooting.body;
 			ctx.fillRect(x + w * 0.38, y + h * 0.5, w * 0.18, h * 0.18);
-			ctx.fillStyle = "#331133";
+			ctx.fillStyle = E_COLS.shooting.gun;
 			ctx.fillRect(x + w * 0.56, y + h * 0.53, w * 0.15, h *
 				0.08);
 		},
@@ -117,9 +122,9 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(3.25),
 		w: 30,
 		h: 30,
-		eye_color: "red",
-		color: "#c2a26b",
-		outline: "#4d3d21",
+		eye_color: E_COLS.desert.eye,
+		color: E_COLS.desert.body,
+		outline: E_COLS.desert.outline,
 		range: 450,
 		delay: 400,
 		bossifier_item: ITEM_BOSSIFIER_DESERT,
@@ -129,7 +134,7 @@ const ENEMY_TYPES = {
 			glowColor: "black",
 			draw_gun: false,
 			draw_gun_boss: true,
-			gun_color: "#222222",
+			gun_color: E_COLS.desert.gun,
 			gun_width: 0.2,
 			outline_width: 1
 		},
@@ -148,8 +153,8 @@ const ENEMY_TYPES = {
 						true,
 						e.w * 0.15,
 						1500,
-						"#aa4400",
-						"#ffcc00",
+						E_COLS.desert.bullet_fill,
+						E_COLS.desert.bullet_outline,
 					);
 					e.shooting_delay = 0;
 				}
@@ -178,10 +183,10 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#222222";
+			ctx.fillStyle = E_COLS.desert.gun;
 			ctx.fillRect(x + w * 0.56, y + h * 0.53, w * 0.15, h *
 				0.08);
-			ctx.fillStyle = "#c2a26b";
+			ctx.fillStyle = E_COLS.desert.body;
 			ctx.fillRect(x + w * 0.38, y + h * 0.5, w * 0.18, h * 0.18);
 		},
 	},
@@ -195,9 +200,9 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(3),
 		w: 30,
 		h: 30,
-		eye_color: "yellow",
-		color: "#999999",
-		outline: "#aa3333",
+		eye_color: E_COLS.shooting_red.eye,
+		color: E_COLS.shooting_red.body,
+		outline: E_COLS.shooting_red.outline,
 		range: 400,
 		delay: 200,
 		bossifier_item: ITEM_BOSSIFIER_RED,
@@ -205,7 +210,7 @@ const ENEMY_TYPES = {
 		visuals: {
 			draw_gun: true,
 			draw_gun_boss: true,
-			gun_color: "#551111",
+			gun_color: E_COLS.shooting_red.gun,
 			gun_width: 0.21,
 			double_gun: true,
 			double_gun_minion: true,
@@ -220,10 +225,12 @@ const ENEMY_TYPES = {
 					bullet_create(obj.game, e.body.position.x + e.w, e
 						.body.position.y, vars.dx, vars.dy, 15, e
 						.damage, true, Math.max(0.09 * e.w, 4),
-						2000, "red", "white");
+						2000, E_COLS.shooting_red.bullet_main,
+						"white");
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, vars.dx, vars.dy, 15, e.damage,
-						true, Math.max(0.09 * e.w, 4), 2000, "red",
+						true, Math.max(0.09 * e.w, 4), 2000, E_COLS
+						.shooting_red.bullet_main,
 						"white");
 					e.shooting_delay = 0;
 				}
@@ -242,8 +249,9 @@ const ENEMY_TYPES = {
 						.ndy * Math.cos(theta);
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, rotatedX, rotatedY, 25, e
-						.damage, true, e.w * 0.1, 2000, "red",
-						"pink");
+						.damage, true, e.w * 0.1, 2000, E_COLS
+						.shooting_red.bullet_main,
+						E_COLS.shooting_red.bullet_alt);
 				}
 				e.shooting_delay = 0;
 			}
@@ -265,9 +273,9 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#999999";
+			ctx.fillStyle = E_COLS.shooting_red.body;
 			ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.2, h * 0.2);
-			ctx.fillStyle = "#551111";
+			ctx.fillStyle = E_COLS.shooting_red.gun;
 			ctx.fillRect(x + w * 0.55, y + h * 0.5, w * 0.15, h * 0.06);
 			ctx.fillRect(x + w * 0.55, y + h * 0.62, w * 0.15, h *
 				0.06);
@@ -277,7 +285,7 @@ const ENEMY_TYPES = {
 		name_eng: "zombie with a sword",
 		name_rus: "бамбуковый заражённый",
 		requires: "shooting red",
-		eye_color: "red",
+		eye_color: E_COLS.sword.eye,
 		weight: 4,
 		health: enemy_health_from_tier(5.25),
 		speed: 9.75,
@@ -288,8 +296,8 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(4.75),
 		w: 30,
 		h: 30,
-		color: "#bbaa11",
-		outline: "lime",
+		color: E_COLS.sword.body,
+		outline: E_COLS.sword.outline,
 		range: 400,
 		delay: 500,
 		max_minions: 25,
@@ -299,7 +307,7 @@ const ENEMY_TYPES = {
 			draw_gun: false,
 			draw_gun_boss: false,
 			draw_sword: true,
-			sword_color: "#55aa11",
+			sword_color: E_COLS.sword.sword,
 			outline_width: 1
 		},
 		minion_behaviour: (obj, dt, target, vars) => {
@@ -307,16 +315,20 @@ const ENEMY_TYPES = {
 			if (vars.v < e.shooting_range && e.shooting_delay >= 500) {
 				bullet_create(obj.game, e.body.position.x, e.body
 					.position.y, vars.tx, vars.ty, 7, e.damage,
-					true, 0.33 * e.w, 2000, "gray", "lime");
+					true, 0.33 * e.w, 2000, E_COLS.sword
+					.bullet_fill, E_COLS.sword.bullet_outline);
 				bullet_create(obj.game, e.body.position.x, e.body
 					.position.y, vars.ty, -vars.tx, 7, e.damage,
-					true, 0.33 * e.w, 2000, "gray", "lime");
+					true, 0.33 * e.w, 2000, E_COLS.sword
+					.bullet_fill, E_COLS.sword.bullet_outline);
 				bullet_create(obj.game, e.body.position.x, e.body
 					.position.y, -vars.tx, -vars.ty, 7, e.damage,
-					true, 0.33 * e.w, 2000, "gray", "lime");
+					true, 0.33 * e.w, 2000, E_COLS.sword
+					.bullet_fill, E_COLS.sword.bullet_outline);
 				bullet_create(obj.game, e.body.position.x, e.body
 					.position.y, -vars.ty, vars.tx, 7, e.damage,
-					true, 0.33 * e.w, 2000, "gray", "lime");
+					true, 0.33 * e.w, 2000, E_COLS.sword
+					.bullet_fill, E_COLS.sword.bullet_outline);
 				e.shooting_delay = 0;
 			}
 		},
@@ -347,10 +359,10 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#bbaa11";
+			ctx.fillStyle = E_COLS.sword.body;
 			ctx.fillRect(x + w * 0.38, y + h * 0.55, w * 0.18, h *
 				0.18);
-			ctx.strokeStyle = "#55aa11";
+			ctx.strokeStyle = E_COLS.sword.sword;
 			ctx.lineWidth = h * 0.045;
 			ctx.beginPath();
 			ctx.moveTo(x + w * 0.5, y + h * 0.7);
@@ -360,7 +372,7 @@ const ENEMY_TYPES = {
 	},
 	"mummy": {
 		name_eng: "ancient mummy",
-		eye_color: "#44bbff",
+		eye_color: E_COLS.mummy.eye,
 		name_rus: "древняя мумия",
 		requires: "desert",
 		weight: 2,
@@ -369,8 +381,8 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(5.25),
 		w: 30,
 		h: 30,
-		color: "#e2d1b3",
-		outline: "#8b7355",
+		color: E_COLS.mummy.body,
+		outline: E_COLS.mummy.outline,
 		range: 450,
 		delay: 1000,
 		theme: THEME_DESERT,
@@ -380,7 +392,7 @@ const ENEMY_TYPES = {
 			glowColor: "black",
 			draw_gun: true,
 			draw_gun_boss: true,
-			gun_color: "#5588aa",
+			gun_color: E_COLS.mummy.gun,
 			gun_width: 0.22,
 			double_gun: true,
 			double_gun_minion: true,
@@ -397,7 +409,7 @@ const ENEMY_TYPES = {
 					0.008)) * (h * 0.08) : Math.sin(Date.now() *
 					0.002) * (h * 0.03);
 				ctx.save();
-				ctx.strokeStyle = "rgba(139, 115, 85, 0.5)";
+				ctx.strokeStyle = E_COLS.mummy.bandage_shadow;
 				ctx.lineWidth = 1.5;
 				let bodyY = y - h * 0.3 + bob;
 				for (let i = 0; i < h * 0.7; i += 6) {
@@ -414,7 +426,7 @@ const ENEMY_TYPES = {
 					ctx.stroke();
 				}
 				ctx.shadowBlur = 10;
-				ctx.shadowColor = "#44bbff";
+				ctx.shadowColor = E_COLS.mummy.glow;
 				ctx.restore();
 			}
 		},
@@ -425,13 +437,13 @@ const ENEMY_TYPES = {
 					bullet_create(obj.game, e.body.position.x + e.w, e
 						.body.position.y, vars.dx, vars.dy, 15, e
 						.damage, true, Math.max(0.09 * e.w, 4),
-						2000, "#44bbff", "white",
+						2000, E_COLS.mummy.glow, "white",
 						false, false, null
 					);
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, vars.dx, vars.dy, 15, e.damage,
 						true, Math.max(0.09 * e.w, 4), 2000,
-						"#44bbff",
+						E_COLS.mummy.glow,
 						"white",
 						false, false, null
 					);
@@ -453,7 +465,7 @@ const ENEMY_TYPES = {
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, rx, ry, 25, e.damage, true, e
 						.w * 0.1, 2000,
-						"#44bbff",
+						E_COLS.mummy.glow,
 						"white",
 						false, false, null
 					);
@@ -464,11 +476,11 @@ const ENEMY_TYPES = {
 		render_icon: (ctx, x, y, w, h) => {
 			y = y - h * 0.1;
 			ctx.fillStyle = "#222222";
-			ctx.strokeStyle = "#8b7355";
+			ctx.strokeStyle = E_COLS.mummy.outline;
 			ctx.lineWidth = w * 0.02;
 			ctx.fillRect(x + w * 0.4, y + h * 0.58, w * 0.2, h * 0.2);
 			ctx.strokeRect(x + w * 0.4, y + h * 0.58, w * 0.2, h * 0.2);
-			ctx.strokeStyle = "#e2d1b3";
+			ctx.strokeStyle = E_COLS.mummy.body;
 			ctx.lineWidth = w * 0.02;
 			ctx.beginPath();
 			ctx.moveTo(x + w * 0.4, y + h * 0.62);
@@ -478,9 +490,9 @@ const ENEMY_TYPES = {
 			ctx.moveTo(x + w * 0.4, y + h * 0.75);
 			ctx.lineTo(x + w * 0.6, y + h * 0.70);
 			ctx.stroke();
-			ctx.fillStyle = "#44bbff";
+			ctx.fillStyle = E_COLS.mummy.glow;
 			ctx.shadowBlur = 4;
-			ctx.shadowColor = "#44bbff";
+			ctx.shadowColor = E_COLS.mummy.glow;
 			ctx.fillRect(x + w * 0.43, y + h * 0.64, w * 0.04, h *
 				0.04);
 			ctx.fillRect(x + w * 0.53, y + h * 0.64, w * 0.04, h *
@@ -514,16 +526,16 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(6),
 		w: 30,
 		h: 30,
-		color: "gray",
-		outline: "black",
-		eye_color: "yellow",
+		color: E_COLS.rocket.body,
+		outline: E_COLS.rocket.outline,
+		eye_color: E_COLS.rocket.eye,
 		range: 400,
 		delay: 2500,
 		bossifier_item: ITEM_BOSSIFIER_ROCKET,
 		visuals: {
 			draw_gun: true,
 			draw_gun_boss: true,
-			gun_color: "#113355",
+			gun_color: E_COLS.rocket.gun,
 			gun_width: 0.25,
 			outline_width: 1
 		},
@@ -567,9 +579,9 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "gray";
+			ctx.fillStyle = E_COLS.rocket.body;
 			ctx.fillRect(x + w * 0.38, y + h * 0.5, w * 0.18, h * 0.18);
-			ctx.fillStyle = "#113355";
+			ctx.fillStyle = E_COLS.rocket.gun;
 			ctx.fillRect(x + w * 0.56, y + h * 0.53, w * 0.15, h *
 				0.08);
 		},
@@ -584,12 +596,12 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(6.25),
 		w: 30,
 		h: 30,
-		color: "rgba(10, 10, 10, 0.6)",
-		outline: "white",
+		color: E_COLS.shadow.body,
+		outline: E_COLS.shadow.outline,
 		range: 500,
 		delay: 1000,
 		theme: THEME_DESERT,
-		eye_color: "purple",
+		eye_color: E_COLS.shadow.eye,
 		bossifier_item: ITEM_BOSSIFIER_SHADOW,
 		max_minions: 3,
 		behaviour: (obj, dt, target, vars) => {
@@ -614,14 +626,15 @@ const ENEMY_TYPES = {
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, Math.cos(angle), Math.sin(
 							angle), 10, e.damage, true, e.w * 0.1,
-						2000, "#4400ff", "#black");
+						2000, E_COLS.shadow.bullet_fill, E_COLS
+						.shadow.bullet_outline);
 				}
 				e.shooting_delay = 0;
 			}
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#222222";
-			ctx.strokeStyle = "white";
+			ctx.fillStyle = E_COLS.shadow.body_icon;
+			ctx.strokeStyle = E_COLS.shadow.outline;
 			ctx.lineWidth = 0.01 * w;
 			y = y - 0.1 * h;
 			ctx.fillRect(x + w * 0.4, y + h * 0.6, w * 0.2, h * 0.2);
@@ -647,7 +660,7 @@ const ENEMY_TYPES = {
 	"anubis": {
 		name_eng: "Anubis",
 		name_rus: "Анубис",
-		eye_color: "#ffff00",
+		eye_color: E_COLS.anubis.eye,
 		requires: "shadow",
 		weight: 4,
 		health: enemy_health_from_tier(7),
@@ -655,8 +668,8 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(7),
 		w: 50,
 		h: 50,
-		color: "#0a0a0a",
-		outline: "#ffd700",
+		color: E_COLS.anubis.body,
+		outline: E_COLS.anubis.outline,
 		range: 700,
 		delay: 400,
 		theme: THEME_DESERT,
@@ -665,7 +678,7 @@ const ENEMY_TYPES = {
 		visuals: {
 			draw_gun: true,
 			draw_gun_boss: false,
-			gun_color: "#ffd700",
+			gun_color: E_COLS.anubis.gun,
 			gun_width: 0.3,
 			double_gun: false,
 			custom_draw: (e, ctx) => {
@@ -680,24 +693,24 @@ const ENEMY_TYPES = {
 					0.002) * (h * 0.03);
 				const headCenterY = y - h * 0.5 + bob;
 				ctx.save();
-				ctx.fillStyle = "#ffd700";
-				ctx.strokeStyle = "#0a0a0a";
+				ctx.fillStyle = E_COLS.anubis.outline;
+				ctx.strokeStyle = E_COLS.anubis.body;
 				ctx.lineWidth = 1;
 				[-1, 1].forEach(side => {
 					let sideX = x + (side * w * 0.32);
 					ctx.fillRect(sideX - w * 0.125,
 						headCenterY - h * 0.2, w * 0.25, h *
 						0.5);
-					ctx.fillStyle = "#0033aa";
+					ctx.fillStyle = E_COLS.anubis.cloth_alt;
 					for (let i = -0.1; i < 0.3; i += 0.15) {
 						ctx.fillRect(sideX - w * 0.125,
 							headCenterY + i * h, w * 0.25,
 							h * 0.04);
 					}
-					ctx.fillStyle = "#ffd700";
+					ctx.fillStyle = E_COLS.anubis.outline;
 				});
-				ctx.fillStyle = "#0a0a0a";
-				ctx.strokeStyle = "#ffd700";
+				ctx.fillStyle = E_COLS.anubis.body;
+				ctx.strokeStyle = E_COLS.anubis.outline;
 				ctx.lineWidth = 2;
 				[-1, 1].forEach(side => {
 					ctx.beginPath();
@@ -720,8 +733,9 @@ const ENEMY_TYPES = {
 				if (e.shooting_delay >= 400 && !e.boss) {
 					bullet_create(obj.game, e.body.position.x, e.body
 						.position.y, vars.ndx, vars.ndy, 18, e
-						.damage, true, 12, 3000, "#ff3300",
-						"#ffaa00");
+						.damage, true, 12, 3000, E_COLS.anubis
+						.bullet_fill,
+						E_COLS.anubis.bullet_outline);
 					e.shooting_delay = 0;
 				}
 				vars.dx = 0;
@@ -747,24 +761,26 @@ const ENEMY_TYPES = {
 							streamAngle), Math.sin(streamAngle),
 						randomSpeed, e.damage * 0.1, true, Math
 						.random() * 5 + 3, 800 + Math.random() *
-						500, "orange", "black");
+						500, E_COLS.anubis.stream_fill, E_COLS
+						.anubis.stream_outline);
 				}
 				e.shooting_delay = 0;
 			}
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#0a0a0a";
+			ctx.fillStyle = "#333333";
 			ctx.strokeStyle = "#ffd700";
-			let cy = y + h * 0.55;
-			ctx.fillRect(x + w * 0.35, cy - h * 0.2, w * 0.3, h * 0.3);
-			ctx.strokeRect(x + w * 0.35, cy - h * 0.2, w * 0.3, h *
-				0.3);
-			ctx.beginPath();
-			ctx.moveTo(x + w * 0.4, cy - h * 0.2);
-			ctx.lineTo(x + w * 0.35, cy - h * 0.45);
-			ctx.moveTo(x + w * 0.6, cy - h * 0.2);
-			ctx.lineTo(x + w * 0.65, cy - h * 0.45);
-			ctx.stroke();
+			y = y - w * 0.05;
+			ctx.fillRect(x + w * 0.4, y + h * 0.58, w * 0.2, h * 0.2);
+			ctx.strokeRect(x + w * 0.4, y + h * 0.58, w * 0.2, h * 0.2);
+			ctx.fillStyle = "#ffd700";
+			ctx.fillRect(x + w * 0.4, y + h * 0.48, w * 0.05, h * 0.1);
+			ctx.fillRect(x + w * 0.55, y + h * 0.48, w * 0.05, h * 0.1);
+			ctx.fillStyle = "#ffff00";
+			ctx.fillRect(x + w * 0.43, y + h * 0.63, w * 0.04, h *
+				0.04);
+			ctx.fillRect(x + w * 0.53, y + h * 0.63, w * 0.04, h *
+				0.04);
 		},
 		on_death: (obj, target) => {
 			if (target?.name == "player") achievement_do(target.data
@@ -795,11 +811,11 @@ const ENEMY_TYPES = {
 		boss_speed_mult: 1.75,
 		boss_max_health_mult: 1.05,
 		w: 50,
-		eye_color: "white",
+		eye_color: E_COLS.laser.eye,
 		h: 50,
-		color: "#000000",
+		color: E_COLS.laser.body_fallback,
 		use_rainbow_color_gradient: true,
-		outline: "white",
+		outline: E_COLS.laser.outline,
 		range: 600,
 		delay: 150,
 		max_minions: 5,
@@ -808,7 +824,7 @@ const ENEMY_TYPES = {
 		visuals: {
 			draw_gun: true,
 			draw_gun_boss: true,
-			gun_color: "#331133",
+			gun_color: E_COLS.laser.gun,
 			gun_width: 0.175,
 			center_gun: false,
 			center_gun_minion: false,
@@ -836,9 +852,7 @@ const ENEMY_TYPES = {
 			if (vars.v < e.shooting_range) {
 				if (!e.boss && !e.is_minion) {
 					if (e.shooting_delay >= 150) {
-						let colors = ["red", "orange", "yellow", "lime",
-							"cyan", "blue", "purple"
-						];
+						let colors = E_COLS.laser.rainbow;
 						let angle = Math.atan2(vars.dy, vars.dx);
 						[Math.PI / 4, -Math.PI / 4].forEach(off => {
 							bullet_create(obj.game, e.body
@@ -910,9 +924,7 @@ const ENEMY_TYPES = {
 			let e = obj.data;
 			if (vars.v < e.shooting_range) {
 				if (e.shooting_delay >= 300) {
-					let colors = ["red", "orange", "yellow", "lime",
-						"cyan", "blue", "purple"
-					];
+					let colors = E_COLS.laser.rainbow;
 					for (let i = 0; i < 7; i++) {
 						let theta = Math.PI * (i - 3) / 14;
 						let rotatedX = vars.ndx * Math.cos(theta) - vars
@@ -950,9 +962,9 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.fillStyle = "#ff0000";
+			ctx.fillStyle = E_COLS.laser.rainbow[0];
 			ctx.fillRect(x + w * 0.4, y + h * 0.5, w * 0.2, h * 0.2);
-			ctx.fillStyle = "#331133";
+			ctx.fillStyle = E_COLS.laser.gun;
 			ctx.fillRect(x + w * 0.55, y + h * 0.5, w * 0.15, h * 0.06);
 			ctx.fillRect(x + w * 0.55, y + h * 0.62, w * 0.15, h *
 				0.06);
@@ -962,7 +974,7 @@ const ENEMY_TYPES = {
 		only_draw_custom: true,
 		name_eng: "deer",
 		name_rus: "олень",
-		eye_color: "red",
+		eye_color: E_COLS.deer_boss.eye,
 		requires: null,
 		weight: 0,
 		health: enemy_health_from_tier(10),
@@ -970,8 +982,8 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(10),
 		w: 50,
 		h: 50,
-		color: "#4a2c16",
-		outline: "#f2d291",
+		color: E_COLS.deer_boss.body,
+		outline: E_COLS.deer_boss.outline,
 		range: 400,
 		delay: 1000,
 		visuals: {
@@ -1025,10 +1037,11 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(10),
 		w: 30,
 		h: 30,
-		color: "#444444",
-		outline: "#ff0000",
+		color: E_COLS.raccoon_boss.body,
+		outline: E_COLS.raccoon_boss.outline,
 		range: 600,
 		delay: 500,
+		only_draw_custom: true,
 		visuals: {
 			draw_gun: false,
 			draw_gun_boss: false,
@@ -1055,7 +1068,8 @@ const ENEMY_TYPES = {
 					trash_bullet_create(obj.game, e.body
 						.position.x, e.body.position.y,
 						finalX, finalY, 24, e.damage, true,
-						e.w * 0.5);
+						e.w * 0.5, E_COLS.raccoon_boss
+						.trash_bullet);
 				});
 				e.shooting_delay = 0;
 			}
@@ -1102,7 +1116,8 @@ const ENEMY_TYPES = {
 				let bullet = trash_bullet_create(obj.game, e.body
 					.position.x, e.body.position.y, vars.ndx, vars
 					.ndy, 16, e.damage, true, 12);
-				if (bullet) bullet.color = "#33ff00";
+				if (bullet) bullet.color = E_COLS.scorpion_boss
+					.venom_bullet;
 				e.shooting_delay = 0;
 			}
 		},
@@ -1126,8 +1141,8 @@ const ENEMY_TYPES = {
 		damage: enemy_damage_from_tier(11),
 		w: 120,
 		h: 15,
-		color: "#1a1a1a",
-		outline: "#00ff44",
+		color: E_COLS.snake_boss.body,
+		outline: E_COLS.snake_boss.outline,
 		range: 500,
 		delay: 800,
 		is_snake: false,
@@ -1177,8 +1192,8 @@ const ENEMY_TYPES = {
 						true,
 						Math.random() * 4 + 2,
 						700 + Math.random() * 400,
-						"lime",
-						"black",
+						E_COLS.snake_boss.venom_stream,
+						E_COLS.snake_boss.venom_outline,
 					);
 				}
 				e.shooting_delay = 0;
@@ -1200,7 +1215,7 @@ const ENEMY_TYPES = {
 				.achievements_shower_element);
 		},
 		render_icon: (ctx, x, y, w, h) => {
-			ctx.strokeStyle = "#00ff44";
+			ctx.strokeStyle = E_COLS.snake_boss.outline;
 			ctx.lineWidth = 3;
 			ctx.beginPath();
 			ctx.moveTo(x + w * 0.2, y + h * 0.5);
@@ -1208,7 +1223,7 @@ const ENEMY_TYPES = {
 				h * 0.8, x + w * 0.8, y + h * 0.5);
 			ctx.stroke();
 		}
-	},
+	}
 };
 ENEMY_TYPES["fat guy"] = {
 	name_eng: "fat guy",

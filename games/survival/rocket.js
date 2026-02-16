@@ -128,18 +128,19 @@ function rocket_draw(rocket_object, ctx) {
 		let sdx = 2.5 * r.w * dx / d;
 		let sdy = 2.5 * r.w * dy / d;
 		drawLine(ctx, rx + 0.3 * sdy - sdx, ry - 0.3 * sdx - sdy, rx - 0.3 *
-			sdy - sdx, ry + 0.3 * sdx - sdy, "red", r.w);
+			sdy - sdx, ry + 0.3 * sdx - sdy, COLORS_DEFAULT.rocket.wings, r
+			.w);
 		drawLine(ctx, rx - 0.25 * sdx - sdx, ry - 0.25 * sdy - sdy, rx + sdx -
-			sdx, ry + sdy - sdy, "gray", r.w);
+			sdx, ry + sdy - sdy, COLORS_DEFAULT.rocket.color, r.w);
 		drawLine(ctx, rx - sdx, ry - sdy, rx + 1.125 * sdx - sdx, ry + 1.125 *
-			sdy - sdy, "gray", 0.75 * r.w);
+			sdy - sdy, COLORS_DEFAULT.rocket.color, 0.75 * r.w);
 	}
 	if (rocket_object.game.settings.indicators["show rocket health"] && r
 		.health > 0) {
-		ctx.fillStyle = "red";
+		ctx.fillStyle = COLORS_DEFAULT.rocket.health_bg;
 		ctx.fillRect(rx - 7 * r.w / 2, ry - 3 * r.w, 7 * r.w, Math.min(4, r.w *
 			0.5));
-		ctx.fillStyle = "lime";
+		ctx.fillStyle = COLORS_DEFAULT.rocket.health_fill;
 		ctx.fillRect(rx - 7 * r.w / 2, ry - 3 * r.w, 7 * r.w * r.health / r
 			.max_health, Math.min(4, r.w * 0.5));
 	}

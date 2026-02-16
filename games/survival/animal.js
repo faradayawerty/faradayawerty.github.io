@@ -1,8 +1,8 @@
 function animal_create(g, x, y, type = "deer") {
 	let config = {
 		"raccoon": {
-			w: 30,
-			h: 30,
+			w: 25,
+			h: 25,
 			hp: 30,
 			speed: 8.5
 		},
@@ -175,20 +175,16 @@ function animal_deer_draw(ctx, x, y, w, h, body) {
 	const isMoving = Math.abs(body.velocity.x) > 0.1 || Math.abs(body.velocity
 		.y) > 0.1;
 	const flip = body.velocity.x < 0 ? -1 : 1;
-	const cMain = "#3d2511";
-	const cDark = "#1a0f07";
-	const cLight = "#8b6b4d";
-	const cHorn = "#f2d291";
-	const cHoof = "#000000";
+	const c = COLORS_DEFAULT.entities.animals.deer;
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.scale(flip, 1);
 	const legWalk = isMoving ? Math.sin(time * 1.5) : 0;
 	const legDist = w * 0.3;
-	drawComplexLeg(ctx, -legDist, h * 0.1, legWalk, cDark, cHoof, w, h);
-	drawComplexLeg(ctx, legDist * 0.6, h * 0.1, -legWalk, cDark, cHoof, w, h);
-	ctx.fillStyle = cMain;
-	ctx.strokeStyle = cDark;
+	drawComplexLeg(ctx, -legDist, h * 0.1, legWalk, c.dark, c.hoof, w, h);
+	drawComplexLeg(ctx, legDist * 0.6, h * 0.1, -legWalk, c.dark, c.hoof, w, h);
+	ctx.fillStyle = c.main;
+	ctx.strokeStyle = c.dark;
 	ctx.lineWidth = 2;
 	ctx.beginPath();
 	ctx.rect(-w * 0.5, -h * 0.35, w, h * 0.65);
@@ -203,7 +199,7 @@ function animal_deer_draw(ctx, x, y, w, h, body) {
 	ctx.translate(w * 0.45, -h * 0.25);
 	const neckShake = isMoving ? Math.sin(time * 2.5) * 0.05 : 0;
 	ctx.rotate(neckShake);
-	ctx.fillStyle = cMain;
+	ctx.fillStyle = c.main;
 	ctx.beginPath();
 	ctx.moveTo(-w * 0.2, h * 0.5);
 	ctx.lineTo(w * 0.1, h * 0.5);
@@ -215,9 +211,9 @@ function animal_deer_draw(ctx, x, y, w, h, body) {
 	ctx.translate(w * 0.05, -h * 0.1);
 	ctx.save();
 	ctx.translate(0, -h * 0.1);
-	drawHorns(ctx, cHorn, w, h);
+	drawHorns(ctx, c.horn, w, h);
 	ctx.restore();
-	ctx.fillStyle = cMain;
+	ctx.fillStyle = c.main;
 	ctx.beginPath();
 	ctx.moveTo(-w * 0.15, -h * 0.15);
 	ctx.lineTo(w * 0.05, -h * 0.12);
@@ -228,30 +224,31 @@ function animal_deer_draw(ctx, x, y, w, h, body) {
 	ctx.closePath();
 	ctx.fill();
 	ctx.stroke();
-	ctx.strokeStyle = cDark;
+	ctx.strokeStyle = c.dark;
 	ctx.lineWidth = 2;
 	ctx.beginPath();
 	ctx.moveTo(w * 0.02, h * -0.02);
 	ctx.lineTo(w * 0.15, h * 0.03);
 	ctx.stroke();
-	ctx.fillStyle = "#fff";
+	ctx.fillStyle = c.eye_bg;
 	ctx.beginPath();
 	ctx.moveTo(w * 0.05, h * 0.03);
 	ctx.lineTo(w * 0.14, h * 0.06);
 	ctx.lineTo(w * 0.06, h * 0.08);
 	ctx.closePath();
 	ctx.fill();
-	ctx.fillStyle = "#000";
+	ctx.fillStyle = c.eye_pupil;
 	ctx.beginPath();
 	ctx.arc(w * 0.09, h * 0.05, 1.5, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.fillStyle = cDark;
+	ctx.fillStyle = c.dark;
 	ctx.beginPath();
 	ctx.arc(w * 0.26, h * 0.1, 1.5, 0, Math.PI * 2);
 	ctx.fill();
 	ctx.restore();
-	drawComplexLeg(ctx, -legDist * 0.5, h * 0.15, -legWalk, cMain, cHoof, w, h);
-	drawComplexLeg(ctx, legDist * 0.6, h * 0.15, legWalk, cMain, cHoof, w, h);
+	drawComplexLeg(ctx, -legDist * 0.5, h * 0.15, -legWalk, c.main, c.hoof, w,
+		h);
+	drawComplexLeg(ctx, legDist * 0.6, h * 0.15, legWalk, c.main, c.hoof, w, h);
 	ctx.restore();
 }
 
@@ -300,7 +297,8 @@ function drawHorns(ctx, color, w, h) {
 }
 
 function animal_raccoon_draw(ctx, x, y, w, h, a) {
-	ctx.fillStyle = "#555555";
+	const c = COLORS_DEFAULT.entities.animals.raccoon;
+	ctx.fillStyle = c.ears;
 	ctx.beginPath();
 	ctx.moveTo(x - w * 0.4, y - h * 0.5);
 	ctx.lineTo(x - w * 0.5, y - h * 0.8);
@@ -311,21 +309,21 @@ function animal_raccoon_draw(ctx, x, y, w, h, a) {
 	ctx.lineTo(x + w * 0.5, y - h * 0.8);
 	ctx.lineTo(x + w * 0.2, y - h * 0.5);
 	ctx.fill();
-	fillMatterBody(ctx, a.body, "#777777");
-	drawMatterBody(ctx, a.body, "#444444", 2);
-	ctx.fillStyle = "#222222";
+	fillMatterBody(ctx, a.body, c.body);
+	drawMatterBody(ctx, a.body, c.outline, 2);
+	ctx.fillStyle = c.mask;
 	ctx.fillRect(x - w * 0.5, y - h * 0.2, w, h * 0.35);
-	ctx.fillStyle = "white";
+	ctx.fillStyle = c.eye_white;
 	ctx.beginPath();
 	ctx.arc(x - w * 0.22, y - h * 0.05, w * 0.08, 0, Math.PI * 2);
 	ctx.arc(x + w * 0.22, y - h * 0.05, w * 0.08, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.fillStyle = "black";
+	ctx.fillStyle = c.eye_pupil;
 	ctx.beginPath();
 	ctx.arc(x - w * 0.22, y - h * 0.05, w * 0.03, 0, Math.PI * 2);
 	ctx.arc(x + w * 0.22, y - h * 0.05, w * 0.03, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.fillStyle = "#111111";
+	ctx.fillStyle = c.nose;
 	ctx.beginPath();
 	ctx.arc(x, y + h * 0.15, w * 0.05, 0, Math.PI * 2);
 	ctx.fill();
@@ -333,7 +331,7 @@ function animal_raccoon_draw(ctx, x, y, w, h, a) {
 	let tailY = y + h * 0.2;
 	ctx.lineWidth = h * 0.2;
 	for (let i = 0; i < 5; i++) {
-		ctx.strokeStyle = (i % 2 === 0) ? "#333333" : "#999999";
+		ctx.strokeStyle = (i % 2 === 0) ? c.tail_stripes[0] : c.tail_stripes[1];
 		ctx.beginPath();
 		ctx.moveTo(tailX - (i * w * 0.15), tailY);
 		ctx.lineTo(tailX - ((i + 1) * w * 0.15), tailY);
@@ -347,6 +345,7 @@ function animal_draw(ao, ctx) {
 	let x = a.body.position.x;
 	let y = a.body.position.y;
 	let angle = a.body.angle;
+	const cInd = COLORS_DEFAULT.entities.indicators;
 	if (a.type === "raccoon") {
 		animal_raccoon_draw(ctx, x, y, a.w, a.h, a);
 	}
@@ -364,21 +363,22 @@ function animal_draw(ao, ctx) {
 		drawMatterBody(ctx, a.body, "white", 0.05 * a.w);
 	}
 	if (ao.game.settings.indicators["show enemy health"]) {
-		ctx.fillStyle = "red";
+		ctx.fillStyle = cInd.health_bg;
 		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w, a.h * 0.05);
-		ctx.fillStyle = "lime";
+		ctx.fillStyle = cInd.health_fill;
 		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w * Math.max(0, a.health) /
 			a.max_health, a.h * 0.05);
 	}
 }
 
 function animal_snake_draw(ctx, x, y, w, h, angle) {
+	const c = COLORS_DEFAULT.entities.animals.snake;
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.rotate(angle);
 	let segments = 22;
 	let segmentSize = w / (segments - 5);
-	ctx.fillStyle = "black";
+	ctx.fillStyle = c.body;
 	for (let i = 0; i < segments; i++) {
 		let wave = Math.sin(Date.now() * 0.006 - i * 0.3) * (h * 0.9);
 		let posX = (segments / 2 - i) * segmentSize * 0.8;
@@ -391,27 +391,28 @@ function animal_snake_draw(ctx, x, y, w, h, angle) {
 		}
 		ctx.fillRect(posX - s / 2, wave - s / 2, s, s);
 		if (i === 0) {
-			ctx.fillStyle = "red";
+			ctx.fillStyle = c.eye;
 			let eyeSize = 0.03 * w;
 			ctx.fillRect(posX + s / 6, wave - s / 4, eyeSize, eyeSize);
 			ctx.fillRect(posX + s / 6, wave + s / 4 - eyeSize, eyeSize,
 				eyeSize);
-			ctx.fillStyle = "black";
+			ctx.fillStyle = c.body;
 		}
 	}
 	ctx.restore();
 }
 
 function animal_scorpion_draw(ctx, x, y, w, h, angle) {
+	const c = COLORS_DEFAULT.entities.animals.scorpion;
 	h = w * 0.45;
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.rotate(angle);
 	let time = Date.now();
 	let t = time * 0.001;
-	const clrDark = "#0a0a0a";
-	const clrMid = "#222222";
-	const clrLight = "#3d3d3d";
+	const clrDark = c.dark;
+	const clrMid = c.mid;
+	const clrLight = c.light;
 	for (let side = -1; side <= 1; side += 2) {
 		for (let i = 0; i < 4; i++) {
 			let phase = (t * 7) + (i * 0.8) + (side === 1 ? Math.PI : 0);
@@ -529,9 +530,9 @@ function animal_scorpion_draw(ctx, x, y, w, h, angle) {
 		}
 		ctx.fill();
 	}
-	ctx.fillStyle = "#ff0000";
+	ctx.fillStyle = c.eye;
 	ctx.shadowBlur = 5;
-	ctx.shadowColor = "red";
+	ctx.shadowColor = c.eye_shadow;
 	ctx.beginPath();
 	ctx.arc(w * 0.42, -h * 0.07, w * 0.025, 0, Math.PI * 2);
 	ctx.arc(w * 0.42, h * 0.07, w * 0.025, 0, Math.PI * 2);
@@ -541,7 +542,8 @@ function animal_scorpion_draw(ctx, x, y, w, h, angle) {
 }
 
 function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
-	ctx.fillStyle = "#333333";
+	const c = COLORS_DEFAULT.entities.animals.bosses.raccoon;
+	ctx.fillStyle = c.ears;
 	ctx.beginPath();
 	ctx.moveTo(x - w * 0.4, y - h * 0.5);
 	ctx.lineTo(x - w * 0.6, y - h * 0.9);
@@ -552,14 +554,14 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	ctx.lineTo(x + w * 0.6, y - h * 0.85);
 	ctx.lineTo(x + w * 0.1, y - h * 0.5);
 	ctx.fill();
-	fillMatterBody(ctx, e.body, "#555555");
+	fillMatterBody(ctx, e.body, c.body);
 	drawMatterBody(ctx, e.body, e.color_outline, 2);
-	ctx.fillStyle = "#111111";
+	ctx.fillStyle = c.mask;
 	ctx.fillRect(x - w * 0.5, y - h * 0.25, w, h * 0.4);
 	let eyeSize = w * 0.12;
-	ctx.fillStyle = "#ff0000";
+	ctx.fillStyle = c.eye;
 	ctx.shadowBlur = 15;
-	ctx.shadowColor = "red";
+	ctx.shadowColor = c.eye_shadow;
 	ctx.beginPath();
 	ctx.arc(x - w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
 	ctx.arc(x + w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
@@ -568,7 +570,7 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	ctx.fillStyle = "black";
 	ctx.fillRect(x - w * 0.26, y - h * 0.15, w * 0.02, h * 0.2);
 	ctx.fillRect(x + w * 0.24, y - h * 0.15, w * 0.02, h * 0.2);
-	ctx.strokeStyle = "white";
+	ctx.strokeStyle = c.mouth;
 	ctx.lineWidth = 2;
 	ctx.beginPath();
 	ctx.moveTo(x - w * 0.2, y + h * 0.2);
@@ -580,7 +582,7 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	let tailX = x - w * 0.5;
 	let tailY = y + h * 0.3;
 	for (let i = 0; i < 6; i++) {
-		ctx.strokeStyle = (i % 2 === 0) ? "#222222" : "#666666";
+		ctx.strokeStyle = (i % 2 === 0) ? c.tail_stripes[0] : c.tail_stripes[1];
 		ctx.lineWidth = h * 0.25;
 		ctx.beginPath();
 		ctx.moveTo(tailX - (i * w * 0.12), tailY + Math.sin(e.color_gradient +
@@ -596,10 +598,12 @@ function animal_deer_boss_render(ctx, x, y, w, h, e) {
 	const isMoving = Math.abs(e.body.velocity.x) > 0.1 || Math.abs(e.body
 		.velocity.y) > 0.1;
 	const time = Date.now() * 0.005;
-	const cMain = e.color || "#3d2511";
-	const cDark = "#1a0f07";
-	const cHorn = "#f2d291";
-	const cEye = e.eye_color || "red";
+	const cNormal = COLORS_DEFAULT.entities.animals.deer;
+	const cBoss = COLORS_DEFAULT.entities.animals.bosses.deer;
+	const cMain = e.color || cNormal.main;
+	const cDark = cBoss.dark;
+	const cHorn = cBoss.horn;
+	const cEye = e.eye_color || COLORS_DEFAULT.entities.animals.scorpion.eye;
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.scale(flip, 1);
@@ -617,7 +621,7 @@ function animal_deer_boss_render(ctx, x, y, w, h, e) {
 		ctx.rect(-legW / 2, 0, legW, legH);
 		ctx.fill();
 		ctx.stroke();
-		ctx.fillStyle = "black";
+		ctx.fillStyle = cBoss.hoof;
 		ctx.fillRect(-legW / 2, legH, legW, h * 0.1);
 		ctx.restore();
 	});
@@ -673,7 +677,7 @@ function animal_deer_boss_render(ctx, x, y, w, h, e) {
 	ctx.closePath();
 	ctx.fill();
 	ctx.shadowBlur = 0;
-	ctx.fillStyle = "black";
+	ctx.fillStyle = cBoss.eye_pupil;
 	ctx.beginPath();
 	ctx.arc(w * 0.25, h * 0.08, w * 0.02, 0, Math.PI * 2);
 	ctx.fill();

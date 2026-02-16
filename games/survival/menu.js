@@ -32,13 +32,13 @@ function menu_create() {
 			"show rocket health": false
 		},
 		want_auto_pickup: {
-			"automatically pickup food and drinks": false,
-			"automatically pickup fuel": false,
-			"automatically pickup health": false,
-			"automatically pickup ammo": false,
-			"automatically pickup weapons": false,
-			"automatically pickup shields": false,
-			"automatically pickup bossifiers": false
+			"automatically pickup food and drinks": true,
+			"automatically pickup fuel": true,
+			"automatically pickup health": true,
+			"automatically pickup ammo": true,
+			"automatically pickup weapons": true,
+			"automatically pickup shields": true,
+			"automatically pickup bossifiers": true
 		},
 		iselected: 0,
 		iselected_last_frame: 0,
@@ -374,16 +374,16 @@ function menu_update(m, dt, input) {
 			m.want_respawn_here = !m.want_respawn_here;
 		}
 		else if (m.buttons[m.iselected] == "set player color to red") {
-			m.want_player_color = "red";
+			m.want_player_color = COLORS_DEFAULT.player.red;
 		}
 		else if (m.buttons[m.iselected] == "set player color to lime") {
-			m.want_player_color = "lime";
+			m.want_player_color = COLORS_DEFAULT.player.lime;
 		}
 		else if (m.buttons[m.iselected] == "set player color to yellow") {
-			m.want_player_color = "yellow";
+			m.want_player_color = COLORS_DEFAULT.player.yellow;
 		}
 		else if (m.buttons[m.iselected] == "set player color to blue") {
-			m.want_player_color = "blue";
+			m.want_player_color = COLORS_DEFAULT.player.blue;
 		}
 		else if (m.buttons[m.iselected] == "enable trees") {
 			m.want_trees = !m.want_trees;

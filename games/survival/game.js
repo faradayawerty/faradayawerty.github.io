@@ -531,18 +531,22 @@ function game_destroy_level(g, old_level = null) {
 						"decorative_level_base",
 						"decorative_no_tree_zone"
 					].includes(g.objects[i].name)) {
-					if (g.objects[i].data.x < Ox || Ox + 2500 <= g.objects[i]
+					if (g.objects[i].data.x < Ox - 2500 || Ox + 5000 <= g
+						.objects[i]
 						.data.x ||
-						g.objects[i].data.y < Oy || Oy + 2500 <= g.objects[i]
+						g.objects[i].data.y < Oy - 2500 || Oy + 5000 <= g
+						.objects[i]
 						.data.y)
 						continue;
 				}
 				if (["bound"].includes(g.objects[i].name)) {
 					if (!g.objects[i].data.body)
 						continue;
-					if (g.objects[i].data.body.position.x < Ox || Ox + 2500 < g
+					if (g.objects[i].data.body.position.x < Ox - 2500 || Ox +
+						5000 < g
 						.objects[i].data.body.position.x ||
-						g.objects[i].data.body.position.y < Oy || Oy + 2500 < g
+						g.objects[i].data.body.position.y < Oy - 2500 || Oy +
+						5000 < g
 						.objects[i].data.body.position.y)
 						continue;
 				}

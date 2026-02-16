@@ -111,10 +111,10 @@ function achievements_draw(ae, ctx) {
 	let as = ae.data.achievements;
 	let scale = get_scale();
 	ctx.globalAlpha = 0.75;
-	ctx.fillStyle = "black";
+	ctx.fillStyle = COLORS_DEFAULT.ui.achievements.bg;
 	ctx.fillRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data
 		.height);
-	ctx.strokeStyle = "white";
+	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.border;
 	ctx.lineWidth = 2;
 	ctx.strokeRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data
 		.height);
@@ -126,13 +126,15 @@ function achievements_draw(ae, ctx) {
 	let my = ae.game.input.mouse.y / scale;
 	let is_over = doRectsCollide(mx, my, 0, 0, cx, cy, cross_width,
 		cross_width);
-	ctx.fillStyle = is_over ? "#882222" : "#444444";
+	ctx.fillStyle = is_over ? COLORS_DEFAULT.ui.achievements.cross_hover :
+		COLORS_DEFAULT.ui.achievements.cross_bg;
 	ctx.fillRect(cx, cy, cross_width, cross_width);
-	ctx.strokeStyle = "white";
+	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.border;
 	ctx.strokeRect(cx, cy, cross_width, cross_width);
 	let p = 0.2 * cross_width;
 	ctx.beginPath();
-	ctx.strokeStyle = is_over ? "#ffaaaa" : "white";
+	ctx.strokeStyle = is_over ? COLORS_DEFAULT.ui.achievements
+		.cross_icon_hover : COLORS_DEFAULT.ui.achievements.border;
 	ctx.lineWidth = 3;
 	ctx.moveTo(cx + p, cy + p);
 	ctx.lineTo(cx + cross_width - p, cy + cross_width - p);
@@ -255,9 +257,9 @@ function achievements_shower_draw(ashe, ctx) {
 		let h = isMob ? rowH : ashe.data.h;
 		let baseSize = Math.min(ashe.data.w, ashe.data.h);
 		ctx.globalAlpha *= 0.5;
-		ctx.fillStyle = "black";
+		ctx.fillStyle = COLORS_DEFAULT.ui.achievements.bg;
 		ctx.fillRect(x, y, w, h);
-		ctx.strokeStyle = "gray";
+		ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.popup_border;
 		ctx.strokeRect(x, y, w, h);
 		ctx.globalAlpha *= 2;
 		let helpText = isMob ? "tap the gold cup" : "press R or J";
@@ -273,10 +275,12 @@ function achievements_shower_draw(ashe, ctx) {
 			let line3 = (ashe.game.settings.language == "русский") ?
 				helpTextRus : helpText + " to view";
 			let textX = x + 3.5 * baseSize;
-			drawText(ctx, textX, y + h * 0.25, line1, fontSize, "white");
-			drawText(ctx, textX, y + h * 0.55, line2, fontSize, "yellow");
+			drawText(ctx, textX, y + h * 0.25, line1, fontSize, COLORS_DEFAULT
+				.ui.achievements.text_main);
+			drawText(ctx, textX, y + h * 0.55, line2, fontSize, COLORS_DEFAULT
+				.ui.achievements.text_accent);
 			drawText(ctx, textX, y + h * 0.85, line3, fontSize,
-				"rgba(255,255,255,0.7)");
+				COLORS_DEFAULT.ui.achievements.text_dim);
 		}
 		else {
 			let text = "task finished: " + ach + "! " + helpText + " to view";
@@ -284,7 +288,8 @@ function achievements_shower_draw(ashe, ctx) {
 				text = "выполнено задание: " + achData.name_rus + "! " +
 					helpTextRus;
 			}
-			drawText(ctx, x + 1.25 * baseSize, y + 0.6 * baseSize, text, 20);
+			drawText(ctx, x + 1.25 * baseSize, y + 0.6 * baseSize, text, 20,
+				COLORS_DEFAULT.ui.achievements.text_main);
 		}
 		let iconSize = isMob ? h * 0.85 : baseSize * 0.75;
 		let iconX = x + (isMob ? (h - iconSize) / 2 : 0.125 * baseSize);
@@ -364,10 +369,10 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 	lines.push(line);
 	ctx.save();
 	ctx.globalAlpha = 0.85;
-	ctx.fillStyle = "black";
+	ctx.fillStyle = COLORS_DEFAULT.ui.achievements.popup_bg;
 	ctx.fillRect(x, y, W, H);
 	ctx.globalAlpha = 1.0;
-	ctx.strokeStyle = "gray";
+	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.popup_border;
 	ctx.lineWidth = 2;
 	ctx.strokeRect(x, y, W, H);
 	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
@@ -375,69 +380,70 @@ function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
 	for (let i = 0; i < lines.length; i++) {
 		if (i === 0) {
 			drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
-				fontsize, "yellow", true);
+				fontsize, COLORS_DEFAULT.ui.achievements.text_accent, true);
 		}
 		else {
 			drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
-				fontsize, "white", false);
+				fontsize, COLORS_DEFAULT.ui.achievements.text_main, false);
 		}
 	}
 	ctx.restore();
 }
 
 function get_achievement_palette(done, animstate) {
+	const pal = COLORS_DEFAULT.ui.achievements.palette;
 	let p = {
-		c0: "red",
-		c1: "yellow",
-		c2: "lime",
-		c3: "blue",
-		c4: "cyan",
-		c5: "purple",
-		c6: "orange",
-		c7: "green",
-		c8: "white",
-		c9: "black",
-		c10: "gray",
-		c11: "#771111",
-		c12: "#1177dd",
-		c13: "#1177ff",
-		c14: "#335544",
-		c16: "#cc1111",
-		c15: "black",
-		c20: "#ffcc00",
-		c21: "#c2a26b",
-		c22: "#4d3d21",
-		c23: "#884411",
-		c24: "#aa6622",
-		c25: "#ff4422",
-		c26: "#442200",
-		c27: "#33aa11",
+		c0: COLORS_DEFAULT.player.red,
+		c1: COLORS_DEFAULT.player.yellow,
+		c2: COLORS_DEFAULT.player.lime,
+		c3: COLORS_DEFAULT.player.blue,
+		c4: pal.cyan,
+		c5: pal.purple,
+		c6: pal.orange,
+		c7: COLORS_DEFAULT.enemies.regular.body,
+		c8: COLORS_DEFAULT.decorations.city.road_marking,
+		c9: COLORS_DEFAULT.ui.achievements.bg,
+		c10: COLORS_DEFAULT.ui.achievements.popup_border,
+		c11: COLORS_DEFAULT.decorations.city.fire_roof,
+		c12: pal.blue_light,
+		c13: pal.blue_bright,
+		c14: pal.green_dark,
+		c16: pal.red_bright,
+		c15: COLORS_DEFAULT.ui.achievements.bg,
+		c20: pal.gold,
+		c21: pal.tan,
+		c22: pal.brown_dark,
+		c23: pal.brown_mid,
+		c24: pal.brown_light,
+		c25: pal.red_orange,
+		c26: COLORS_DEFAULT.decorations.nature.tree_trunk_outline,
+		c27: COLORS_DEFAULT.decorations.nature.grass,
 	};
 	if (!done) {
-		p.c0 = "black";
-		p.c1 = "white";
-		p.c2 = "white";
-		p.c3 = "black";
-		p.c4 = "gray";
-		p.c5 = "gray";
-		p.c6 = "gray";
-		p.c7 = "black";
-		p.c8 = "white";
-		p.c9 = "black";
-		p.c10 = "white";
-		p.c11 = "#111111";
-		p.c12 = "#777777";
-		p.c13 = "#777777";
-		p.c14 = "#333333";
-		p.c16 = "#111111";
-		p.c20 = "#111111";
-		p.c21 = "#c2c2c2";
-		p.c22 = "#4d4d4d";
-		p.c23 = "#4d4d4d";
-		p.c24 = "#626262";
-		p.c25 = "#333333";
-		p.c26 = "#4d4d4d";
-		p.c27 = "#222222";
+		p.c0 = COLORS_DEFAULT.ui.achievements.bg;
+		p.c1 = COLORS_DEFAULT.ui.achievements.border;
+		p.c2 = COLORS_DEFAULT.ui.achievements.border;
+		p.c3 = COLORS_DEFAULT.ui.achievements.bg;
+		p.c4 = pal.gray_mid;
+		p.c5 = pal.gray_mid;
+		p.c6 = pal.gray_mid;
+		p.c7 = COLORS_DEFAULT.ui.achievements.bg;
+		p.c8 = COLORS_DEFAULT.ui.achievements.border;
+		p.c9 = COLORS_DEFAULT.ui.achievements.bg;
+		p.c10 = COLORS_DEFAULT.ui.achievements.border;
+		p.c11 = pal.gray_very_dark;
+		p.c12 = pal.gray_text;
+		p.c13 = pal.gray_text;
+		p.c14 = pal.gray_dark;
+		p.c16 = pal.gray_very_dark;
+		p.c20 = pal.gray_very_dark;
+		p.c21 = pal.gray_silver;
+		p.c22 = pal.gray_mid;
+		p.c23 = pal.gray_mid;
+		p.c24 = pal.gray_light;
+		p.c25 = pal.gray_dark;
+		p.c26 = pal.gray_mid;
+		p.c27 = pal.black_soft;
 	}
 	if (animstate !== null) {
 		let r = Math.cos(0.1 * animstate) * 15;
@@ -459,7 +465,7 @@ function achievement_icon_draw_question_mark(ctx, x, y, w, h) {
 	ctx.save();
 	let cx = x + w / 2;
 	let cy = y + h / 2;
-	ctx.strokeStyle = "#555555";
+	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.question_mark;
 	ctx.lineWidth = w * 0.12;
 	ctx.lineCap = "round";
 	ctx.lineJoin = "round";
@@ -470,7 +476,7 @@ function achievement_icon_draw_question_mark(ctx, x, y, w, h) {
 	ctx.stroke();
 	ctx.beginPath();
 	ctx.arc(cx, cy + h * 0.35, w * 0.05, 0, Math.PI * 2);
-	ctx.fillStyle = "#555555";
+	ctx.fillStyle = COLORS_DEFAULT.ui.achievements.question_mark;
 	ctx.fill();
 	ctx.restore();
 }
@@ -497,9 +503,10 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
 	ctx.lineWidth = 0.025 * w;
 	if (back) {
 		ctx.globalAlpha *= 0.25;
-		ctx.fillStyle = done ? "green" : "red";
+		ctx.fillStyle = done ? COLORS_DEFAULT.enemies.regular.body :
+			COLORS_DEFAULT.player.red;
 		ctx.fillRect(x, y, w, h);
-		ctx.strokeStyle = "white";
+		ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.border;
 		ctx.strokeRect(x, y, w, h);
 		ctx.globalAlpha *= 4;
 	}

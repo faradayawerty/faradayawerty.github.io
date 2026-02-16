@@ -1,15 +1,42 @@
+ITEMS_DATA[ITEM_CACTUS_JUICE] = {
+	name: "Cactus Juice",
+	desc: "It's the quenchiest! May cause mild hallucinations.",
+	name_rus: "Кактусовый сок",
+	desc_rus: "Отлично утоляет жажду! Возможны легкие галлюцинации.",
+	render: (ctx, x, y, w, h) => {
+		let c = COLORS_DEFAULT.items.cactus_juice;
+		ctx.fillStyle = c.bottle;
+		ctx.beginPath();
+		ctx.roundRect(x + w * 0.25, y + h * 0.2, w * 0.5, h * 0.7, w *
+			0.05);
+		ctx.fill();
+		ctx.fillStyle = c.liquid;
+		ctx.fillRect(x + w * 0.3, y + h * 0.5, w * 0.4, h * 0.35);
+		ctx.fillStyle = c.label;
+		ctx.fillRect(x + w * 0.25, y + h * 0.45, w * 0.5, h * 0.2);
+		ctx.fillStyle = c.spike;
+		ctx.fillRect(x + w * 0.47, y + h * 0.48, w * 0.06, h * 0.14);
+		ctx.fillRect(x + w * 0.42, y + h * 0.52, w * 0.16, h * 0.04);
+		ctx.fillStyle = c.spike;
+		ctx.fillRect(x + w * 0.4, y + h * 0.15, w * 0.2, h * 0.08);
+		ctx.strokeStyle = c.spike;
+		ctx.lineWidth = w * 0.03;
+		ctx.strokeRect(x + w * 0.25, y + h * 0.2, w * 0.5, h * 0.7);
+	}
+};
 ITEMS_DATA[ITEM_HEALTH] = {
 	name: "Health Kit",
 	desc: "Restores a portion of HP.",
 	name_rus: "Аптечка",
 	desc_rus: "Восстанавливает часть здоровья.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "white";
+		let c = COLORS_DEFAULT.items.health_kit;
+		ctx.fillStyle = c.bg;
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		ctx.fillStyle = "#1177ff";
+		ctx.fillStyle = c.icon;
 		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
-		ctx.strokeStyle = "#1177ff";
+		ctx.strokeStyle = c.stroke;
 		ctx.lineWidth = h * 0.01;
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	}
@@ -20,12 +47,13 @@ ITEMS_DATA[ITEM_HEALTH_GREEN] = {
 	name_rus: "Улучшенная аптечка",
 	desc_rus: "Мощные регенерирующие химикаты.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "white";
+		let c = COLORS_DEFAULT.items.health_kit_adv;
+		ctx.fillStyle = c.bg;
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		ctx.fillStyle = "#11ff77";
+		ctx.fillStyle = c.icon;
 		ctx.fillRect(x + w * 0.4, y + h * 0.3, w * 0.2, h * 0.4);
 		ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
-		ctx.strokeStyle = "#11ff77";
+		ctx.strokeStyle = c.stroke;
 		ctx.lineWidth = h * 0.01;
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	}
@@ -36,21 +64,22 @@ ITEMS_DATA[ITEM_FUEL] = {
 	name_rus: "Бензин",
 	desc_rus: "Используется для заправки машин.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#ff1111";
+		let c = COLORS_DEFAULT.items.fuel;
+		ctx.fillStyle = c.body;
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.05, h * 0.2);
 		ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.05, h * 0.2);
 		ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.2, h * 0.05);
 		ctx.lineWidth = 0.01 * w;
-		ctx.strokeStyle = "black";
+		ctx.strokeStyle = c.outline;
 		ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-		ctx.fillStyle = "yellow";
+		ctx.fillStyle = c.cap;
 		ctx.fillRect(x + w * 0.55, y + h * 0.15, w * 0.2, h * 0.05);
 		drawLine(ctx, x + w * 0.3, y + h * 0.3, x + w * 0.7, y + h *
-			0.7, "#cc1111", 0.05 * w);
+			0.7, c.shadow, 0.05 * w);
 		drawLine(ctx, x + w * 0.7, y + h * 0.3, x + w * 0.3, y + h *
-			0.7, "#cc1111", 0.05 * w);
-		ctx.fillStyle = "#dd1111";
+			0.7, c.shadow, 0.05 * w);
+		ctx.fillStyle = c.accent;
 		ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
 	}
 };
@@ -60,8 +89,9 @@ ITEMS_DATA[ITEM_SHIELD] = {
 	name_rus: "Энергетический щит",
 	desc_rus: "Дает временную защиту.",
 	render: (ctx, x, y, w, h) => {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "cyan",
-			"white", 0.05 * w);
+		let c = COLORS_DEFAULT.items.shield_energy;
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, c.fill,
+			c.outline, 0.05 * w);
 	}
 };
 ITEMS_DATA[ITEM_SHIELD_RAINBOW] = {
@@ -71,6 +101,7 @@ ITEMS_DATA[ITEM_SHIELD_RAINBOW] = {
 	desc_rus: "Максимальная защита от всех типов урона.",
 	render: (ctx, x, y, w, h, animstate) => {
 		if (animstate == null) return;
+		let c = COLORS_DEFAULT.items.shield_energy;
 		let r = Math.floor(Math.pow(Math.cos(0.1 * animstate) * 15,
 			2));
 		let g = Math.floor(Math.pow(0.7 * (Math.cos(0.1 *
@@ -82,7 +113,7 @@ ITEMS_DATA[ITEM_SHIELD_RAINBOW] = {
 			.toString(16).padStart(2, '0') + b.toString(16)
 			.padStart(2, '0');
 		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, color,
-			"white", 0.05 * w);
+			c.outline, 0.05 * w);
 	}
 };
 ITEMS_DATA[ITEM_SHIELD_GREEN] = {
@@ -91,8 +122,9 @@ ITEMS_DATA[ITEM_SHIELD_GREEN] = {
 	name_rus: "Кинетический барьер",
 	desc_rus: "Усиленное поле, поглощающее энергию сильных ударов.",
 	render: (ctx, x, y, w, h) => {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "lime",
-			"white", 0.05 * w);
+		let c = COLORS_DEFAULT.items.shield_kinetic;
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, c.fill,
+			c.outline, 0.05 * w);
 	}
 };
 ITEMS_DATA[ITEM_BOSSIFIER] = {
@@ -102,6 +134,7 @@ ITEMS_DATA[ITEM_BOSSIFIER] = {
 	desc_rus: "Может боссифицировать любое живое создание.",
 	render: (ctx, x, y, w, h, animstate) => {
 		if (animstate == null) return;
+		let c = COLORS_DEFAULT.items.bossifier;
 		let rate = 0.05;
 		let r = Math.floor(Math.pow(Math.cos(rate * animstate) * 15,
 			2));
@@ -113,7 +146,7 @@ ITEMS_DATA[ITEM_BOSSIFIER] = {
 		let color = "#" + r.toString(16).padStart(2, '0') + g
 			.toString(16).padStart(2, '0') + b.toString(16)
 			.padStart(2, '0');
-		ctx.fillStyle = "black";
+		ctx.fillStyle = c.bg;
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 		drawLine(ctx, x + w * 0.5, y + h * 0.7, x + w * 0.5, y + h *
 			0.28375, color, w * 0.05);
@@ -132,9 +165,10 @@ ITEMS_DATA[ITEM_CANNED_MEAT] = {
 	name_rus: "Тушенка",
 	desc_rus: "Питательно и долго хранится.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "gray";
+		let c = COLORS_DEFAULT.items.canned_meat;
+		ctx.fillStyle = c.body;
 		ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
-		ctx.fillStyle = "#771111";
+		ctx.fillStyle = c.label;
 		ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 	}
 };
@@ -144,11 +178,12 @@ ITEMS_DATA[ITEM_ORANGE] = {
 	name_rus: "Апельсин",
 	desc_rus: "Богат витамином C.",
 	render: (ctx, x, y, w, h) => {
+		let c = COLORS_DEFAULT.items.orange;
 		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w,
-			"#ff8800", "#773311", 0.05 * w);
+			c.skin, c.shadow, 0.05 * w);
 		drawCircle(ctx, x + 0.4 * w, y + 0.4 * h, 0.05 * w,
-			"#ffaa44", "#ffaa44", 0);
-		ctx.fillStyle = "#442200";
+			c.light, c.light, 0);
+		ctx.fillStyle = c.stem;
 		ctx.fillRect(x + 0.48 * w, y + 0.25 * h, 0.04 * w, 0.04 *
 			h);
 	}
@@ -159,22 +194,23 @@ ITEMS_DATA[ITEM_APPLE] = {
 	name_rus: "Яблоко",
 	desc_rus: "Свежий и хрустящий перекус.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#ff4422";
+		let c = COLORS_DEFAULT.items.apple;
+		ctx.fillStyle = c.skin;
 		ctx.beginPath();
 		ctx.ellipse(x + 0.5 * w, y + 0.55 * h, 0.24 * w, 0.24 * h,
 			0, 0, Math.PI * 2);
 		ctx.fill();
-		ctx.strokeStyle = "#440000";
+		ctx.strokeStyle = c.shadow;
 		ctx.lineWidth = 0.03 * w;
 		ctx.stroke();
 		drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y +
-			0.15 * h, "#442200", 0.04 * w);
-		ctx.fillStyle = "#33aa11";
+			0.15 * h, c.stem, 0.04 * w);
+		ctx.fillStyle = c.leaf;
 		ctx.beginPath();
 		ctx.ellipse(x + 0.6 * w, y + 0.22 * h, 0.1 * w, 0.05 * w, -
 			Math.PI / 4, 0, Math.PI * 2);
 		ctx.fill();
-		ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+		ctx.fillStyle = c.light;
 		ctx.beginPath();
 		ctx.ellipse(x + 0.4 * w, y + 0.45 * h, 0.07 * w, 0.07 * w,
 			0, 0, Math.PI * 2);
@@ -187,18 +223,19 @@ ITEMS_DATA[ITEM_CHERRIES] = {
 	name_rus: "Вишни",
 	desc_rus: "Маленькие, но сладкие.",
 	render: (ctx, x, y, w, h) => {
+		let c = COLORS_DEFAULT.items.cherries;
 		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.35 * w, y +
-			0.65 * h, "#224400", 0.04 * w);
+			0.65 * h, c.stem, 0.04 * w);
 		drawLine(ctx, x + 0.5 * w, y + 0.25 * h, x + 0.65 * w, y +
-			0.65 * h, "#224400", 0.04 * w);
+			0.65 * h, c.stem, 0.04 * w);
 		drawCircle(ctx, x + 0.35 * w, y + 0.7 * h, 0.12 * w,
-			"#cc0000", "#660000", 0.02 * w);
+			c.fruit1, c.shadow, 0.02 * w);
 		drawCircle(ctx, x + 0.65 * w, y + 0.7 * h, 0.12 * w,
-			"#ee0000", "#660000", 0.02 * w);
+			c.fruit2, c.shadow, 0.02 * w);
 		drawCircle(ctx, x + 0.32 * w, y + 0.65 * h, 0.03 * w,
-			"white", "none", 0);
+			c.light, "none", 0);
 		drawCircle(ctx, x + 0.62 * w, y + 0.65 * h, 0.03 * w,
-			"white", "none", 0);
+			c.light, "none", 0);
 	}
 };
 ITEMS_DATA[ITEM_CHICKEN_LEG] = {
@@ -207,18 +244,19 @@ ITEMS_DATA[ITEM_CHICKEN_LEG] = {
 	name_rus: "Куриная ножка",
 	desc_rus: "Идеально прожарена.",
 	render: (ctx, x, y, w, h) => {
+		let c = COLORS_DEFAULT.items.chicken;
 		drawLine(ctx, x + 0.5 * w, y + 0.6 * h, x + 0.5 * w, y +
-			0.85 * h, "#eeeeee", 0.08 * w);
+			0.85 * h, c.bone, 0.08 * w);
 		drawCircle(ctx, x + 0.45 * w, y + 0.85 * h, 0.05 * w,
-			"#eeeeee", "#cccccc", 0.01 * w);
+			c.bone, c.bone_shadow, 0.01 * w);
 		drawCircle(ctx, x + 0.55 * w, y + 0.85 * h, 0.05 * w,
-			"#eeeeee", "#cccccc", 0.01 * w);
-		ctx.fillStyle = "#884411";
+			c.bone, c.bone_shadow, 0.01 * w);
+		ctx.fillStyle = c.meat_dark;
 		ctx.beginPath();
 		ctx.ellipse(x + 0.5 * w, y + 0.4 * h, 0.2 * w, 0.28 * h, 0,
 			0, Math.PI * 2);
 		ctx.fill();
-		ctx.fillStyle = "#aa6622";
+		ctx.fillStyle = c.meat_light;
 		ctx.beginPath();
 		ctx.ellipse(x + 0.45 * w, y + 0.35 * h, 0.12 * w, 0.18 * h,
 			0, 0, Math.PI * 2);
@@ -231,15 +269,16 @@ ITEMS_DATA[ITEM_CHOCOLATE] = {
 	name_rus: "Шоколад",
 	desc_rus: "Быстрый заряд энергии.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#331100";
+		let c = COLORS_DEFAULT.items.chocolate;
+		ctx.fillStyle = c.dark;
 		ctx.fillRect(x + w * 0.2, y + h * 0.15, w * 0.6, h * 0.7);
-		ctx.fillStyle = "#aa0000";
+		ctx.fillStyle = c.wrapper;
 		ctx.fillRect(x + w * 0.2, y + h * 0.45, w * 0.6, h * 0.45);
-		ctx.strokeStyle = "#220800";
+		ctx.strokeStyle = c.border;
 		ctx.lineWidth = 1;
 		ctx.strokeRect(x + w * 0.25, y + h * 0.2, w * 0.2, h * 0.2);
 		ctx.strokeRect(x + w * 0.55, y + h * 0.2, w * 0.2, h * 0.2);
-		ctx.fillStyle = "#d4af37";
+		ctx.fillStyle = c.gold;
 		ctx.fillRect(x + w * 0.2, y + h * 0.55, w * 0.6, h * 0.05);
 	}
 };
@@ -249,9 +288,10 @@ ITEMS_DATA[ITEM_WATER] = {
 	name_rus: "Вода",
 	desc_rus: "Необходима для выживания.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#777777";
+		let c = COLORS_DEFAULT.items.water;
+		ctx.fillStyle = c.bottle;
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
-		ctx.fillStyle = "#1177dd";
+		ctx.fillStyle = c.liquid;
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	}
 };
@@ -261,9 +301,10 @@ ITEMS_DATA[ITEM_COLA] = {
 	name_rus: "Кола",
 	desc_rus: "Сладкая и газированная.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#777777";
+		let c = COLORS_DEFAULT.items.cola;
+		ctx.fillStyle = c.bottle;
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
-		ctx.fillStyle = "#dd1111";
+		ctx.fillStyle = c.liquid;
 		ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 	}
 };
@@ -273,12 +314,13 @@ ITEMS_DATA[ITEM_MILK] = {
 	name_rus: "Молоко",
 	desc_rus: "Полезно для костей.",
 	render: (ctx, x, y, w, h) => {
-		ctx.fillStyle = "#113377";
+		let c = COLORS_DEFAULT.items.milk;
+		ctx.fillStyle = c.top;
 		ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.4);
-		ctx.fillStyle = "#dddddd";
+		ctx.fillStyle = c.bottom;
 		ctx.fillRect(x + w * 0.2, y + h * 0.5, w * 0.6, h * 0.4);
 		ctx.lineWidth = 0.05 * w;
-		ctx.strokeStyle = "black";
+		ctx.strokeStyle = c.outline;
 		ctx.strokeRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
 	}
 };
@@ -288,8 +330,9 @@ ITEMS_DATA[ITEM_SHADOW_SHIELD] = {
 	name_rus: "Теневой панцирь",
 	desc_rus: "Теневой щит, дарующий призрачный рывок и уклонение.",
 	render: (ctx, x, y, w, h) => {
-		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, "#1a0033",
-			"#8800ff", 0.05 * w);
+		let c = COLORS_DEFAULT.items.shield_shadow;
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, c.fill,
+			c.outline, 0.05 * w);
 	}
 };
 ITEMS_DATA[ITEM_ANUBIS_REGEN_SHIELD] = {
@@ -300,14 +343,15 @@ ITEMS_DATA[ITEM_ANUBIS_REGEN_SHIELD] = {
 	render: (ctx, x, y, w, h, animstate) => {
 		const t = animstate || 0;
 		const pulse = Math.sin(t * 0.1) * 0.05;
+		let c = COLORS_DEFAULT.items.aegis;
 		ctx.save();
 		ctx.translate(x + w * 0.5, y + h * 0.5);
-		ctx.fillStyle = "#cc0000";
-		ctx.strokeStyle = "#FFD700";
+		ctx.fillStyle = c.body;
+		ctx.strokeStyle = c.gold;
 		ctx.lineWidth = w * 0.025;
 		ctx.lineJoin = "round";
 		ctx.shadowBlur = w * 0.1 * (1 + pulse);
-		ctx.shadowColor = "#FFD700";
+		ctx.shadowColor = c.gold;
 		ctx.beginPath();
 		ctx.arc(0, -h * 0.15, w * 0.12, 0.8 * Math.PI, 0.2 * Math.PI,
 			false);
@@ -338,14 +382,14 @@ ITEMS_DATA[ITEM_ANUBIS_REGEN_SHIELD] = {
 		ctx.stroke();
 		ctx.save();
 		ctx.shadowBlur = w * 0.15 * (1 + pulse);
-		ctx.shadowColor = "#FFD700";
-		ctx.fillStyle = "#FFD700";
+		ctx.shadowColor = c.gold;
+		ctx.fillStyle = c.gold;
 		ctx.globalAlpha = 0.6 + pulse * 4;
 		ctx.beginPath();
 		ctx.arc(0, 0, w * 0.08, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.restore();
-		ctx.fillStyle = "#FFD700";
+		ctx.fillStyle = c.gold;
 		for (let i = 0; i < 4; i++) {
 			let r = w * 0.04;
 			let ang = t * 0.1 + (i * Math.PI / 2);

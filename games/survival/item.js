@@ -215,6 +215,16 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_fuel = 0;
 			available_food = [ITEM_APPLE];
 		}
+		else if (tile / 200 > 0) {
+			chance_food = 0;
+			chance_drink = 20;
+			chance_gun = 1;
+			chance_ammo = 3;
+			chance_health = 0;
+			chance_shield = 0;
+			chance_fuel = 0;
+			available_drinks = [ITEM_CACTUS_JUICE];
+		}
 	}
 	chance_gun = chance_gun * Math.min(1, available_guns.length);
 	chance_ammo = chance_ammo * Math.min(1, available_ammos.length);
