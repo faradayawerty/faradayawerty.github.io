@@ -1,10 +1,18 @@
+const COLLISION_TARGETS_BULLET = ["enemy", "car", "trashcan", "animal",
+	"rocket"
+];
+const COLLISION_TARGETS_ROCKET = ["player", "enemy", "car", "trashcan",
+	"animal", "rocket"
+];
+
 function collisions_init(g) {
 	g.engine.constraintIterations = 4;
 	g.engine.positionIterations = 10;
-	Matter.Events.on(g.engine, 'collisionActive', (event) => {
+	Matter.Events.on(g.engine, 'collisionStart', (event) => {
 		const dt = g.lastDt || 16.6667;
-		for (let i = 0; i < event.pairs.length; i++) {
-			const pair = event.pairs[i];
+		const pairs = event.pairs;
+		for (let i = 0; i < pairs.length; i++) {
+			const pair = pairs[i];
 			const objA = pair.bodyA.gameObject;
 			const objB = pair.bodyB.gameObject;
 			if (!objA || !objB || objA.destroyed || objB.destroyed)
@@ -21,19 +29,21 @@ function collisions_handle_pair(g, self, other, dt) {
 	const sData = self.data;
 	const oData = other.data;
 	if (sName === "bullet" || sName === "trashbullet") {
+		if (sData.damaged) return;
 		if (sData.enemy) {
 			if (oName === "player") {
 				collisions_apply_damage_to_player(oData, sData.damage, dt,
 					"bullet", g);
+				sData.damaged = true;
 			}
 		}
 		else {
-			const targets = ["enemy", "car", "trashcan", "animal", "rocket"];
-			if (targets.includes(oName)) {
+			if (COLLISION_TARGETS_BULLET.includes(oName)) {
 				if (sName === "trashbullet" && oName === "rocket") return;
 				if (oName === "rocket" && !oData.enemy) return;
 				collisions_apply_damage_to_object(g, other, sData.damage, dt,
 					true);
+				sData.damaged = true;
 				if (oName === "rocket") {
 					oData.health -= sData.damage * dt;
 					oData.target_object = null;
@@ -42,14 +52,11 @@ function collisions_handle_pair(g, self, other, dt) {
 			}
 		}
 	}
-	if (sName === "rocket") {
+	else if (sName === "rocket") {
 		if (sData.enemy && oName === "enemy") return;
 		if (!sData.enemy && (oName === "player" || (oName === "car" && !oData
 				.enemy))) return;
-		const potentialTargets = ["player", "enemy", "car", "trashcan",
-			"animal", "rocket"
-		];
-		if (potentialTargets.includes(oName)) {
+		if (COLLISION_TARGETS_ROCKET.includes(oName)) {
 			if (oName === "rocket" && sData.enemy === oData.enemy) return;
 			if (oName === "player" && sData.enemy) {
 				collisions_apply_damage_to_player(oData, sData.damage, dt,
@@ -65,23 +72,24 @@ function collisions_handle_pair(g, self, other, dt) {
 			sData.bounce_ticks = 10;
 		}
 	}
-	if (sName === "enemy") {
+	else if (sName === "enemy") {
 		if (oName === "player") {
 			collisions_apply_damage_to_player(oData, sData.damage, dt, "enemy",
 				g);
 		}
-		if (oName === "car") {
+		else if (oName === "car") {
 			oData.health -= (oData.is_tank ? 0.0625 : 1) * sData.damage * dt;
 			let vel = Matter.Body.getVelocity(oData.body);
-			let speed = Math.sqrt(vel.x * vel.x + vel.y * vel.y);
-			if ((!sData.boss && speed > 0.9 * oData.max_speed) || (oData
-					.is_tank && speed > 0.1 * oData.max_speed)) {
+			let speedSq = vel.x * vel.x + vel.y * vel.y;
+			let maxSpeed = oData.max_speed || 1;
+			if ((!sData.boss && speedSq > 0.81 * maxSpeed * maxSpeed) || (oData
+					.is_tank && speedSq > 0.01 * maxSpeed * maxSpeed)) {
 				sData.health -= 100 * sData.damage * dt;
 				sData.hit_by_player = true;
 			}
 		}
 	}
-	if (sName === "car" && oName === "animal") {
+	else if (sName === "car" && oName === "animal") {
 		oData.health -= 0.75 * dt;
 	}
 }
@@ -122,20 +130,18 @@ function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 	p.health -= k * totalDmg;
 	if (p.health <= 0) {
 		if (source === "enemy") {
-			DEATH_MESSAGE = "☠️ the player has been infected";
-			if (g.settings.language === "русский")
-				DEATH_MESSAGE = "☠️ игрок был заражён";
+			DEATH_MESSAGE = g.settings.language === "русский" ?
+				"☠️ игрок был заражён" : "☠️ the player has been infected";
 		}
-		if (source === "bullet") {
-			DEATH_MESSAGE = "☠️ the player was killed by a bullet";
-			if (g.settings.language === "русский")
-				DEATH_MESSAGE = "☠️ игрок был подстрелен";
+		else if (source === "bullet") {
+			DEATH_MESSAGE = g.settings.language === "русский" ?
+				"☠️ игрок был подстрелен" :
+				"☠️ the player was killed by a bullet";
 		}
-		if (source === "rocket") {
-			DEATH_MESSAGE = "☠️ the player was killed by a rocket";
-			if (g.settings.language === "русский")
-				DEATH_MESSAGE =
-				"☠️ игрок был подстрелен самонаводящейся ракетой";
+		else if (source === "rocket") {
+			DEATH_MESSAGE = g.settings.language === "русский" ?
+				"☠️ игрок был подстрелен самонаводящейся ракетой" :
+				"☠️ the player was killed by a rocket";
 		}
 	}
 }

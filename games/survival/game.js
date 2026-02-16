@@ -403,8 +403,11 @@ function game_update(g, dt) {
 function game_draw(g, ctx, alpha) {
 	ctx.save();
 	if (g.camera_target_body) {
-		let targetObj = g.objects.find(obj => obj.data && obj.data.body === g
-			.camera_target_body);
+		let targetObj = g.camera_target_body.gameObject;
+		if (!targetObj) {
+			targetObj = g.objects.find(obj => obj.data && obj.data.body === g
+				.camera_target_body);
+		}
 		if (targetObj && targetObj.prevX !== undefined && targetObj.prevY !==
 			undefined) {
 			g.offset_x = targetObj.prevX + (g.camera_target_body.position.x -
@@ -420,72 +423,83 @@ function game_draw(g, ctx, alpha) {
 	ctx.scale(g.scale, g.scale);
 	ctx.translate(0.5 * window.innerWidth / g.scale - g.offset_x, 0.5 * window
 		.innerHeight / g.scale - g.offset_y);
-	for (let i = 0; i < g.objects.length; i++)
-		if (!g.objects[i].destroyed) {
-			let drawTime = performance.now();
-			let curX = (g.objects[i].data && g.objects[i].data.body) ? g
-				.objects[i].data.body.position.x : (g.objects[i].data ? g
-					.objects[i].data.x : null);
-			let curY = (g.objects[i].data && g.objects[i].data.body) ? g
-				.objects[i].data.body.position.y : (g.objects[i].data ? g
-					.objects[i].data.y : null);
-			ctx.save();
-			if (INTEROLATION && curX !== null && curY !== null && g.objects[i]
-				.prevX !== undefined && g.objects[i].prevY !== undefined) {
-				let shiftX = (curX - g.objects[i].prevX) * (alpha - 1);
-				let shiftY = (curY - g.objects[i].prevY) * (alpha - 1);
-				ctx.translate(shiftX, shiftY);
+	let level_Ox = 0;
+	let level_Oy = 0;
+	if (g.respawn_level) {
+		const parts = g.respawn_level.split("x");
+		level_Ox = parseInt(parts[0]) * 2500;
+		level_Oy = parseInt(parts[1]) * 2500;
+	}
+	for (let i = 0; i < g.objects.length; i++) {
+		const obj = g.objects[i];
+		if (obj.destroyed) continue;
+		let drawTime = 0;
+		if (DEBUG_DRAW) drawTime = performance.now();
+		const d = obj.data;
+		let curX = null;
+		let curY = null;
+		if (d) {
+			if (d.body) {
+				curX = d.body.position.x;
+				curY = d.body.position.y;
 			}
-			let doDraw = true;
-			let d = g.objects[i].data;
-			if (d) {
-				let [level_x, level_y] = g.respawn_level.split("x").map(Number);
-				let Ox = 2500 * level_x;
-				let Oy = 2500 * level_y;
-				let x = d.body ? d.body.position.x : d.x;
-				let y = d.body ? d.body.position.y : d.y;
-				if (x !== undefined && y !== undefined) {
-					if (x < Ox - 2500 || x > Ox + 5000 || y < Oy - 2500 || y >
-						Oy + 5000) {
-						doDraw = false;
-					}
-				}
-			}
-			if (doDraw) {
-				if (!(g.objects[i].name === "bullet" && g.objects[i].data
-						.last_bullet_num < g.last_bullet_num - BULLET_LIMIT))
-					g.objects[i].draw(g.objects[i], ctx);
-			}
-			ctx.restore();
-			if (DEBUG_DRAW) {
-				if (g.totalDraws[g.objects[i].name] === undefined)
-					g.totalDraws[g.objects[i].name] = 0;
-				g.totalDraws[g.objects[i].name] += 1;
-				if (g.drawDurations[g.objects[i].name] === undefined)
-					g.drawDurations[g.objects[i].name] = 0;
-				g.drawDurations[g.objects[i].name] += (performance.now() -
-					drawTime);
+			else {
+				curX = d.x;
+				curY = d.y;
 			}
 		}
+		ctx.save();
+		if (INTEROLATION && curX !== null && curY !== null && obj.prevX !==
+			undefined && obj.prevY !== undefined) {
+			ctx.translate((curX - obj.prevX) * (alpha - 1), (curY - obj.prevY) *
+				(alpha - 1));
+		}
+		let doDraw = true;
+		if (curX !== null && curY !== null) {
+			if (curX < level_Ox - 2500 || curX > level_Ox + 5000 || curY <
+				level_Oy - 2500 || curY > level_Oy + 5000) {
+				doDraw = false;
+			}
+		}
+		if (doDraw) {
+			if (!(obj.name === "bullet" && obj.bullet_num < g.last_bullet_num -
+					BULLET_LIMIT)) {
+				obj.draw(obj, ctx);
+			}
+		}
+		ctx.restore();
+		if (DEBUG_DRAW) {
+			if (g.totalDraws[obj.name] === undefined) g.totalDraws[obj.name] =
+				0;
+			g.totalDraws[obj.name] += 1;
+			if (g.drawDurations[obj.name] === undefined) g.drawDurations[obj
+				.name] = 0;
+			g.drawDurations[obj.name] += (performance.now() - drawTime);
+		}
+	}
 	ctx.restore();
-	if (!g.show_gui)
-		return;
+	if (!g.show_gui) return;
 	if (g.debug) {
 		ctx.save();
 		ctx.scale(get_scale(), get_scale());
-		for (let i = 0; i < Math.min(50, g.debug_console.length); i++)
+		const debugLen = Math.min(50, g.debug_console.length);
+		for (let i = 0; i < debugLen; i++) {
 			drawText(ctx, 50, 110 + i * 20, g.debug_console[i]);
+		}
 		ctx.restore();
 	}
-	ctx.save()
+	ctx.save();
 	ctx.scale(get_scale(), get_scale());
 	for (let i = 0; i < g.gui_elements.length; i++) {
-		if (!g.gui_elements[i].destroyed && g.gui_elements[i].shown) {
-			let drawTime = performance.now();
-			g.gui_elements[i].draw(g.gui_elements[i], ctx);
-			if (DEBUG_ELEMENTS_DRAW)
-				g.debug_console.unshift('drawn ' + g.gui_elements[i].name +
-					' in ' + (performance.now() - drawTime));
+		const guiElem = g.gui_elements[i];
+		if (!guiElem.destroyed && guiElem.shown) {
+			let drawTime = 0;
+			if (DEBUG_ELEMENTS_DRAW) drawTime = performance.now();
+			guiElem.draw(guiElem, ctx);
+			if (DEBUG_ELEMENTS_DRAW) {
+				g.debug_console.unshift('drawn ' + guiElem.name + ' in ' + (
+					performance.now() - drawTime));
+			}
 		}
 	}
 	game_draw_dps(g, ctx);
