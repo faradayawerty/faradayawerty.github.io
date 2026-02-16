@@ -1,7 +1,4 @@
-
-const PALETTE_DEFAULT = {
-};
-
+const PALETTE_DEFAULT = {};
 let COLORS_SCHEME_DEFAULT_PALETTE = {
 	trashcan: {
 		fill: "#555555",

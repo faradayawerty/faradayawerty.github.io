@@ -1,4 +1,3 @@
-
 let COLORS_SCHEME_DEFAULT_NO_PALETTE_SCARY = {
 	trashcan: {
 		fill: "#1a1a1a",
@@ -163,7 +162,9 @@ let COLORS_SCHEME_DEFAULT_NO_PALETTE_SCARY = {
 			outline: "#333333",
 			eye: "#660000",
 			gun: "#1a0a1a",
-			rainbow: ["#440000", "#442200", "#444400", "#004400", "#004444", "#000044", "#220044"]
+			rainbow: ["#440000", "#442200", "#444400", "#004400", "#004444",
+				"#000044", "#220044"
+			]
 		},
 		deer_boss: {
 			body: "#2a1a0a",
@@ -646,7 +647,9 @@ let COLORS_SCHEME_DEFAULT_NO_PALETTE_SCARY = {
 			fire_accent: "#1a0505",
 			fire_roof: "#110000",
 			fire_roof_outline: "#050000",
-			bench_options: ["#1a0f0a", "#150a05", "#1a0a0a", "#1a0000", "#1a140a", "#1a0f00", "#0a0000"]
+			bench_options: ["#1a0f0a", "#150a05", "#1a0a0a", "#1a0000",
+				"#1a140a", "#1a0f00", "#0a0000"
+			]
 		},
 		objects: {
 			fuel_base: "#1a1a1a",

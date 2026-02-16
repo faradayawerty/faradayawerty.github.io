@@ -162,7 +162,9 @@ let COLORS_SCHEME_DEFAULT_NO_PALETTE_DIM = {
 			outline: "#ffffff",
 			eye: "#ffffff",
 			gun: "#331133",
-			rainbow: ["#ef4444", "#f97316", "#facc15", "#22c55e", "#06b6d4", "#3b82f6", "#8b5cf6"]
+			rainbow: ["#ef4444", "#f97316", "#facc15", "#22c55e", "#06b6d4",
+				"#3b82f6", "#8b5cf6"
+			]
 		},
 		deer_boss: {
 			body: "#4a2c16",

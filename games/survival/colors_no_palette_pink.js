@@ -162,7 +162,8 @@ let COLORS_SCHEME_DEFAULT_NO_PALETTE_PINK = {
 			outline: "#ffffff",
 			eye: "#ffffff",
 			gun: "#ff00ff",
-			rainbow: ["#ff00ff", "#ff66b2", "#ffb3d9", "#ffffff", "#ffccf2", "#ff1493",
+			rainbow: ["#ff00ff", "#ff66b2", "#ffb3d9", "#ffffff", "#ffccf2",
+				"#ff1493",
 				"#ff0099"
 			]
 		},
