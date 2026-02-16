@@ -276,7 +276,7 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.fillRect(cw * 0.2, ch / 2, ww, wh);
 			ctx.fillRect(-cw * 0.35, -ch / 2 - wh, ww, wh);
 			ctx.fillRect(-cw * 0.35, ch / 2, ww, wh);
-			ctx.fillStyle = "#aaddff";
+			ctx.fillStyle = p.c28;
 			ctx.strokeStyle = "#222";
 			ctx.lineWidth = 1;
 			ctx.fillRect(cw * 0.1, -ch * 0.35, cw * 0.15, ch * 0.7);
@@ -640,13 +640,13 @@ let ACHIEVEMENT_REGISTRY = {
 		draw: (ctx, x, y, w, h, p) => {
 			let N = 4;
 			for (let i = 0; i < N; i++) {
-				ctx.fillStyle = "yellow";
+				ctx.fillStyle = p.c1;
 				ctx.fillRect(x + i * w / N + 0.25 * w / N, y + 0.25 * h,
 					0.5 * w / N, 0.5 * h);
-				ctx.fillStyle = "orange";
+				ctx.fillStyle = p.c6;
 				ctx.fillRect(x + i * w / N + 0.25 * w / N, y + 0.25 * h,
 					0.5 * w / N, 0.125 * h);
-				ctx.strokeStyle = "orange";
+				ctx.strokeStyle = p.c6;
 				ctx.lineWidth = 0.01 * w;
 				ctx.strokeRect(x + i * w / N + 0.25 * w / N, y + 0.25 *
 					h, 0.5 * w / N, 0.5 * h);

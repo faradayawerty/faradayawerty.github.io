@@ -409,13 +409,14 @@ function player_update(player_object, dt) {
 			let id = closest_item.data.id;
 			if (
 				(
-					(ITEMS_AMMOS.concat(ITEMS_JUNK).includes(id) &&
+					(ITEMS_AMMOS.concat(ITEMS_JUNK).concat([ITEM_AMMO])
+						.includes(id) &&
 						player_object.game.settings.auto_pickup[
 							"automatically pickup ammo"]) ||
 					(ITEMS_FOODS.concat(ITEMS_DRINKS).includes(id) &&
 						player_object.game.settings.auto_pickup[
 							"automatically pickup food and drinks"]) ||
-					(ITEMS_BOSSIFIERS.includes(id) &&
+					(ITEMS_BOSSIFIERS.concat([ITEM_BOSSIFIER]).includes(id) &&
 						player_object.game.settings.auto_pickup[
 							"automatically pickup bossifiers"]) ||
 					(ITEMS_GUNS.concat(ITEMS_MELEE).includes(id) &&

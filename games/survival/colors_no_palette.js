@@ -612,7 +612,8 @@ let COLORS_SCHEME_DEFAULT_NO_PALETTE = {
 				gray_very_dark: "#111111",
 				gray_silver: "#c2c2c2",
 				gray_text: "#777777",
-				black_soft: "#222222"
+				black_soft: "#222222",
+				glass: "#aaddff"
 			}
 		}
 	},

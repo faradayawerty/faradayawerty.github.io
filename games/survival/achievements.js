@@ -418,6 +418,7 @@ function get_achievement_palette(done, animstate) {
 		c25: pal.red_orange,
 		c26: COLORS_DEFAULT.decorations.nature.tree_trunk_outline,
 		c27: COLORS_DEFAULT.decorations.nature.grass,
+		c28: COLORS_DEFAULT.ui.achievements.palette.glass,
 	};
 	if (!done) {
 		p.c0 = COLORS_DEFAULT.ui.achievements.bg;
@@ -444,6 +445,7 @@ function get_achievement_palette(done, animstate) {
 		p.c25 = pal.gray_dark;
 		p.c26 = pal.gray_mid;
 		p.c27 = pal.black_soft;
+		p.c28 = pal.gray_silver;
 	}
 	if (animstate !== null) {
 		let r = Math.cos(0.1 * animstate) * 15;
