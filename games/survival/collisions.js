@@ -42,8 +42,14 @@ function collisions_handle_pair(g, self, other, dt) {
 		if (sData.damaged) return;
 		if (sData.enemy) {
 			if (oName === "player") {
-				collisions_apply_damage_to_player(oData, sData.damage, dt,
-					"bullet", g);
+				if (oData.car_object) {
+					collisions_apply_damage_to_object(g, oData.car_object, sData
+						.damage, dt, false);
+				}
+				else {
+					collisions_apply_damage_to_player(oData, sData.damage, dt,
+						"bullet", g);
+				}
 				sData.damaged = true;
 			}
 		}
@@ -73,8 +79,14 @@ function collisions_handle_pair(g, self, other, dt) {
 		if (COLLISION_TARGETS_ROCKET.has(oName)) {
 			if (oName === "rocket" && sData.enemy === oData.enemy) return;
 			if (oName === "player" && sData.enemy) {
-				collisions_apply_damage_to_player(oData, sData.damage, dt,
-					"rocket", g);
+				if (oData.car_object) {
+					collisions_apply_damage_to_object(g, oData.car_object, sData
+						.damage, dt, false);
+				}
+				else {
+					collisions_apply_damage_to_player(oData, sData.damage, dt,
+						"rocket", g);
+				}
 			}
 			else {
 				const isFromPlayer = !sData.enemy;
@@ -92,8 +104,14 @@ function collisions_handle_pair(g, self, other, dt) {
 	}
 	else if (sName === "enemy") {
 		if (oName === "player") {
-			collisions_apply_damage_to_player(oData, sData.damage, dt, "enemy",
-				g);
+			if (oData.car_object) {
+				collisions_apply_damage_to_object(g, oData.car_object, sData
+					.damage, dt, false);
+			}
+			else {
+				collisions_apply_damage_to_player(oData, sData.damage, dt,
+					"enemy", g);
+			}
 		}
 		else if (oName === "car") {
 			oData.health -= (oData.is_tank ? 0.0625 : 1) * sData.damage * dt;
@@ -117,7 +135,7 @@ function collisions_handle_pair(g, self, other, dt) {
 }
 
 function collisions_apply_damage_to_player(p, damage, dt, source, g) {
-	if (p.immunity > 0) return;
+	if (p.immunity > 0 || p.car_object) return;
 	let totalDmg = damage * dt;
 	if (p.shield_blue_health > 0) {
 		p.shield_blue_health -= (source === "enemy" ? 1.0 : 0.95) * totalDmg;
