@@ -88,7 +88,7 @@ let COLORS_SCHEME_DEFAULT_NO_PALETTE = {
 	},
 	enemies: {
 		regular: {
-			body: "green",
+			body: "darkgreen",
 			outline: "white",
 			eye: "red"
 		},
@@ -621,7 +621,7 @@ let COLORS_SCHEME_DEFAULT_NO_PALETTE = {
 		nature: {
 			grass: "#117711",
 			sand: "#bbaa55",
-			tree_leaves: "lime",
+			tree_leaves: "limegreen",
 			tree_leaves_outline: "#224400",
 			tree_trunk: "brown",
 			tree_trunk_outline: "#442200",
