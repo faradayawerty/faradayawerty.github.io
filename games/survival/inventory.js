@@ -307,6 +307,7 @@ function inventory_sort(inventory_element) {
 			if (id !== 0) {
 				let is_weapon = ITEMS_GUNS.includes(id) || ITEMS_MELEE.includes(
 					id);
+				let is_bossifier = ITEMS_BOSSIFIERS.includes(id);
 				let is_health = (id === ITEM_HEALTH || id ===
 					ITEM_HEALTH_GREEN);
 				let is_food = ITEMS_FOODS.includes(id);
@@ -330,7 +331,7 @@ function inventory_sort(inventory_element) {
 				}
 				else {
 					if (!item_counts[id]) item_counts[id] = 0;
-					if (is_weapon) {
+					if (is_weapon || is_bossifier) {
 						if (item_counts[id] >= 1) can_add = false;
 						else item_counts[id]++;
 					}
