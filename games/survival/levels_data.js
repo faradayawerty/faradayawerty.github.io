@@ -782,7 +782,7 @@ let TILES = {
 		}
 	},
 	[LEVEL_TILE_CITY_PARK]: {
-		weight: 25,
+		weight: 10,
 		connections: {
 			N: 1,
 			E: 1,
