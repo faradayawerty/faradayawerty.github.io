@@ -276,16 +276,17 @@ function inventory_close_button_update(inventory_element, mx, my, is_clicked) {
 }
 
 function inventory_get_item_weight(id) {
-	if (id === 0) return 500;
+	if (id === 0) return 999;
 	if (ITEMS_GUNS.includes(id) || ITEMS_MELEE.includes(id)) return 1;
-	if (ITEMS_FOODS.includes(id)) return 2;
-	if (ITEMS_DRINKS.includes(id)) return 3;
-	if (id === ITEM_HEALTH || id === ITEM_HEALTH_GREEN) return 4;
+	if (ITEMS_BOSSIFIERS.includes(id)) return 2;
 	if (id === ITEM_SHIELD || id === ITEM_SHIELD_GREEN || id ===
 		ITEM_SHIELD_RAINBOW ||
 		id === ITEM_SHIELD_GRAY || id === ITEM_SHADOW_SHIELD || id ===
-		ITEM_ANUBIS_REGEN_SHIELD) return 5;
-	if (id === ITEM_FUEL) return 6;
+		ITEM_ANUBIS_REGEN_SHIELD) return 3;
+	if (id === ITEM_HEALTH || id === ITEM_HEALTH_GREEN) return 4;
+	if (ITEMS_FOODS.includes(id)) return 5;
+	if (ITEMS_DRINKS.includes(id)) return 6;
+	if (id === ITEM_FUEL) return 7;
 	if (ITEMS_AMMOS.includes(id)) return 1000;
 	return 10;
 }
@@ -293,23 +294,103 @@ function inventory_get_item_weight(id) {
 function inventory_sort(inventory_element) {
 	let inv = inventory_element.data;
 	let all_slots = [];
+	let group_counts = {
+		health: 0,
+		food: 0,
+		drink: 0
+	};
+	let item_counts = {};
+	let original_order_counter = 0;
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
-			all_slots.push(inv.items[i][j]);
+			let id = inv.items[i][j];
+			if (id !== 0) {
+				let is_weapon = ITEMS_GUNS.includes(id) || ITEMS_MELEE.includes(
+					id);
+				let is_health = (id === ITEM_HEALTH || id ===
+					ITEM_HEALTH_GREEN);
+				let is_food = ITEMS_FOODS.includes(id);
+				let is_drink = ITEMS_DRINKS.includes(id);
+				let is_shield = (id === ITEM_SHIELD || id ===
+					ITEM_SHIELD_GREEN || id === ITEM_SHIELD_RAINBOW ||
+					id === ITEM_SHIELD_GRAY || id === ITEM_SHADOW_SHIELD ||
+					id === ITEM_ANUBIS_REGEN_SHIELD);
+				let can_add = true;
+				if (is_health) {
+					if (group_counts.health >= 6) can_add = false;
+					else group_counts.health++;
+				}
+				else if (is_food) {
+					if (group_counts.food >= 6) can_add = false;
+					else group_counts.food++;
+				}
+				else if (is_drink) {
+					if (group_counts.drink >= 6) can_add = false;
+					else group_counts.drink++;
+				}
+				else {
+					if (!item_counts[id]) item_counts[id] = 0;
+					if (is_weapon) {
+						if (item_counts[id] >= 1) can_add = false;
+						else item_counts[id]++;
+					}
+					else if (is_shield) {
+						if (item_counts[id] >= 3) can_add = false;
+						else item_counts[id]++;
+					}
+					else {
+						if (item_counts[id] >= 6) can_add = false;
+						else item_counts[id]++;
+					}
+				}
+				if (can_add) {
+					all_slots.push({
+						id: id,
+						original_index: original_order_counter++,
+						is_weapon: is_weapon
+					});
+				}
+				else {
+					if (inv.attached_to_object && inv.attached_to_object.data
+						.body) {
+						item_create(inventory_element.game, id,
+							inv.attached_to_object.data.body.position.x +
+							100 * Math.cos(2 * Math.PI * Math.random()),
+							inv.attached_to_object.data.body.position.y +
+							100 * Math.sin(2 * Math.PI * Math.random()),
+							true, true);
+					}
+				}
+			}
 		}
 	}
+	let total_capacity = inv.items.length * inv.items[0].length;
+	while (all_slots.length < total_capacity) {
+		all_slots.push({
+			id: 0,
+			original_index: original_order_counter++,
+			is_weapon: false
+		});
+	}
 	all_slots.sort((a, b) => {
-		let wa = inventory_get_item_weight(a);
-		let wb = inventory_get_item_weight(b);
-		if (wa === 1 && wb === 1) return 0;
-		if (wa === 1000 && wb === 1000) return a - b;
+		let wa = inventory_get_item_weight(a.id);
+		let wb = inventory_get_item_weight(b.id);
 		if (wa !== wb) return wa - wb;
-		return a - b;
+		if (a.is_weapon && b.is_weapon) {
+			return a.original_index - b.original_index;
+		}
+		if (wa === 2 && wb === 2) {
+			let idxA = ITEMS_BOSSIFIERS.indexOf(a.id);
+			let idxB = ITEMS_BOSSIFIERS.indexOf(b.id);
+			if (idxA !== idxB) return idxB - idxA;
+		}
+		if (a.id !== b.id) return a.id - b.id;
+		return a.original_index - b.original_index;
 	});
 	let idx = 0;
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
-			inv.items[i][j] = all_slots[idx];
+			inv.items[i][j] = all_slots[idx].id;
 			idx++;
 		}
 	}

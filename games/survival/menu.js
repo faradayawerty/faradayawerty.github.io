@@ -296,7 +296,12 @@ function menu_update(m, dt, input) {
 		}
 		else if (m.buttons[m.iselected] == "settings" || m.buttons[m
 				.iselected] == "back to settings") {
-			m.buttons = m.settings_buttons;
+			if (m.mobile) {
+				m.buttons = m.settings_buttons.filter(b => b !== "ui scale");
+			}
+			else {
+				m.buttons = m.settings_buttons;
+			}
 			if (!isScreenTouched(input))
 				m.iselected = 0;
 		}

@@ -1,4 +1,7 @@
 let DEATH_MESSAGE = "default death message";
+const FONT_CACHE = {};
+const MOUSE_RADII_POOL = [0, 0, 0, 0];
+const PI2 = Math.PI * 2;
 
 function drawButton(ctx, x, y, text) {
 	if (text === "DEATH")
@@ -12,41 +15,51 @@ function drawButton(ctx, x, y, text) {
 
 function drawText(ctx, x, y, text, fontsize = 18, color = 'white', isBold =
 	false) {
-	ctx.save();
-	let weight = isBold ? "bold " : "";
-	ctx.font = weight + fontsize + "px sans-serif";
+	const fontKey = (isBold ? "b" : "n") + fontsize;
+	if (!FONT_CACHE[fontKey]) {
+		FONT_CACHE[fontKey] = (isBold ? "bold " : "") + fontsize +
+			"px sans-serif";
+	}
+	ctx.font = FONT_CACHE[fontKey];
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x, y);
 	ctx.fillStyle = color;
 	ctx.fillText(text, x + 1, y + 1);
-	ctx.restore();
 }
 
 function fillMatterBody(ctx, b, color) {
+	const vertices = b.vertices;
+	const v0 = vertices[0];
 	ctx.beginPath();
-	let vertices = b.vertices;
-	ctx.moveTo(vertices[0].x, vertices[0].y);
-	for (let j = 1; j < vertices.length; j += 1)
-		ctx.lineTo(vertices[j].x, vertices[j].y);
-	ctx.lineTo(vertices[0].x, vertices[0].y);
+	ctx.moveTo(v0.x, v0.y);
+	for (let j = 1; j < vertices.length; j += 1) {
+		const v = vertices[j];
+		ctx.lineTo(v.x, v.y);
+	}
+	ctx.lineTo(v0.x, v0.y);
 	ctx.fillStyle = color;
 	ctx.fill();
 }
 
 function drawMatterBody(ctx, b, color, lw = 2) {
+	const vertices = b.vertices;
+	const v0 = vertices[0];
 	ctx.beginPath();
 	ctx.lineWidth = lw;
-	let vertices = b.vertices;
-	ctx.moveTo(vertices[0].x, vertices[0].y);
-	for (let j = 1; j < vertices.length; j += 1)
-		ctx.lineTo(vertices[j].x, vertices[j].y);
-	ctx.lineTo(vertices[0].x, vertices[0].y);
+	ctx.moveTo(v0.x, v0.y);
+	for (let j = 1; j < vertices.length; j += 1) {
+		const v = vertices[j];
+		ctx.lineTo(v.x, v.y);
+	}
+	ctx.lineTo(v0.x, v0.y);
 	ctx.strokeStyle = color;
 	ctx.stroke();
 }
 
 function dist(v1, v2) {
-	return Matter.Vector.magnitude(Matter.Vector.sub(v1, v2));
+	const dx = v1.x - v2.x;
+	const dy = v1.y - v2.y;
+	return Math.sqrt(dx * dx + dy * dy);
 }
 
 function doRectsCollide(x1, y1, w1, h1, x2, y2, w2, h2) {
@@ -64,16 +77,16 @@ function drawLine(ctx, x1, y1, x2, y2, color, width) {
 }
 
 function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
-	ctx.beginPath()
-	ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
+	ctx.beginPath();
+	ctx.arc(x, y, radius, 0, PI2, false);
 	if (fill) {
-		ctx.fillStyle = fill
-		ctx.fill()
+		ctx.fillStyle = fill;
+		ctx.fill();
 	}
 	if (stroke) {
-		ctx.lineWidth = strokeWidth
-		ctx.strokeStyle = stroke
-		ctx.stroke()
+		ctx.lineWidth = strokeWidth;
+		ctx.strokeStyle = stroke;
+		ctx.stroke();
 	}
 }
 
@@ -86,17 +99,18 @@ function randomNormal() {
 		v = 0;
 	while (u === 0) u = Math.random();
 	while (v === 0) v = Math.random();
-	let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+	let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(PI2 * v);
 	num = num / 10.0 + 0.5;
 	if (num > 1 || num < 0) return randomNormal();
 	return num;
 }
 const drawMouse = (ctx, mx, my, w, h) => {
-	let mw = 0.28 * w,
-		mh = 0.42 * h;
+	const mw = 0.28 * w;
+	const mh = 0.42 * h;
+	const r = 0.08 * w;
 	ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
 	ctx.beginPath();
-	ctx.roundRect(mx, my, mw, mh, 0.08 * w);
+	ctx.roundRect(mx, my, mw, mh, r);
 	ctx.fill();
 	ctx.strokeStyle = "rgba(0,0,0,0.6)";
 	ctx.lineWidth = 2;
@@ -109,11 +123,10 @@ const drawMouse = (ctx, mx, my, w, h) => {
 	ctx.stroke();
 	ctx.fillStyle = "rgba(255, 0, 0, 0.6)";
 	ctx.beginPath();
-	ctx.roundRect(mx, my, mw * 0.5, mh * 0.4, {
-		tl: 0.08 * w,
-		tr: 0,
-		bl: 0,
-		br: 0
-	});
+	MOUSE_RADII_POOL[0] = r;
+	MOUSE_RADII_POOL[1] = 0;
+	MOUSE_RADII_POOL[2] = 0;
+	MOUSE_RADII_POOL[3] = 0;
+	ctx.roundRect(mx, my, mw * 0.5, mh * 0.4, MOUSE_RADII_POOL);
 	ctx.fill();
 }

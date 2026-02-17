@@ -1,6 +1,22 @@
 let DEBUG_ENEMY = false;
 let ENEMY_DAMAGE_COEFFICIENT = 1.0;
 let ENEMY_HEALTH_COEFFICIENT = 1.0;
+const _ENEMY_VARS = {
+	tx: 0,
+	ty: 0,
+	v: 0,
+	dx: 0,
+	dy: 0,
+	ndx: 0,
+	ndy: 0
+};
+const _ENEMY_VEC = {
+	x: 0,
+	y: 0
+};
+const _ENEMY_DROP_DATA = {
+	N: 1
+};
 
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	"random", tile = LEVEL_TILE_VOID) {
@@ -12,19 +28,25 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		else if (tile >= THEME_DESERT) {
 			currentTileTheme = THEME_DESERT;
 		}
-		const availableKeys = Object.keys(ENEMY_TYPES).filter(k => {
+		const availableKeys = [];
+		const allEnemyKeys = Object.keys(ENEMY_TYPES);
+		for (let i = 0; i < allEnemyKeys.length; i++) {
+			const k = allEnemyKeys[i];
 			const isUnlocked = (k === "regular") || g.available_enemies
 				.includes(k);
-			const isCorrectTheme = (ENEMY_TYPES[k].theme ===
-				currentTileTheme);
-			return isUnlocked && isCorrectTheme;
-		});
+			const isCorrectTheme = (ENEMY_TYPES[k].theme === currentTileTheme);
+			if (isUnlocked && isCorrectTheme) {
+				availableKeys.push(k);
+			}
+		}
 		if (availableKeys.length === 0) {
 			type = "regular";
 		}
 		else {
-			const totalWeight = availableKeys.reduce((sum, key) => sum + (
-				ENEMY_TYPES[key].weight || 0), 0);
+			let totalWeight = 0;
+			for (let i = 0; i < availableKeys.length; i++) {
+				totalWeight += (ENEMY_TYPES[availableKeys[i]].weight || 0);
+			}
 			let randomNum = Math.random() * totalWeight;
 			for (let i = 0; i < availableKeys.length; i++) {
 				const key = availableKeys[i];
@@ -101,18 +123,18 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	if (config.use_rainbow_color_gradient) {
 		e.color_gradient = Math.random() * 2 * Math.PI / 0.03;
 		let r = Math.pow(Math.cos(0.02 * e.color_gradient) * 15, 2);
-		let g = Math.pow(0.7 * (Math.cos(0.02 * e.color_gradient) + Math
-			.sin(0.02 * e.color_gradient)) * 15, 2);
-		let b = Math.pow(Math.sin(0.02 * e.color_gradient) * 15, 2);
+		let gr = Math.pow(0.7 * (Math.cos(0.02 * e.color_gradient) + Math.sin(
+			0.02 * e.color_gradient)) * 15, 2);
+		let bl = Math.pow(Math.sin(0.02 * e.color_gradient) * 15, 2);
 		e.color = "#" + Math.floor(r).toString(16).padStart(2, '0') + Math
-			.floor(g).toString(16).padStart(2, '0') + Math.floor(b)
-			.toString(16).padStart(2, '0');
+			.floor(gr).toString(16).padStart(2, '0') + Math.floor(bl).toString(
+				16).padStart(2, '0');
 	}
 	if (config.mask) {
 		e.body.collisionFilter.mask = config.mask;
 	}
 	if (boss) {
-		e.damage = 1.05 * e.damage;
+		e.damage = 3.05 * e.damage;
 		e.health = 25 * e.max_health;
 		e.max_health = 25 * e.max_health;
 		e.hunger = 1.75 * e.max_hunger;
@@ -162,18 +184,18 @@ function enemy_destroy(enemy_object, death = true) {
 	if (enemy_object.destroyed)
 		return;
 	let g = enemy_object.game;
-	if (enemy_object.data.hit_by_player && enemy_object.data.hunger > 0 &&
-		death) {
-		if (g.enemy_kills[enemy_object.data.type] === undefined)
-			g.enemy_kills[enemy_object.data.type] = 0;
-		g.enemy_kills[enemy_object.data.type] += 1;
+	let e = enemy_object.data;
+	if (e.hit_by_player && e.hunger > 0 && death) {
+		if (g.enemy_kills[e.type] === undefined)
+			g.enemy_kills[e.type] = 0;
+		g.enemy_kills[e.type] += 1;
 		if (DEBUG_ENEMY)
-			g.debug_console.unshift("killed " + enemy_object.data.type + ": " +
-				g.enemy_kills[enemy_object.data.type]);
-		if (enemy_object.data.boss) {
+			g.debug_console.unshift("killed " + e.type + ": " + g.enemy_kills[e
+				.type]);
+		if (e.boss) {
 			g.boss_kills += 1;
 			for (let nextType in ENEMY_TYPES) {
-				if (ENEMY_TYPES[nextType].requires === enemy_object.data.type) {
+				if (ENEMY_TYPES[nextType].requires === e.type) {
 					if (!g.available_enemies.includes(nextType)) {
 						g.kills_for_boss = Math.max(16, g.kills_for_boss);
 					}
@@ -185,20 +207,12 @@ function enemy_destroy(enemy_object, death = true) {
 			g.kills += 1;
 			g.kills_for_boss -= 1;
 		}
-		if (DEBUG_ENEMY)
-			g.debug_console.unshift("need kills for boss: " + g.kills_for_boss +
-				", kills: " + g.kills);
 	}
-	if (enemy_object.data.boss && enemy_object.data.hit_by_player &&
-		enemy_object.data.hunger <= 0 && death) {
+	if (e.boss && e.hit_by_player && e.hunger <= 0 && death) {
 		g.kills_for_boss = Math.max(32, g.kills_for_boss);
-		if (DEBUG_ENEMY)
-			g.debug_console.unshift(
-				"couldn't defeat boss, need kills for boss: " + g
-				.kills_for_boss + ", kills: " + g.kills);
 	}
-	Matter.Composite.remove(g.engine.world, enemy_object.data.body);
-	enemy_object.data.body = null;
+	Matter.Composite.remove(g.engine.world, e.body);
+	e.body = null;
 	enemy_object.destroyed = true;
 }
 
@@ -209,9 +223,8 @@ function enemy_get_target_object(enemy_object, dt) {
 	if (target_object == null)
 		target_object = game_object_find_closest(enemy_object.game, e.body
 			.position.x, e.body.position.y, "car", e.follow_range);
-	if (target_object != null) {
-		if (target_object.data.car_object)
-			target_object = target_object.data.car_object;
+	if (target_object != null && target_object.data.car_object) {
+		target_object = target_object.data.car_object;
 	}
 	if (dt > -1) {
 		if (target_object)
@@ -219,9 +232,7 @@ function enemy_get_target_object(enemy_object, dt) {
 		else
 			e.hunt_delay = e.hunt_delay_max;
 	}
-	if (e.hunt_delay > 0)
-		target_object = null;
-	return target_object;
+	return (e.hunt_delay > 0) ? null : target_object;
 }
 
 function enemy_update(enemy_object, dt) {
@@ -242,67 +253,53 @@ function enemy_update(enemy_object, dt) {
 	e.color_gradient += 0.01 * dt;
 	if (typeData.behaviour_no_target)
 		typeData.behaviour_no_target(enemy_object, dt);
-	let vars = {
-		tx: 0,
-		ty: 0,
-		v: 0,
-		dx: 0,
-		dy: 0,
-		ndx: 0,
-		ndy: 0,
-	};
 	let target_object = enemy_get_target_object(enemy_object, dt);
 	if (target_object != null) {
-		let tx = target_object.data.body.position.x - e.body.position.x;
-		let ty = target_object.data.body.position.y - e.body.position.y;
-		let v = Math.sqrt(tx * tx + ty * ty) || 0.001;
-		vars = {
-			tx: tx,
-			ty: ty,
-			v: v,
-			dx: e.speed * tx / v,
-			dy: e.speed * ty / v,
-			ndx: tx / v,
-			ndy: ty / v
-		};
+		let vrs = _ENEMY_VARS;
+		vrs.tx = target_object.data.body.position.x - e.body.position.x;
+		vrs.ty = target_object.data.body.position.y - e.body.position.y;
+		vrs.v = Math.sqrt(vrs.tx * vrs.tx + vrs.ty * vrs.ty) || 0.001;
+		vrs.dx = e.speed * vrs.tx / vrs.v;
+		vrs.dy = e.speed * vrs.ty / vrs.v;
+		vrs.ndx = vrs.tx / vrs.v;
+		vrs.ndy = vrs.ty / vrs.v;
 		if (typeData.behaviour) typeData.behaviour(enemy_object, dt,
-			target_object, vars);
+			target_object, vrs);
 		if (e.boss && typeData.boss_behaviour) typeData.boss_behaviour(
-			enemy_object, dt, target_object, vars);
+			enemy_object, dt, target_object, vrs);
 		if (e.is_minion && typeData.minion_behaviour) typeData.minion_behaviour(
-			enemy_object, dt, target_object, vars);
-		let v_sq = vars.dx * vars.dx + vars.dy * vars.dy;
-		if (v_sq > 0) {
-			Matter.Body.setVelocity(e.body, {
-				x: vars.dx,
-				y: vars.dy
-			});
+			enemy_object, dt, target_object, vrs);
+		if (vrs.dx * vrs.dx + vrs.dy * vrs.dy > 0) {
+			_ENEMY_VEC.x = vrs.dx;
+			_ENEMY_VEC.y = vrs.dy;
+			Matter.Body.setVelocity(e.body, _ENEMY_VEC);
 		}
-		if (e.boss) {
-			if (e.spawn_minion_delay >= 4000) {
-				let max_minions = typeData.max_minions || 10;
-				if (typeData.max_minions === 0)
-					max_minions = 0;
-				if (enemy_count_minions(enemy_object) < max_minions) {
-					for (let i = 0; i < Math.random() * 4 + 1; i++) {
-						let theta = 2 * Math.PI * Math.random();
-						let sx = e.body.position.x + 200 * Math.cos(theta);
-						let sy = e.body.position.y + 200 * Math.sin(theta);
-						if (typeData.minion_dist_mult) {
-							let dist = typeData.minion_dist_mult * e.w;
-							sx = target_object.data.body.position.x + dist *
-								Math.cos(theta);
-							sy = target_object.data.body.position.y + dist *
-								Math.sin(theta);
-						}
-						enemy_create(enemy_object.game, sx, sy, false, true, e
-							.type);
+		if (e.boss && e.spawn_minion_delay >= 4000) {
+			let max_minions = typeData.max_minions === 0 ? 0 : (typeData
+				.max_minions || 10);
+			if (enemy_count_minions(enemy_object) < max_minions) {
+				let spawnCount = Math.floor(Math.random() * 4) + 1;
+				for (let i = 0; i < spawnCount; i++) {
+					let theta = 2 * Math.PI * Math.random();
+					let sx, sy;
+					if (typeData.minion_dist_mult) {
+						let dist = typeData.minion_dist_mult * e.w;
+						sx = target_object.data.body.position.x + dist * Math
+							.cos(theta);
+						sy = target_object.data.body.position.y + dist * Math
+							.sin(theta);
 					}
+					else {
+						sx = e.body.position.x + 200 * Math.cos(theta);
+						sy = e.body.position.y + 200 * Math.sin(theta);
+					}
+					enemy_create(enemy_object.game, sx, sy, false, true, e
+						.type);
 				}
-				e.spawn_minion_delay = 0;
 			}
-			e.spawn_minion_delay += Math.random() * dt;
+			e.spawn_minion_delay = 0;
 		}
+		e.spawn_minion_delay += Math.random() * dt;
 	}
 	if (e.health <= 0) {
 		if (e.hit_by_player) {
@@ -313,35 +310,32 @@ function enemy_update(enemy_object, dt) {
 			if (typeData.on_death) typeData.on_death(enemy_object,
 				target_object);
 			if (typeData.bossifier_item) {
-				let killsOfThisType = enemy_object.game.enemy_kills[e.type] ||
-					0;
-				let finalChance = 0.25 * Math.tanh(0.015 * killsOfThisType);
-				if (!e.boss && !e.is_minion && Math.random() < finalChance)
+				let kills = enemy_object.game.enemy_kills[e.type] || 0;
+				if (!e.boss && !e.is_minion && Math.random() < 0.25 * Math.tanh(
+						0.015 * kills))
 					item_create(enemy_object.game, typeData.bossifier_item, e
 						.body.position.x, e.body.position.y);
 			}
-			let dropData = {
-				N: 1
-			};
+			let drp = _ENEMY_DROP_DATA;
+			drp.N = 1;
 			if (e.boss) {
 				if (e.hunger > 0) {
-					dropData.N = 20 * Math.random() + 10;
+					drp.N = 20 * Math.random() + 10;
 					if (typeData.on_boss_death) typeData.on_boss_death(
-						enemy_object, target_object, dropData);
+						enemy_object, target_object, drp);
 				}
-				else dropData.N = 5 * Math.random();
+				else drp.N = 5 * Math.random();
 			}
-			if (!e.boss && Math.random() < 0.25)
-				dropData.N = 2;
+			else if (Math.random() < 0.25) drp.N = 2;
 			let sound = e.boss ? "data/sfx/zombie_boss_dies_1.mp3" :
 				"data/sfx/zombie_dies_1.mp3";
 			let p_close = game_object_find_closest(enemy_object.game, e.body
 				.position.x, e.body.position.y, "player", 10000);
 			if (p_close && !p_close.data.ai_controlled) audio_play(sound);
-			for (let i = 0; i < dropData.N; i++) {
+			for (let i = 0; i < drp.N; i++) {
 				let theta = 2 * Math.PI * Math.random();
-				if ((2 * Math.random() < 1 && !e.boss || Math.random() < 0.75 &&
-						e.boss) && DROP_ITEMS)
+				if (((Math.random() < 0.5 && !e.boss) || (Math.random() <
+						0.75 && e.boss)) && DROP_ITEMS)
 					item_spawn(enemy_object.game, e.body.position.x + 50 * Math
 						.cos(theta), e.body.position.y + 50 * Math.sin(theta), e
 						.type);
@@ -356,14 +350,16 @@ function enemy_draw(enemy_object, ctx) {
 	if (e.health <= 0) return;
 	const typeData = ENEMY_TYPES[e.type] || ENEMY_TYPES["regular"];
 	const vis = typeData.visuals || {};
-	let t = Date.now() * 0.008;
-	let speed = Math.sqrt(e.body.velocity.x ** 2 + e.body.velocity.y ** 2);
+	let now = Date.now();
+	let t = now * 0.008;
+	let speed = Math.sqrt(e.body.velocity.x * e.body.velocity.x + e.body
+		.velocity.y * e.body.velocity.y);
 	let bob = (speed > 0.5) ? Math.abs(Math.cos(t)) * (e.h * 0.08) : Math.sin(
-		Date.now() * 0.002) * (e.h * 0.03);
+		now * 0.002) * (e.h * 0.03);
 	let walk = (speed > 0.5) ? Math.sin(t) * (e.h * 0.15) : 0;
 	let target_object = enemy_get_target_object(enemy_object, -1);
-	let angle = 0;
-	let gx = 0,
+	let angle = 0,
+		gx = 0,
 		gy = 0,
 		g = 0.001;
 	if (target_object) {
@@ -376,8 +372,7 @@ function enemy_draw(enemy_object, ctx) {
 		angle = Math.atan2(e.body.velocity.y, e.body.velocity.x);
 	}
 	ctx.save();
-	if (vis.custom_draw && !vis.custom_draw_above)
-		vis.custom_draw(e, ctx);
+	if (vis.custom_draw && !vis.custom_draw_above) vis.custom_draw(e, ctx);
 	if (vis.glowColor) {
 		ctx.shadowBlur = vis.glowBlur || 15;
 		ctx.shadowColor = vis.glowColor;
@@ -415,104 +410,73 @@ function enemy_draw(enemy_object, ctx) {
 		let lookX = Math.cos(angle) * (e.w * 0.05);
 		let lookY = Math.sin(angle) * (e.h * 0.02);
 		ctx.beginPath();
-		ctx.arc(-e.w * 0.1 + lookX, -e.h * 0.05 + lookY, e.w * 0.04, 0, Math
-			.PI * 2);
-		ctx.arc(e.w * 0.1 + lookX, -e.h * 0.05 + lookY, e.w * 0.04, 0, Math.PI *
-			2);
+		ctx.arc(-e.w * 0.1 + lookX, -e.h * 0.05 + lookY, e.w * 0.04, 0, 6.28);
+		ctx.arc(e.w * 0.1 + lookX, -e.h * 0.05 + lookY, e.w * 0.04, 0, 6.28);
 		ctx.fill();
-		ctx.shadowBlur = 0;
 		ctx.restore();
 	}
 	ctx.restore();
 	if (target_object != null) {
-		let bodyCenterY = e.body.position.y + bob;
-		let handOffset = e.w * 0.35;
+		let bCY = e.body.position.y + bob;
+		let hOff = e.w * 0.35;
 		if ((vis.draw_gun && !e.boss || vis.draw_gun_boss && e.boss) && g <
 			1.25 * e.shooting_range) {
 			ctx.strokeStyle = vis.gun_color || "#331133";
 			ctx.lineWidth = (vis.gun_width || 0.25) * e.w;
-			let gunPoints = [];
-			let useCenter = vis.center_gun;
-			if (e.boss && vis.center_gun_boss !== undefined) useCenter = vis
-				.center_gun_boss;
-			if (e.is_minion && vis.center_gun_minion !== undefined) useCenter =
-				vis.center_gun_minion;
-			let useDouble = vis.double_gun;
-			if (e.boss && vis.double_gun_boss !== undefined) useDouble = vis
-				.double_gun_boss;
-			if (e.is_minion && vis.double_gun_minion !== undefined) useDouble =
-				vis.double_gun_minion;
-			if (useCenter) {
-				gunPoints.push({
-					x: e.body.position.x,
-					y: bodyCenterY
-				});
-			}
-			else if (useDouble) {
-				gunPoints.push({
-					x: e.body.position.x - handOffset,
-					y: bodyCenterY
-				});
-				gunPoints.push({
-					x: e.body.position.x + handOffset,
-					y: bodyCenterY
-				});
-			}
-			else {
-				gunPoints.push({
-					x: e.body.position.x - handOffset,
-					y: bodyCenterY
-				});
-			}
-			gunPoints.forEach(p => {
+			let useCenter = e.boss ? (vis.center_gun_boss ?? vis.center_gun) : (
+				e.is_minion ? (vis.center_gun_minion ?? vis.center_gun) :
+				vis.center_gun);
+			let useDouble = e.boss ? (vis.double_gun_boss ?? vis.double_gun) : (
+				e.is_minion ? (vis.double_gun_minion ?? vis.double_gun) :
+				vis.double_gun);
+			for (let i = 0; i < (useDouble ? 2 : 1); i++) {
+				let px = useCenter ? e.body.position.x : (i === 0 ? e.body
+					.position.x - hOff : e.body.position.x + hOff);
 				ctx.save();
 				ctx.strokeStyle = e.color;
 				ctx.lineWidth = e.w * 0.12;
 				ctx.lineCap = "round";
 				ctx.beginPath();
-				ctx.moveTo(p.x, p.y);
-				let handX = p.x + (e.w * 0.15) * gx / g;
-				let handY = p.y + (e.w * 0.15) * gy / g;
-				ctx.lineTo(handX, handY);
+				ctx.moveTo(px, bCY);
+				let hX = px + (e.w * 0.15) * gx / g;
+				let hY = bCY + (e.w * 0.15) * gy / g;
+				ctx.lineTo(hX, hY);
 				ctx.stroke();
 				ctx.restore();
 				ctx.beginPath();
-				ctx.moveTo(handX, handY);
-				let gunLen = (e.type.includes("rocket") || e.type
-					.includes("laser") ? e.h * 0.8 : e.w * 0.6);
-				let targetX = handX + gunLen * gx / g;
-				let targetY = handY + gunLen * gy / g;
-				ctx.lineTo(targetX, targetY);
+				ctx.moveTo(hX, hY);
+				let gunLen = (e.type.includes("rocket") || e.type.includes(
+					"laser") ? e.h * 0.8 : e.w * 0.6);
+				let tX = hX + gunLen * gx / g;
+				let tY = hY + gunLen * gy / g;
+				ctx.lineTo(tX, tY);
 				ctx.stroke();
-				if (vis.laser_beam && e.boss && e.shooting_delay < -
-					4500) {
+				if (vis.laser_beam && e.boss && e.shooting_delay < -4500) {
 					ctx.save();
 					ctx.beginPath();
 					ctx.strokeStyle = e.color;
 					ctx.lineWidth = 0.15 * e.w;
-					ctx.moveTo(targetX, targetY);
-					ctx.lineTo(p.x + 4 * gx, p.y + 4 * gy);
+					ctx.moveTo(tX, tY);
+					ctx.lineTo(px + 4 * gx, bCY + 4 * gy);
 					ctx.stroke();
 					ctx.beginPath();
 					ctx.strokeStyle = "white";
 					ctx.lineWidth = 0.1 * e.w;
-					ctx.moveTo(targetX, targetY);
-					ctx.lineTo(p.x + 4 * gx, p.y + 4 * gy);
+					ctx.moveTo(tX, tY);
+					ctx.lineTo(px + 4 * gx, bCY + 4 * gy);
 					ctx.stroke();
 					ctx.restore();
 				}
-			});
+			}
 		}
 		if (vis.draw_sword && g < 0.33 * e.shooting_range && !e.is_minion) {
 			ctx.save();
 			ctx.strokeStyle = vis.sword_color || "#55aa11";
 			ctx.lineWidth = 0.25 * e.w;
-			ctx.lineCap = "butt";
-			let sx = e.body.position.x - handOffset;
-			let sy = bodyCenterY;
+			let sx = e.body.position.x - hOff;
 			ctx.beginPath();
-			ctx.moveTo(sx, sy);
-			ctx.lineTo(sx + Math.cos(e.sword_rotation) * 1.5 * e.w, sy + Math
+			ctx.moveTo(sx, bCY);
+			ctx.lineTo(sx + Math.cos(e.sword_rotation) * 1.5 * e.w, bCY + Math
 				.sin(e.sword_rotation) * 1.5 * e.w);
 			ctx.stroke();
 			ctx.restore();
@@ -530,7 +494,6 @@ function enemy_draw(enemy_object, ctx) {
 		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.health_bg;
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
 			e.w, e.h * 0.05);
-		ctx.fillStyle = "lime";
 		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.health_fill;
 		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
 			e.w * e.health / e.max_health, e.h * 0.05);
@@ -543,30 +506,36 @@ function enemy_draw(enemy_object, ctx) {
 }
 
 function enemy_boss_exists(g) {
-	if (!g.objects.find((obj) => obj.name == "enemy" && obj.data.boss))
-		return false;
-	return true;
+	for (let i = 0; i < g.objects.length; i++) {
+		if (g.objects[i].name === "enemy" && g.objects[i].data.boss)
+			return true;
+	}
+	return false;
 }
 
 function enemy_boss_distance_to_player(g, x, y) {
-	let player_object = game_object_find_closest(g, x, y, "player", 20000);
+	let player = game_object_find_closest(g, x, y, "player", 20000);
+	if (!player) return -1;
 	let enemies = g.collections["enemy"] || [];
-	let boss_objects = enemies.filter((obj) => !obj.destroyed && obj.data.boss);
-	if (boss_objects.length < 1 || !player_object)
-		return -1;
-	let boss_closest = boss_objects[0];
-	for (let i = 1; i < boss_objects.length; i++) {
-		if (dist(boss_closest.data.body.position, player_object.data.body
-				.position) > dist(boss_objects[i].data.body.position,
-				player_object.data.body.position))
-			boss_closest = boss_objects[i];
+	let minDist = -1;
+	for (let i = 0; i < enemies.length; i++) {
+		let obj = enemies[i];
+		if (!obj.destroyed && obj.data.boss) {
+			let d = dist(obj.data.body.position, player.data.body.position);
+			if (minDist === -1 || d < minDist) minDist = d;
+		}
 	}
-	return dist(boss_closest.data.body.position, player_object.data.body
-		.position);
+	return minDist;
 }
 
 function enemy_count_minions(enemy_object) {
 	let enemies = enemy_object.game.collections["enemy"] || [];
-	return enemies.filter(obj => obj.data.type == enemy_object.data.type && obj
-		.data.is_minion).length;
+	let count = 0;
+	for (let i = 0; i < enemies.length; i++) {
+		if (enemies[i].data.type === enemy_object.data.type && enemies[i].data
+			.is_minion) {
+			count++;
+		}
+	}
+	return count;
 }

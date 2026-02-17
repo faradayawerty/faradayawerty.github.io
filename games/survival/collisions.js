@@ -1,14 +1,22 @@
-const COLLISION_TARGETS_BULLET = ["enemy", "car", "trashcan", "animal",
+const COLLISION_TARGETS_BULLET = new Set(["enemy", "car", "trashcan", "animal",
 	"rocket"
-];
-const COLLISION_TARGETS_ROCKET = ["player", "enemy", "car", "trashcan",
+]);
+const COLLISION_TARGETS_ROCKET = new Set(["player", "enemy", "car", "trashcan",
 	"animal", "rocket"
-];
+]);
+const dpsEntryPool = [];
+for (let i = 0; i < 1000; i++) {
+	dpsEntryPool.push({
+		dmg: 0,
+		time: 0
+	});
+}
+let dpsPoolIndex = 0;
 
 function collisions_init(g) {
 	g.engine.constraintIterations = 4;
 	g.engine.positionIterations = 10;
-	Matter.Events.on(g.engine, 'collisionStart', (event) => {
+	const handleCollisions = (event) => {
 		const dt = g.lastDt || 16.6667;
 		const pairs = event.pairs;
 		for (let i = 0; i < pairs.length; i++) {
@@ -20,7 +28,9 @@ function collisions_init(g) {
 			collisions_handle_pair(g, objA, objB, dt);
 			collisions_handle_pair(g, objB, objA, dt);
 		}
-	});
+	};
+	Matter.Events.on(g.engine, 'collisionStart', handleCollisions);
+	Matter.Events.on(g.engine, 'collisionActive', handleCollisions);
 }
 
 function collisions_handle_pair(g, self, other, dt) {
@@ -38,7 +48,7 @@ function collisions_handle_pair(g, self, other, dt) {
 			}
 		}
 		else {
-			if (COLLISION_TARGETS_BULLET.includes(oName)) {
+			if (COLLISION_TARGETS_BULLET.has(oName)) {
 				if (sName === "trashbullet" && oName === "rocket") return;
 				if (oName === "rocket" && !oData.enemy) return;
 				if (oName === "enemy" || oName === "animal") {
@@ -60,7 +70,7 @@ function collisions_handle_pair(g, self, other, dt) {
 		if (sData.enemy && oName === "enemy") return;
 		if (!sData.enemy && (oName === "player" || (oName === "car" && !oData
 				.enemy))) return;
-		if (COLLISION_TARGETS_ROCKET.includes(oName)) {
+		if (COLLISION_TARGETS_ROCKET.has(oName)) {
 			if (oName === "rocket" && sData.enemy === oData.enemy) return;
 			if (oName === "player" && sData.enemy) {
 				collisions_apply_damage_to_player(oData, sData.damage, dt,
@@ -87,7 +97,7 @@ function collisions_handle_pair(g, self, other, dt) {
 		}
 		else if (oName === "car") {
 			oData.health -= (oData.is_tank ? 0.0625 : 1) * sData.damage * dt;
-			let vel = Matter.Body.getVelocity(oData.body);
+			let vel = oData.body.velocity;
 			let speedSq = vel.x * vel.x + vel.y * vel.y;
 			let maxSpeed = oData.max_speed || 1;
 			if ((!sData.boss && speedSq > 0.81 * maxSpeed * maxSpeed) || (oData
@@ -171,9 +181,13 @@ function collisions_apply_damage_to_object(g, obj, damage, dt, isFromPlayer) {
 		d.hit_by_player = true;
 		let w = g.current_weapon;
 		if (!g.dps_history[w]) g.dps_history[w] = [];
-		g.dps_history[w].push({
-			dmg: finalDmg,
-			time: Date.now()
-		});
+		let dpsEntry = dpsEntryPool[dpsPoolIndex];
+		dpsEntry.dmg = finalDmg;
+		dpsEntry.time = Date.now();
+		g.dps_history[w].push(dpsEntry);
+		dpsPoolIndex = (dpsPoolIndex + 1) % dpsEntryPool.length;
+		if (g.dps_history[w].length > 1000) {
+			g.dps_history[w].shift();
+		}
 	}
 }

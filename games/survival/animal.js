@@ -1,38 +1,51 @@
+const ANIMAL_CONFIGS = {
+	"raccoon": {
+		w: 25,
+		h: 25,
+		hp: 300,
+		speed: 8.5
+	},
+	"deer": {
+		w: 45,
+		h: 45,
+		hp: 1000,
+		speed: 6.25
+	},
+	"snake": {
+		w: 75,
+		h: 7,
+		hp: 600,
+		speed: 4.5
+	},
+	"scorpion": {
+		w: 22.5,
+		h: 10,
+		hp: 200,
+		speed: 5.0
+	}
+};
+
 function animal_create(g, x, y, type = "deer") {
-	let config = {
-		"raccoon": {
-			w: 25,
-			h: 25,
-			hp: 300,
-			speed: 8.5
-		},
-		"deer": {
-			w: 45,
-			h: 45,
-			hp: 1000,
-			speed: 6.25
-		},
-		"snake": {
-			w: 75,
-			h: 7,
-			hp: 600,
-			speed: 4.5
-		},
-		"scorpion": {
-			w: 22.5,
-			h: 10,
-			hp: 200,
-			speed: 5.0
-		}
-	};
-	let settings = config[type] || config["deer"];
+	let settings = ANIMAL_CONFIGS[type] || ANIMAL_CONFIGS["deer"];
 	let width = settings.w;
 	let height = settings.h;
-	let animals = g.objects.filter((obj) => obj.name == "animal");
-	if (animals.length > 20) {
-		for (let i = 0; i < animals.length - 20; i++) {
-			if (animals[i] && animals[i].destroy) animals[i].destroy(animals[
-				i]);
+	let animalsCount = 0;
+	let firstAnimal = null;
+	for (let i = 0; i < g.objects.length; i++) {
+		if (g.objects[i].name === "animal") {
+			animalsCount++;
+			if (!firstAnimal) firstAnimal = g.objects[i];
+		}
+	}
+	if (animalsCount > 20) {
+		let removed = 0;
+		let targetToRemove = animalsCount - 20;
+		for (let i = 0; i < g.objects.length && removed < targetToRemove; i++) {
+			let obj = g.objects[i];
+			if (obj.name === "animal" && !obj.destroyed) {
+				if (obj.destroy) obj.destroy(obj);
+				removed++;
+			}
 		}
 	}
 	let a = {
@@ -71,58 +84,57 @@ function animal_create(g, x, y, type = "deer") {
 
 function animal_destroy(ao) {
 	if (ao.destroyed) return;
-	Matter.Composite.remove(ao.game.engine.world, ao.data.body);
-	ao.data.body = null;
+	if (ao.data && ao.data.body) {
+		Matter.Composite.remove(ao.game.engine.world, ao.data.body);
+		ao.data.body = null;
+	}
 	ao.destroyed = true;
 }
 
 function animal_update(ao, dt) {
 	if (ao.destroyed || !ao.data.body) return;
 	let a = ao.data;
+	let pos = a.body.position;
 	if (a.health <= 0) {
 		if (a.type === "raccoon") {
 			if (Math.random() < 0.75) {
 				if (Math.random() < 0.25)
-					item_spawn(ao.game, a.body.position.x, a.body.position.y,
+					item_spawn(ao.game, pos.x, pos.y,
 						null, LEVEL_TILE_RESIDENTIAL_T_SOUTH, null);
 				else {
 					let junk_id = ITEMS_JUNK[Math.floor(Math.random() *
 						ITEMS_JUNK.length)];
-					item_create(ao.game, junk_id, a.body.position.x, a.body
-						.position.y);
+					item_create(ao.game, junk_id, pos.x, pos.y);
 				}
 			}
 			audio_play("data/sfx/raccoon_dies.mp3", 1.0);
 		}
 		else if (a.type === "deer") {
 			if (Math.random() < 0.75)
-				item_create(ao.game, ITEM_CANNED_MEAT, a.body.position.x, a.body
-					.position.y);
+				item_create(ao.game, ITEM_CANNED_MEAT, pos.x, pos.y);
 			audio_play("data/sfx/deer_dies_1.mp3");
 		}
 		else if (a.type === "scorpion" || a.type === "snake") {
 			if (Math.random() < 0.75)
-				item_create(ao.game, ITEM_VENOM, a.body.position.x, a.body
-					.position.y);
+				item_create(ao.game, ITEM_VENOM, pos.x, pos.y);
 		}
-		if (Math.random() < 0.0025) item_create(ao.game, ITEM_AMMO, a.body
-			.position.x, a.body.position.y);
+		if (Math.random() < 0.0025) item_create(ao.game, ITEM_AMMO, pos.x, pos
+			.y);
 		animal_destroy(ao);
 		return;
 	}
 	if (a.moving_duration > 0) a.moving_duration -= dt;
 	if (a.movement_change_delay > 0) a.movement_change_delay -= Math.random() *
 		dt;
-	let ho = game_object_find_closest(ao.game, a.body.position.x, a.body
-		.position.y, "rocket", 500);
-	if (!ho) ho = game_object_find_closest(ao.game, a.body.position.x, a.body
-		.position.y, "enemy", 400);
-	if (!ho) ho = game_object_find_closest(ao.game, a.body.position.x, a.body
-		.position.y, "player", 300);
+	let ho = game_object_find_closest(ao.game, pos.x, pos.y, "rocket", 500);
+	if (!ho) ho = game_object_find_closest(ao.game, pos.x, pos.y, "enemy", 400);
+	if (!ho) ho = game_object_find_closest(ao.game, pos.x, pos.y, "player",
+		300);
 	if (ho) {
-		let dx = a.body.position.x - ho.data.body.position.x;
-		let dy = a.body.position.y - ho.data.body.position.y;
-		let d = Math.sqrt(dx * dx + dy * dy);
+		let hPos = ho.data.body.position;
+		let dx = pos.x - hPos.x;
+		let dy = pos.y - hPos.y;
+		let d = Math.sqrt(dx * dx + dy * dy) || 1;
 		a.target_vel.x = (dx / d) * a.speed;
 		a.target_vel.y = (dy / d) * a.speed;
 	}
@@ -148,8 +160,7 @@ function animal_update(ao, dt) {
 		a.current_vel.y += (a.target_vel.y - a.current_vel.y) * lerpFactor;
 	}
 	if (Math.abs(a.current_vel.x) > 0.1 || Math.abs(a.current_vel.y) > 0.1) {
-		Matter.Body.setVelocity(a.body, Matter.Vector.create(a.current_vel.x, a
-			.current_vel.y));
+		Matter.Body.setVelocity(a.body, a.current_vel);
 		if (a.type === "snake" || a.type === "scorpion") {
 			Matter.Body.setAngle(a.body, Math.atan2(a.current_vel.y, a
 				.current_vel.x));
@@ -172,9 +183,9 @@ function drawLine(ctx, x1, y1, x2, y2, color, width) {
 
 function animal_deer_draw(ctx, x, y, w, h, body) {
 	const time = Date.now() * 0.005;
-	const isMoving = Math.abs(body.velocity.x) > 0.1 || Math.abs(body.velocity
-		.y) > 0.1;
-	const flip = body.velocity.x < 0 ? -1 : 1;
+	const vel = body.velocity;
+	const isMoving = Math.abs(vel.x) > 0.1 || Math.abs(vel.y) > 0.1;
+	const flip = vel.x < 0 ? -1 : 1;
 	const c = COLORS_DEFAULT.entities.animals.deer;
 	ctx.save();
 	ctx.translate(x, y);
@@ -282,18 +293,19 @@ function drawHorns(ctx, color, w, h) {
 	ctx.strokeStyle = color;
 	ctx.lineWidth = w * 0.06;
 	ctx.lineCap = "round";
-	[-1, 1].forEach(side => {
+	for (let i = 0; i < 2; i++) {
+		let side = i === 0 ? -1 : 1;
 		ctx.beginPath();
 		ctx.moveTo(side * w * 0.05, 0);
-		ctx.quadraticCurveTo(side * w * 0.4, -h * 0.5, side * w * 0.2, -
-			h * 0.8);
+		ctx.quadraticCurveTo(side * w * 0.4, -h * 0.5, side * w * 0.2, -h *
+			0.8);
 		ctx.stroke();
 		ctx.lineWidth = w * 0.035;
 		ctx.beginPath();
 		ctx.moveTo(side * w * 0.25, -h * 0.4);
 		ctx.lineTo(side * w * 0.5, -h * 0.55);
 		ctx.stroke();
-	});
+	}
 }
 
 function animal_raccoon_draw(ctx, x, y, w, h, a) {
@@ -342,8 +354,9 @@ function animal_raccoon_draw(ctx, x, y, w, h, a) {
 function animal_draw(ao, ctx) {
 	let a = ao.data;
 	if (a.type === "piginator") return;
-	let x = a.body.position.x;
-	let y = a.body.position.y;
+	let bPos = a.body.position;
+	let x = bPos.x;
+	let y = bPos.y;
 	let angle = a.body.angle;
 	const cInd = COLORS_DEFAULT.entities.indicators;
 	if (a.type === "raccoon") {
@@ -378,9 +391,10 @@ function animal_snake_draw(ctx, x, y, w, h, angle) {
 	ctx.rotate(angle);
 	let segments = 22;
 	let segmentSize = w / (segments - 5);
+	let time = Date.now() * 0.006;
 	ctx.fillStyle = c.body;
 	for (let i = 0; i < segments; i++) {
-		let wave = Math.sin(Date.now() * 0.006 - i * 0.3) * (h * 0.9);
+		let wave = Math.sin(time - i * 0.3) * (h * 0.9);
 		let posX = (segments / 2 - i) * segmentSize * 0.8;
 		let s = segmentSize * 1.8;
 		if (i === 0) {
@@ -408,8 +422,7 @@ function animal_scorpion_draw(ctx, x, y, w, h, angle) {
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.rotate(angle);
-	let time = Date.now();
-	let t = time * 0.001;
+	let t = Date.now() * 0.001;
 	const clrDark = c.dark;
 	const clrMid = c.mid;
 	const clrLight = c.light;
@@ -455,11 +468,7 @@ function animal_scorpion_draw(ctx, x, y, w, h, angle) {
 		let wave = Math.sin(t * 4 - i * 0.5) * (h * 0.08);
 		tailX -= segW * 1.3;
 		tailY += wave;
-		let g = ctx.createRadialGradient(tailX, tailY - segH * 0.2, 1, tailX,
-			tailY, segH);
-		g.addColorStop(0, clrLight);
-		g.addColorStop(1, "black");
-		ctx.fillStyle = g;
+		ctx.fillStyle = isLast ? clrLight : "black";
 		ctx.beginPath();
 		if (isLast) ctx.ellipse(tailX, tailY, segW * 1.3, segH * 1.1, 0, 0, Math
 			.PI * 2);
@@ -483,11 +492,7 @@ function animal_scorpion_draw(ctx, x, y, w, h, angle) {
 		ctx.fillRect(0, -h * 0.04, w * 0.25, h * 0.08);
 		ctx.translate(w * 0.25, 0);
 		ctx.rotate(side * -0.2);
-		let clawG = ctx.createRadialGradient(w * 0.15, 0, 1, w * 0.15, 0, w *
-			0.3);
-		clawG.addColorStop(0, clrMid);
-		clawG.addColorStop(1, "black");
-		ctx.fillStyle = clawG;
+		ctx.fillStyle = clrMid;
 		ctx.beginPath();
 		ctx.ellipse(w * 0.15, 0, w * 0.22, h * 0.22, 0, 0, Math.PI * 2);
 		ctx.fill();
@@ -514,11 +519,7 @@ function animal_scorpion_draw(ctx, x, y, w, h, angle) {
 		let segX = (0.35 - i * 0.15) * w;
 		let segW = w * 0.16;
 		let segH = h * 0.45 - (i * i * 0.01);
-		let g = ctx.createLinearGradient(segX, -segH, segX, segH);
-		g.addColorStop(0, "black");
-		g.addColorStop(0.5, clrMid);
-		g.addColorStop(1, "black");
-		ctx.fillStyle = g;
+		ctx.fillStyle = clrMid;
 		ctx.beginPath();
 		if (i === 0) {
 			if (ctx.roundRect) ctx.roundRect(segX - segW * 0.8, -segH, segW * 2,
@@ -531,13 +532,10 @@ function animal_scorpion_draw(ctx, x, y, w, h, angle) {
 		ctx.fill();
 	}
 	ctx.fillStyle = c.eye;
-	ctx.shadowBlur = 5;
-	ctx.shadowColor = c.eye_shadow;
 	ctx.beginPath();
 	ctx.arc(w * 0.42, -h * 0.07, w * 0.025, 0, Math.PI * 2);
 	ctx.arc(w * 0.42, h * 0.07, w * 0.025, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.shadowBlur = 0;
 	ctx.restore();
 }
 
@@ -560,13 +558,10 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	ctx.fillRect(x - w * 0.5, y - h * 0.25, w, h * 0.4);
 	let eyeSize = w * 0.12;
 	ctx.fillStyle = c.eye;
-	ctx.shadowBlur = 15;
-	ctx.shadowColor = c.eye_shadow;
 	ctx.beginPath();
 	ctx.arc(x - w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
 	ctx.arc(x + w * 0.25, y - h * 0.05, eyeSize, 0, Math.PI * 2);
 	ctx.fill();
-	ctx.shadowBlur = 0;
 	ctx.fillStyle = "black";
 	ctx.fillRect(x - w * 0.26, y - h * 0.15, w * 0.02, h * 0.2);
 	ctx.fillRect(x + w * 0.24, y - h * 0.15, w * 0.02, h * 0.2);
@@ -581,22 +576,22 @@ function enemy_raccoon_boss_draw(ctx, x, y, w, h, e) {
 	ctx.stroke();
 	let tailX = x - w * 0.5;
 	let tailY = y + h * 0.3;
+	let cg = e.color_gradient;
 	for (let i = 0; i < 6; i++) {
 		ctx.strokeStyle = (i % 2 === 0) ? c.tail_stripes[0] : c.tail_stripes[1];
 		ctx.lineWidth = h * 0.25;
 		ctx.beginPath();
-		ctx.moveTo(tailX - (i * w * 0.12), tailY + Math.sin(e.color_gradient +
-			i) * 5);
-		ctx.lineTo(tailX - ((i + 1) * w * 0.12), tailY + Math.sin(e
-			.color_gradient + i + 1) * 5);
+		ctx.moveTo(tailX - (i * w * 0.12), tailY + Math.sin(cg + i) * 5);
+		ctx.lineTo(tailX - ((i + 1) * w * 0.12), tailY + Math.sin(cg + i + 1) *
+			5);
 		ctx.stroke();
 	}
 }
 
 function animal_deer_boss_render(ctx, x, y, w, h, e) {
-	const flip = e.body.velocity.x < 0 ? -1 : 1;
-	const isMoving = Math.abs(e.body.velocity.x) > 0.1 || Math.abs(e.body
-		.velocity.y) > 0.1;
+	const vel = e.body.velocity;
+	const flip = vel.x < 0 ? -1 : 1;
+	const isMoving = Math.abs(vel.x) > 0.1 || Math.abs(vel.y) > 0.1;
 	const time = Date.now() * 0.005;
 	const cNormal = COLORS_DEFAULT.entities.animals.deer;
 	const cBoss = COLORS_DEFAULT.entities.animals.bosses.deer;
@@ -613,9 +608,10 @@ function animal_deer_boss_render(ctx, x, y, w, h, e) {
 	ctx.fillStyle = cMain;
 	ctx.strokeStyle = cDark;
 	ctx.lineWidth = 2;
-	[-0.3, 0.3].forEach((pos, i) => {
+	const positions = [-0.3, 0.3];
+	for (let i = 0; i < 2; i++) {
 		ctx.save();
-		ctx.translate(pos * w, h * 0.2);
+		ctx.translate(positions[i] * w, h * 0.2);
 		ctx.rotate(i % 2 === 0 ? walkCycle : -walkCycle);
 		ctx.beginPath();
 		ctx.rect(-legW / 2, 0, legW, legH);
@@ -624,7 +620,7 @@ function animal_deer_boss_render(ctx, x, y, w, h, e) {
 		ctx.fillStyle = cBoss.hoof;
 		ctx.fillRect(-legW / 2, legH, legW, h * 0.1);
 		ctx.restore();
-	});
+	}
 	ctx.fillStyle = cMain;
 	ctx.beginPath();
 	ctx.rect(-w * 0.5, -h * 0.35, w, h * 0.7);
@@ -650,13 +646,14 @@ function animal_deer_boss_render(ctx, x, y, w, h, e) {
 	ctx.stroke();
 	ctx.strokeStyle = cHorn;
 	ctx.lineWidth = w * 0.05;
-	[-1, 1].forEach(side => {
+	for (let i = 0; i < 2; i++) {
+		let side = i === 0 ? -1 : 1;
 		ctx.save();
 		ctx.translate(0, -h * 0.1);
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
-		ctx.quadraticCurveTo(side * w * 0.4, -h * 0.6, side * w * 0.2, -
-			h * 0.9);
+		ctx.quadraticCurveTo(side * w * 0.4, -h * 0.6, side * w * 0.2, -h *
+			0.9);
 		ctx.stroke();
 		ctx.lineWidth = w * 0.02;
 		ctx.beginPath();
@@ -666,17 +663,14 @@ function animal_deer_boss_render(ctx, x, y, w, h, e) {
 		ctx.lineTo(side * w * 0.4, -h * 0.8);
 		ctx.stroke();
 		ctx.restore();
-	});
+	}
 	ctx.fillStyle = cEye;
-	ctx.shadowBlur = 10;
-	ctx.shadowColor = cEye;
 	ctx.beginPath();
 	ctx.moveTo(w * 0.05, 0);
 	ctx.lineTo(w * 0.18, h * 0.05);
 	ctx.lineTo(w * 0.05, h * 0.08);
 	ctx.closePath();
 	ctx.fill();
-	ctx.shadowBlur = 0;
 	ctx.fillStyle = cBoss.eye_pupil;
 	ctx.beginPath();
 	ctx.arc(w * 0.25, h * 0.08, w * 0.02, 0, Math.PI * 2);

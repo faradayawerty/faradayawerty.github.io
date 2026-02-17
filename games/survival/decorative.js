@@ -1,21 +1,32 @@
 function roof_apply_transparency(g, bx, by, bw, bh) {
 	let p = g.player_object;
-	if (!p) p = g.objects.find(o => o.name === "player" && !o.data
-		.ai_controlled);
-	if (p && p.data.body) {
+	if (!p) {
+		for (let i = 0; i < g.objects.length; i++) {
+			let o = g.objects[i];
+			if (o.name === "player" && !o.data.ai_controlled) {
+				g.player_object = o;
+				p = o;
+				break;
+			}
+		}
+	}
+	if (p && p.data && p.data.body) {
 		let px = p.data.body.position.x;
 		let py = p.data.body.position.y;
 		if (px >= bx && px <= bx + bw && py >= by && py <= by + bh) {
 			return 0.4;
 		}
 	}
-	for (let i = 0; i < g.objects.length; i++) {
-		let obj = g.objects[i];
-		if (obj.name === "enemy" && !obj.destroyed && obj.data.body) {
-			let ex = obj.data.body.position.x;
-			let ey = obj.data.body.position.y;
-			if (ex >= bx && ex <= bx + bw && ey >= by && ey <= by + bh) {
-				return 0.7;
+	let enemies = g.collections["enemy"];
+	if (enemies) {
+		for (let i = 0; i < enemies.length; i++) {
+			let obj = enemies[i];
+			if (!obj.destroyed && obj.data.body) {
+				let ex = obj.data.body.position.x;
+				let ey = obj.data.body.position.y;
+				if (ex >= bx && ex <= bx + bw && ey >= by && ey <= by + bh) {
+					return 0.7;
+				}
 			}
 		}
 	}
@@ -40,7 +51,7 @@ function decorative_roof_draw(self, ctx) {
 	ctx.globalAlpha = roof_apply_transparency(self.game, d.bx, d.by, d.bw, d
 		.bh);
 	if (d.text) {
-		ctx.font = "bold " + d.size + "px verdana";
+		ctx.font = d.font_cache;
 		ctx.fillStyle = d.color;
 		ctx.textBaseline = "top";
 		ctx.fillText(d.text, d.x, d.y);
@@ -101,11 +112,13 @@ function roof_rect_create(g, x, y, w, h, bx, by, bw, bh, fill, outline =
 }
 
 function roof_text_create(g, text, x, y, size, bx, by, bw, bh, color) {
+	let s = Math.floor(size);
 	let i = game_object_create(g, "decorative_roof", {
 			text,
 			x,
 			y,
-			size: Math.floor(size),
+			size: s,
+			font_cache: "bold " + s + "px verdana",
 			bx,
 			by,
 			bw,
@@ -122,16 +135,18 @@ function roof_text_create(g, text, x, y, size, bx, by, bw, bh, color) {
 }
 
 function decorative_text_create(g, text, x, y, size, color) {
+	let s = Math.floor(size);
 	let i = game_object_create(g, "decorative", {
 			text,
 			x,
 			y,
-			size: Math.floor(size),
+			size: s,
+			font_cache: "bold " + s + "px verdana",
 			color
 		},
 		function() {},
 		function(self, ctx) {
-			ctx.font = "bold " + self.data.size + "px verdana";
+			ctx.font = self.data.font_cache;
 			ctx.fillStyle = self.data.color;
 			ctx.textBaseline = "top";
 			ctx.fillText(self.data.text, self.data.x, self.data.y);
@@ -158,8 +173,13 @@ function decorative_grass_create(g, x, y, w, h, trees = true) {
 	if (trees) {
 		let N = w / 300.0;
 		let M = h / 300.0;
-		let zones = g.objects.filter(o => o.name ===
-			"decorative_no_tree_zone" && !o.destroyed);
+		let zones = [];
+		for (let k = 0; k < g.objects.length; k++) {
+			let o = g.objects[k];
+			if (o.name === "decorative_no_tree_zone" && !o.destroyed) {
+				zones.push(o);
+			}
+		}
 		for (let i = 1; i < N - 1; i++) {
 			for (let j = 0.75; j < M - 1; j++) {
 				let treeX = x + (i + 0.5 * (Math.random() - 0.5)) * w / N;
@@ -331,7 +351,7 @@ function decorative_fuel_pump_draw(self, ctx) {
 	ctx.fillRect(d.x, d.y, d.w, d.h * 0.25);
 	ctx.fillStyle = c.fuel_display;
 	ctx.fillRect(d.x + d.w * 0.1, d.y + d.h * 0.3, d.w * 0.8, d.h * 0.2);
-	ctx.font = "bold " + Math.floor(d.h * 0.18) + "px Arial";
+	ctx.font = d.font_cache;
 	ctx.fillStyle = COLORS_DEFAULT.decorations.city.road_marking;
 	ctx.textBaseline = "top";
 	ctx.save();
@@ -353,12 +373,14 @@ function decorative_fuel_pump_create(g, x, y, w = 45, h = 65, label = "98") {
 	if (label === "80") accent = c.fuel_80;
 	if (label === "92") accent = c.fuel_92;
 	bound_create(g, x, y + h * 0.5, w, h * 0.5);
+	let s = Math.floor(h * 0.18);
 	let i = game_object_create(g, "decorative_fuel_pump", {
 		x,
 		y,
 		w,
 		h,
 		label,
+		font_cache: "bold " + s + "px Arial",
 		color_base: c.fuel_base,
 		accent_color: accent
 	}, function() {}, decorative_fuel_pump_draw, function(o) {
@@ -436,7 +458,8 @@ function decorative_parkinglot_create(g, x, y, w, h, level_visited = true,
 			let color_h = Math.floor(Math.random() * 360);
 			let color_s = Math.floor(Math.random() * 40 + 50);
 			let color_l = Math.floor(Math.random() * 30 + 40);
-			let randomColor = `hsl(${color_h}, ${color_s}%, ${color_l}%)`;
+			let randomColor = "hsl(" + color_h + ", " + color_s + "%, " +
+				color_l + "%)";
 			let type = car_types[Math.floor(Math.random() * car_types.length)];
 			car_create(g, carX, carY, randomColor, false, false, type);
 		}
@@ -519,8 +542,13 @@ function decorative_sand_create(g, x, y, w, h, cacti = true,
 	if (cacti) {
 		let N = w / 300.0;
 		let M = h / 300.0;
-		let zones = g.objects.filter(o => o.name ===
-			"decorative_no_tree_zone" && !o.destroyed);
+		let zones = [];
+		for (let k = 0; k < g.objects.length; k++) {
+			let o = g.objects[k];
+			if (o.name === "decorative_no_tree_zone" && !o.destroyed) {
+				zones.push(o);
+			}
+		}
 		let chance = 1.0;
 		let gridPositions = [];
 		for (let i = 1; i < N - 1; i++) {
@@ -533,9 +561,9 @@ function decorative_sand_create(g, x, y, w, h, cacti = true,
 		}
 		for (let k = gridPositions.length - 1; k > 0; k--) {
 			const r = Math.floor(Math.random() * (k + 1));
-			[gridPositions[k], gridPositions[r]] = [gridPositions[r],
-				gridPositions[k]
-			];
+			let temp = gridPositions[k];
+			gridPositions[k] = gridPositions[r];
+			gridPositions[r] = temp;
 		}
 		for (let p = 0; p < gridPositions.length; p++) {
 			let pos = gridPositions[p];

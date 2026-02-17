@@ -160,6 +160,32 @@ function car_update(car_object, dt) {
 		dy = car_object.game.input.joystick.left.dy;
 		is_shooting = (dx !== 0 || dy !== 0);
 	}
+	if (p.is_tank && player_object && player_object.data.car_object ==
+		car_object) {
+		if (car_object.game.settings.auto_aim) {
+			let nearest_enemy = game_object_find_closest(
+				car_object.game,
+				p.body.position.x,
+				p.body.position.y,
+				"rocket",
+				800,
+				(obj) => obj.data && obj.data.enemy === true
+			);
+			if (!nearest_enemy) {
+				nearest_enemy = game_object_find_closest(
+					car_object.game,
+					p.body.position.x,
+					p.body.position.y,
+					"enemy",
+					800
+				);
+			}
+			if (nearest_enemy) {
+				dx = nearest_enemy.data.body.position.x - p.body.position.x;
+				dy = nearest_enemy.data.body.position.y - p.body.position.y;
+			}
+		}
+	}
 	let g_test = Math.sqrt(dx * dx + dy * dy);
 	if (p.is_tank && player_object && player_object.data.car_object ==
 		car_object && is_shooting && p.shot_cooldown >= 600 && g_test > 0.01) {
@@ -264,10 +290,37 @@ function car_draw(car_object, ctx) {
 		let gx = 0,
 			gy = -1;
 		if (player_object && player_object.data.car_object == car_object) {
-			gx = (car_object.game.mobile) ? car_object.game.input.joystick.left
+			let dx = (car_object.game.mobile) ? car_object.game.input.joystick
+				.left
 				.dx : (car_object.game.input.mouse.x - window.innerWidth / 2);
-			gy = (car_object.game.mobile) ? car_object.game.input.joystick.left
+			let dy = (car_object.game.mobile) ? car_object.game.input.joystick
+				.left
 				.dy : (car_object.game.input.mouse.y - window.innerHeight / 2);
+			if (car_object.game.settings.auto_aim) {
+				let nearest_enemy = game_object_find_closest(
+					car_object.game,
+					p.body.position.x,
+					p.body.position.y,
+					"rocket",
+					800,
+					(obj) => obj.data && obj.data.enemy === true
+				);
+				if (!nearest_enemy) {
+					nearest_enemy = game_object_find_closest(
+						car_object.game,
+						p.body.position.x,
+						p.body.position.y,
+						"enemy",
+						800
+					);
+				}
+				if (nearest_enemy) {
+					dx = nearest_enemy.data.body.position.x - p.body.position.x;
+					dy = nearest_enemy.data.body.position.y - p.body.position.y;
+				}
+			}
+			gx = dx;
+			gy = dy;
 		}
 		let towerAngle = (Math.abs(gx) < 0.01 && Math.abs(gy) < 0.01) ? 0 : Math
 			.atan2(gy, gx) - p.body.angle;
