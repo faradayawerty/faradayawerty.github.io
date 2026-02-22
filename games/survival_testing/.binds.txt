@@ -1,0 +1,4 @@
+
+bind('p', function() {enemy_create(game1, 1250, 1250, false, false, "shooting")}); bind('o', function() {enemy_create(game1, 1250, 1250, false, false, "shooting red")}); bind('\'', function() {enemy_create(game1, 1250, 1250, false, false, "sword")}); bind(';', function() {enemy_create(game1, 1250, 1250, false, false, "shooting rocket")}); bind('l', function() {enemy_create(game1, 1250, 1250, false, false, "shooting laser")})
+
+

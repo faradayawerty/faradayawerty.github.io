@@ -1,0 +1,337 @@
+<html>
+
+<head>
+	<meta charset="utf-8" name="viewport"
+		content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<title>faw_survival</title>
+	<link rel="icon" href="data/img/icon.png">
+	<style>
+		* {
+			margin-top: 0px;
+			margin-bottom: 0px;
+			margin-left: 0px;
+			margin-right: 0px;
+			padding: 0;
+			touch-action: none;
+		}
+
+		body {
+			overscroll-behavior: contain;
+			background: #111111;
+		}
+
+		#canvas {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			border: 0px solid;
+			display: block;
+			image-rendering: pixelated;
+		}
+	</style>
+</head>
+
+<body>
+	<a id="downloadAnchorElem" style="display:none"></a>
+	<input id="file-input" type="file" name="name" style="display: none;" />
+	<canvas id="canvas" width=1600 height=1200
+		style="background-color: #dddddd; border-color: #aaaaaa;"></canvas>
+	<script src="util.js" type="text/javascript"></script>
+	<script src="colors_no_palette.js" type="text/javascript"></script>
+	<script src="colors_no_palette_new.js" type="text/javascript"></script>
+	<script src="colors.js" type="text/javascript"></script>
+	<script src="damage.js" type="text/javascript"></script>
+	<script src="menu.js" type="text/javascript"></script>
+	<script src="bloodsplash.js" type="text/javascript"></script>
+	<script src="collisions.js" type="text/javascript"></script>
+	<script src="game.js" type="text/javascript"></script>
+	<script src="bounds.js" type="text/javascript"></script>
+	<script src="animal.js" type="text/javascript"></script>
+	<script src="decorative.js" type="text/javascript"></script>
+	<script src="levels_data.js" type="text/javascript"></script>
+	<script src="levels.js" type="text/javascript"></script>
+	<script src="car.js" type="text/javascript"></script>
+	<script src="item_ids.js" type="text/javascript"></script>
+	<script src="item_data.js" type="text/javascript"></script>
+	<script src="item_data_weapons.js" type="text/javascript"></script>
+	<script src="item_data_ammo.js" type="text/javascript"></script>
+	<script src="item_data_consumable.js" type="text/javascript"></script>
+	<script src="player_data_weapons.js" type="text/javascript"></script>
+	<script src="enemy_data.js" type="text/javascript"></script>
+	<script src="player_data_consumable.js" type="text/javascript"></script>
+	<script src="player_data.js" type="text/javascript"></script>
+	<script src="item.js" type="text/javascript"></script>
+	<script src="enemy.js" type="text/javascript"></script>
+	<script src="story_note.js" type="text/javascript"></script>
+	<script src="player.js" type="text/javascript"></script>
+	<script src="inventory.js" type="text/javascript"></script>
+	<script src="hotbar.js" type="text/javascript"></script>
+	<script src="bullet.js" type="text/javascript"></script>
+	<script src="infobox.js" type="text/javascript"></script>
+	<script src="achievements_data.js" type="text/javascript"></script>
+	<script src="achievements.js" type="text/javascript"></script>
+	<script src="input.js" type="text/javascript"></script>
+	<script src="rocket.js" type="text/javascript"></script>
+	<script src="trashcan.js" type="text/javascript"></script>
+	<script src="trashbullet.js" type="text/javascript"></script>
+	<script src="audio.js" type="text/javascript"></script>
+	<script src="cheats.js" type="text/javascript"></script>
+	<script src="bindings.js" type="text/javascript"></script>
+	<script src="lib/matter.js" type="text/javascript"></script>
+	<script>
+		let DPR = window.devicePixelRatio || 1;
+		let cvs1 = document.getElementById("canvas");
+		let ctx1 = cvs1.getContext("2d", {
+			alpha: false
+		});
+		let engine1 = Matter.Engine.create();
+		let input1 = input_create();
+		let audios1 = null;
+		let menu1 = menu_create();
+		let game1 = game_create(input1, engine1, audios1);
+		let frameRate = 1000 / 60;
+		let totalUpdates = 0;
+		let totalDraws = 0;
+		let totalTimeUpdates = 0;
+		let totalTimeDraws = 0;
+		let gameStartTime = 0;
+		let totalEngineUpdates = 0;
+		let accumulatorEngine = 0;
+		let accumulatorUpdate = 0;
+		let accumulatorDraw = 0;
+		let DEBUG_INDEX = false;
+		const MENU_ITEMS_HAS_PLAYER = [
+			"continue game",
+			"settings",
+			"save game",
+			"load game",
+		];
+		const MENU_ITEMS_NO_PLAYER = [
+			"continue game",
+			"settings",
+		];
+
+		function get_scale() {
+			let k = game1.mobile ? 1200 : 1500;
+			k /= menu1.want_ui_scale / 100;
+			return Math.min(window.innerWidth / k, window.innerHeight / k);
+		}
+
+		function resize() {
+			DPR = window.devicePixelRatio || 1;
+			cvs1.width = window.innerWidth * DPR;
+			cvs1.height = window.innerHeight * DPR;
+			game1.scale = 0.6328125 / DPR;
+		}
+		window.addEventListener('resize', resize);
+		document.addEventListener("visibilitychange", function() {
+			if (document.hidden)
+				menu1.shown = true;
+			if (document.visibilityState === 'hidden') {
+				if (typeof game1 !== 'undefined') {
+					game_autosave(game1);
+					console.log("Автосохранение: игрок покинул вкладку");
+				}
+			}
+		});
+		document.addEventListener('contextmenu', event => event.preventDefault());
+
+		function animate(lastUpdateTime) {
+			let now = performance.now();
+			let dt = now - lastUpdateTime;
+			if (dt > 50)
+				dt = 50;
+			lastUpdateTime = now;
+			if (!menu1.shown) {
+				accumulatorEngine += dt;
+				accumulatorUpdate += dt;
+				accumulatorDraw += dt;
+			}
+			ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
+			ctx1.save();
+			ctx1.scale(DPR, DPR);
+			ctx1.fillStyle = "black";
+			ctx1.fillRect(0, 0, cvs1.width, cvs1.height);
+			if (menu1.want_player_color != game1.settings.player_color)
+				game1.settings.player_color = menu1.want_player_color;
+			if (menu1.want_player_draw_gun != game1.settings.player_draw_gun)
+				game1.settings.player_draw_gun = menu1.want_player_draw_gun;
+			if (menu1.want_enemies_spawn != game1.settings.enemies_spawn)
+				game1.settings.enemies_spawn = menu1.want_enemies_spawn;
+			if (menu1.want_hints != game1.settings.show_hints)
+				game1.settings.show_hints = menu1.want_hints;
+			if (menu1.want_language != game1.settings.language)
+				game1.settings.language = menu1.want_language;
+			if (menu1.want_ammo_pickup_last != game1.settings.ammo_pickup_last)
+				game1.settings.ammo_pickup_last = menu1.want_ammo_pickup_last;
+			if (menu1.want_indicators != game1.settings.indicators)
+				game1.settings.indicators = menu1.want_indicators;
+			if (menu1.want_auto_pickup != game1.settings.auto_pickup)
+				game1.settings.auto_pickup = menu1.want_auto_pickup;
+			if (menu1.want_lose_items != game1.settings.lose_items_on_death)
+				game1.settings.lose_items_on_death = menu1.want_lose_items;
+			if (menu1.want_respawn_here != game1.settings.respawn_on_current_level)
+				game1.settings.respawn_on_current_level = menu1.want_respawn_here;
+			if (menu1.want_trees != game1.settings.trees)
+				game1.settings.trees = menu1.want_trees;
+			if (menu1.want_debug != game1.debug)
+				game1.debug = menu1.want_debug;
+			if (menu1.want_auto_aim != game1.settings.auto_aim)
+				game1.settings.auto_aim = menu1.want_auto_aim;
+			if (menu1.want_save) {
+				game_save(game1);
+				menu1.want_save = false;
+			}
+			if (menu1.want_load) {
+				game_load(game1);
+				menu1.want_load = false;
+			}
+			if (menu1.mobile)
+				game1.mobile = true;
+			if (game1.mobile)
+				menu1.iselected = -1;
+			if (game_has_player(game1)) {
+				let makeMenu = false;
+				if (menu1.buttons == menu1.main_menu_buttons)
+					makeMenu = true;
+				if (menu1.main_menu_buttons != MENU_ITEMS_HAS_PLAYER) {
+					menu1.main_menu_buttons = MENU_ITEMS_HAS_PLAYER;
+				}
+				if (makeMenu)
+					menu1.buttons = menu1.main_menu_buttons;
+			}
+			else {
+				let makeMenu = false;
+				if (menu1.buttons == menu1.main_menu_buttons)
+					makeMenu = true;
+				if (menu1.main_menu_buttons != MENU_ITEMS_NO_PLAYER) {
+					menu1.main_menu_buttons = MENU_ITEMS_NO_PLAYER;
+				}
+				if (makeMenu)
+					menu1.buttons = menu1.main_menu_buttons;
+			}
+			if (isKeyDown(input1, 'escape', true)) {
+				menu1.shown = !menu1.shown;
+				game1.want_hide_inventory = true;
+			}
+			if (menu1.shown)
+				menu1.death_message = game1.want_death_message;
+			if (game1.want_menu) {
+				menu1.shown = true;
+			}
+			if (menu1.shown) {
+				menu_update(menu1, dt, input1);
+				game1.show_gui = false;
+				game1.want_menu = false;
+			}
+			else if (game1.want_respawn_menu) {
+				menu1.shown = true;
+				let idx = menu1.main_menu_buttons.indexOf("continue game");
+				if (idx !== -1) {
+					menu1.main_menu_buttons = [...menu1.main_menu_buttons];
+					menu1.main_menu_buttons[idx] = "respawn and continue game";
+				}
+				menu1.buttons = menu1.menu_respawn_buttons;
+				game1.want_respawn_menu = false;
+			}
+			else if (menu1.want_new_game) {
+				game_new(game1, true);
+				menu1.want_new_game = false;
+			}
+			else if ((menu1.want_player_respawn || !menu1.shown) && !game_has_player(
+					game1)) {
+				let level_str = game1.respawn_level;
+				let split_idx = level_str.indexOf('x');
+				let level_x = Number(level_str.substring(0, split_idx));
+				let level_y = Number(level_str.substring(split_idx + 1));
+				if (!game1.settings.respawn_on_current_level) {
+					level_x = 0;
+					level_y = 0;
+				}
+				player_create(game1, 1250 + level_x * 2500, 1250 + level_y * 2500,
+					true, menu1.want_spawn_ai);
+				menu1.want_player_respawn = false;
+				menu1.buttons = menu1.main_menu_buttons;
+				let idx = menu1.main_menu_buttons.indexOf(
+					"respawn and continue game");
+				if (idx !== -1) {
+					menu1.main_menu_buttons = [...menu1.main_menu_buttons];
+					menu1.main_menu_buttons[idx] = "continue game";
+				}
+			}
+			else {
+				game1.show_gui = true;
+				let updateTime = performance.now();
+				while (accumulatorUpdate >= frameRate) {
+					game_update(game1, frameRate);
+					accumulatorUpdate -= frameRate;
+					if (DEBUG_INDEX) {
+						let deltaTimeUpdate = performance.now() - updateTime;
+						totalTimeUpdates += deltaTimeUpdate;
+						totalUpdates++;
+						if (deltaTimeUpdate > 3 * totalTimeUpdates / totalUpdates) {
+							console.log('большой скачок game_update!');
+						}
+						game1.debug_console.unshift('game_update: ' +
+							totalTimeUpdates / totalUpdates);
+						game1.debug_console.unshift('ups: ' + 1000 * totalUpdates / (
+							performance.now() - gameStartTime));
+						game1.debug_console.unshift('ups (now): ' + (1000 / dt)
+							.toFixed(1));
+					}
+				}
+				while (accumulatorEngine >= frameRate) {
+					Matter.Engine.update(engine1, frameRate);
+					accumulatorEngine -= frameRate;
+					if (DEBUG_INDEX) {
+						totalEngineUpdates++;
+						game1.debug_console.unshift('engine ups: ' + 1000 *
+							totalEngineUpdates / (performance.now() -
+								gameStartTime));
+					}
+				}
+			}
+			let alpha = accumulatorUpdate / frameRate;
+			if (menu1.shown)
+				alpha = 0;
+			let drawTime = performance.now();
+			game_draw(game1, ctx1, alpha);
+			if (DEBUG_INDEX) {
+				totalTimeDraws += performance.now() - drawTime;
+				totalDraws++;
+				game1.debug_console.unshift('game_draw: ' + totalTimeDraws /
+					totalDraws);
+				game1.debug_console.unshift('fps: ' + 1000 * totalDraws / (performance
+					.now() - gameStartTime));
+				game1.debug_console.unshift('fps (now): ' + (1000 / dt).toFixed(1));
+			}
+			if (menu1.shown)
+				menu_draw(ctx1, menu1);
+			ctx1.restore();
+			if (DEBUG_INDEX && performance.memory) {
+				let memory = performance.memory;
+				game1.debug_console.unshift('used: ' + (memory.usedJSHeapSize /
+					1048576).toFixed(2) + ' MB');
+				game1.debug_console.unshift('total: ' + (memory.totalJSHeapSize /
+					1048576).toFixed(2) + ' MB');
+			}
+			window.requestAnimationFrame(function() {
+				animate(lastUpdateTime);
+			});
+		}
+
+		function main() {
+			game_new(game1);
+			engine1.world.gravity.y = 0;
+			initializeKeyboardInput(input1.keys);
+			initializeMouseInput(input1.mouse, ctx1);
+			initializeTouchInput(input1.touch, input1.joystick, ctx1);
+			resize();
+			gameStartTime = performance.now();
+			animate(performance.now());
+		}
+		main()
+	</script>
+</body>
+
+</html>
