@@ -28,7 +28,6 @@ function levels_set(g, level, old_level = null) {
 		vIdx = g.visited_levels.length - 1;
 	}
 	let tile = g.assigned_tiles[vIdx];
-	console.log(tile);
 	if (player_object && !player_object.data.ai_controlled) {
 		let tileTheme = Math.floor(tile / 200) * 200;
 		if (tileTheme === THEME_DESERT) {

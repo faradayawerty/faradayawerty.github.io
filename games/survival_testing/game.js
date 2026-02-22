@@ -38,8 +38,8 @@ function game_create(input_, engine_, audios_) {
 		current_enemy_dps: 0,
 		dps_sessions: [],
 		dps_history: {},
-		enemy_dps_history: [],
 		dps_stats: {},
+		enemy_dps_history: [],
 		enemy_dps_stats: {
 			sessions: [],
 			min: 0,

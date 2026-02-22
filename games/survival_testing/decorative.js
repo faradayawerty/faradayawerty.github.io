@@ -748,7 +748,7 @@ function decorative_fallen_tree_straight(g, x, y) {
 	let len = 100 + Math.random() * 60;
 	bound_create(g, x, y, len, 25);
 	game_object_change_name(g, decorative_rectangle_create(g, x, y, len, 25,
-		"#5d4037", "#3e2723"), "decorative_trunk");
+		"#5d4037", "#3e2723"), "decorative");
 }
 
 function decorative_taiga_bush_v3(g, x, y) {

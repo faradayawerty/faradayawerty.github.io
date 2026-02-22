@@ -4,7 +4,7 @@ function weapon_damage_from_tier(n) {
 	const phi = 1.618033988749895;
 	const sqrt5 = 2.23606797749979;
 	let fib = Math.round(Math.pow(phi, n + 2) / sqrt5);
-	return game_round(fib) * 0.1;
+	return fib * 0.1;
 }
 const WEAPON_DEFS = {
 	[ITEM_PP_SH]: {

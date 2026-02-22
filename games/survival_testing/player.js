@@ -33,20 +33,15 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		}),
 		immunity: 6000,
 		shield_blue_health: 0,
-		shield_blue_health_max: 200 * Math.round(enemy_damage_from_tier(
-			ENEMY_TIER_SHOOTING) * 10),
+		shield_blue_health_max: 100,
 		shield_green_health: 0,
-		shield_green_health_max: 200 * Math.round(enemy_damage_from_tier(
-			ENEMY_TIER_SWORD) * 10),
+		shield_green_health_max: 500,
 		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 200 * Math.round(enemy_damage_from_tier(
-			ENEMY_TIER_SHOOTING_LASER) * 10),
+		shield_rainbow_health_max: 3000,
 		shield_shadow_health: 0,
-		shield_shadow_health_max: 200 * Math.round(enemy_damage_from_tier(
-			ENEMY_TIER_SHADOW) * 10),
+		shield_shadow_health_max: 1000,
 		shield_anubis_health: 0,
-		shield_anubis_health_max: 200 * Math.round(enemy_damage_from_tier(
-			ENEMY_TIER_ANUBIS) * 10),
+		shield_anubis_health_max: 2000,
 		shadow_jump_lock: false,
 		shadow_jump_delay: 0,
 		shadow_jump_time: 0,
@@ -257,11 +252,11 @@ function player_update(player_object, dt) {
 	if (p.shotgun_cooldown > 0) p.shotgun_cooldown -= dt;
 	if (p.minigun_cooldown > 0) p.minigun_cooldown -= dt;
 	p.item_animstate += 0.01 * dt;
-	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.003 * dt;
-	if (p.shield_green_health > 0) p.shield_green_health -= 0.003 * dt;
-	if (p.shield_shadow_health > 0) p.shield_shadow_health -= 0.003 * dt;
-	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.003 * dt;
-	if (p.shield_anubis_health > 0) p.shield_anubis_health -= 0.003 * dt;
+	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.00075 * dt;
+	if (p.shield_green_health > 0) p.shield_green_health -= 0.00075 * dt;
+	if (p.shield_shadow_health > 0) p.shield_shadow_health -= 0.00075 * dt;
+	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.00075 * dt;
+	if (p.shield_anubis_health > 0) p.shield_anubis_health -= 0.00075 * dt;
 	if (DEBUG_PLAYER && p.saved_health - p.health > 1) {
 		g.debug_console.unshift("player health: " + Math.round(p.health) +
 			", change " + Math.round(p.saved_health - p.health) +

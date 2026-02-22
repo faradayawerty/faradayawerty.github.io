@@ -21,11 +21,58 @@ let ENEMY_TIER_DEVIL = 18;
 let ENEMY_TIER_ANIMALS = ENEMY_TIER_SHOOTING_LASER + 1;
 
 function enemy_health_from_tier(n) {
-	return 1000 * weapon_damage_from_tier(n - 1);
+	return game_round(1000 * weapon_damage_from_tier(n - 1));
 }
 
 function enemy_damage_from_tier(n) {
-	return 0.5 * Math.tanh(0.1 * n);
+	const points = [{
+			tier: ENEMY_TIER_REGULAR,
+			dmg: 100
+		},
+		{
+			tier: ENEMY_TIER_SHOOTING,
+			dmg: 200
+		},
+		{
+			tier: ENEMY_TIER_SWORD,
+			dmg: 600
+		},
+		{
+			tier: ENEMY_TIER_SHADOW,
+			dmg: 1100
+		},
+		{
+			tier: ENEMY_TIER_ANUBIS,
+			dmg: 2100
+		},
+		{
+			tier: ENEMY_TIER_SHOOTING_LASER,
+			dmg: 3100
+		}
+	];
+	let low, high;
+	if (n <= points[0].tier) {
+		[low, high] = [points[0], points[1]];
+	}
+	else if (n >= points[points.length - 1].tier) {
+		low = points[points.length - 2];
+		high = points[points.length - 1];
+	}
+	else {
+		for (let i = 0; i < points.length - 1; i++) {
+			if (n >= points[i].tier && n <= points[i + 1].tier) {
+				low = points[i];
+				high = points[i + 1];
+				break;
+			}
+		}
+	}
+	const tierDiff = high.tier - low.tier;
+	const dmgDiff = high.dmg - low.dmg;
+	const ratio = dmgDiff / tierDiff;
+	const total_10s = low.dmg + (n - low.tier) * ratio;
+	let seconds_to_kill = 20;
+	return total_10s / 1000 * (10 / seconds_to_kill);
 }
 const ENEMY_TYPES = {
 	"regular": {
@@ -36,7 +83,7 @@ const ENEMY_TYPES = {
 		weight: 1,
 		health: enemy_health_from_tier(ENEMY_TIER_REGULAR),
 		speed: 7,
-		damage: enemy_damage_from_tier(ENEMY_TIER_REGULAR),
+		damage: 2 * enemy_damage_from_tier(ENEMY_TIER_REGULAR),
 		w: 30,
 		h: 30,
 		color: E_COLS.regular.body,
@@ -76,7 +123,7 @@ const ENEMY_TYPES = {
 		eye_color: E_COLS.shooting.eye,
 		health: enemy_health_from_tier(ENEMY_TIER_SHOOTING),
 		speed: 5,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SHOOTING),
+		damage: 100 / 17 * enemy_damage_from_tier(ENEMY_TIER_SHOOTING),
 		w: 30,
 		h: 30,
 		color: E_COLS.shooting.body,
@@ -139,7 +186,7 @@ const ENEMY_TYPES = {
 		weight: 2,
 		health: enemy_health_from_tier(ENEMY_TIER_DESERT),
 		speed: 5.5,
-		damage: enemy_damage_from_tier(ENEMY_TIER_DESERT),
+		damage: 1.9 * enemy_damage_from_tier(ENEMY_TIER_DESERT),
 		w: 30,
 		h: 30,
 		eye_color: E_COLS.desert.eye,
@@ -217,7 +264,8 @@ const ENEMY_TYPES = {
 		weight: 3,
 		health: enemy_health_from_tier(ENEMY_TIER_SHOOTING_RED),
 		speed: 8,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SHOOTING_RED),
+		damage: 100 / 110 * 100 / 80 * 100 / 110 * enemy_damage_from_tier(
+			ENEMY_TIER_SHOOTING_RED),
 		w: 30,
 		h: 30,
 		eye_color: E_COLS.shooting_red.eye,
@@ -313,7 +361,7 @@ const ENEMY_TYPES = {
 		boss_max_health_mult: 0.95,
 		minion_speed_mult: 0,
 		minion_max_health_mult: 0.25,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SWORD),
+		damage: 2 * 100 / 130 * enemy_damage_from_tier(ENEMY_TIER_SWORD),
 		w: 30,
 		h: 30,
 		color: E_COLS.sword.body,
@@ -543,7 +591,8 @@ const ENEMY_TYPES = {
 		weight: 5,
 		health: enemy_health_from_tier(ENEMY_TIER_SHOOTING_ROCKET),
 		speed: 4.75,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SHOOTING_ROCKET),
+		damage: 5 * 100 / 83 * enemy_damage_from_tier(
+			ENEMY_TIER_SHOOTING_ROCKET),
 		w: 30,
 		h: 30,
 		color: E_COLS.rocket.body,
@@ -613,7 +662,7 @@ const ENEMY_TYPES = {
 		weight: 4,
 		health: enemy_health_from_tier(ENEMY_TIER_SHADOW),
 		speed: 6.5,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SHADOW),
+		damage: 1.9 * enemy_damage_from_tier(ENEMY_TIER_SHADOW),
 		w: 30,
 		h: 30,
 		color: E_COLS.shadow.body,
@@ -685,7 +734,8 @@ const ENEMY_TYPES = {
 		weight: 4,
 		health: enemy_health_from_tier(ENEMY_TIER_ANUBIS),
 		speed: 5.5,
-		damage: enemy_damage_from_tier(ENEMY_TIER_ANUBIS),
+		damage: 2.1 * 100 / 97.5 * enemy_damage_from_tier(
+			ENEMY_TIER_ANUBIS),
 		w: 50,
 		h: 50,
 		color: E_COLS.anubis.body,
@@ -826,7 +876,8 @@ const ENEMY_TYPES = {
 		weight: 4,
 		health: enemy_health_from_tier(ENEMY_TIER_SHOOTING_LASER),
 		speed: 8.25,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SHOOTING_LASER),
+		damage: 1 / 25 * 100 / 87.5 * 100 / 110 * enemy_damage_from_tier(
+			ENEMY_TIER_SHOOTING_LASER),
 		boss_shooting_range_mult: 1.5,
 		boss_speed_mult: 1.75,
 		boss_max_health_mult: 1.05,
@@ -1245,7 +1296,8 @@ const ENEMY_TYPES = {
 		weight: 2,
 		health: enemy_health_from_tier(ENEMY_TIER_SNOW),
 		speed: 6.5,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SNOW),
+		damage: 100 / 40 * 100 / 125 * enemy_damage_from_tier(
+			ENEMY_TIER_SNOW),
 		w: 30,
 		h: 30,
 		color: "#d0e8e0",
@@ -1318,7 +1370,7 @@ const ENEMY_TYPES = {
 		eye_color: "#ff0000",
 		health: enemy_health_from_tier(ENEMY_TIER_USHANKA),
 		speed: 5.5,
-		damage: enemy_damage_from_tier(ENEMY_TIER_USHANKA),
+		damage: 100 / 136 * enemy_damage_from_tier(ENEMY_TIER_USHANKA),
 		w: 30,
 		h: 30,
 		color: "#d0e8e0",
@@ -1448,7 +1500,7 @@ const ENEMY_TYPES = {
 		theme: THEME_TAIGA,
 		health: enemy_health_from_tier(ENEMY_TIER_SNOWMAN),
 		speed: 4,
-		damage: enemy_damage_from_tier(ENEMY_TIER_SNOWMAN),
+		damage: 100 / 60 * enemy_damage_from_tier(ENEMY_TIER_SNOWMAN),
 		w: 42,
 		h: 42,
 		only_draw_custom: true,
@@ -1584,7 +1636,7 @@ const ENEMY_TYPES = {
 		weight: 4,
 		health: enemy_health_from_tier(ENEMY_TIER_KRAMPUS),
 		speed: 7.2,
-		damage: enemy_damage_from_tier(ENEMY_TIER_KRAMPUS),
+		damage: 3 / 16 * enemy_damage_from_tier(ENEMY_TIER_KRAMPUS),
 		w: 55,
 		h: 55,
 		only_draw_custom: false,
@@ -1712,7 +1764,7 @@ const ENEMY_TYPES = {
 		weight: 2,
 		health: enemy_health_from_tier(ENEMY_TIER_BLOOD),
 		speed: 7,
-		damage: enemy_damage_from_tier(ENEMY_TIER_BLOOD),
+		damage: 4 * enemy_damage_from_tier(ENEMY_TIER_BLOOD),
 		w: 30,
 		h: 30,
 		color: "#BB1111",

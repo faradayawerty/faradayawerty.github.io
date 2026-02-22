@@ -144,7 +144,7 @@ function collisions_handle_pair(g, self, other, dt) {
 				collisions_apply_damage_to_object(g, oData.car_object, sData
 					.damage, dt, false);
 			}
-			else {
+			else if (Math.random() < 0.0625) {
 				collisions_apply_damage_to_player(oData, sData.damage, dt,
 					"enemy", g);
 			}
@@ -213,52 +213,57 @@ function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 	g.enemy_dps_history.push(eDpsEntry);
 	enemyDpsPoolIndex = (enemyDpsPoolIndex + 1) % enemyDpsEntryPool.length;
 	if (p.shield_blue_health > 0) {
+		let finalShieldDmg = Math.round((source === "enemy" ? 1.0 : 0.95) *
+			totalDmg);
 		if (g.settings.indicators["show damage numbers"]) {
 			damage_text_create(g, p.body.position.x, p.body.position.y - 20,
-				totalDmg, "#00ccff");
+				finalShieldDmg, "#00ccff");
 		}
-		p.shield_blue_health -= Math.round((source === "enemy" ? 1.0 : 0.95) *
-			totalDmg);
+		p.shield_blue_health -= finalShieldDmg;
 		if (p.shield_blue_health < 0) p.shield_blue_health = 0;
 		return;
 	}
 	if (p.shield_green_health > 0) {
+		let finalShieldDmg = Math.round((source === "enemy" ? 0.25 : 0.75) *
+			totalDmg);
 		if (g.settings.indicators["show damage numbers"]) {
 			damage_text_create(g, p.body.position.x, p.body.position.y - 20,
-				totalDmg, "#00ff00");
+				finalShieldDmg, "#00ff00");
 		}
-		p.shield_green_health -= Math.round((source === "enemy" ? 0.25 : 0.75) *
-			totalDmg);
+		p.shield_green_health -= finalShieldDmg;
 		if (p.shield_green_health < 0) p.shield_green_health = 0;
 		return;
 	}
 	if (p.shield_shadow_health > 0) {
+		let finalShieldDmg = Math.round((source === "enemy" ? 0.25 : 0.75) *
+			totalDmg);
 		if (g.settings.indicators["show damage numbers"]) {
 			damage_text_create(g, p.body.position.x, p.body.position.y - 20,
-				totalDmg, "#555555");
+				finalShieldDmg, "#555555");
 		}
-		p.shield_shadow_health -= Math.round((source === "enemy" ? 0.25 :
-			0.75) * totalDmg);
+		p.shield_shadow_health -= finalShieldDmg;
 		if (p.shield_shadow_health < 0) p.shield_shadow_health = 0;
 		return;
 	}
 	if (p.shield_rainbow_health > 0) {
+		let finalShieldDmg = Math.round((source === "enemy" ? 0.10 : 0.55) *
+			totalDmg);
 		if (g.settings.indicators["show damage numbers"]) {
 			damage_text_create(g, p.body.position.x, p.body.position.y - 20,
-				totalDmg, "#ff00ff");
+				finalShieldDmg, "#ff00ff");
 		}
-		p.shield_rainbow_health -= Math.round((source === "enemy" ? 0.10 :
-			0.55) * totalDmg);
+		p.shield_rainbow_health -= finalShieldDmg;
 		if (p.shield_rainbow_health < 0) p.shield_rainbow_health = 0;
 		return;
 	}
 	if (p.shield_anubis_health > 0) {
+		let finalShieldDmg = Math.round((source === "enemy" ? 0.10 : 0.55) *
+			totalDmg);
 		if (g.settings.indicators["show damage numbers"]) {
 			damage_text_create(g, p.body.position.x, p.body.position.y - 20,
-				totalDmg, "#ffd700");
+				finalShieldDmg, "#ffd700");
 		}
-		p.shield_anubis_health -= Math.round((source === "enemy" ? 0.10 :
-			0.55) * totalDmg);
+		p.shield_anubis_health -= finalShieldDmg;
 		if (p.shield_anubis_health < 0) p.shield_anubis_health = 0;
 		return;
 	}

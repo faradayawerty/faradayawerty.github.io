@@ -397,21 +397,57 @@ function enemy_update(enemy_object, dt) {
 									py - (y1 + t_param * (y2 - y1)), 2));
 							}
 							if (distToLine < (t.w * 0.6)) {
-								let rate = e.boss ? 0.88 : 0.65;
-								if (t.shield_blue_health > 0) t
-									.shield_blue_health -= 0.8 * e.damage * dt;
-								else if (t.shield_green_health > 0) t
-									.shield_green_health -= 0.4 * e.damage * dt;
-								else if (t.shield_shadow_health > 0) t
-									.shield_shadow_health -= 0.2 * e.damage *
-									dt;
-								else if (t.shield_rainbow_health > 0) t
-									.shield_rainbow_health -= 0.1 * e.damage *
-									dt;
-								else if (t.shield_anubis_health > 0) t
-									.shield_anubis_health -= 0.05 * e.damage *
-									dt;
-								else t.health -= 1.6 * e.damage * dt;
+								let rawDamage = e.damage * dt * (e.boss ? 0.88 :
+									0.65);
+								let finalDmg = 0;
+								let color = "#ff0000";
+								if (t.shield_blue_health > 0) {
+									finalDmg = Math.round(0.8 * rawDamage);
+									t.shield_blue_health -= finalDmg;
+									color = "#00ccff";
+								}
+								else if (t.shield_green_health > 0) {
+									finalDmg = Math.round(0.4 * rawDamage);
+									t.shield_green_health -= finalDmg;
+									color = "#00ff00";
+								}
+								else if (t.shield_shadow_health > 0) {
+									finalDmg = Math.round(0.2 * rawDamage);
+									t.shield_shadow_health -= finalDmg;
+									color = "#555555";
+								}
+								else if (t.shield_rainbow_health > 0) {
+									finalDmg = Math.round(0.1 * rawDamage);
+									t.shield_rainbow_health -= finalDmg;
+									color = "#ff00ff";
+								}
+								else if (t.shield_anubis_health > 0) {
+									finalDmg = Math.round(0.05 * rawDamage);
+									t.shield_anubis_health -= finalDmg;
+									color = "#ffd700";
+								}
+								else {
+									finalDmg = Math.round(1.6 * rawDamage);
+									t.health -= finalDmg;
+									if (g.settings.indicators["show blood"]) {
+										blood_splash_create(g, t.body.position
+											.x, t.body.position.y, 5, 2,
+											"#bc0000", 0.8);
+									}
+								}
+								if (finalDmg >= 1 && g.settings.indicators[
+										"show damage numbers"]) {
+									damage_text_create(g, t.body.position.x, t
+										.body.position.y - 20, finalDmg,
+										color);
+								}
+								let eDpsEntry = enemyDpsEntryPool[
+									enemyDpsPoolIndex];
+								eDpsEntry.dmg = finalDmg;
+								eDpsEntry.time = Date.now();
+								g.enemy_dps_history.push(eDpsEntry);
+								enemyDpsPoolIndex = (enemyDpsPoolIndex + 1) %
+									enemyDpsEntryPool.length;
 							}
 						}
 					}
