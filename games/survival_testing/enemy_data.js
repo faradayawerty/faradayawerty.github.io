@@ -1,11 +1,11 @@
 const E_COLS = COLORS_DEFAULT.enemies;
 let ENEMY_TIER_REGULAR = 1;
-let ENEMY_TIER_SHOOTING = 2;
+let ENEMY_TIER_SHOOTING = 3;
 let ENEMY_TIER_SHOOTING_RED = 6;
 let ENEMY_TIER_SWORD = 7;
 let ENEMY_TIER_SHOOTING_ROCKET = 10;
 let ENEMY_TIER_SHOOTING_LASER = 19;
-let ENEMY_TIER_DESERT = 3;
+let ENEMY_TIER_DESERT = 2;
 let ENEMY_TIER_MUMMY = 4;
 let ENEMY_TIER_SHADOW = 11;
 let ENEMY_TIER_ANUBIS = 15;
@@ -2515,23 +2515,19 @@ const ENEMY_TYPES = {
 				const y = e.body.position.y;
 				const w = e.w;
 				const h = e.h;
-				const t = Date.now() * 0.005;
-				const headY = y - h * 0.5;
+				if (e.age === undefined) e.age = 0;
+				e.age += 1;
+				const headY = y - h * 0.4;
 				ctx.save();
 				ctx.fillStyle = "#1a0000";
 				ctx.strokeStyle = "#000000";
 				ctx.lineWidth = 2;
-				[-1, 1].forEach(side => {
-					ctx.beginPath();
-					ctx.moveTo(x + side * w * 0.15, headY - h *
-						0.05);
-					ctx.quadraticCurveTo(x + side * w * 0.45,
-						headY - h * 0.5, x + side * w * 0.5,
-						headY - h * 0.2);
-					ctx.lineTo(x + side * w * 0.2, headY);
-					ctx.fill();
-					ctx.stroke();
-				});
+				ctx.beginPath();
+				ctx.arc(x, headY - h * 0.7, w * 0.7, 0, Math.PI, false);
+				ctx.arc(x, headY - h * 0.9, w * 0.7, Math.PI, 0, true);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
 				ctx.restore();
 				if (!e.tail_segments) {
 					e.tail_segments = Array.from({
@@ -2541,20 +2537,43 @@ const ENEMY_TYPES = {
 						y: y
 					}));
 				}
+				const spawnRatio = Math.min(1, e.age / 35);
+				const burstEffect = Math.max(0, 1 - e.age / 15);
 				ctx.save();
 				ctx.strokeStyle = "#4a0000";
-				ctx.lineWidth = w * 0.06;
+				ctx.lineWidth = w * 0.08;
 				ctx.lineCap = "round";
 				let prevX = x;
-				let prevY = y + h * 0.2;
+				let prevY = y + h * 0.25;
+				const segmentLen = w * 0.18;
+				const vel = e.body.velocity;
+				const isMoving = Math.hypot(vel.x, vel.y) > 0.2;
+				const targetBaseAngle = isMoving ? Math.atan2(vel.y, vel
+					.x) + Math.PI : 0;
 				e.tail_segments.forEach((seg, i) => {
-					const sideSwing = Math.sin(t * 1.5 + i *
-						0.6) * 12;
-					const targetX = prevX - (e.body.velocity.x *
-						1.2) + sideSwing;
-					const targetY = prevY + 5;
-					seg.x += (targetX - seg.x) * 0.3;
-					seg.y += (targetY - seg.y) * 0.3;
+					const shootLeft = burstEffect * (-w * 12) *
+						(i / 7);
+					const targetAngle = i === 0 ?
+						targetBaseAngle : Math.atan2(seg.y -
+							prevY, seg.x - prevX);
+					const targetX = prevX + Math.cos(
+							targetAngle) * segmentLen +
+						shootLeft;
+					const targetY = prevY + Math.sin(
+						targetAngle) * segmentLen;
+					const followSpeed = 0.5 + (spawnRatio *
+					0.3);
+					seg.x += (targetX - seg.x) * followSpeed;
+					seg.y += (targetY - seg.y) * followSpeed;
+					const dx = seg.x - prevX;
+					const dy = seg.y - prevY;
+					const dist = Math.hypot(dx, dy);
+					if (dist > 0) {
+						seg.x = prevX + (dx / dist) *
+						segmentLen;
+						seg.y = prevY + (dy / dist) *
+						segmentLen;
+					}
 					ctx.beginPath();
 					ctx.moveTo(prevX, prevY);
 					ctx.lineTo(seg.x, seg.y);
@@ -2564,11 +2583,12 @@ const ENEMY_TYPES = {
 						ctx.translate(seg.x, seg.y);
 						ctx.rotate(Math.atan2(seg.y - prevY, seg
 							.x - prevX));
-						ctx.fillStyle = "#4a0000";
+						ctx.fillStyle = "#2a0000";
 						ctx.beginPath();
-						ctx.moveTo(0, 0);
-						ctx.lineTo(-12, -6);
-						ctx.lineTo(-12, 6);
+						ctx.moveTo(w * 0.12, 0);
+						ctx.lineTo(0, -w * 0.08);
+						ctx.lineTo(-w * 0.08, 0);
+						ctx.lineTo(0, w * 0.08);
 						ctx.closePath();
 						ctx.fill();
 						ctx.restore();
@@ -2594,9 +2614,9 @@ const ENEMY_TYPES = {
 						bullet_create(
 							obj.game,
 							e.body.position.x + Math.cos(
-								finalAngle) * spawnDist,
+							finalAngle) * spawnDist,
 							e.body.position.y + Math.sin(
-								finalAngle) * spawnDist,
+							finalAngle) * spawnDist,
 							Math.cos(finalAngle), Math.sin(
 								finalAngle),
 							pSpeed, e.damage * 0.15,
@@ -2639,9 +2659,9 @@ const ENEMY_TYPES = {
 			ctx.fill();
 			ctx.fillStyle = "#ff0000";
 			ctx.fillRect(x + w * 0.43, y + h * 0.63, w * 0.04, h *
-				0.04);
+			0.04);
 			ctx.fillRect(x + w * 0.53, y + h * 0.63, w * 0.04, h *
-				0.04);
+			0.04);
 		},
 	},
 };
