@@ -83,6 +83,59 @@ ITEMS_DATA[ITEM_FUEL] = {
 		ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
 	}
 };
+ITEMS_DATA[ITEM_PUMPKIN_SHIELD] = {
+	name: "Pumpkin Shield",
+	desc: "A spectral aura of autumn malevolence that wards off strikes.",
+	name_rus: "Тыквенный щит",
+	desc_rus: "Призрачная аура осенней злобы, отражающая вражеские удары.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const pumpkinBody = "#E67E22";
+		const pumpkinStroke = "#A04000";
+		const fireColor = "#FFD700";
+		const pulse = 1;
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, pumpkinBody,
+			pumpkinStroke, 0.05 * w);
+		ctx.save();
+		ctx.translate(x + w * 0.5, y + h * 0.5);
+		ctx.scale(0.7, 0.7);
+		ctx.translate(-(x + w * 0.5), -(y + h * 0.5));
+		ctx.fillStyle = fireColor;
+		ctx.shadowBlur = (w * 0.1) + pulse;
+		ctx.shadowColor = fireColor;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.3, y + h * 0.35);
+		ctx.lineTo(x + w * 0.48, y + h * 0.45);
+		ctx.lineTo(x + w * 0.32, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.7, y + h * 0.35);
+		ctx.lineTo(x + w * 0.52, y + h * 0.45);
+		ctx.lineTo(x + w * 0.68, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.5, y + h * 0.48);
+		ctx.lineTo(x + w * 0.46, y + h * 0.55);
+		ctx.lineTo(x + w * 0.54, y + h * 0.55);
+		ctx.fill();
+		let mouthOffset = -0.1 * h;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.25, y + mouthOffset + h * 0.65);
+		ctx.lineTo(x + w * 0.35, y + mouthOffset + h * 0.75);
+		ctx.lineTo(x + w * 0.42, y + mouthOffset + h * 0.67);
+		ctx.lineTo(x + w * 0.5, y + mouthOffset + h * 0.77);
+		ctx.lineTo(x + w * 0.58, y + mouthOffset + h * 0.67);
+		ctx.lineTo(x + w * 0.65, y + mouthOffset + h * 0.75);
+		ctx.lineTo(x + w * 0.75, y + mouthOffset + h * 0.65);
+		ctx.lineTo(x + w * 0.65, y + mouthOffset + h * 0.83);
+		ctx.lineTo(x + w * 0.58, y + mouthOffset + h * 0.73);
+		ctx.lineTo(x + w * 0.5, y + mouthOffset + h * 0.9);
+		ctx.lineTo(x + w * 0.42, y + mouthOffset + h * 0.73);
+		ctx.lineTo(x + w * 0.35, y + mouthOffset + h * 0.83);
+		ctx.closePath();
+		ctx.fill();
+		ctx.restore();
+	}
+};
 ITEMS_DATA[ITEM_SHIELD] = {
 	name: "Energy Shield",
 	desc: "Provides temporary protection.",
@@ -399,5 +452,221 @@ ITEMS_DATA[ITEM_ANUBIS_REGEN_SHIELD] = {
 			ctx.fill();
 		}
 		ctx.restore();
+	}
+};
+ITEMS_DATA[ITEM_HONEY] = {
+	name: "Honey",
+	desc: "Sweet and sticky.",
+	name_rus: "Мёд",
+	desc_rus: "Сладкий и липкий.",
+	render: (ctx, x, y, w, h) => {
+		const c = {
+			glass: "#AADDFF88",
+			honey: "#FF9100",
+			label: "#FDF5E6",
+			wax: "#D35400",
+			wax_fill: "#FFB300",
+			cap: "#4E342E"
+		};
+		ctx.fillStyle = c.glass;
+		ctx.beginPath();
+		ctx.roundRect(x + w * 0.25, y + h * 0.2, w * 0.5, h * 0.7, w *
+			0.08);
+		ctx.fill();
+		ctx.fillStyle = c.honey;
+		ctx.beginPath();
+		ctx.roundRect(x + w * 0.28, y + h * 0.35, w * 0.44, h * 0.5, w *
+			0.05);
+		ctx.fill();
+		ctx.fillStyle = c.label;
+		ctx.fillRect(x + w * 0.25, y + h * 0.45, w * 0.5, h * 0.3);
+		const drawHex = (hx, hy, radius) => {
+			ctx.beginPath();
+			for (let i = 0; i < 6; i++) {
+				let angle = (Math.PI / 3) * i - Math.PI / 2;
+				let px = hx + radius * Math.cos(angle);
+				let py = hy + radius * Math.sin(angle);
+				if (i === 0) ctx.moveTo(px, py);
+				else ctx.lineTo(px, py);
+			}
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+		};
+		ctx.lineWidth = w * 0.015;
+		ctx.strokeStyle = c.wax;
+		ctx.fillStyle = c.wax_fill;
+		ctx.lineJoin = "round";
+		let r = w * 0.06;
+		let centerX = x + w * 0.5;
+		let centerY = y + h * 0.545;
+		let horizontalDist = r * Math.sqrt(3);
+		let verticalDist = r * 1.5;
+		drawHex(centerX, centerY, r);
+		drawHex(centerX - horizontalDist / 2, centerY + verticalDist,
+			r);
+		drawHex(centerX + horizontalDist / 2, centerY + verticalDist,
+			r);
+		ctx.fillStyle = c.cap;
+		ctx.beginPath();
+		ctx.roundRect(x + w * 0.22, y + h * 0.15, w * 0.56, h * 0.12,
+			w * 0.04);
+		ctx.fill();
+	}
+};
+ITEMS_DATA[ITEM_EYEBALL_SOUP] = {
+	name: "Eyeball Soup",
+	desc: "A bowl full of staring eyes. Crunchy!",
+	name_rus: "Суп из глазных яблок",
+	desc_rus: "Миска, полная глазеющих на тебя глаз. Хрустяще!",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const c = {
+			bowl: "#5D4037",
+			bowl_dark: "#3E2723",
+			sclera: "#F5F5F5",
+			iris: "#D32F2F",
+			pupil: "#000000",
+			blood: "#7B1FA2"
+		};
+		ctx.fillStyle = c.blood;
+		ctx.beginPath();
+		ctx.ellipse(x + w * 0.5, y + h * 0.48, w * 0.3, h * 0.08, 0, 0,
+			Math.PI * 2);
+		ctx.fill();
+		const drawEye = (ex, ey, er, seed) => {
+			ctx.save();
+			ctx.translate(ex, ey);
+			ctx.fillStyle = c.sclera;
+			ctx.beginPath();
+			ctx.arc(0, 0, er, 0, Math.PI * 2);
+			ctx.fill();
+			let lookX = Math.cos(t * 0.04 + seed) * (er * 0.4);
+			let lookY = Math.sin(t * 0.06 + seed) * (er * 0.3);
+			ctx.fillStyle = c.iris;
+			ctx.beginPath();
+			ctx.arc(lookX, lookY, er * 0.5, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.fillStyle = c.pupil;
+			ctx.beginPath();
+			ctx.arc(lookX, lookY, er * 0.25, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.restore();
+		};
+		let r = w * 0.1;
+		drawEye(x + w * 0.38, y + h * 0.42, r * 0.9, 10);
+		drawEye(x + w * 0.62, y + h * 0.42, r * 0.9, 20);
+		drawEye(x + w * 0.5, y + h * 0.48, r, 30);
+		drawEye(x + w * 0.32, y + h * 0.5, r, 40);
+		drawEye(x + w * 0.68, y + h * 0.5, r, 50);
+		drawEye(x + w * 0.5, y + h * 0.38, r, 60);
+		ctx.fillStyle = c.bowl;
+		ctx.beginPath();
+		ctx.arc(x + w * 0.5, y + h * 0.5, w * 0.35, 0, Math.PI, false);
+		ctx.fill();
+		ctx.fillRect(x + w * 0.15, y + h * 0.48, w * 0.7, h * 0.06);
+	}
+};
+ITEMS_DATA[ITEM_BEER] = {
+	name: "Beer",
+	desc: "Cold and refreshing. Don't drink and drive!",
+	name_rus: "Пиво",
+	desc_rus: "Холодное и освежающее. Не пей за рулем!",
+	render: (ctx, x, y, w, h) => {
+		const c = {
+			glass: "#E0F7FA88",
+			liquid: "#FFC107",
+			foam: "#FFFFFF",
+			handle: "#B2EBF2"
+		};
+		ctx.strokeStyle = c.handle;
+		ctx.lineWidth = w * 0.08;
+		ctx.beginPath();
+		ctx.arc(x + w * 0.7, y + h * 0.55, w * 0.15, -Math.PI / 2, Math
+			.PI / 2);
+		ctx.stroke();
+		ctx.fillStyle = c.glass;
+		ctx.beginPath();
+		ctx.roundRect(x + w * 0.25, y + h * 0.25, w * 0.5, h * 0.65, w *
+			0.05);
+		ctx.fill();
+		ctx.fillStyle = c.liquid;
+		ctx.fillRect(x + w * 0.3, y + h * 0.45, w * 0.4, h * 0.4);
+		ctx.fillStyle = c.foam;
+		const drawFoam = (fx, fy, fr) => {
+			ctx.beginPath();
+			ctx.arc(fx, fy, fr, 0, Math.PI * 2);
+			ctx.fill();
+		};
+		drawFoam(x + w * 0.35, y + h * 0.25, w * 0.1);
+		drawFoam(x + w * 0.5, y + h * 0.22, w * 0.12);
+		drawFoam(x + w * 0.65, y + h * 0.25, w * 0.1);
+		ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+		ctx.lineWidth = w * 0.04;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.35, y + h * 0.35);
+		ctx.lineTo(x + w * 0.35, y + h * 0.8);
+		ctx.stroke();
+	}
+};
+ITEMS_DATA[ITEM_PUMPKIN_JUICE] = {
+	name: "Pumpkin Juice",
+	desc: "Rich, creamy, and smells like autumn.",
+	name_rus: "Тыквенный сок",
+	desc_rus: "Густой, нежный и пахнет осенью.",
+	render: (ctx, x, y, w, h) => {
+		const pumpkinBody = "#E67E22";
+		const pumpkinStroke = "#A04000";
+		const pumpkinBlack = "#1a1a1a";
+		const stemGreen = "#2E7D32";
+		const stemStroke = "#1B5E20";
+		const strokeWidth = w * 0.03;
+		ctx.lineWidth = strokeWidth;
+		ctx.fillStyle = pumpkinBody;
+		ctx.strokeStyle = pumpkinStroke;
+		const bodyX = x + w * 0.25;
+		const bodyY = y + h * 0.2;
+		const bodyW = w * 0.5;
+		const bodyH = h * 0.7;
+		ctx.fillRect(bodyX, bodyY, bodyW, bodyH);
+		ctx.strokeRect(bodyX, bodyY, bodyW, bodyH);
+		ctx.fillStyle = stemGreen;
+		ctx.strokeStyle = stemStroke;
+		const stemX = x + w * 0.42;
+		const stemY = y + h * 0.1;
+		const stemW = w * 0.16;
+		const stemH = h * 0.1;
+		ctx.fillRect(stemX, stemY, stemW, stemH);
+		ctx.strokeRect(stemX, stemY, stemW, stemH);
+		ctx.fillStyle = pumpkinBlack;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.3, y + h * 0.35);
+		ctx.lineTo(x + w * 0.48, y + h * 0.45);
+		ctx.lineTo(x + w * 0.32, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.7, y + h * 0.35);
+		ctx.lineTo(x + w * 0.52, y + h * 0.45);
+		ctx.lineTo(x + w * 0.68, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.5, y + h * 0.48);
+		ctx.lineTo(x + w * 0.46, y + h * 0.55);
+		ctx.lineTo(x + w * 0.54, y + h * 0.55);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.28, y + h * 0.6);
+		ctx.lineTo(x + w * 0.35, y + h * 0.7);
+		ctx.lineTo(x + w * 0.42, y + h * 0.62);
+		ctx.lineTo(x + w * 0.5, y + h * 0.72);
+		ctx.lineTo(x + w * 0.58, y + h * 0.62);
+		ctx.lineTo(x + w * 0.65, y + h * 0.7);
+		ctx.lineTo(x + w * 0.72, y + h * 0.6);
+		ctx.lineTo(x + w * 0.65, y + h * 0.78);
+		ctx.lineTo(x + w * 0.58, y + h * 0.68);
+		ctx.lineTo(x + w * 0.5, y + h * 0.85);
+		ctx.lineTo(x + w * 0.42, y + h * 0.68);
+		ctx.lineTo(x + w * 0.35, y + h * 0.78);
+		ctx.fill();
 	}
 };

@@ -162,3 +162,76 @@ ITEMS_DATA[ITEM_RAINBOW_AMMO] = {
 		}
 	}
 };
+ITEMS_DATA[ITEM_SNOWBALL] = {
+	name: "Snowball",
+	desc: "A singular, perfectly packed ball of ice and snow.",
+	name_rus: "Снежок",
+	desc_rus: "Одиночный, идеально слепленный комок снега и льда.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const cx = x + w * 0.5;
+		const cy = y + h * 0.5;
+		const radius = w * 0.25;
+		ctx.fillStyle = "white";
+		ctx.beginPath();
+		ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+		ctx.fill();
+		const grad = ctx.createRadialGradient(
+			cx - radius * 0.2, cy - radius * 0.2, radius * 0.1,
+			cx, cy, radius
+		);
+		grad.addColorStop(0, "rgba(255, 255, 255, 1)");
+		grad.addColorStop(1, "rgba(200, 240, 255, 0.5)");
+		ctx.fillStyle = grad;
+		ctx.beginPath();
+		ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+		for (let i = 0; i < 3; i++) {
+			let px = cx + Math.cos(t * 0.05 + i * 2) * radius * 0.5;
+			let py = cy + Math.sin(t * 0.05 + i * 2) * radius * 0.5;
+			ctx.fillRect(px, py, 2, 2);
+		}
+		ctx.strokeStyle = "cyan";
+		ctx.lineWidth = 1.5;
+		ctx.beginPath();
+		ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+		ctx.stroke();
+	}
+};
+ITEMS_DATA[ITEM_PRESENT] = {
+	name: "Gift Box",
+	desc: "Contains a lethal surprise.",
+	name_rus: "Подарок",
+	desc_rus: "Содержит смертоносный сюрприз.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const paper = "#117733";
+		const ribbon = "#gold";
+		const shadow = "rgba(0,0,0,0.2)";
+		ctx.save();
+		ctx.translate(x + w / 2, y + h * 0.5);
+		ctx.rotate(Math.sin(t * 0.05) * 0.02);
+		let bx = -w * 0.3,
+			by = -h * 0.2,
+			bw = w * 0.6,
+			bh = h * 0.5;
+		ctx.fillStyle = shadow;
+		ctx.fillRect(bx, by, bw, bh);
+		ctx.fillStyle = paper;
+		ctx.fillRect(bx + 1, by + 1, bw - 2, bh - 2);
+		ctx.fillStyle = "gold";
+		ctx.fillRect(bx + bw * 0.4, by, bw * 0.2, bh);
+		ctx.fillRect(bx, by + bh * 0.35, bw, bh * 0.2);
+		ctx.beginPath();
+		ctx.moveTo(0, by);
+		ctx.bezierCurveTo(bw * 0.3, by - h * 0.2, bw * 0.1, by - h *
+			0.25, 0, by);
+		ctx.bezierCurveTo(-bw * 0.3, by - h * 0.2, -bw * 0.1, by - h *
+			0.25, 0, by);
+		ctx.fill();
+		ctx.strokeStyle = "rgba(0,0,0,0.3)";
+		ctx.stroke();
+		ctx.restore();
+	}
+};

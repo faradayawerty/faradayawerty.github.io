@@ -2,25 +2,25 @@ const ANIMAL_CONFIGS = {
 	"raccoon": {
 		w: 25,
 		h: 25,
-		hp: 300,
+		hp: 30,
 		speed: 8.5
 	},
 	"deer": {
 		w: 45,
 		h: 45,
-		hp: 1000,
+		hp: 100,
 		speed: 6.25
 	},
 	"snake": {
 		w: 75,
 		h: 7,
-		hp: 600,
+		hp: 60,
 		speed: 4.5
 	},
 	"scorpion": {
 		w: 22.5,
 		h: 10,
-		hp: 200,
+		hp: 20,
 		speed: 5.0
 	}
 };
@@ -376,11 +376,25 @@ function animal_draw(ao, ctx) {
 		drawMatterBody(ctx, a.body, "white", 0.05 * a.w);
 	}
 	if (ao.game.settings.indicators["show enemy health"]) {
-		ctx.fillStyle = cInd.health_bg;
-		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w, a.h * 0.05);
-		ctx.fillStyle = cInd.health_fill;
-		ctx.fillRect(x - a.w / 2, y - 0.75 * a.h, a.w * Math.max(0, a.health) /
-			a.max_health, a.h * 0.05);
+		const hPerc = Math.max(0, a.health / a.max_health);
+		const fontSize = a.w * 0.33;
+		const yPos = y - a.h * 0.85;
+		const r = Math.floor(255 * (1 - hPerc));
+		const g = Math.floor(255 * hPerc);
+		const color = `rgb(${r}, ${g}, 0)`;
+		const text = `${Math.ceil(a.health)}/${Math.ceil(a.max_health)}`;
+		ctx.save();
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+		ctx.font = `bold ${fontSize}px Arial`;
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = fontSize * 0.15;
+		ctx.lineJoin = "round";
+		ctx.lineCap = "round";
+		ctx.strokeText(text, x, yPos);
+		ctx.fillStyle = color;
+		ctx.fillText(text, x, yPos);
+		ctx.restore();
 	}
 }
 

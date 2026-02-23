@@ -17,12 +17,28 @@ const _ENEMY_VEC = {
 const _ENEMY_DROP_DATA = {
 	N: 1
 };
+const MAX_FIRE_PARTICLES = 100;
+const _FIRE_POOL = Array.from({
+	length: MAX_FIRE_PARTICLES
+}, () => ({
+	x: 0,
+	y: 0,
+	vx: 0,
+	vy: 0,
+	life: 0,
+	maxLife: 0,
+	size: 0
+}));
+let _fire_idx = 0;
 
 function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	"random", tile = LEVEL_TILE_VOID) {
 	if (type === "random") {
 		let currentTileTheme = undefined;
-		if (tile >= THEME_TAIGA) {
+		if (tile >= THEME_BLOOD_FOREST) {
+			currentTileTheme = THEME_BLOOD_FOREST;
+		}
+		else if (tile >= THEME_TAIGA) {
 			currentTileTheme = THEME_TAIGA;
 		}
 		else if (tile >= THEME_DESERT) {
@@ -90,7 +106,7 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		width = width * 0.67;
 		height = height * 0.67;
 	}
-	let max_health_random = config.health * (1 + 0.25 * Math.random());
+	let max_health_random = config.health;
 	let e = {
 		health: max_health_random * ENEMY_HEALTH_COEFFICIENT,
 		max_health: max_health_random * ENEMY_HEALTH_COEFFICIENT,
@@ -118,7 +134,25 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		hunt_delay: 1000,
 		hunt_delay_max: 1000,
 		poisoned_time: 0,
-		is_snake: config.is_snake
+		burning_time: 0,
+		frozen_time: 0,
+		electrified_time: 0,
+		dot_timers: {
+			poison: 0,
+			burn: 0,
+			electric: 0,
+			freeze: 0
+		},
+		dot_accumulators: {
+			poison: 0,
+			burn: 0,
+			electric: 0,
+			freeze: 0
+		},
+		is_snake: config.is_snake,
+		chain_segments: [],
+		whip_timer: 0,
+		whip_angle: 0
 	};
 	if (config.use_rainbow_color_gradient) {
 		e.color_gradient = Math.random() * 2 * Math.PI / 0.03;
@@ -135,10 +169,10 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	}
 	if (boss) {
 		e.damage = 3.05 * e.damage;
-		e.health = 25 * e.max_health;
-		e.max_health = 25 * e.max_health;
-		e.hunger = 1.75 * e.max_hunger;
-		e.max_hunger = 1.75 * e.max_hunger;
+		e.health = (25 * e.max_health);
+		e.max_health = (25 * e.max_health);
+		e.hunger = (1.75 * e.max_hunger);
+		e.max_hunger = (1.75 * e.max_hunger);
 		e.speed = 0.5 * e.speed;
 		if (config.boss_shooting_range_mult !== undefined)
 			e.shooting_range *= config.boss_shooting_range_mult;
@@ -154,10 +188,10 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 	}
 	if (make_minion) {
 		e.damage = 0.5 * e.damage;
-		e.health = 0.5 * e.max_health;
-		e.max_health = 0.5 * e.max_health;
-		e.hunger = 0.05 * e.max_hunger;
-		e.max_hunger = 0.05 * e.max_hunger;
+		e.health = (0.5 * e.max_health);
+		e.max_health = (0.5 * e.max_health);
+		e.hunger = (0.05 * e.max_hunger);
+		e.max_hunger = (0.05 * e.max_hunger);
 		if (config.is_snake) {
 			e.hunger = 1.75 * e.max_hunger;
 			e.max_hunger = 1.75 * e.max_hunger;
@@ -176,6 +210,10 @@ function enemy_create(g, x, y, make_boss = false, make_minion = false, type =
 		e.is_minion = true;
 	}
 	Matter.Composite.add(g.engine.world, e.body);
+	e.health = game_round(e.health);
+	e.max_health = game_round(e.max_health);
+	e.hunger = game_round(e.hunger);
+	e.max_hunger = game_round(e.max_hunger);
 	return game_object_create(g, "enemy", e, enemy_update, enemy_draw,
 		enemy_destroy);
 }
@@ -237,20 +275,200 @@ function enemy_get_target_object(enemy_object, dt) {
 
 function enemy_update(enemy_object, dt) {
 	let e = enemy_object.data;
+	let g = enemy_object.game;
 	let typeData = ENEMY_TYPES[e.type] || ENEMY_TYPES["regular"];
 	if (e.hunger > 0) e.hunger = Math.max(0, e.hunger - 0.001 * dt);
 	if (e.hunger <= 0) {
 		e.health *= Math.pow(0.5, dt / 1000);
 		e.health -= 0.01 * e.max_health * dt / 1000;
 	}
+	const show_dot_damage = (type, damage, color) => {
+		e.dot_accumulators[type] += damage;
+		e.dot_timers[type] += dt;
+		if (e.dot_timers[type] >= 500) {
+			if (g.settings.indicators["show damage numbers"]) {
+				damage_text_create(g, e.body.position.x, e.body.position.y -
+					e.h * 0.5, Math.ceil(e.dot_accumulators[type]),
+					color);
+			}
+			e.dot_timers[type] = 0;
+			e.dot_accumulators[type] = 0;
+		}
+	};
 	if (e.poisoned_time > 0) {
-		e.health -= 2.75 * dt / 1000;
+		let dmg = 2 * dt;
+		e.health -= dmg;
 		e.poisoned_time -= dt;
+		show_dot_damage("poison", dmg, "#22ff00");
+	}
+	if (e.burning_time > 0) {
+		let dmg = 0.5 * dt;
+		e.health -= dmg;
+		e.burning_time -= dt;
+		show_dot_damage("burn", dmg, "#ffaa00");
+	}
+	if (e.electrified_time > 0) {
+		let dmg = 0.8 * dt;
+		e.health -= dmg;
+		e.electrified_time -= dt;
+		show_dot_damage("electric", dmg, "#00ffff");
+	}
+	let current_speed = e.speed;
+	if (e.frozen_time > 0) {
+		let dmg = 0.25 * dt;
+		e.health -= dmg;
+		current_speed *= 0.15;
+		e.frozen_time -= dt;
+		show_dot_damage("freeze", dmg, "#64dcff");
 	}
 	if (e.shooting_delay < 5000) e.shooting_delay += dt;
 	if (e.jump_delay < 4000) e.jump_delay += Math.random() * dt;
 	e.sword_rotation += 0.01 * dt;
 	e.color_gradient += 0.01 * dt;
+	if (typeData.visuals && typeData.visuals.draw_chain) {
+		e.whip_timer += dt;
+		const numWhips = e.boss ? 3 : 1;
+		const numSegments = 12;
+		const segmentLen = e.w * 0.45;
+		if (e.chain_segments.length === 0) {
+			for (let w = 0; w < numWhips; w++) {
+				let whip = [];
+				for (let i = 0; i < numSegments; i++) {
+					whip.push({
+						x: e.body.position.x,
+						y: e.body.position.y
+					});
+				}
+				e.chain_segments.push(whip);
+			}
+		}
+		let target = enemy_get_target_object(enemy_object, -1);
+		let strikeCycle = 1500;
+		let strikeProgress = (e.whip_timer % strikeCycle) / strikeCycle;
+		for (let w = 0; w < numWhips; w++) {
+			let whip = e.chain_segments[w];
+			whip[0].x = e.body.position.x;
+			whip[0].y = e.body.position.y;
+			if (target) {
+				let dx = target.data.body.position.x - e.body.position.x;
+				let dy = target.data.body.position.y - e.body.position.y;
+				let baseAngle = Math.atan2(dy, dx);
+				let angleOffset = 0;
+				if (e.boss) {
+					if (w === 1) angleOffset = Math.PI / 4;
+					if (w === 2) angleOffset = -Math.PI / 4;
+				}
+				let targetAngle = baseAngle + angleOffset;
+				for (let i = 1; i < numSegments; i++) {
+					let p = i / numSegments;
+					let wave = Math.sin(strikeProgress * Math.PI * 2 + w) * (1 -
+						p) * (e.w * 2);
+					let bend = Math.sin(p * Math.PI) * wave;
+					let currentAngle = targetAngle + (bend / (e.w * 0.5));
+					let targetX = whip[i - 1].x + Math.cos(currentAngle) *
+						segmentLen;
+					let targetY = whip[i - 1].y + Math.sin(currentAngle) *
+						segmentLen;
+					whip[i].x += (targetX - whip[i].x) * 0.4;
+					whip[i].y += (targetY - whip[i].y) * 0.4;
+					if (target.name === "player") {
+						let t = target.data;
+						if (t.immunity <= 0) {
+							let px = t.body.position.x;
+							let py = t.body.position.y;
+							let x1 = whip[i - 1].x,
+								y1 = whip[i - 1].y;
+							let x2 = whip[i].x,
+								y2 = whip[i].y;
+							let l2 = Math.pow(x2 - x1, 2) + Math.pow(y2 - y1,
+								2);
+							let distToLine = 0;
+							if (l2 === 0) {
+								distToLine = Math.sqrt(Math.pow(px - x1, 2) +
+									Math.pow(py - y1, 2));
+							}
+							else {
+								let t_param = Math.max(0, Math.min(1, ((px -
+									x1) * (x2 - x1) + (py -
+									y1) * (
+									y2 - y1)) / l2));
+								distToLine = Math.sqrt(Math.pow(px - (x1 +
+									t_param * (x2 - x1)), 2) + Math.pow(
+									py - (y1 + t_param * (y2 - y1)), 2));
+							}
+							if (distToLine < (t.w * 0.6)) {
+								let rawDamage = e.damage * dt * (e.boss ? 0.88 :
+									0.65);
+								let finalDmg = 0;
+								let color = "#ff0000";
+								if (t.shield_blue_health > 0) {
+									finalDmg = Math.round(0.8 * rawDamage);
+									t.shield_blue_health -= finalDmg;
+									color = "#00ccff";
+								}
+								else if (t.shield_green_health > 0) {
+									finalDmg = Math.round(0.4 * rawDamage);
+									t.shield_green_health -= finalDmg;
+									color = "#00ff00";
+								}
+								else if (t.shield_shadow_health > 0) {
+									finalDmg = Math.round(0.2 * rawDamage);
+									t.shield_shadow_health -= finalDmg;
+									color = "#555555";
+								}
+								else if (t.shield_rainbow_health > 0) {
+									finalDmg = Math.round(0.1 * rawDamage);
+									t.shield_rainbow_health -= finalDmg;
+									color = "#ff00ff";
+								}
+								else if (t.shield_anubis_health > 0) {
+									finalDmg = Math.round(0.05 * rawDamage);
+									t.shield_anubis_health -= finalDmg;
+									color = "#ffd700";
+								}
+								else if (t.shield_pumpkin_health > 0) {
+									finalDmg = Math.round(0.05 * rawDamage);
+									t.shield_pumpkin_health -= finalDmg;
+									color = "orange";
+								}
+								else {
+									finalDmg = Math.round(1.6 * rawDamage);
+									t.health -= finalDmg;
+									if (g.settings.indicators["show blood"]) {
+										blood_splash_create(g, t.body.position
+											.x, t.body.position.y, 5, 2,
+											"#bc0000", 0.8);
+									}
+								}
+								if (finalDmg >= 1 && g.settings.indicators[
+										"show damage numbers"]) {
+									damage_text_create(g, t.body.position.x, t
+										.body.position.y - 20, finalDmg,
+										color);
+								}
+								let eDpsEntry = enemyDpsEntryPool[
+									enemyDpsPoolIndex];
+								eDpsEntry.dmg = finalDmg;
+								eDpsEntry.time = Date.now();
+								g.enemy_dps_history.push(eDpsEntry);
+								enemyDpsPoolIndex = (enemyDpsPoolIndex + 1) %
+									enemyDpsEntryPool.length;
+							}
+						}
+					}
+				}
+			}
+			else {
+				for (let i = 1; i < numSegments; i++) {
+					let targetX = whip[i - 1].x + (e.boss ? (w - 1) * e.w *
+						0.3 : 0);
+					let targetY = whip[i - 1].y + segmentLen * 0.5;
+					whip[i].x += (targetX - whip[i].x) * 0.2;
+					whip[i].y += (targetY - whip[i].y) * 0.2;
+				}
+			}
+		}
+	}
 	if (typeData.behaviour_no_target)
 		typeData.behaviour_no_target(enemy_object, dt);
 	let target_object = enemy_get_target_object(enemy_object, dt);
@@ -259,8 +477,8 @@ function enemy_update(enemy_object, dt) {
 		vrs.tx = target_object.data.body.position.x - e.body.position.x;
 		vrs.ty = target_object.data.body.position.y - e.body.position.y;
 		vrs.v = Math.sqrt(vrs.tx * vrs.tx + vrs.ty * vrs.ty) || 0.001;
-		vrs.dx = e.speed * vrs.tx / vrs.v;
-		vrs.dy = e.speed * vrs.ty / vrs.v;
+		vrs.dx = current_speed * vrs.tx / vrs.v;
+		vrs.dy = current_speed * vrs.ty / vrs.v;
 		vrs.ndx = vrs.tx / vrs.v;
 		vrs.ndy = vrs.ty / vrs.v;
 		if (typeData.behaviour) typeData.behaviour(enemy_object, dt,
@@ -372,7 +590,10 @@ function enemy_draw(enemy_object, ctx) {
 		angle = Math.atan2(e.body.velocity.y, e.body.velocity.x);
 	}
 	ctx.save();
-	if (vis.custom_draw && !vis.custom_draw_above) vis.custom_draw(e, ctx);
+	ctx.translate(0, bob);
+	if (vis.custom_draw && !vis.custom_draw_above) {
+		vis.custom_draw(e, ctx);
+	}
 	if (vis.glowColor) {
 		ctx.shadowBlur = vis.glowBlur || 15;
 		ctx.shadowColor = vis.glowColor;
@@ -381,9 +602,9 @@ function enemy_draw(enemy_object, ctx) {
 		ctx.fillStyle = "rgba(0,0,0,0.4)";
 		ctx.beginPath();
 		ctx.roundRect(e.body.position.x - e.w * 0.25, e.body.position.y + e.h *
-			0.25 + walk, e.w * 0.18, e.h * 0.35, e.w * 0.05);
+			0.25 + walk - bob, e.w * 0.18, e.h * 0.35, e.w * 0.05);
 		ctx.roundRect(e.body.position.x + e.w * 0.07, e.body.position.y + e.h *
-			0.25 - walk, e.w * 0.18, e.h * 0.35, e.w * 0.05);
+			0.25 - walk - bob, e.w * 0.18, e.h * 0.35, e.w * 0.05);
 		ctx.fill();
 		let outlineW = vis.outline_is_relative ? vis.outline_width * e.w : (vis
 			.outline_width || 1);
@@ -392,11 +613,11 @@ function enemy_draw(enemy_object, ctx) {
 		ctx.lineWidth = outlineW;
 		ctx.beginPath();
 		ctx.roundRect(e.body.position.x - e.w * 0.35, e.body.position.y - e.h *
-			0.3 + bob, e.w * 0.7, e.h * 0.7, e.w * 0.1);
+			0.3, e.w * 0.7, e.h * 0.7, e.w * 0.1);
 		ctx.fill();
 		ctx.stroke();
 		ctx.save();
-		ctx.translate(e.body.position.x, e.body.position.y - e.h * 0.5 + bob);
+		ctx.translate(e.body.position.x, e.body.position.y - e.h * 0.5);
 		ctx.fillStyle = e.color;
 		ctx.beginPath();
 		ctx.roundRect(-e.w * 0.25, -e.h * 0.25, e.w * 0.5, e.h * 0.4, e.w *
@@ -416,6 +637,103 @@ function enemy_draw(enemy_object, ctx) {
 		ctx.restore();
 	}
 	ctx.restore();
+	for (let i = 0; i < MAX_FIRE_PARTICLES; i++) {
+		let p = _FIRE_POOL[i];
+		if (p.life <= 0) continue;
+		p.life -= 0.025;
+		p.x += p.vx;
+		p.y += p.vy;
+		if (p.life > 0) {
+			ctx.save();
+			ctx.globalCompositeOperation = "lighter";
+			let alpha = p.life;
+			let s = p.size * (0.4 + p.life * 0.6);
+			let grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, s);
+			if (p.life > 0.5) {
+				grad.addColorStop(0, `rgba(255, 180, 0, ${alpha})`);
+				grad.addColorStop(0.5, `rgba(255, 60, 0, ${alpha * 0.8})`);
+				grad.addColorStop(1, `rgba(150, 0, 0, 0)`);
+			}
+			else {
+				grad.addColorStop(0, `rgba(200, 40, 0, ${alpha})`);
+				grad.addColorStop(1, `rgba(50, 0, 0, 0)`);
+			}
+			ctx.fillStyle = grad;
+			ctx.beginPath();
+			ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.restore();
+		}
+	}
+	if (e.burning_time > 0) {
+		if (Math.random() < 0.8) {
+			let p = _FIRE_POOL[_fire_idx];
+			p.life = 1.0;
+			p.maxLife = 0.4 + Math.random() * 0.4;
+			p.x = e.body.position.x + (Math.random() - 0.5) * e.w * 0.8;
+			p.y = e.body.position.y + (Math.random() - 0.5) * e.h * 0.5;
+			p.vx = (Math.random() - 0.5) * 1.2;
+			p.vy = -Math.random() * 2 - 1;
+			p.size = e.w * (0.15 + Math.random() * 0.15);
+			_fire_idx = (_fire_idx + 1) % MAX_FIRE_PARTICLES;
+		}
+	}
+	if (e.electrified_time > 0) {
+		ctx.save();
+		ctx.strokeStyle = "#44ffff";
+		ctx.lineWidth = 2;
+		ctx.shadowBlur = 10;
+		ctx.shadowColor = "#00ffff";
+		ctx.globalCompositeOperation = "lighter";
+		for (let j = 0; j < 3; j++) {
+			if (Math.random() > 0.7) {
+				let x = e.body.position.x + (Math.random() - 0.5) * e.w * 1.2;
+				let y = e.body.position.y + (Math.random() - 0.5) * e.h * 1.2;
+				ctx.beginPath();
+				ctx.moveTo(x, y);
+				for (let k = 0; k < 4; k++) {
+					x += (Math.random() - 0.5) * e.w * 0.4;
+					y += (Math.random() - 0.5) * e.h * 0.4;
+					ctx.lineTo(x, y);
+				}
+				ctx.stroke();
+			}
+		}
+		ctx.restore();
+	}
+	if (e.frozen_time > 0) {
+		ctx.save();
+		ctx.fillStyle = "rgba(100, 220, 255, 0.35)";
+		ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+		ctx.lineWidth = 3;
+		ctx.lineJoin = "round";
+		let pulse = 1;
+		ctx.beginPath();
+		ctx.roundRect(e.body.position.x - e.w * 0.45 * pulse, e.body.position
+			.y - e.h * 0.65 * pulse, e.w * 0.9 * pulse, e.h * 1.15 * pulse,
+			e.w * 0.15);
+		ctx.fill();
+		ctx.stroke();
+		ctx.restore();
+	}
+	if (e.poisoned_time > 0) {
+		ctx.save();
+		ctx.globalAlpha = 0.6;
+		for (let i = 0; i < 6; i++) {
+			let time = now * 0.002 + i * 1.2;
+			let px = e.body.position.x + Math.sin(time) * e.w * 0.45;
+			let py = e.body.position.y + Math.cos(time * 0.8) * e.h * 0.3;
+			let bubbleSize = e.w * 0.1 * (1 + Math.sin(time * 3) * 0.5);
+			ctx.fillStyle = "#22ff00";
+			ctx.beginPath();
+			ctx.arc(px, py, bubbleSize, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.strokeStyle = "#116600";
+			ctx.lineWidth = 1;
+			ctx.stroke();
+		}
+		ctx.restore();
+	}
 	if (target_object != null) {
 		let bCY = e.body.position.y + bob;
 		let hOff = e.w * 0.35;
@@ -482,27 +800,105 @@ function enemy_draw(enemy_object, ctx) {
 			ctx.restore();
 		}
 	}
-	if (enemy_object.game.settings.indicators["show enemy hunger"]) {
-		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.hunger_bg;
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
-			e.w, e.h * 0.05);
-		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.hunger_fill;
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.7 * e.h,
-			e.w * e.hunger / e.max_hunger, e.h * 0.05);
-	}
-	if (enemy_object.game.settings.indicators["show enemy health"]) {
-		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.health_bg;
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
-			e.w, e.h * 0.05);
-		ctx.fillStyle = COLORS_DEFAULT.entities.indicators.health_fill;
-		ctx.fillRect(e.body.position.x - e.w / 2, e.body.position.y - 0.8 * e.h,
-			e.w * e.health / e.max_health, e.h * 0.05);
-	}
 	if (vis.custom_draw && vis.custom_draw_above) {
 		ctx.save();
+		ctx.translate(0, bob);
 		vis.custom_draw(e, ctx);
 		ctx.restore();
 	}
+	if (vis.draw_chain && e.chain_segments.length > 0) {
+		ctx.save();
+		const chainCol = vis.chain_color || "#444";
+		const strikeProgress = (e.whip_timer % 1500) / 1500;
+		for (let w = 0; w < e.chain_segments.length; w++) {
+			let whip = e.chain_segments[w];
+			for (let i = 0; i < whip.length; i++) {
+				let s = whip[i];
+				let next = whip[i + 1];
+				let p = i / whip.length;
+				ctx.save();
+				ctx.translate(s.x, s.y);
+				if (next) {
+					ctx.rotate(Math.atan2(next.y - s.y, next.x - s.x));
+				}
+				else if (whip[i - 1]) {
+					ctx.rotate(Math.atan2(s.y - whip[i - 1].y, s.x - whip[i - 1]
+						.x));
+				}
+				if (i === whip.length - 1) {
+					ctx.fillStyle = "#900";
+					ctx.strokeStyle = "black";
+					ctx.lineWidth = e.w * 0.02;
+					ctx.beginPath();
+					ctx.moveTo(0, 0);
+					ctx.lineTo(-e.w * 0.25, -e.w * 0.15);
+					ctx.quadraticCurveTo(e.w * 0.15, 0, -e.w * 0.25, e.w *
+						0.15);
+					ctx.closePath();
+					ctx.fill();
+					ctx.stroke();
+					ctx.beginPath();
+					ctx.arc(0, 0, e.w * 0.08, 0, Math.PI * 2);
+					ctx.fill();
+					ctx.stroke();
+				}
+				else {
+					let linkW = e.w * (0.18 * (1 - p * 0.5));
+					let linkH = e.w * (0.1 * (1 - p * 0.5));
+					ctx.fillStyle = chainCol;
+					ctx.strokeStyle = "black";
+					ctx.lineWidth = e.w * 0.015;
+					if (strikeProgress > 0.45 && strikeProgress < 0.55) {
+						ctx.shadowBlur = 10;
+						ctx.shadowColor = "red";
+					}
+					ctx.beginPath();
+					ctx.roundRect(-linkW * 0.5, -linkH * 0.5, linkW, linkH,
+						linkH * 0.4);
+					ctx.fill();
+					ctx.stroke();
+					ctx.fillStyle = "rgba(255,255,255,0.15)";
+					ctx.fillRect(-linkW * 0.3, -linkH * 0.3, linkW * 0.2,
+						linkH * 0.2);
+				}
+				ctx.restore();
+			}
+		}
+		ctx.restore();
+	}
+	const fontSize = e.w * 0.33;
+	ctx.save();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.lineWidth = fontSize * 0.15;
+	ctx.strokeStyle = "black";
+	ctx.lineJoin = "round";
+	ctx.lineCap = "round";
+	if (enemy_object.game.settings.indicators["show enemy health"]) {
+		const hPerc = Math.max(0, e.health / e.max_health);
+		const yHealth = e.body.position.y - e.h * 1.25;
+		const r = Math.floor(255 * (1 - hPerc));
+		const g = Math.floor(255 * hPerc);
+		const text =
+			`${Math.ceil(e.health).toLocaleString()} / ${Math.ceil(e.max_health).toLocaleString()}`;
+		ctx.strokeText(text, e.body.position.x, yHealth);
+		ctx.fillStyle = `rgb(${r}, ${g}, 0)`;
+		ctx.fillText(text, e.body.position.x, yHealth);
+	}
+	if (enemy_object.game.settings.indicators["show enemy hunger"]) {
+		const fPerc = Math.max(0, e.hunger / e.max_hunger);
+		const offset = enemy_object.game.settings.indicators[
+			"show enemy health"] ? 0.90 : 1.15;
+		const yHunger = e.body.position.y - e.h * offset;
+		const r = 255;
+		const g = Math.floor(165 * fPerc);
+		const text = `${Math.ceil(e.hunger)}/${Math.ceil(e.max_hunger)}`;
+		ctx.strokeText(text, e.body.position.x, yHunger);
+		ctx.fillStyle = `rgb(${r}, ${g}, 0)`;
+		ctx.fillText(text, e.body.position.x, yHunger);
+	}
+	ctx.restore();
 }
 
 function enemy_boss_exists(g) {

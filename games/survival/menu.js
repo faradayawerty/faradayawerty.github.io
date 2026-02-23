@@ -22,14 +22,16 @@ function menu_create() {
 		want_ui_scale: 100,
 		death_message: "DEATH",
 		want_indicators: {
-			"show player health": true,
-			"show player hunger": true,
-			"show player thirst": true,
+			"show player health": false,
+			"show player hunger": false,
+			"show player thirst": false,
 			"show enemy health": true,
 			"show enemy hunger": true,
 			"show car health": true,
 			"show car fuel": true,
-			"show rocket health": false
+			"show rocket health": false,
+			"show blood": false,
+			"show damage numbers": true
 		},
 		want_auto_pickup: {
 			"automatically pickup food and drinks": false,
@@ -96,6 +98,8 @@ function menu_create() {
 			"show car health",
 			"show car fuel",
 			"show rocket health",
+			"show blood",
+			"show damage numbers",
 			"back to settings"
 		],
 		auto_pickup_settings: [
@@ -117,24 +121,20 @@ function menu_create() {
 	if (saved) {
 		try {
 			let data = JSON.parse(saved);
-			Object.assign(m, data);
-			if (m.want_auto_pickup["automatically pickup bossifiers"] ===
-				undefined) {
-				m.want_auto_pickup["automatically pickup bossifiers"] = false;
-				console.log(
-					"Добавлено отсутствующее поле: automatically pickup bossifiers"
-				);
-			}
-			if (data.corrected_for_mobile !== undefined) {
-				m.corrected_for_mobile = data.corrected_for_mobile;
+			for (let key in data) {
+				if (key === "want_indicators" || key === "want_auto_pickup") {
+					for (let subKey in data[key]) {
+						m[key][subKey] = data[key][subKey];
+					}
+				}
+				else {
+					m[key] = data[key];
+				}
 			}
 			if (data.volume !== undefined)
 				GLOBAL_VOLUME = data.volume;
-			if (data.want_ui_scale !== undefined)
-				m.want_ui_scale = data.want_ui_scale;
-			else
+			if (m.want_ui_scale === undefined)
 				m.want_ui_scale = 100;
-			console.log("Загруженные настройки:", data);
 		}
 		catch (e) {
 			console.error("Ошибка загрузки настроек", e);
@@ -502,9 +502,13 @@ function menu_translate(lang, str) {
 		else if (str == "show enemy hunger")
 			str = "показывать значение сытости зомби";
 		else if (str == "show car health")
-			str = "показывать значение сломанности автомобилей"
+			str = "показывать значение сломанности автомобилей";
 		else if (str == "show car fuel")
 			str = "показывать значение топлива автомобиля";
+		else if (str == "show blood")
+			str = "показывать кровь";
+		else if (str == "show damage numbers")
+			str = "показывать числа урона";
 		else if (str == "show hints")
 			str = "подсказки";
 		else if (str == "ammo pickup in last slot")

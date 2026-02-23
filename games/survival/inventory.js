@@ -218,8 +218,44 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	let isRus = game.settings.language === "русский";
 	let name = isRus ? data.name_rus : data.name;
 	let desc = isRus ? data.desc_rus : data.desc;
+	let ammoInfo = null;
+	let weaponDef = WEAPON_DEFS[item_id];
+	if (weaponDef) {
+		if (item_id === ITEM_RAINBOW_PISTOLS) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Любые" :
+				"Consumes: Any";
+		}
+		if (item_id === ITEM_LASER_GUN) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Радужное ядро" :
+				"Consumes: Rainbow Core";
+		}
+		if (item_id === ITEM_GREEN_GUN) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Игрок" :
+				"Consumes: The Player";
+		}
+		if (item_id === ITEM_JUNK_CANNON) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Мусор" :
+				"Consumes: Junk";
+		}
+		if (item_id === ITEM_PRESENT_LAUNCHER) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Подарки" :
+				"Consumes: Presents";
+		}
+		if (item_id === ITEM_CANDY_GUN) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Конфеты" :
+				"Consumes: Candies";
+		}
+		else if (weaponDef.ammo) {
+			let ammoData = ITEMS_DATA[weaponDef.ammo];
+			if (ammoData) {
+				ammoInfo = isRus ?
+					`Требуется для стрельбы: ${ammoData.name_rus}` :
+					`Consumes: ${ammoData.name}`;
+			}
+		}
+	}
 	let W = 750;
-	let H = 400;
+	let H = ammoInfo ? 450 : 400;
 	let fontsize = 32;
 	let scale = get_scale();
 	let screenW = window.innerWidth / scale;
@@ -237,17 +273,22 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 	ctx.strokeRect(x, y, W, H);
 	ctx.globalAlpha = 1.0;
 	ctx.fillStyle = INV_COLS.popup_title;
-	ctx.font = `bold ${fontsize - 2}px Arial`;
-	ctx.fillText(name, x + 10, y + 30);
+	ctx.font = `bold ${fontsize + 4}px Arial`;
+	ctx.fillText(name, x + 20, y + 45);
+	if (ammoInfo) {
+		ctx.fillStyle = "gray";
+		ctx.font = `${fontsize - 4}px Arial`;
+		ctx.fillText(ammoInfo, x + 20, y + 85);
+	}
 	ctx.fillStyle = INV_COLS.popup_text;
 	ctx.font = `${fontsize}px Arial`;
 	let words = desc.split(' ');
 	let line = "";
-	let lineY = y + 75;
+	let lineY = ammoInfo ? y + 130 : y + 95;
 	for (let n = 0; n < words.length; n++) {
 		let testLine = line + words[n] + " ";
-		if (testLine.length > 30) {
-			ctx.fillText(line, x + 10, lineY);
+		if (testLine.length > 35) {
+			ctx.fillText(line, x + 20, lineY);
 			line = words[n] + " ";
 			lineY += fontsize * 1.2;
 		}
@@ -255,7 +296,7 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 			line = testLine;
 		}
 	}
-	ctx.fillText(line, x + 10, lineY);
+	ctx.fillText(line, x + 20, lineY);
 	ctx.restore();
 }
 
@@ -282,7 +323,7 @@ function inventory_get_item_weight(id) {
 	if (id === ITEM_SHIELD || id === ITEM_SHIELD_GREEN || id ===
 		ITEM_SHIELD_RAINBOW ||
 		id === ITEM_SHIELD_GRAY || id === ITEM_SHADOW_SHIELD || id ===
-		ITEM_ANUBIS_REGEN_SHIELD) return 3;
+		ITEM_ANUBIS_REGEN_SHIELD || id === ITEM_PUMPKIN_SHIELD) return 3;
 	if (id === ITEM_HEALTH || id === ITEM_HEALTH_GREEN) return 4;
 	if (ITEMS_FOODS.includes(id)) return 5;
 	if (ITEMS_DRINKS.includes(id)) return 6;
@@ -297,72 +338,123 @@ function inventory_sort(inventory_element) {
 	let group_counts = {
 		health: 0,
 		food: 0,
-		drink: 0
+		drink: 0,
+		shield: 0
 	};
 	let item_counts = {};
-	let original_order_counter = 0;
+	const shield_power = {};
+	shield_power[ITEM_SHIELD] = 1;
+	shield_power[ITEM_SHIELD_GREEN] = 2;
+	shield_power[ITEM_SHADOW_SHIELD] = 3;
+	shield_power[ITEM_PUMPKIN_SHIELD] = 4;
+	shield_power[ITEM_ANUBIS_REGEN_SHIELD] = 5;
+	shield_power[ITEM_SHIELD_RAINBOW] = 6;
+	shield_power[ITEM_SHIELD_GRAY] = 1;
+	let temp_shields = [];
+	let other_items = [];
 	for (let i = 0; i < inv.items.length; i++) {
 		for (let j = 0; j < inv.items[i].length; j++) {
 			let id = inv.items[i][j];
-			if (id !== 0) {
-				let is_weapon = ITEMS_GUNS.includes(id) || ITEMS_MELEE.includes(
-					id);
-				let is_bossifier = ITEMS_BOSSIFIERS.includes(id);
-				let is_health = (id === ITEM_HEALTH || id ===
-					ITEM_HEALTH_GREEN);
-				let is_food = ITEMS_FOODS.includes(id);
-				let is_drink = ITEMS_DRINKS.includes(id);
-				let is_shield = (id === ITEM_SHIELD || id ===
-					ITEM_SHIELD_GREEN || id === ITEM_SHIELD_RAINBOW ||
-					id === ITEM_SHIELD_GRAY || id === ITEM_SHADOW_SHIELD ||
-					id === ITEM_ANUBIS_REGEN_SHIELD);
-				let can_add = true;
-				if (is_health) {
-					if (group_counts.health >= 6) can_add = false;
-					else group_counts.health++;
-				}
-				else if (is_food) {
-					if (group_counts.food >= 6) can_add = false;
-					else group_counts.food++;
-				}
-				else if (is_drink) {
-					if (group_counts.drink >= 6) can_add = false;
-					else group_counts.drink++;
-				}
-				else {
-					if (!item_counts[id]) item_counts[id] = 0;
-					if (is_weapon || is_bossifier) {
-						if (item_counts[id] >= 1) can_add = false;
-						else item_counts[id]++;
-					}
-					else if (is_shield) {
-						if (item_counts[id] >= 3) can_add = false;
-						else item_counts[id]++;
-					}
-					else {
-						if (item_counts[id] >= 6) can_add = false;
-						else item_counts[id]++;
-					}
-				}
-				if (can_add) {
-					all_slots.push({
-						id: id,
-						original_index: original_order_counter++,
-						is_weapon: is_weapon
-					});
+			if (id === 0) continue;
+			let is_shield = (id === ITEM_SHIELD || id === ITEM_SHIELD_GREEN ||
+				id === ITEM_SHIELD_RAINBOW || id === ITEM_SHIELD_GRAY ||
+				id === ITEM_SHADOW_SHIELD || id ===
+				ITEM_ANUBIS_REGEN_SHIELD || id === ITEM_PUMPKIN_SHIELD
+			);
+			if (is_shield) {
+				temp_shields.push(id);
+			}
+			else {
+				other_items.push(id);
+			}
+		}
+	}
+	temp_shields.sort((a, b) => (shield_power[b] || 0) - (shield_power[a] ||
+		0));
+	let final_shields = [];
+	let shields_to_drop = [];
+	for (let id of temp_shields) {
+		if (final_shields.length < 6) {
+			let is_shadow = (id === ITEM_SHADOW_SHIELD);
+			let power = shield_power[id] || 0;
+			let stronger_count = final_shields.filter(s => shield_power[s] >
+				power).length;
+			if (is_shadow) {
+				let shadow_in_final = final_shields.filter(s => s ===
+					ITEM_SHADOW_SHIELD).length;
+				if (stronger_count > 0 && shadow_in_final >= 3) {
+					shields_to_drop.push(id);
 				}
 				else {
-					if (inv.attached_to_object && inv.attached_to_object.data
-						.body) {
-						item_create(inventory_element.game, id,
-							inv.attached_to_object.data.body.position.x +
-							100 * Math.cos(2 * Math.PI * Math.random()),
-							inv.attached_to_object.data.body.position.y +
-							100 * Math.sin(2 * Math.PI * Math.random()),
-							true, true);
-					}
+					final_shields.push(id);
 				}
 			}
+			else {
+				final_shields.push(id);
+			}
+		}
+		else {
+			shields_to_drop.push(id);
+		}
+	}
+	let original_order_counter = 0;
+	for (let id of final_shields) {
+		all_slots.push({
+			id: id,
+			original_index: original_order_counter++,
+			is_weapon: false
+		});
+	}
+	for (let id of other_items) {
+		let is_weapon = ITEMS_GUNS.includes(id) || ITEMS_MELEE.includes(id);
+		let is_bossifier = ITEMS_BOSSIFIERS.includes(id);
+		let is_health = (id === ITEM_HEALTH || id === ITEM_HEALTH_GREEN);
+		let is_food = ITEMS_FOODS.includes(id);
+		let is_drink = ITEMS_DRINKS.includes(id);
+		let can_add = true;
+		if (is_health) {
+			if (group_counts.health >= 6) can_add = false;
+			else group_counts.health++;
+		}
+		else if (is_food) {
+			if (group_counts.food >= 6) can_add = false;
+			else group_counts.food++;
+		}
+		else if (is_drink) {
+			if (group_counts.drink >= 6) can_add = false;
+			else group_counts.drink++;
+		}
+		else {
+			if (!item_counts[id]) item_counts[id] = 0;
+			if (is_weapon || is_bossifier) {
+				if (item_counts[id] >= 1) can_add = false;
+				else item_counts[id]++;
+			}
+			else {
+				if (item_counts[id] >= 6) can_add = false;
+				else item_counts[id]++;
+			}
+		}
+		if (can_add) {
+			all_slots.push({
+				id: id,
+				original_index: original_order_counter++,
+				is_weapon: is_weapon
+			});
+		}
+		else {
+			shields_to_drop.push(id);
+		}
+	}
+	for (let i = 0; i < inv.items.length; i++) {
+		for (let j = 0; j < inv.items[i].length; j++) {
+			inv.items[i][j] = 0;
+		}
+	}
+	if (inv.attached_to_object && inv.attached_to_object.data.body) {
+		for (let id of shields_to_drop) {
+			inv.items[0][0] = id;
+			inventory_drop_item(inventory_element, 0, 0, false);
 		}
 	}
 	let total_capacity = inv.items.length * inv.items[0].length;
@@ -377,9 +469,12 @@ function inventory_sort(inventory_element) {
 		let wa = inventory_get_item_weight(a.id);
 		let wb = inventory_get_item_weight(b.id);
 		if (wa !== wb) return wa - wb;
-		if (a.is_weapon && b.is_weapon) {
-			return a.original_index - b.original_index;
+		if (wa === 3 && wb === 3) {
+			return (shield_power[b.id] || 0) - (shield_power[a.id] ||
+				0);
 		}
+		if (a.is_weapon && b.is_weapon) return a.original_index - b
+			.original_index;
 		if (wa === 2 && wb === 2) {
 			let idxA = ITEMS_BOSSIFIERS.indexOf(a.id);
 			let idxB = ITEMS_BOSSIFIERS.indexOf(b.id);

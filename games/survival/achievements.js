@@ -1,7 +1,24 @@
 let DEBUG_ACHIEVEMENTS = false;
 
 function achievements_create(g) {
-	const achievementsList = Object.keys(ACHIEVEMENT_REGISTRY).map(key => {
+	const getDepth = (key) => {
+		let depth = 0;
+		let current = ACHIEVEMENT_REGISTRY[key];
+		while (current && current.req) {
+			depth++;
+			current = ACHIEVEMENT_REGISTRY[current.req];
+		}
+		return depth;
+	};
+	const sortedKeys = Object.keys(ACHIEVEMENT_REGISTRY).sort((a, b) => {
+		if (!ACHIEVEMENT_REGISTRY[a]) return 1;
+		if (!ACHIEVEMENT_REGISTRY[b]) return -1;
+		const depthA = getDepth(a);
+		const depthB = getDepth(b);
+		if (depthA !== depthB) return depthA - depthB;
+		return a.localeCompare(b);
+	});
+	const achievementsList = sortedKeys.map(key => {
 		const entry = ACHIEVEMENT_REGISTRY[key];
 		let description = entry.desc;
 		let descriptionRus = entry.desc;
@@ -32,7 +49,7 @@ function achievements_create(g) {
 		width: 1000,
 		height: 1000,
 		offset_x: 40,
-		offset_y: 40,
+		offset_y: 120,
 		x: 50,
 		y: 50,
 		xx: 0,
@@ -42,10 +59,52 @@ function achievements_create(g) {
 		clicked: false,
 		icon_size: 60,
 		animstate: 0,
-		cross_width: 40,
+		cross_size: 40,
+		view_mode: "list",
 		_cross_held: false,
 		_cross_pc_held: false,
-		achievements: achievementsList
+		achievements: achievementsList,
+		sorted_keys: sortedKeys,
+		zoom: 1.4,
+		page: 0,
+		visual_page: 0,
+		items_per_page: 24,
+		close_button: {
+			x: 0,
+			y: 0,
+			size: 40,
+			is_hovered: false
+		},
+		zoom_in_btn: {
+			x: 0,
+			y: 0,
+			size: 40,
+			is_hovered: false
+		},
+		zoom_out_btn: {
+			x: 0,
+			y: 0,
+			size: 40,
+			is_hovered: false
+		},
+		view_mode_btn: {
+			x: 0,
+			y: 0,
+			size: 40,
+			is_hovered: false
+		},
+		prev_btn: {
+			x: 0,
+			y: 0,
+			size: 40,
+			is_hovered: false
+		},
+		next_btn: {
+			x: 0,
+			y: 0,
+			size: 40,
+			is_hovered: false
+		}
 	};
 	return game_gui_element_create(g, "achievements", ach, achievements_update,
 		achievements_draw, achievements_destroy);
@@ -61,10 +120,10 @@ function achievements_update(ae, dt) {
 	ae.data.animstate += 0.0075 * dt;
 	let input = ae.game.input;
 	let scale = get_scale();
-	if (ae.data._cross_held === undefined) ae.data._cross_held = false;
-	if (ae.data._cross_pc_held === undefined) ae.data._cross_pc_held = false;
+	let data = ae.data;
 	let mx = input.mouse.x / scale;
 	let my = input.mouse.y / scale;
+	let is_clicked = false;
 	let freeTouch = null;
 	if (ae.game.mobile) {
 		freeTouch = input.touch.find(t => t.id !== input.joystick.left.id &&
@@ -72,105 +131,322 @@ function achievements_update(ae, dt) {
 		if (freeTouch) {
 			mx = freeTouch.x / scale;
 			my = freeTouch.y / scale;
+			if (data.active_touch_id !== freeTouch.id) {
+				data.active_touch_id = freeTouch.id;
+				is_clicked = true;
+			}
+		}
+		else {
+			data.active_touch_id = null;
 		}
 	}
-	let crossX = ae.data.offset_x + ae.data.width - ae.data.cross_width;
-	let crossY = ae.data.offset_y;
-	let is_over_cross = doRectsCollide(mx, my, 0, 0, crossX, crossY, ae.data
-		.cross_width, ae.data.cross_width);
+	else {
+		if (input.mouse.leftButtonPressed && !data.was_left_down) is_clicked =
+			true;
+		data.was_left_down = input.mouse.leftButtonPressed;
+	}
+	let lerpSpeed = 1 - Math.pow(0.001, dt / 400);
+	data.visual_page += (data.page - data.visual_page) * lerpSpeed;
+	if (Math.abs(data.page - data.visual_page) < 0.001) data.visual_page = data
+		.page;
+	let btn = data.close_button;
+	btn.size = data.cross_size;
+	btn.x = data.offset_x + data.width + 15;
+	btn.y = data.offset_y;
+	btn.is_hovered = doRectsCollide(mx, my, 0, 0, btn.x, btn.y, btn.size, btn
+		.size);
 	if (ae.game.mobile) {
-		if (is_over_cross && freeTouch) {
-			ae.data._cross_held = true;
+		if (freeTouch && btn.is_hovered) {
+			data._cross_held = true;
 		}
-		else if (freeTouch && !is_over_cross) {
-			ae.data._cross_held = false;
+		else if (freeTouch && !btn.is_hovered) {
+			data._cross_held = false;
 		}
-		else if (!freeTouch && ae.data._cross_held) {
-			ae.data._cross_held = false;
+		else if (!freeTouch && data._cross_held) {
+			data._cross_held = false;
 			ae.shown = false;
 			return;
 		}
 	}
 	else {
-		if (input.mouse.leftButtonPressed && is_over_cross) {
-			ae.data._cross_pc_held = true;
+		if (input.mouse.leftButtonPressed && btn.is_hovered) {
+			data._cross_pc_held = true;
 		}
-		if (!input.mouse.leftButtonPressed && ae.data._cross_pc_held) {
-			ae.data._cross_pc_held = false;
-			if (is_over_cross) {
+		if (!input.mouse.leftButtonPressed && data._cross_pc_held) {
+			data._cross_pc_held = false;
+			if (btn.is_hovered) {
 				ae.shown = false;
 				return;
 			}
 		}
 	}
-	ae.data.was_left_down = input.mouse.leftButtonPressed;
+	let zi = data.zoom_in_btn;
+	zi.size = data.cross_size;
+	zi.x = btn.x;
+	zi.y = btn.y + btn.size + 10;
+	zi.is_hovered = doRectsCollide(mx, my, 0, 0, zi.x, zi.y, zi.size, zi.size);
+	if (zi.is_hovered && is_clicked) {
+		data.zoom = Math.min(1.8, data.zoom + 0.1);
+		data.page = 0;
+		data.visual_page = 0;
+	}
+	let zo = data.zoom_out_btn;
+	zo.size = data.cross_size;
+	zo.x = btn.x;
+	zo.y = zi.y + zi.size + 10;
+	zo.is_hovered = doRectsCollide(mx, my, 0, 0, zo.x, zo.y, zo.size, zo.size);
+	if (zo.is_hovered && is_clicked) {
+		data.zoom = Math.max(1.0, data.zoom - 0.1);
+		data.page = 0;
+		data.visual_page = 0;
+	}
+	let vmb = data.view_mode_btn;
+	vmb.size = data.cross_size;
+	vmb.x = btn.x;
+	vmb.y = zo.y + zo.size + 10;
+	vmb.is_hovered = doRectsCollide(mx, my, 0, 0, vmb.x, vmb.y, vmb.size, vmb
+		.size);
+	if (vmb.is_hovered && is_clicked) {
+		data.view_mode = (data.view_mode === "grid") ? "list" : "grid";
+		data.page = 0;
+		data.visual_page = 0;
+	}
+	const padding = 60;
+	const spacing = 2.0;
+	const currentW = data.icon_size * data.zoom;
+	const currentH = data.icon_size * data.zoom;
+	const availableW = data.width - padding * 2;
+	const availableH = data.height - padding * 2;
+	if (data.view_mode === "grid") {
+		const cols = Math.max(1, Math.floor((availableW + currentW * (spacing -
+			1)) / (currentW * spacing)));
+		const rows = Math.max(1, Math.floor((availableH + currentH * (spacing -
+			1)) / (currentH * spacing)));
+		data.items_per_page = cols * rows;
+	}
+	else {
+		let estimatedRowH = Math.max(currentH + 40, 110 * data.zoom);
+		data.items_per_page = Math.max(1, Math.floor(availableH /
+			estimatedRowH));
+	}
+	let pb = data.prev_btn;
+	pb.size = 40;
+	pb.x = data.offset_x;
+	pb.y = data.offset_y + data.height + 10;
+	pb.is_hovered = doRectsCollide(mx, my, 0, 0, pb.x, pb.y, pb.size, pb.size);
+	if (pb.is_hovered && is_clicked && data.page > 0) {
+		data.page--;
+	}
+	let nb = data.next_btn;
+	nb.size = 40;
+	nb.x = data.offset_x + data.width - nb.size;
+	nb.y = data.offset_y + data.height + 10;
+	nb.is_hovered = doRectsCollide(mx, my, 0, 0, nb.x, nb.y, nb.size, nb.size);
+	if (nb.is_hovered && is_clicked) {
+		let maxPage = Math.floor((data.sorted_keys.length - 1) / data
+			.items_per_page);
+		if (data.page < maxPage) data.page++;
+	}
 }
 
 function achievements_draw(ae, ctx) {
-	let drawTime = performance.now();
-	let as = ae.data.achievements;
+	let data = ae.data;
+	let inv_cols = COLORS_DEFAULT.ui.inventory;
 	let scale = get_scale();
+	ctx.save();
 	ctx.globalAlpha = 0.75;
 	ctx.fillStyle = COLORS_DEFAULT.ui.achievements.bg;
-	ctx.fillRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data
-		.height);
+	ctx.fillRect(data.offset_x, data.offset_y, data.width, data.height);
 	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.border;
 	ctx.lineWidth = 2;
-	ctx.strokeRect(ae.data.offset_x, ae.data.offset_y, ae.data.width, ae.data
-		.height);
-	ctx.globalAlpha = 1.0;
-	let cross_width = ae.data.cross_width;
-	let cx = ae.data.offset_x + ae.data.width - cross_width;
-	let cy = ae.data.offset_y;
+	ctx.strokeRect(data.offset_x, data.offset_y, data.width, data.height);
+	ctx.restore();
+	const drawStyledButton = (b, type) => {
+		let cs = b.size;
+		ctx.save();
+		ctx.fillStyle = b.is_hovered ? inv_cols.close_hover : inv_cols
+			.close_bg;
+		ctx.fillRect(b.x, b.y, cs, cs);
+		ctx.strokeStyle = inv_cols.close_icon;
+		ctx.lineWidth = 2;
+		ctx.strokeRect(b.x, b.y, cs, cs);
+		ctx.beginPath();
+		ctx.strokeStyle = b.is_hovered ? inv_cols.close_icon_hover :
+			inv_cols.close_icon;
+		if (type === "cross") {
+			ctx.moveTo(b.x + cs * 0.25, b.y + cs * 0.25);
+			ctx.lineTo(b.x + cs * 0.75, b.y + cs * 0.75);
+			ctx.moveTo(b.x + cs * 0.75, b.y + cs * 0.25);
+			ctx.lineTo(b.x + cs * 0.25, b.y + cs * 0.75);
+		}
+		else if (type === "plus") {
+			ctx.moveTo(b.x + cs * 0.5, b.y + cs * 0.25);
+			ctx.lineTo(b.x + cs * 0.5, b.y + cs * 0.75);
+			ctx.moveTo(b.x + cs * 0.25, b.y + cs * 0.5);
+			ctx.lineTo(b.x + cs * 0.75, b.y + cs * 0.5);
+		}
+		else if (type === "minus") {
+			ctx.moveTo(b.x + cs * 0.25, b.y + cs * 0.5);
+			ctx.lineTo(b.x + cs * 0.75, b.y + cs * 0.5);
+		}
+		else if (type === "view_toggle") {
+			if (data.view_mode === "grid") {
+				for (let m = 0; m < 3; m++) {
+					ctx.moveTo(b.x + cs * 0.25, b.y + cs * (0.3 + m * 0.2));
+					ctx.lineTo(b.x + cs * 0.75, b.y + cs * (0.3 + m * 0.2));
+				}
+			}
+			else {
+				let s = cs * 0.2;
+				ctx.fillStyle = b.is_hovered ? inv_cols.close_icon_hover :
+					inv_cols.close_icon;
+				ctx.fillRect(b.x + cs * 0.25, b.y + cs * 0.25, s, s);
+				ctx.fillRect(b.x + cs * 0.55, b.y + cs * 0.25, s, s);
+				ctx.fillRect(b.x + cs * 0.25, b.y + cs * 0.55, s, s);
+				ctx.fillRect(b.x + cs * 0.55, b.y + cs * 0.55, s, s);
+			}
+		}
+		else if (type === "prev") {
+			ctx.moveTo(b.x + cs * 0.65, b.y + cs * 0.25);
+			ctx.lineTo(b.x + cs * 0.35, b.y + cs * 0.5);
+			ctx.lineTo(b.x + cs * 0.65, b.y + cs * 0.75);
+		}
+		else if (type === "next") {
+			ctx.moveTo(b.x + cs * 0.35, b.y + cs * 0.25);
+			ctx.lineTo(b.x + cs * 0.65, b.y + cs * 0.5);
+			ctx.lineTo(b.x + cs * 0.35, b.y + cs * 0.75);
+		}
+		ctx.stroke();
+		ctx.restore();
+	};
+	drawStyledButton(data.close_button, "cross");
+	drawStyledButton(data.zoom_in_btn, "plus");
+	drawStyledButton(data.zoom_out_btn, "minus");
+	drawStyledButton(data.view_mode_btn, "view_toggle");
+	drawStyledButton(data.prev_btn, "prev");
+	drawStyledButton(data.next_btn, "next");
+	ctx.save();
+	ctx.beginPath();
+	ctx.rect(data.offset_x, data.offset_y, data.width, data.height);
+	ctx.clip();
+	const padding = 60;
+	const w = data.icon_size * data.zoom;
+	const h = data.icon_size * data.zoom;
+	const spacing = 2.0;
+	const availableW = data.width - padding * 2;
+	const availableH = data.height - padding * 2;
+	const cols = Math.max(1, Math.floor((availableW + w * (spacing - 1)) / (w *
+		spacing)));
 	let mx = ae.game.input.mouse.x / scale;
 	let my = ae.game.input.mouse.y / scale;
-	let is_over = doRectsCollide(mx, my, 0, 0, cx, cy, cross_width,
-		cross_width);
-	ctx.fillStyle = is_over ? COLORS_DEFAULT.ui.achievements.cross_hover :
-		COLORS_DEFAULT.ui.achievements.cross_bg;
-	ctx.fillRect(cx, cy, cross_width, cross_width);
-	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.border;
-	ctx.strokeRect(cx, cy, cross_width, cross_width);
-	let p = 0.2 * cross_width;
-	ctx.beginPath();
-	ctx.strokeStyle = is_over ? COLORS_DEFAULT.ui.achievements
-		.cross_icon_hover : COLORS_DEFAULT.ui.achievements.border;
-	ctx.lineWidth = 3;
-	ctx.moveTo(cx + p, cy + p);
-	ctx.lineTo(cx + cross_width - p, cy + cross_width - p);
-	ctx.moveTo(cx + p, cy + cross_width - p);
-	ctx.lineTo(cx + cross_width - p, cy + p);
-	ctx.stroke();
-	let startX = ae.data.offset_x + 0.5 * ae.data.x;
-	let startY = ae.data.offset_y + 0.5 * ae.data.y;
-	let w = ae.data.icon_size;
-	let h = ae.data.icon_size;
-	let spacing = 2.0;
 	let hoveredAchKey = null;
-	if (DEBUG_ACHIEVEMENTS)
-		ae.game.debug_console.unshift(
-			'1st step in achievements draw completed in ' + (performance.now() -
-				drawTime));
-	drawTime = performance.now();
-	for (let key in ACHIEVEMENT_REGISTRY) {
-		let config = ACHIEVEMENT_REGISTRY[key];
-		let ix = startX + config.grid.x * (w * spacing);
-		let iy = startY + config.grid.y * (h * spacing);
-		achievement_icon_draw(ctx, as, key, ix, iy, w, h,
-			false, ae.data.offset_x, ae.data.offset_y,
-			ae.data.offset_x + ae.data.width,
-			ae.data.offset_y + ae.data.height,
-			ae.data.animstate);
-		if (mx > ix && mx < ix + w && my > iy && my < iy + h) {
-			hoveredAchKey = key;
+	let startPage = Math.floor(data.visual_page);
+	let endPage = Math.ceil(data.visual_page);
+	let maxP = Math.floor((data.sorted_keys.length - 1) / data.items_per_page);
+	for (let pIndex = startPage; pIndex <= endPage; pIndex++) {
+		if (pIndex < 0 || pIndex > maxP) continue;
+		let startIdx = pIndex * data.items_per_page;
+		let endIdx = Math.min(startIdx + data.items_per_page, data.sorted_keys
+			.length);
+		let xShift = (pIndex - data.visual_page) * data.width;
+		let startX = data.offset_x + padding + xShift;
+		let startY = data.offset_y + padding;
+		if (data.view_mode === "grid") {
+			const currentCols = Math.min(cols, endIdx - startIdx);
+			const totalGridW = (currentCols * w * spacing) - (w * (spacing -
+				1));
+			const gridCenteringX = (availableW - totalGridW) / 2;
+			for (let i = startIdx; i < endIdx; i++) {
+				let key = data.sorted_keys[i];
+				let relIdx = i - startIdx;
+				let col = relIdx % cols;
+				let row = Math.floor(relIdx / cols);
+				let ix = startX + gridCenteringX + col * (w * spacing);
+				let iy = startY + row * (h * spacing);
+				achievement_icon_draw(ctx, data.achievements, key, ix, iy, w, h,
+					false, data.offset_x, data.offset_y,
+					data.offset_x + data.width,
+					data.offset_y + data.height,
+					data.animstate);
+				if (pIndex === data.page && mx > ix && mx < ix + w && my > iy &&
+					my < iy + h) {
+					hoveredAchKey = key;
+				}
+			}
+		}
+		else {
+			let fontSize = Math.max(14, Math.floor(h * 0.45));
+			let descFontSize = fontSize * 0.85;
+			let textMaxWidth = availableW - (h + 30);
+			let currentY = startY;
+			for (let i = startIdx; i < endIdx; i++) {
+				let key = data.sorted_keys[i];
+				const config = ACHIEVEMENT_REGISTRY[key];
+				if (!config) continue;
+				let achData = achievement_get(data.achievements, key);
+				let isHidden = false;
+				if (config.req) {
+					const reqAch = achievement_get(data.achievements, config
+						.req);
+					if (!reqAch || !reqAch.done) isHidden = true;
+				}
+				let name = isHidden ? "Скрытая задача" : (ae.game.settings
+					.language == "русский" ? achData.name_rus : key);
+				let desc = "";
+				if (!isHidden) {
+					let dRaw = ae.game.settings.language == "русский" ? achData
+						.desc_rus : achData.desc;
+					desc = (typeof dRaw === 'object') ? (ae.game.mobile ? dRaw
+						.mobile : dRaw.pc) : dRaw;
+				}
+				else {
+					desc =
+						"Новые задачи открываются по мере выполнения других задач. Используйте задачи как гайд в мир игры. Ваша цель - выполнить все задания.";
+				}
+				ctx.font = descFontSize + "px sans-serif";
+				let words = desc.split(' ');
+				let lines = [];
+				let line = "";
+				for (let n = 0; n < words.length; n++) {
+					let test = line + words[n] + " ";
+					if (ctx.measureText(test).width > textMaxWidth) {
+						lines.push(line);
+						line = words[n] + " ";
+					}
+					else line = test;
+				}
+				lines.push(line);
+				let rowH = Math.max(h + 20, (fontSize * 1.5) + (lines.length *
+					descFontSize * 1.2) + 40);
+				if (currentY + rowH - startY > availableH + 10) break;
+				ctx.save();
+				ctx.globalAlpha = 0.3;
+				ctx.fillStyle = COLORS_DEFAULT.ui.achievements.bg;
+				ctx.fillRect(startX - 10, currentY, availableW + 20, rowH - 10);
+				ctx.restore();
+				achievement_icon_draw(ctx, data.achievements, key, startX,
+					currentY + (rowH - 10 - h) / 2, h, h, false, data
+					.offset_x, data.offset_y, data.offset_x + data.width,
+					data.offset_y + data.height, data.animstate);
+				drawText(ctx, startX + h + 25, currentY + fontSize + 15, name,
+					fontSize * 0.8, COLORS_DEFAULT.ui.achievements
+					.text_accent, true);
+				for (let l = 0; l < lines.length; l++) {
+					drawText(ctx, startX + h + 25, currentY + (fontSize * 2) +
+						25 + l * descFontSize * 1.2, lines[l], descFontSize,
+						COLORS_DEFAULT.ui.achievements.text_main);
+				}
+				if (pIndex === data.page && mx > startX && mx < startX +
+					availableW && my > currentY && my < currentY + rowH) {
+					hoveredAchKey = key;
+				}
+				currentY += rowH;
+			}
 		}
 	}
-	if (DEBUG_ACHIEVEMENTS)
-		ae.game.debug_console.unshift(
-			'2st step in achievements draw completed in ' + (performance.now() -
-				drawTime));
-	if (hoveredAchKey) {
-		achievement_draw_popup(ctx, ae, hoveredAchKey, mx, my, w, h);
+	ctx.restore();
+	if (hoveredAchKey && data.view_mode === 'grid') {
+		achievement_draw_popup(ctx, ae, hoveredAchKey, mx, my);
 	}
 }
 
@@ -182,12 +458,8 @@ function achievement_get(as, name) {
 }
 
 function achievement_do(as, name, ash = null, silent = false) {
-	if (DEBUG_ACHIEVEMENTS && false)
-		game1.debug_console.unshift("doing achievement " + name);
 	let achData = achievement_get(as, name);
-	if (!achData) {
-		return;
-	}
+	if (!achData) return;
 	if (achData.done) return;
 	const config = ACHIEVEMENT_REGISTRY[name];
 	if (!config) {
@@ -197,9 +469,7 @@ function achievement_do(as, name, ash = null, silent = false) {
 	if (config.req) {
 		achievement_do(as, config.req, ash, silent);
 		let reqAch = achievement_get(as, config.req);
-		if (!reqAch || !reqAch.done) {
-			return;
-		}
+		if (!reqAch || !reqAch.done) return;
 	}
 	achData.done = true;
 	if (ash && !silent) {
@@ -308,84 +578,79 @@ function achievements_shower_destroy(ashe) {
 	achievements_destroy(ashe.data.attached_to);
 }
 
-function achievement_draw_popup(ctx, ae, ach, x, y, w, h, bbw = 1000, bbh =
-	1100) {
+function achievement_draw_popup(ctx, ae, ach, mx, my) {
 	let as = ae.data.achievements;
-	let W = bbw * 0.85;
-	let H = bbh * 0.5;
 	let scale = get_scale();
+	let h = ae.data.icon_size * ae.data.zoom;
+	let fontSize = Math.max(14, Math.floor(h * 0.45));
+	let descFontSize = fontSize * 0.85;
+	ctx.save();
+	ctx.setTransform(scale, 0, 0, scale, 0, 0);
+	const W = ae.data.width - 120;
 	let screenW = window.innerWidth / scale;
 	let screenH = window.innerHeight / scale;
-	if (ae.game.mobile) {
-		x += 80;
-		y += 80;
-	}
-	if (x + W > screenW) x = x - W;
-	if (y + H > screenH) y = y - H;
-	if (x < 5) x = 5;
-	if (y < 5) y = 5;
-	if (x + W > screenW) W = screenW - x - 10;
-	if (y + H > screenH) H = screenH - y - 10;
 	const config = ACHIEVEMENT_REGISTRY[ach];
 	let isHidden = false;
 	if (config.req) {
 		const reqAch = achievement_get(as, config.req);
 		if (!reqAch || !reqAch.done) isHidden = true;
 	}
-	let lines = [];
 	let achData = achievement_get(as, ach);
-	let name = "";
-	let desc = "";
+	let name = "",
+		desc = "";
 	if (isHidden) {
-		name = (ae.game.settings.language == "русский") ? "Скрытая задача" :
-			"Hidden task";
-		desc = (ae.game.settings.language == "русский") ?
-			"Новые задачи открываются по мере выполнения других задач. Используйте задачи как гайд в мир игры. Ваша цель - выполнить все задания." :
-			"New tasks are unlocked as you earn others. Use tasks as a guide to the game world. Your goal is to do them all.";
+		name = "Скрытая задача";
+		desc =
+			"Новые задачи открываются по мере выполнения других задач. Используйте задачи как гайд в мир игры. Ваша цель - выполнить все задания.";
 	}
 	else {
-		name = (ae.game.settings.language == "русский") ? achData.name_rus :
-			achData.name;
+		name = (ae.game.settings.language == "русский") ? (achData.name_rus ||
+			ach) : ach;
 		let descRaw = (ae.game.settings.language == "русский") ? achData
 			.desc_rus : achData.desc;
-		desc = (typeof descRaw === 'object' && descRaw !== null) ? (ae.game
-			.mobile ? descRaw.mobile : descRaw.pc) : descRaw;
+		desc = (typeof descRaw === 'object' && descRaw !== null) ? descRaw.pc :
+			descRaw;
 	}
-	lines.push(name[0].toUpperCase() + name.slice(1) + (isHidden ? "" : "!"));
-	lines.push("");
-	let fontsize = Math.floor(W / 24);
-	let charlim = Math.floor(1.25 * W / fontsize);
-	let words = desc.split(' ');
-	let line = "";
-	for (let i = 0; i < words.length; i++) {
-		if ((line + words[i]).length > charlim && line.length > 0) {
-			lines.push(line);
-			line = "";
-		}
-		line += words[i] + " ";
-		if (i === 0)
-			line = line[0].toUpperCase() + line.slice(1);
-	}
-	lines.push(line);
-	ctx.save();
-	ctx.globalAlpha = 0.85;
-	ctx.fillStyle = COLORS_DEFAULT.ui.achievements.popup_bg;
-	ctx.fillRect(x, y, W, H);
-	ctx.globalAlpha = 1.0;
-	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.popup_border;
-	ctx.lineWidth = 2;
-	ctx.strokeRect(x, y, W, H);
-	achievement_icon_draw(ctx, as, ach, x + 0.5 * w, y + 0.5 * h, 2 * w, 2 * h,
-		false, 0, 0, screenW, screenH, ae.data.animstate);
-	for (let i = 0; i < lines.length; i++) {
-		if (i === 0) {
-			drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
-				fontsize, COLORS_DEFAULT.ui.achievements.text_accent, true);
+	let textMaxWidth = W - (h + 35);
+	ctx.font = descFontSize + "px sans-serif";
+	let words = (desc || "").split(' ');
+	let lines = [];
+	let currentLine = "";
+	for (let n = 0; n < words.length; n++) {
+		let testLine = currentLine + words[n] + " ";
+		if (ctx.measureText(testLine).width > textMaxWidth && n > 0) {
+			lines.push(currentLine);
+			currentLine = words[n] + " ";
 		}
 		else {
-			drawText(ctx, x + 3 * h, y + h + i * fontsize * 1.25, lines[i],
-				fontsize, COLORS_DEFAULT.ui.achievements.text_main, false);
+			currentLine = testLine;
 		}
+	}
+	lines.push(currentLine);
+	let H = Math.max(h + 20, (fontSize * 1.5) + (lines.length * descFontSize *
+		1.2) + 40);
+	let x = mx + 20;
+	let y = my + 20;
+	if (x + W > screenW) x = mx - W - 20;
+	if (y + H > screenH) y = my - H - 20;
+	if (x < 10) x = 10;
+	if (y < 10) y = 10;
+	ctx.globalAlpha = 0.95;
+	ctx.fillStyle = COLORS_DEFAULT.ui.achievements.bg;
+	ctx.fillRect(x, y, W, H);
+	ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.border;
+	ctx.lineWidth = 1;
+	ctx.strokeRect(x, y, W, H);
+	achievement_icon_draw(ctx, as, ach, x + 10, y + (H - h) / 2, h, h, false, 0,
+		0, screenW, screenH, ae.data.animstate);
+	let textStartX = x + h + 25;
+	const formattedName = name;
+	drawText(ctx, textStartX, y + fontSize + 15, formattedName, fontSize * 0.8,
+		COLORS_DEFAULT.ui.achievements.text_accent, true);
+	for (let l = 0; l < lines.length; l++) {
+		let lineY = y + (fontSize * 2) + 25 + l * descFontSize * 1.2;
+		drawText(ctx, textStartX, lineY, lines[l], descFontSize, COLORS_DEFAULT
+			.ui.achievements.text_main);
 	}
 	ctx.restore();
 }
@@ -485,9 +750,7 @@ function achievement_icon_draw_question_mark(ctx, x, y, w, h) {
 
 function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
 	50, bby = 50, bbw = 1000, bbh = 1000, animstate = null, back = true) {
-	let drawTime = performance.now();
-	if (x < bbx || x > bbw - 0.2 * w || y < bby || y > bbh - 0.2 * h || !name)
-		return;
+	if (x + w < bbx || x > bbw || y + h < bby || y > bbh || !name) return;
 	const config = ACHIEVEMENT_REGISTRY[name];
 	if (!config) return;
 	const ach = achievement_get(as, name);
@@ -498,22 +761,18 @@ function achievement_icon_draw(ctx, as, name, x, y, w, h, done = false, bbx =
 			return;
 		}
 	}
-	if (!done && ach) {
-		done = ach.done;
-	}
+	if (!done && ach) done = ach.done;
 	const p = get_achievement_palette(done, animstate);
 	ctx.lineWidth = 0.025 * w;
 	if (back) {
+		ctx.save();
 		ctx.globalAlpha *= 0.25;
 		ctx.fillStyle = done ? COLORS_DEFAULT.enemies.regular.body :
 			COLORS_DEFAULT.player.red;
 		ctx.fillRect(x, y, w, h);
 		ctx.strokeStyle = COLORS_DEFAULT.ui.achievements.border;
 		ctx.strokeRect(x, y, w, h);
-		ctx.globalAlpha *= 4;
+		ctx.restore();
 	}
 	config.draw(ctx, x, y, w, h, p);
-	if (DEBUG_ACHIEVEMENTS)
-		game1.debug_console.unshift('drawn icon ' + name + ' in ' + (performance
-			.now() - drawTime));
 }

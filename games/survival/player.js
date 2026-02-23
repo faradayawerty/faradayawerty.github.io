@@ -7,13 +7,13 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		old_health: 100,
 		health: 100,
 		max_health: 100,
-		thirst: 210,
-		max_thirst: 210,
-		hunger: 210,
-		max_hunger: 210,
+		thirst: 100,
+		max_thirst: 100,
+		hunger: 100,
+		max_hunger: 100,
 		saved_health: 100,
-		saved_thirst: 210,
-		saved_hunger: 210,
+		saved_thirst: 100,
+		saved_hunger: 100,
 		speed: 10,
 		max_speed: 10,
 		shot_cooldown: 0,
@@ -33,15 +33,17 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		}),
 		immunity: 6000,
 		shield_blue_health: 0,
-		shield_blue_health_max: 250,
+		shield_blue_health_max: 100,
 		shield_green_health: 0,
 		shield_green_health_max: 500,
-		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 1000,
 		shield_shadow_health: 0,
-		shield_shadow_health_max: 500,
+		shield_shadow_health_max: 1000,
+		shield_pumpkin_health: 0,
+		shield_pumpkin_health_max: 2000,
 		shield_anubis_health: 0,
-		shield_anubis_health_max: 1000,
+		shield_anubis_health_max: 3000,
+		shield_rainbow_health: 0,
+		shield_rainbow_health_max: 5000,
 		shadow_jump_lock: false,
 		shadow_jump_delay: 0,
 		shadow_jump_time: 0,
@@ -56,6 +58,7 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		shooting_laser: false,
 		laser_sound_has_played: false,
 		last_melee_angle_sound: 0,
+		regen_delay: 0
 	};
 	p.achievements_element = g.gui_elements[achievements_create(g)];
 	p.achievements_shower_element = g.gui_elements[achievements_shower_create(g,
@@ -127,7 +130,6 @@ function player_destroy(player_object) {
 function player_die(player_object) {
 	let g = player_object.game;
 	let p = player_object.data;
-	console.log(p.hunger);
 	if (p.hunger <= 0 && p.thirst <= 0) {
 		DEATH_MESSAGE = "☠️ the player couldn't find anything to eat or drink";
 		if (g.settings.language === "русский")
@@ -249,15 +251,17 @@ function player_update(player_object, dt) {
 		_update_const.tempPos.y = -limit;
 		Matter.Body.setPosition(p.body, _update_const.tempPos, false);
 	}
+	if (p.regen_delay > 0) p.regen_delay -= dt;
 	if (p.shot_cooldown > 0) p.shot_cooldown -= dt;
 	if (p.shotgun_cooldown > 0) p.shotgun_cooldown -= dt;
 	if (p.minigun_cooldown > 0) p.minigun_cooldown -= dt;
 	p.item_animstate += 0.01 * dt;
-	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.003 * dt;
-	if (p.shield_green_health > 0) p.shield_green_health -= 0.003 * dt;
-	if (p.shield_shadow_health > 0) p.shield_shadow_health -= 0.003 * dt;
-	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.003 * dt;
-	if (p.shield_anubis_health > 0) p.shield_anubis_health -= 0.003 * dt;
+	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.00075 * dt;
+	if (p.shield_green_health > 0) p.shield_green_health -= 0.00075 * dt;
+	if (p.shield_shadow_health > 0) p.shield_shadow_health -= 0.00075 * dt;
+	if (p.shield_pumpkin_health > 0) p.shield_pumpkin_health -= 0.00075 * dt;
+	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.00075 * dt;
+	if (p.shield_anubis_health > 0) p.shield_anubis_health -= 0.00075 * dt;
 	if (DEBUG_PLAYER && p.saved_health - p.health > 1) {
 		g.debug_console.unshift("player health: " + Math.round(p.health) +
 			", change " + Math.round(p.saved_health - p.health) +
@@ -265,9 +269,6 @@ function player_update(player_object, dt) {
 				p.thirst) +
 			", at x:" + Math.round(bPos.x) + " y:" + Math.round(bPos.y));
 	}
-	p.saved_health = p.health;
-	p.saved_hunger = p.hunger;
-	p.saved_thirst = p.thirst;
 	if (p.immunity > 0) p.immunity -= dt;
 	if (p.health <= 0 && !g.godmode) {
 		player_die(player_object);
@@ -289,25 +290,26 @@ function player_update(player_object, dt) {
 	if (p.thirst > 0 && (uiHidden || p.thirst >= 0.33 * p.max_thirst) && !p
 		.car_object && can_lose_hunger_or_thirst) {
 		if (p.shield_green_health > 0) p.thirst = Math.max(0, p.thirst -
-			0.0005 * dt);
+			0.00005 * dt);
 		else if (p.shield_rainbow_health > 0) p.thirst = Math.max(0, p.thirst -
 			0.00000025 * dt);
-		else p.thirst = Math.max(0, p.thirst - 0.001 * dt);
+		else p.thirst = Math.max(0, p.thirst - 0.00025 * dt);
 	}
 	if (p.thirst <= 0) p.health -= 0.01 * dt;
 	if (p.hunger > 0 && (uiHidden || p.hunger >= 0.11 * p.max_hunger) && !p
 		.car_object && can_lose_hunger_or_thirst) {
 		if (p.shield_green_health > 0) p.hunger = Math.max(0, p.hunger -
-			0.0005 * dt);
+			0.00005 * dt);
 		else if (p.shield_rainbow_health > 0) p.hunger = Math.max(0, p.hunger -
 			0.00000025 * dt);
-		else p.hunger = Math.max(0, p.hunger - 0.001 * dt);
+		else p.hunger = Math.max(0, p.hunger - 0.00025 * dt);
 	}
 	if (p.hunger <= 0) p.health -= 0.005 * dt;
 	p.speed = p.max_speed;
 	if (p.thirst < 0.33 * p.max_thirst) p.speed *= 0.875;
 	if (p.hunger < 0.11 * p.max_hunger) p.speed *= 0.75;
-	if (p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst)
+	if (p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst && p
+		.regen_delay <= 0)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
 	if (p.want_level == null) {
 		if (!level_visible(g, "0x0", player_object)) levels_set(g, "0x0");
@@ -582,6 +584,15 @@ function player_update(player_object, dt) {
 			p.mobile_delay = 500;
 		}
 	}
+	if (p.health > p.saved_health) {
+		let heal_amount = p.health - p.saved_health;
+		if (heal_amount > 1) {
+			damage_text_create(g, bPos.x, bPos.y, heal_amount, "#00ff00", true);
+		}
+	}
+	p.saved_health = p.health;
+	p.saved_hunger = p.hunger;
+	p.saved_thirst = p.thirst;
 }
 const _cachedLaserColor = {
 	r: 0,
@@ -611,24 +622,128 @@ function drawRigidArm(ctx, posX, bodyY, ph, pw, endX, endY, side, c) {
 	ctx.restore();
 }
 
-function drawStat(ctx, posX, posY, pw, ph, val, max, offset, color, c) {
-	ctx.fillStyle = c.player.indicator_bg;
-	ctx.fillRect(posX - pw / 2, posY - offset * ph, pw, ph * 0.05);
+function drawStat(ctx, posX, posY, pw, ph, val, max, offset, type) {
+	const fontSize = pw * 0.275;
+	const perc = Math.max(0, val / max);
+	let color;
+	if (type === "health") {
+		const r = Math.floor(255 * (1 - perc));
+		const g = Math.floor(255 * perc);
+		color = `rgb(${r}, ${g}, 0)`;
+	}
+	else if (type === "thirst") {
+		const r = Math.floor(255 * (1 - perc));
+		const g = Math.floor(200 * perc);
+		const b = Math.floor(255 * perc);
+		color = `rgb(${r}, ${g}, ${b})`;
+	}
+	else if (type === "hunger") {
+		const r = 255;
+		const g = Math.floor(165 * perc);
+		color = `rgb(${r}, ${g}, 0)`;
+	}
+	const text = `${Math.ceil(val)}/${Math.ceil(max)}`;
+	ctx.save();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.strokeStyle = "black";
+	ctx.lineWidth = fontSize * 0.2;
+	ctx.lineJoin = "round";
+	ctx.lineCap = "round";
+	const yPos = posY - offset * ph;
+	ctx.strokeText(text, posX, yPos);
 	ctx.fillStyle = color;
-	ctx.fillRect(posX - pw / 2, posY - offset * ph, pw * Math.max(val, 0) / max,
-		ph * 0.05);
+	ctx.fillText(text, posX, yPos);
+	ctx.restore();
 }
 
-function renderShield(ctx, posX, posY, pw, ph, health, max, fill, stroke, c) {
+function renderShield(ctx, posX, posY, pw, ph, health, max, fill, stroke, c,
+	isPumpkin) {
 	if (health <= 0) return;
-	ctx.fillStyle = c.player.indicator_shield_bg;
-	ctx.fillRect(posX - 1.25 * pw, posY - 1.85 * ph, 2.5 * pw, ph * 0.05);
-	ctx.fillStyle = fill;
-	ctx.fillRect(posX - 1.25 * pw, posY - 1.85 * ph, 2.5 * pw * health / max,
-		ph * 0.05);
-	ctx.globalAlpha = 0.25;
+	const fontSize = pw * 0.275;
+	const perc = Math.max(0, health / max);
+	const text = `${Math.ceil(health)}/${Math.ceil(max)}`;
+	const yPos = posY - 1.65 * ph;
+	const getShieldColor = (baseFill, p) => {
+		const tempCtx = document.createElement('canvas').getContext('2d');
+		tempCtx.fillStyle = baseFill;
+		const colorStr = tempCtx.fillStyle;
+		const r = parseInt(colorStr.slice(1, 3), 16);
+		const g = parseInt(colorStr.slice(3, 5), 16);
+		const b = parseInt(colorStr.slice(5, 7), 16);
+		const finalR = Math.floor(r * p + 128 * (1 - p));
+		const finalG = Math.floor(g * p + 128 * (1 - p));
+		const finalB = Math.floor(b * p + 128 * (1 - p));
+		return `rgb(${finalR}, ${finalG}, ${finalB})`;
+	};
+	ctx.save();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.strokeStyle = "black";
+	ctx.lineWidth = fontSize * 0.2;
+	ctx.lineJoin = "round";
+	ctx.lineCap = "round";
+	ctx.strokeText(text, posX, yPos);
+	ctx.fillStyle = getShieldColor(fill, perc);
+	ctx.fillText(text, posX, yPos);
+	ctx.restore();
+	ctx.save();
+	if (isPumpkin) {
+		ctx.globalAlpha = 0.65;
+	}
+	else {
+		ctx.globalAlpha = 0.25;
+	}
 	drawCircle(ctx, posX, posY, 1.5 * pw, fill, stroke, 0.05 * pw);
-	ctx.globalAlpha = 1.0;
+	if (isPumpkin) {
+		ctx.save();
+		ctx.globalAlpha = 1.0;
+		ctx.fillStyle = "#FFD700";
+		ctx.shadowBlur = (pw * 0.3);
+		ctx.shadowColor = "#FFD700";
+		ctx.translate(posX, posY);
+		ctx.scale(3.8, 3.8);
+		ctx.translate(-posX, -posY);
+		const w = pw;
+		const h = ph;
+		const x = posX - w * 0.5;
+		const y = posY - h * 0.55;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.3, y + h * 0.35);
+		ctx.lineTo(x + w * 0.48, y + h * 0.45);
+		ctx.lineTo(x + w * 0.32, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.7, y + h * 0.35);
+		ctx.lineTo(x + w * 0.52, y + h * 0.45);
+		ctx.lineTo(x + w * 0.68, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.5, y + h * 0.48);
+		ctx.lineTo(x + w * 0.46, y + h * 0.55);
+		ctx.lineTo(x + w * 0.54, y + h * 0.55);
+		ctx.fill();
+		let mY = y - 0.1 * h;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.25, mY + h * 0.65);
+		ctx.lineTo(x + w * 0.35, mY + h * 0.75);
+		ctx.lineTo(x + w * 0.42, mY + h * 0.67);
+		ctx.lineTo(x + w * 0.5, mY + h * 0.77);
+		ctx.lineTo(x + w * 0.58, mY + h * 0.67);
+		ctx.lineTo(x + w * 0.65, mY + h * 0.75);
+		ctx.lineTo(x + w * 0.75, mY + h * 0.65);
+		ctx.lineTo(x + w * 0.65, mY + h * 0.83);
+		ctx.lineTo(x + w * 0.58, mY + h * 0.73);
+		ctx.lineTo(x + w * 0.5, mY + h * 0.9);
+		ctx.lineTo(x + w * 0.42, mY + h * 0.73);
+		ctx.lineTo(x + w * 0.35, mY + h * 0.83);
+		ctx.closePath();
+		ctx.fill();
+		ctx.restore();
+	}
+	ctx.restore();
 }
 
 function player_draw(player_object, ctx) {
@@ -787,6 +902,7 @@ function player_draw(player_object, ctx) {
 			col = c.weapons.special.sword_blade,
 			swW = 0.18 * pw;
 		if (selected_item === ITEM_HORN) col = c.weapons.common.wood;
+		if (selected_item === ITEM_KRAMPUS_CHAIN) col = "#111111";
 		if (selected_item === ITEM_STICK) {
 			col = c.weapons.common.wood;
 			swLen = 50;
@@ -838,24 +954,95 @@ function player_draw(player_object, ctx) {
 		ctx.stroke();
 		p.shooting_laser = false;
 	}
+	if (p.drawing_whip && p.whip_segments) {
+		ctx.save();
+		const strikeProgress = (p.whip_timer % 800) / 800;
+		const chainCol = "#1a1a1a";
+		let handX = posX + dirX * ARM_L;
+		let handY = (bodyY + ph * 0.3) + dirY * ARM_L;
+		drawRigidArm(ctx, posX, bodyY, ph, pw, handX, handY, -1, c);
+		drawRigidArm(ctx, posX, bodyY, ph, pw, handX, handY, 1, c);
+		for (let i = 1; i < p.whip_segments.length; i++) {
+			let s = p.whip_segments[i];
+			if (i === 0) {
+				s.x = handX;
+				s.y = handY;
+			}
+			let next = p.whip_segments[i + 1];
+			let p_norm = i / p.whip_segments.length;
+			ctx.save();
+			ctx.translate(s.x, s.y);
+			if (next) {
+				ctx.rotate(Math.atan2(next.y - s.y, next.x - s.x));
+			}
+			else if (p.whip_segments[i - 1]) {
+				ctx.rotate(Math.atan2(s.y - p.whip_segments[i - 1].y, s.x - p
+					.whip_segments[i - 1].x));
+			}
+			if (i === p.whip_segments.length - 1) {
+				ctx.fillStyle = "#700";
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = pw * 0.03;
+				ctx.beginPath();
+				ctx.moveTo(0, 0);
+				ctx.lineTo(-pw * 0.4, -pw * 0.2);
+				ctx.quadraticCurveTo(pw * 0.25, 0, -pw * 0.4, pw * 0.2);
+				ctx.closePath();
+				ctx.fill();
+				ctx.stroke();
+				ctx.fillStyle = "#f00";
+				ctx.beginPath();
+				ctx.arc(0, 0, pw * 0.1, 0, Math.PI * 2);
+				ctx.fill();
+			}
+			else {
+				let linkW = pw * (0.35 * (1 - p_norm * 0.4));
+				let linkH = pw * (0.22 * (1 - p_norm * 0.4));
+				ctx.fillStyle = chainCol;
+				ctx.strokeStyle = "#000";
+				ctx.lineWidth = pw * 0.02;
+				if (strikeProgress > 0.4 && strikeProgress < 0.6) {
+					ctx.shadowBlur = 15;
+					ctx.shadowColor = "rgba(255,50,0,0.8)";
+				}
+				ctx.beginPath();
+				ctx.roundRect(-linkW * 0.5, -linkH * 0.5, linkW, linkH, linkH *
+					0.4);
+				ctx.fill();
+				ctx.stroke();
+				ctx.fillStyle = "rgba(255,255,255,0.1)";
+				ctx.fillRect(-linkW * 0.3, -linkH * 0.3, linkW * 0.2, linkH *
+					0.2);
+			}
+			ctx.restore();
+		}
+		ctx.restore();
+		p.drawing_whip = false;
+	}
 	ctx.restore();
-	if (g.settings.indicators["show player health"]) drawStat(ctx, posX, posY,
-		pw, ph, p.health, p.max_health, 0.9, c.player.indicator_health, c);
-	if (g.settings.indicators["show player thirst"]) drawStat(ctx, posX, posY,
-		pw, ph, p.thirst, p.max_thirst, 0.8, c.player.indicator_thirst, c);
-	if (g.settings.indicators["show player hunger"]) drawStat(ctx, posX, posY,
-		pw, ph, p.hunger, p.max_hunger, 0.7, c.player.indicator_hunger, c);
-	renderShield(ctx, posX, posY, pw, ph, p.shield_blue_health, p
+	if (g.settings.indicators["show player health"])
+		drawStat(ctx, posX, posY, pw, ph, p.health, p.max_health, 1.575,
+			"health");
+	if (g.settings.indicators["show player thirst"])
+		drawStat(ctx, posX, posY, pw, ph, p.thirst, p.max_thirst, 1.3,
+			"thirst");
+	if (g.settings.indicators["show player hunger"])
+		drawStat(ctx, posX, posY, pw, ph, p.hunger, p.max_hunger, 1.0,
+			"hunger");
+	renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p.shield_blue_health, p
 		.shield_blue_health_max, c.player.shield_blue_fill, c.player
 		.shield_blue_stroke, c);
-	renderShield(ctx, posX, posY, pw, ph, p.shield_green_health, p
+	renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p.shield_green_health, p
 		.shield_green_health_max, c.items.shield_kinetic.fill, c.items
 		.shield_kinetic.outline, c);
-	renderShield(ctx, posX, posY, pw, ph, p.shield_shadow_health, p
-		.shield_shadow_health_max, c.items.shield_shadow.fill, c.items
+	renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p.shield_shadow_health, p
+		.shield_shadow_health_max, "purple", c.items
 		.shield_shadow.outline, c);
-	renderShield(ctx, posX, posY, pw, ph, p.shield_anubis_health, p
+	renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p.shield_anubis_health, p
 		.shield_anubis_health_max, c.items.aegis.body, c.items.aegis.gold, c
+	);
+	renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p.shield_pumpkin_health, p
+		.shield_pumpkin_health_max, "#E67E22", "#A04000", c, true
 	);
 	if (p.shield_rainbow_health > 0) {
 		let anim = 0.1 * p.item_animstate;
@@ -864,8 +1051,46 @@ function player_draw(player_object, ctx) {
 			15, 2));
 		let b = Math.floor(Math.pow(Math.sin(anim) * 15, 2));
 		let rCol = "rgb(" + r + "," + gre + "," + b + ")";
-		renderShield(ctx, posX, posY, pw, ph, p.shield_rainbow_health, p
+		renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p
+			.shield_rainbow_health, p
 			.shield_rainbow_health_max, rCol, c.player.laser_glow, c);
+	}
+	let achs = p.achievements_element.data.achievements;
+	let hasLearned = (achievement_get(achs, "yummy")?.done) ||
+		(achievement_get(achs, "stay hydrated")?.done) ||
+		(achievement_get(achs, "healthy lifestyle")?.done);
+	if (!hasLearned) {
+		const medicalItems = [ITEM_HEALTH, ITEM_HEALTH_GREEN];
+		const foodItems = ITEMS_FOODS || [];
+		const drinkItems = ITEMS_DRINKS || [];
+		let isEducationalItem = medicalItems.includes(selected_item) ||
+			foodItems.includes(selected_item) ||
+			drinkItems.includes(selected_item);
+		if (isEducationalItem) {
+			ctx.save();
+			let floatAnim = Math.sin(now * 0.005) * 10;
+			let textY = headY - 50 + floatAnim;
+			let promptText = "PRESS LMB";
+			if (g.settings.language === "русский") {
+				promptText = "НАЖМИТЕ ЛКМ";
+			}
+			if (g.mobile) {
+				promptText = (g.settings.language === "русский") ?
+					"НАЖМИТЕ USE" : "TAP USE";
+			}
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.font =
+				`bold ${pw * 0.28}px system-ui, -apple-system, sans-serif`;
+			ctx.lineJoin = "round";
+			ctx.miterLimit = 2;
+			ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
+			ctx.lineWidth = 5;
+			ctx.strokeText(promptText, posX, textY);
+			ctx.fillStyle = "yellow";
+			ctx.fillText(promptText, posX, textY);
+			ctx.restore();
+		}
 	}
 }
 
@@ -1104,4 +1329,34 @@ function player_show_note(p, title, content) {
 		p.inventory_element.shown = false;
 		return true;
 	}
+}
+
+function create_lifesteal_particle(g, sx, sy, targetBody) {
+	game_object_create(g, "vfx_drain", {
+		x: sx,
+		y: sy,
+		target: targetBody,
+		life: 1.0,
+		speed: 0.005
+	}, (obj, dt) => {
+		let d = obj.data;
+		d.life -= 0.002 * dt;
+		if (d.life <= 0) {
+			obj.destroyed = true;
+			return;
+		}
+		const tPos = d.target.position;
+		d.x += (tPos.x - d.x) * d.speed * dt;
+		d.y += (tPos.y - d.y) * d.speed * dt;
+		d.speed += 0.0001 * dt;
+	}, (obj, ctx) => {
+		let d = obj.data;
+		ctx.fillStyle = "#ff0000";
+		ctx.beginPath();
+		ctx.moveTo(d.x, d.y - 4);
+		ctx.lineTo(d.x + 4, d.y);
+		ctx.lineTo(d.x, d.y + 4);
+		ctx.lineTo(d.x - 4, d.y);
+		ctx.fill();
+	});
 }

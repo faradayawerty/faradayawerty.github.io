@@ -1,6 +1,7 @@
 let THEME_FOREST = 0;
 let THEME_DESERT = 200;
 let THEME_TAIGA = 400;
+let THEME_BLOOD_FOREST = 600;
 let LEVEL_TILE_VOID = 0;
 let LEVEL_TILE_START = 1;
 let LEVEL_TILE_ROAD_VERTICAL = 2;
@@ -29,6 +30,49 @@ let LEVEL_TILE_ROAD_TURN_WN_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_WN;
 let LEVEL_TILE_ROAD_TURN_WS_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_WS;
 let LEVEL_TILE_ROAD_TURN_EN_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_EN;
 let LEVEL_TILE_ROAD_TURN_ES_DESERT = THEME_DESERT + LEVEL_TILE_ROAD_TURN_ES;
+let LEVEL_TILE_ROAD_CROSSROAD_TAIGA = THEME_TAIGA + LEVEL_TILE_ROAD_CROSSROAD;
+let LEVEL_TILE_ROAD_CROSSROAD_BLOOD_FOREST = THEME_BLOOD_FOREST +
+	LEVEL_TILE_ROAD_CROSSROAD;
+let LEVEL_TILE_ROAD_VERTICAL_TAIGA = THEME_TAIGA + LEVEL_TILE_ROAD_VERTICAL;
+let LEVEL_TILE_ROAD_HORIZONTAL_TAIGA = THEME_TAIGA + LEVEL_TILE_ROAD_HORIZONTAL;
+let LEVEL_TILE_DEFAULT_TAIGA = THEME_TAIGA + LEVEL_TILE_DEFAULT;
+let LEVEL_TILE_ROAD_TURN_WN_TAIGA = THEME_TAIGA + LEVEL_TILE_ROAD_TURN_WN;
+let LEVEL_TILE_ROAD_TURN_WS_TAIGA = THEME_TAIGA + LEVEL_TILE_ROAD_TURN_WS;
+let LEVEL_TILE_ROAD_TURN_EN_TAIGA = THEME_TAIGA + LEVEL_TILE_ROAD_TURN_EN;
+let LEVEL_TILE_ROAD_TURN_ES_TAIGA = THEME_TAIGA + LEVEL_TILE_ROAD_TURN_ES;
+let LEVEL_TILE_ROAD_VERTICAL_BLOOD = THEME_BLOOD_FOREST +
+	LEVEL_TILE_ROAD_VERTICAL;
+let LEVEL_TILE_ROAD_HORIZONTAL_BLOOD = THEME_BLOOD_FOREST +
+	LEVEL_TILE_ROAD_HORIZONTAL;
+let LEVEL_TILE_DEFAULT_BLOOD = THEME_BLOOD_FOREST + LEVEL_TILE_DEFAULT;
+let LEVEL_TILE_ROAD_TURN_WN_BLOOD = THEME_BLOOD_FOREST +
+	LEVEL_TILE_ROAD_TURN_WN;
+let LEVEL_TILE_ROAD_TURN_WS_BLOOD = THEME_BLOOD_FOREST +
+	LEVEL_TILE_ROAD_TURN_WS;
+let LEVEL_TILE_ROAD_TURN_EN_BLOOD = THEME_BLOOD_FOREST +
+	LEVEL_TILE_ROAD_TURN_EN;
+let LEVEL_TILE_ROAD_TURN_ES_BLOOD = THEME_BLOOD_FOREST +
+	LEVEL_TILE_ROAD_TURN_ES;
+let LEVEL_TILES_TAIGA_ZONE = [
+	LEVEL_TILE_DEFAULT_TAIGA,
+	LEVEL_TILE_ROAD_HORIZONTAL_TAIGA,
+	LEVEL_TILE_ROAD_VERTICAL_TAIGA,
+	LEVEL_TILE_ROAD_CROSSROAD_TAIGA,
+	LEVEL_TILE_ROAD_TURN_WN_TAIGA,
+	LEVEL_TILE_ROAD_TURN_WS_TAIGA,
+	LEVEL_TILE_ROAD_TURN_EN_TAIGA,
+	LEVEL_TILE_ROAD_TURN_ES_TAIGA
+];
+let LEVEL_TILES_BLOOD_FOREST_ZONE = [
+	LEVEL_TILE_DEFAULT_BLOOD,
+	LEVEL_TILE_ROAD_HORIZONTAL_BLOOD,
+	LEVEL_TILE_ROAD_VERTICAL_BLOOD,
+	LEVEL_TILE_ROAD_CROSSROAD_BLOOD_FOREST,
+	LEVEL_TILE_ROAD_TURN_WN_BLOOD,
+	LEVEL_TILE_ROAD_TURN_WS_BLOOD,
+	LEVEL_TILE_ROAD_TURN_EN_BLOOD,
+	LEVEL_TILE_ROAD_TURN_ES_BLOOD
+];
 let LEVEL_TILES_FOREST_ZONE = [
 	LEVEL_TILE_DEFAULT,
 	LEVEL_TILE_ROAD_HORIZONTAL,
@@ -53,6 +97,346 @@ let LEVEL_TILES_SUBURBAN_ZONE = [
 	LEVEL_TILE_RESIDENTIAL_T_SOUTH
 ];
 let TILES = {
+	[LEVEL_TILE_ROAD_VERTICAL_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 0,
+			S: 1,
+			W: 0
+		},
+		base_color: "#2d3c3d",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 1090, 2500);
+			decorative_taiga_grass_create(g, Ox + 1410, Oy, 1090, 2500);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
+		}
+	},
+	[LEVEL_TILE_ROAD_HORIZONTAL_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 1,
+			S: 0,
+			W: 1
+		},
+		base_color: "#2d3c3d",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 2500, 1090);
+			decorative_taiga_grass_create(g, Ox, Oy + 1410, 2500, 1090);
+			decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+		}
+	},
+	[LEVEL_TILE_DEFAULT_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 0,
+			S: 0,
+			W: 0
+		},
+		base_color: "#1a2526",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 2500, 2500, true);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 4 + 2;
+			for (let i = 0; i < N; i++) item_spawn(g, Ox + Math
+				.random() * 2500, Oy + Math.random() * 2500, null,
+				tile);
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_WN_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 0,
+			S: 0,
+			W: 1
+		},
+		base_color: "#2d3c3d",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 1090, 1090);
+			decorative_taiga_grass_create(g, Ox + 1410, Oy, 1090, 2500);
+			decorative_taiga_grass_create(g, Ox, Oy + 1410, 1410, 1090);
+			decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_WS_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 0,
+			S: 1,
+			W: 1
+		},
+		base_color: "#2d3c3d",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 2500, 1090);
+			decorative_taiga_grass_create(g, Ox, Oy + 1410, 1090, 1090);
+			decorative_taiga_grass_create(g, Ox + 1410, Oy + 1090, 1090,
+				1410);
+			decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_ES_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 1,
+			S: 1,
+			W: 0
+		},
+		base_color: "#2d3c3d",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 2500, 1090);
+			decorative_taiga_grass_create(g, Ox, Oy + 1090, 1090, 1410);
+			decorative_taiga_grass_create(g, Ox + 1410, Oy + 1410, 1090,
+				1090);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_EN_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 1,
+			S: 0,
+			W: 0
+		},
+		base_color: "#2d3c3d",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 1090, 1500);
+			decorative_taiga_grass_create(g, Ox + 1410, Oy, 1090, 1090);
+			decorative_taiga_grass_create(g, Ox, Oy + 1410, 2500, 1090);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_VERTICAL_BLOOD]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 0,
+			S: 1,
+			W: 0
+		},
+		base_color: "#5a1010",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 1090, 2500);
+			decorative_blood_grass_create(g, Ox + 1410, Oy, 1090, 2500);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
+		}
+	},
+	[LEVEL_TILE_ROAD_HORIZONTAL_BLOOD]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 1,
+			S: 0,
+			W: 1
+		},
+		base_color: "#5a1010",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 2500, 1090);
+			decorative_blood_grass_create(g, Ox, Oy + 1410, 2500, 1090);
+			decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+		}
+	},
+	[LEVEL_TILE_DEFAULT_BLOOD]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 0,
+			S: 0,
+			W: 0
+		},
+		base_color: "#300000",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 2500, 2500, true);
+		},
+		populate_with_items: (g, Ox, Oy, tile) => {
+			let N = Math.random() * 3 + 1;
+			for (let i = 0; i < N; i++) item_spawn(g, Ox + Math
+				.random() * 2500, Oy + Math.random() * 2500, null,
+				tile);
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_WN_BLOOD]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 0,
+			S: 0,
+			W: 1
+		},
+		base_color: "#5a1010",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 1090, 1090);
+			decorative_blood_grass_create(g, Ox + 1410, Oy, 1090, 2500);
+			decorative_blood_grass_create(g, Ox, Oy + 1410, 1410, 1090);
+			decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_WS_BLOOD]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 0,
+			S: 1,
+			W: 1
+		},
+		base_color: "#5a1010",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 2500, 1090);
+			decorative_blood_grass_create(g, Ox, Oy + 1410, 1090, 1090);
+			decorative_blood_grass_create(g, Ox + 1410, Oy + 1090, 1090,
+				1410);
+			decorative_road_create(g, Ox, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_ES_BLOOD]: {
+		weight: 100,
+		connections: {
+			N: 0,
+			E: 1,
+			S: 1,
+			W: 0
+		},
+		base_color: "#5a1010",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 2500, 1090);
+			decorative_blood_grass_create(g, Ox, Oy + 1090, 1090, 1410);
+			decorative_blood_grass_create(g, Ox + 1410, Oy + 1410, 1090,
+				1090);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_TURN_EN_BLOOD]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 1,
+			S: 0,
+			W: 0
+		},
+		base_color: "#5a1010",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 1090, 1500);
+			decorative_blood_grass_create(g, Ox + 1410, Oy, 1090, 1090);
+			decorative_blood_grass_create(g, Ox, Oy + 1410, 2500, 1090);
+			decorative_road_create(g, Ox + 1150, Oy + 1150, 1350, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 1350);
+			decorative_rectangle_create(g, Ox + 1150, Oy + 1150, 200,
+				200, "#222222", "#222222");
+		}
+	},
+	[LEVEL_TILE_ROAD_CROSSROAD_TAIGA]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 1,
+			S: 1,
+			W: 1
+		},
+		base_color: "#2d3c3d",
+		spawn_enemies: true,
+		spawn_animals: true,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_taiga_grass_create(g, Ox, Oy, 1090, 1090);
+			decorative_taiga_grass_create(g, Ox + 1410, Oy, 1090, 1090);
+			decorative_taiga_grass_create(g, Ox, Oy + 1410, 1090, 1090);
+			decorative_taiga_grass_create(g, Ox + 1410, Oy + 1410, 1090,
+				1090);
+			decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
+		}
+	},
+	[LEVEL_TILE_ROAD_CROSSROAD_BLOOD_FOREST]: {
+		weight: 100,
+		connections: {
+			N: 1,
+			E: 1,
+			S: 1,
+			W: 1
+		},
+		base_color: "#5a1010",
+		spawn_enemies: true,
+		spawn_animals: false,
+		spawn_items: true,
+		populate: (g, Ox, Oy) => {
+			decorative_blood_grass_create(g, Ox, Oy, 1090, 1090);
+			decorative_blood_grass_create(g, Ox + 1410, Oy, 1090, 1090);
+			decorative_blood_grass_create(g, Ox, Oy + 1410, 1090, 1090);
+			decorative_blood_grass_create(g, Ox + 1410, Oy + 1410, 1090,
+				1090);
+			decorative_road_create(g, Ox, Oy + 1150, 2500, 200);
+			decorative_road_create(g, Ox + 1150, Oy, 200, 2500);
+		}
+	},
 	[LEVEL_TILE_HUT_IN_FOREST]: {
 		weight: 25,
 		connections: {

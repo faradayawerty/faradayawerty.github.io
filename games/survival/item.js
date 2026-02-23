@@ -1,13 +1,5 @@
 let DEBUG_ITEM = false;
 let BOSSIFIER_GRAY_CACHE = null;
-const _ITEM_POOL = {
-	guns: [],
-	ammos: [],
-	health: [],
-	shields: [],
-	food: [],
-	drinks: []
-};
 const _ITEM_TEXT_CACHE = {
 	ru: "НАЖМИТЕ ",
 	en: "PRESS ",
@@ -17,114 +9,203 @@ const _ITEM_TEXT_CACHE = {
 
 function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 	context = null) {
-	const p = _ITEM_POOL;
-	p.guns.length = 0;
-	p.guns.push(ITEM_GUN);
-	p.ammos.length = 0;
-	p.ammos.push(ITEM_AMMO);
-	p.health.length = 0;
-	p.health.push(ITEM_HEALTH);
-	p.shields.length = 0;
-	p.food.length = 0;
-	p.food.push(ITEM_CANNED_MEAT);
-	p.drinks.length = 0;
-	p.drinks.push(ITEM_WATER);
+	let tile_theme = 200 * Math.floor(tile / 200);
+	let available_guns = [ITEM_GUN];
+	let available_ammos = [ITEM_AMMO];
+	let available_health = [ITEM_HEALTH];
+	let available_shields = [];
+	let available_food = [ITEM_CANNED_MEAT];
+	let available_drinks = [ITEM_WATER];
 	const shootingAvail = (enemy_type == "shooting" || (enemy_type == null && g
 		.available_enemies.includes("shooting")));
-	if (shootingAvail) {
-		p.guns.push(ITEM_SHOTGUN);
-		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") p.guns
-			.push(ITEM_MINIGUN);
-		if (enemy_type != null) {
-			p.ammos.push(ITEM_PLASMA);
-			p.shields.push(ITEM_SHIELD);
-		}
-	}
 	const shootingRedAvail = (enemy_type == "shooting red" || (enemy_type ==
 		null && g.available_enemies.includes("shooting red")));
-	if (shootingRedAvail) {
-		p.ammos.push(ITEM_PLASMA);
-		p.guns.push(ITEM_PLASMA_LAUNCHER);
-		p.shields.push(ITEM_SHIELD);
-		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") p.guns
-			.push(ITEM_PLASMA_PISTOL);
-		if (enemy_type != null) p.ammos.push(ITEM_RED_PLASMA);
-	}
 	const swordAvail = (enemy_type == "sword" || (enemy_type == null && g
 		.available_enemies.includes("sword")));
-	if (swordAvail) {
-		p.guns.push(ITEM_RED_PISTOLS);
-		p.ammos.push(ITEM_RED_PLASMA);
-		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") p.guns
-			.push(ITEM_RED_SHOTGUN);
-		if (enemy_type != null) {
-			p.health.length = 0;
-			p.health.push(ITEM_HEALTH_GREEN);
-			p.shields.length = 0;
-			p.shields.push(ITEM_SHIELD_GREEN);
-		}
-	}
 	const rocketAvail = (enemy_type == "shooting rocket" || (enemy_type ==
 		null && g.available_enemies.includes("shooting rocket")));
-	if (rocketAvail) {
-		p.guns.push(ITEM_SWORD);
-		p.health.push(ITEM_SHIELD_GREEN, ITEM_HEALTH_GREEN);
-		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") p.guns
-			.push(ITEM_GREEN_GUN);
-		if (enemy_type != null) {
-			p.ammos.length = 0;
-			p.ammos.push(ITEM_ROCKET);
-		}
-	}
 	const laserAvail = (enemy_type == "shooting laser" || (enemy_type == null &&
 		g.available_enemies.includes("shooting laser")));
-	if (laserAvail) {
-		p.guns.push(ITEM_ROCKET_LAUNCHER);
-		p.ammos.push(ITEM_ROCKET);
-		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") p.guns
-			.push(ITEM_ROCKET_SHOTGUN);
+	if (shootingAvail) {
+		available_guns.push(ITEM_SHOTGUN);
+		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") {
+			available_guns.push(ITEM_MINIGUN);
+		}
 		if (enemy_type != null) {
-			p.ammos.length = 0;
-			p.ammos.push(ITEM_ROCKET, ITEM_RAINBOW_AMMO);
-			p.shields.push(ITEM_SHIELD_RAINBOW);
+			available_ammos.push(ITEM_PLASMA);
+			available_shields.push(ITEM_SHIELD);
 		}
 	}
-	if (enemy_type == "mummy") {
-		p.guns.push(ITEM_KALASHNIKOV);
-		p.ammos.push(ITEM_PLASMA);
+	if (shootingRedAvail) {
+		available_ammos.push(ITEM_PLASMA);
+		available_guns.push(ITEM_PLASMA_LAUNCHER);
+		available_shields.push(ITEM_SHIELD);
+		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") {
+			available_guns.push(ITEM_PLASMA_PISTOL);
+		}
+		if (enemy_type != null) {
+			available_ammos.push(ITEM_RED_PLASMA);
+		}
 	}
-	if (enemy_type == "shadow") {
-		p.guns.push(ITEM_MUMMY_PISTOLS);
-		p.ammos.push(ITEM_PLASMA);
-		p.shields.push(ITEM_SHADOW_SHIELD);
+	if (swordAvail) {
+		available_guns.push(ITEM_RED_PISTOLS);
+		available_ammos.push(ITEM_RED_PLASMA);
+		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") {
+			available_guns.push(ITEM_RED_SHOTGUN);
+		}
+		if (enemy_type != null) {
+			available_health = [ITEM_HEALTH_GREEN];
+			available_shields = [ITEM_SHIELD_GREEN];
+		}
+	}
+	if (rocketAvail) {
+		available_guns.push(ITEM_SWORD);
+		available_health.push(ITEM_SHIELD_GREEN, ITEM_HEALTH_GREEN);
+		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") {
+			available_guns.push(ITEM_GREEN_GUN);
+		}
+		if (enemy_type != null) {
+			available_ammos = [ITEM_ROCKET];
+		}
+	}
+	if (laserAvail) {
+		available_guns.push(ITEM_ROCKET_LAUNCHER);
+		available_ammos.push(ITEM_ROCKET);
+		if (tile === LEVEL_TILE_CITY_POLICE || car_type === "police") {
+			available_guns.push(ITEM_ROCKET_SHOTGUN);
+		}
+		if (enemy_type != null) {
+			available_ammos = [ITEM_ROCKET, ITEM_RAINBOW_AMMO];
+			available_shields.push(ITEM_SHIELD_RAINBOW);
+		}
+	}
+	if (enemy_type == "mummy" || (enemy_type == null && g.available_enemies
+			.includes("mummy") && tile_theme === THEME_DESERT)) {
+		available_guns.push(ITEM_KALASHNIKOV);
+		available_ammos.push(ITEM_PLASMA);
+		available_shields.push(ITEM_SHIELD);
+	}
+	if (enemy_type == "shadow" || (enemy_type == null && g.available_enemies
+			.includes("shadow") && tile_theme === THEME_DESERT)) {
+		available_guns.push(ITEM_MUMMY_PISTOLS);
+		available_ammos.push(ITEM_PLASMA);
+		available_shields.push(ITEM_SHADOW_SHIELD);
 	}
 	if (enemy_type == "anubis") {
-		p.guns.push(ITEM_SHADOW_STAFF);
-		p.ammos.push(ITEM_RED_PLASMA);
-		p.shields.push(ITEM_ANUBIS_REGEN_SHIELD);
+		available_guns.push(ITEM_SHADOW_STAFF);
+		available_ammos.push(ITEM_RED_PLASMA);
+		available_shields.push(ITEM_ANUBIS_REGEN_SHIELD);
 	}
-	let chance_ammo = 1,
-		chance_health = 1,
-		chance_shield = 1,
-		chance_gun = 1,
-		chance_food = 1,
-		chance_drink = 1,
-		chance_fuel = 1;
+	if (enemy_type == "snow regular" || (enemy_type == null && g
+			.available_enemies
+			.includes("snow regular") && tile_theme === THEME_TAIGA)) {
+		available_ammos.push(ITEM_AMMO);
+		available_ammos.push(ITEM_PLASMA);
+		available_shields.push(ITEM_SHIELD);
+	}
+	if (enemy_type == "ushanka" || (enemy_type == null && g.available_enemies
+			.includes("ushanka") && tile_theme === THEME_TAIGA)) {
+		available_guns.push(ITEM_PP_SH);
+		available_guns.push(ITEM_MOSIN_RIFLE);
+		available_ammos.push(ITEM_PLASMA, ITEM_RED_PLASMA, ITEM_ROCKET);
+		available_shields.push(ITEM_SHIELD);
+	}
+	if (enemy_type == "snowman" || (enemy_type == null && g.available_enemies
+			.includes("snowman") && tile_theme === THEME_TAIGA)) {
+		available_guns.push(ITEM_FLAMETHROWER, ITEM_TESLA_GUN,
+			ITEM_ROCKET_PISTOL);
+		available_ammos = [ITEM_PLASMA, ITEM_SNOWBALL];
+	}
+	if (enemy_type == "krampus" || (enemy_type == null && g.available_enemies
+			.includes("krampus") && tile_theme === THEME_TAIGA)) {
+		available_guns.push(ITEM_SNOWBALL_GUN, ITEM_FREEZE_GUN);
+		available_ammos.push(ITEM_SNOWBALL, ITEM_PRESENT);
+	}
+	if (enemy_type == "blood" || (enemy_type == null && g.available_enemies
+			.includes("blood") && tile_theme === THEME_BLOOD_FOREST)) {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos = [ITEM_RED_PLASMA];
+	}
+	if (enemy_type == "pumpkin skeleton") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos = [ITEM_PUMPKIN, ITEM_PUMPKIN, ITEM_PUMPKIN,
+			ITEM_PUMPKIN, ITEM_PUMPKIN
+		].concat(ITEMS_CANDIES);
+	}
+	if (enemy_type == "vampire") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos.push(ITEM_RED_PLASMA, ITEM_ROCKET)
+	}
+	if (enemy_type == "necromancer") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos = [ITEM_PLASMA];
+	}
+	if (enemy_type == "devil") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos = [ITEM_RED_PLASMA];
+	}
+	let chance_ammo = 1;
+	let chance_health = 1;
+	let chance_shield = 1;
+	let chance_gun = 1;
+	let chance_food = 1;
+	let chance_drink = 1;
+	let chance_fuel = 1;
 	if (enemy_type != null) {
 		chance_fuel = 5;
-		chance_ammo = 25;
+		chance_ammo = 30;
 		chance_health = 0;
-		chance_shield = 15;
+		chance_shield = 10;
 		chance_food = 10;
 		chance_drink = 10;
-		if (enemy_type == "shooting") chance_health = 5;
+		if (enemy_type == "blood") {
+			chance_fuel = 1;
+			chance_ammo = 20;
+			chance_health = 0;
+			chance_shield = 0;
+			chance_food = 5;
+			chance_drink = 5;
+		}
+		if (enemy_type == "snowman") {
+			chance_fuel = 0;
+			chance_ammo = 100;
+			chance_health = 0;
+			chance_shield = 0;
+			chance_food = 0;
+			chance_drink = 0;
+		}
+		if (enemy_type == "pumpkin skeleton") {
+			chance_health = 0;
+			chance_gun = 0.1;
+			chance_fuel = 1;
+			chance_food = 2.5;
+			chance_drink = 2.5;
+			chance_shield = 15;
+			chance_ammo = 30;
+		}
+		if (enemy_type == "shooting") {
+			chance_health = 5;
+			chance_shield = 15;
+		}
 		if (enemy_type == "sword") {
 			chance_health = 15;
+			chance_shield = 15;
 			chance_food = 0;
 			chance_drink = 0;
 		}
 		if (enemy_type == "desert" || enemy_type == "mummy" || enemy_type ==
-			"shadow" || enemy_type == "anubis") chance_drink = 0;
+			"shadow" || enemy_type == "anubis") {
+			chance_drink = 0;
+		}
 	}
 	else if (car_type !== null) {
 		chance_ammo = 0;
@@ -143,7 +224,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			case "police":
 				chance_ammo = 50;
 				chance_gun = 15;
-				if (Math.random() < 0.25) p.guns.push(ITEM_DESERT_EAGLE);
+				if (Math.random() < 0.25) available_guns.push(
+					ITEM_DESERT_EAGLE);
 				break;
 			case "fireman":
 				chance_drink = 80;
@@ -152,8 +234,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 				chance_health = 100;
 				chance_drink = 5;
 				chance_food = 5;
-				p.food.length = 0;
-				p.food.push(ITEM_ORANGE);
+				available_food = [ITEM_ORANGE];
 				break;
 		}
 	}
@@ -166,9 +247,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_health = 0;
 			chance_shield = 10;
 			chance_fuel = 0;
-			p.drinks.length = 0;
-			p.drinks.push(ITEM_COLA);
-			if (Math.random() < 0.25) p.guns.push(ITEM_DESERT_EAGLE);
+			available_drinks = [ITEM_COLA];
+			if (Math.random() < 0.25) available_guns.push(ITEM_DESERT_EAGLE);
 		}
 		else if (tile === LEVEL_TILE_CITY_HOSPITAL) {
 			chance_food = 10;
@@ -178,8 +258,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_health = 50;
 			chance_shield = 15;
 			chance_fuel = 0;
-			p.food.length = 0;
-			p.food.push(ITEM_ORANGE);
+			available_food = [ITEM_ORANGE];
 		}
 		else if (tile === LEVEL_TILE_CITY_FIRE_STATION) {
 			chance_food = 10;
@@ -199,10 +278,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_health = 0;
 			chance_shield = 10;
 			chance_fuel = (tile === LEVEL_TILE_CITY_GAS_STATION) ? 120 : 0;
-			p.food.length = 0;
-			p.food.push(ITEM_ORANGE, ITEM_CHICKEN_LEG, ITEM_CHOCOLATE);
-			p.drinks.length = 0;
-			p.drinks.push(ITEM_MILK, ITEM_COLA);
+			available_food = [ITEM_ORANGE, ITEM_CHICKEN_LEG, ITEM_CHOCOLATE];
+			available_drinks = [ITEM_MILK, ITEM_COLA];
 		}
 		else if (tile === LEVEL_TILE_HUT_IN_FOREST) {
 			chance_food = 40;
@@ -212,10 +289,8 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_health = 0;
 			chance_shield = 0;
 			chance_fuel = 0;
-			p.food.length = 0;
-			p.food.push(ITEM_APPLE, ITEM_CANNED_MEAT, ITEM_CHICKEN_LEG);
-			p.drinks.length = 0;
-			p.drinks.push(ITEM_WATER, ITEM_MILK);
+			available_food = [ITEM_APPLE, ITEM_CANNED_MEAT, ITEM_CHICKEN_LEG];
+			available_drinks = [ITEM_WATER, ITEM_MILK];
 		}
 		else if (LEVEL_TILES_FOREST_ZONE.includes(tile)) {
 			chance_food = 30;
@@ -225,10 +300,9 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_health = 0;
 			chance_shield = 1;
 			chance_fuel = 0;
-			p.food.length = 0;
-			p.food.push(ITEM_APPLE);
+			available_food = [ITEM_APPLE];
 		}
-		else if (tile / 200 > 0) {
+		else if (THEME_DESERT <= tile && tile < THEME_DESERT + 200) {
 			chance_food = 0;
 			chance_drink = 20;
 			chance_gun = 1;
@@ -236,35 +310,67 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_health = 0;
 			chance_shield = 0;
 			chance_fuel = 0;
-			p.drinks.length = 0;
-			p.drinks.push(ITEM_CACTUS_JUICE);
+			available_drinks = [ITEM_CACTUS_JUICE];
+		}
+		else if (THEME_TAIGA <= tile && tile < THEME_TAIGA + 200) {
+			chance_food = 20;
+			chance_drink = 0;
+			chance_gun = 1;
+			chance_ammo = 3;
+			chance_health = 0;
+			chance_shield = 0;
+			chance_fuel = 0;
+			available_food = [ITEM_HONEY];
+		}
+		else if (THEME_BLOOD_FOREST <= tile && tile < THEME_BLOOD_FOREST +
+			200) {
+			chance_food = 20;
+			chance_drink = 0;
+			chance_gun = 1;
+			chance_ammo = 3;
+			chance_health = 0;
+			chance_shield = 0;
+			chance_fuel = 0;
+			available_food = [ITEM_EYEBALL_SOUP];
 		}
 	}
-	chance_gun *= (p.guns.length > 0 ? 1 : 0);
-	chance_ammo *= (p.ammos.length > 0 ? 1 : 0);
-	chance_food *= (p.food.length > 0 ? 1 : 0);
-	chance_drink *= (p.drinks.length > 0 ? 1 : 0);
-	chance_shield *= (p.shields.length > 0 ? 1 : 0);
+	chance_gun *= (available_guns.length > 0 ? 1 : 0);
+	chance_ammo *= (available_ammos.length > 0 ? 1 : 0);
+	chance_food *= (available_food.length > 0 ? 1 : 0);
+	chance_drink *= (available_drinks.length > 0 ? 1 : 0);
+	chance_shield *= (available_shields.length > 0 ? 1 : 0);
 	const chance_sum = chance_gun + chance_ammo + chance_fuel + chance_food +
 		chance_drink + chance_shield + chance_health;
 	let r = Math.random() * chance_sum;
 	let item = ITEM_MONEY;
-	if (r < chance_health) item = p.health[Math.floor(Math.random() * p.health
-		.length)];
-	else if (r < (chance_health + chance_shield)) item = p.shields[Math.floor(
-		Math.random() * p.shields.length)];
-	else if (r < (chance_health + chance_shield + chance_gun)) item = p.guns[
-		Math.floor(Math.random() * p.guns.length)];
-	else if (r < (chance_health + chance_shield + chance_gun + chance_fuel))
+	let acc = 0;
+	if (r < (acc += chance_health)) {
+		item = available_health[Math.floor(Math.random() * available_health
+			.length)];
+	}
+	else if (r < (acc += chance_shield)) {
+		item = available_shields[Math.floor(Math.random() * available_shields
+			.length)];
+	}
+	else if (r < (acc += chance_gun)) {
+		item = available_guns[Math.floor(Math.random() * available_guns
+			.length)];
+	}
+	else if (r < (acc += chance_fuel)) {
 		item = ITEM_FUEL;
-	else if (r < (chance_health + chance_shield + chance_gun + chance_fuel +
-			chance_food)) item = p.food[Math.floor(Math.random() * p.food
-		.length)];
-	else if (r < (chance_health + chance_shield + chance_gun + chance_fuel +
-			chance_food + chance_drink)) item = p.drinks[Math.floor(Math
-		.random() * p.drinks.length)];
-	else if (r < chance_sum) item = p.ammos[Math.floor(Math.random() * p.ammos
-		.length)];
+	}
+	else if (r < (acc += chance_food)) {
+		item = available_food[Math.floor(Math.random() * available_food
+			.length)];
+	}
+	else if (r < (acc += chance_drink)) {
+		item = available_drinks[Math.floor(Math.random() * available_drinks
+			.length)];
+	}
+	else if (r < chance_sum) {
+		item = available_ammos[Math.floor(Math.random() * available_ammos
+			.length)];
+	}
 	if (DEBUG_ITEM) {
 		g.debug_console.unshift("item_spawn i:" + item + " r:" + Math.round(
 			100 * (r / chance_sum)) + "%");
@@ -278,6 +384,11 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 		.important_items.includes(ITEM_DIARY) && context !== "trashcan") {
 		item = ITEM_DIARY;
 		g.important_items.push(ITEM_DIARY);
+	}
+	if (Math.random() < 0.25 && LEVEL_TILES_SUBURBAN_ZONE.includes(tile) && !g
+		.important_items.includes(ITEM_MONEY)) {
+		item = ITEM_MONEY;
+		g.important_items.push(ITEM_MONEY);
 	}
 	item_create(g, item, x, y);
 }
@@ -344,7 +455,8 @@ function item_draw(item_object, ctx) {
 		.animation_state);
 	const player = g.player_object || (g.collections && g.collections[
 		"player"] ? g.collections["player"][0] : null);
-	if (player && player.data && player.data.achievements_element) {
+	if (player && player.data && player.data.body && player.data.body
+		.position && player.data.achievements_element) {
 		const achvs = player.data.achievements_element.data.achievements;
 		let hasPick = false;
 		for (let i = 0; i < achvs.length; i++) {
@@ -354,8 +466,9 @@ function item_draw(item_object, ctx) {
 			}
 		}
 		if (!hasPick) {
-			const dx = px - player.data.body.position.x;
-			const dy = py - player.data.body.position.y;
+			const pPos = player.data.body.position;
+			const dx = px - pPos.x;
+			const dy = py - pPos.y;
 			const distSq = dx * dx + dy * dy;
 			if (distSq < 250000) {
 				const dist = Math.sqrt(distSq);
@@ -368,7 +481,7 @@ function item_draw(item_object, ctx) {
 				const lang = g.settings.language;
 				if (_ITEM_TEXT_CACHE.lastLang !== lang) {
 					_ITEM_TEXT_CACHE.lastLang = lang;
-					const keyText = g.mobile ? "[PICK UP]" : "[F]";
+					const keyText = g.mobile ? "PICK UP" : "F";
 					_ITEM_TEXT_CACHE.lastFull = (lang === "русский" ?
 						_ITEM_TEXT_CACHE.ru : _ITEM_TEXT_CACHE.en) + keyText;
 				}

@@ -114,21 +114,40 @@ function drawIndicators(car_object, ctx, p) {
 	let px = p.body.position.x;
 	let py = p.body.position.y;
 	let barWidth = 0.5 * p.h;
+	const fontSize = p.w * 0.08;
+	ctx.save();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.font = `bold ${fontSize}px Arial`;
+	ctx.lineWidth = fontSize * 0.25;
+	ctx.strokeStyle = "black";
+	ctx.lineJoin = "round";
+	ctx.lineCap = "round";
 	if (car_object.game.settings.indicators["show car health"] && p.health >
 		0) {
-		ctx.fillStyle = COLORS_CARS.ui.health_bg;
-		ctx.fillRect(px - barWidth / 2, py - 0.25 * p.h, barWidth, 2);
-		ctx.fillStyle = COLORS_CARS.ui.health_fill;
-		ctx.fillRect(px - barWidth / 2, py - 0.25 * p.h, barWidth * (p.health /
-			p.max_health), 2);
+		const hPerc = Math.max(0, p.health / p.max_health);
+		const yHealth = py - p.h * 0.35;
+		const r = Math.floor(255 * (1 - hPerc));
+		const g = Math.floor(255 * hPerc);
+		const text = `${Math.ceil(p.health)}/${Math.ceil(p.max_health)}`;
+		ctx.strokeText(text, px, yHealth);
+		ctx.fillStyle = `rgb(${r}, ${g}, 0)`;
+		ctx.fillText(text, px, yHealth);
 	}
 	if (car_object.game.settings.indicators["show car fuel"]) {
-		ctx.fillStyle = COLORS_CARS.ui.fuel_bg;
-		ctx.fillRect(px - barWidth / 2, py - 0.2 * p.h, barWidth, 2);
-		ctx.fillStyle = COLORS_CARS.ui.fuel_fill;
-		ctx.fillRect(px - barWidth / 2, py - 0.2 * p.h, barWidth * (p.fuel / p
-			.max_fuel), 2);
+		const fPerc = Math.max(0, p.fuel / p.max_fuel);
+		const hasHealth = car_object.game.settings.indicators[
+			"show car health"] && p.health > 0;
+		const yFuel = py - p.h * (hasHealth ? 0.20 : 0.35);
+		const r = Math.floor(255 - (127 * fPerc));
+		const gb = Math.floor(128 * fPerc);
+		const color = `rgb(${r}, ${gb}, ${gb})`;
+		const text = `${Math.ceil(p.fuel)}/${Math.ceil(p.max_fuel)}`;
+		ctx.strokeText(text, px, yFuel);
+		ctx.fillStyle = color;
+		ctx.fillText(text, px, yFuel);
 	}
+	ctx.restore();
 }
 
 function car_update(car_object, dt) {

@@ -2240,8 +2240,7 @@ const ENEMY_TYPES = {
 			if (vars.v < e.shooting_range) {
 				if (e.shooting_delay >= 1000) {
 					let spawnDist = e.w * 1.8;
-					let count = e.boss ? 1 : Math.floor(Math.random() *
-						3) + 1;
+					let count = Math.random() < 0.25 || !e.boss ? 1 : 0;
 					let spreadStep = 1.4;
 					for (let i = 0; i < count; i++) {
 						let angleOffset = (i - (count - 1) / 2) *
@@ -2294,9 +2293,9 @@ const ENEMY_TYPES = {
 		requires: "vampire",
 		weight: 4,
 		theme: THEME_BLOOD_FOREST,
-		health: enemy_health_from_tier(ENEMY_TIER_NECROMANCER) * 1.8,
+		health: enemy_health_from_tier(ENEMY_TIER_NECROMANCER),
 		speed: 4.2,
-		damage: enemy_damage_from_tier(ENEMY_TIER_NECROMANCER) * 0.5,
+		damage: enemy_damage_from_tier(ENEMY_TIER_NECROMANCER),
 		w: 42,
 		h: 58,
 		only_draw_custom: true,

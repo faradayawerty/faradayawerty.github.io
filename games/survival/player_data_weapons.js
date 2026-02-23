@@ -1,9 +1,373 @@
 const BALANCE_FACTOR = 1.0;
 
 function weapon_damage_from_tier(n) {
-	return Math.pow(1.25, n);
+	const phi = 1.618033988749895;
+	const sqrt5 = 2.23606797749979;
+	let fib = Math.round(Math.pow(phi, n + 2) / sqrt5);
+	return fib * 0.1;
 }
 const WEAPON_DEFS = {
+	[ITEM_PP_SH]: {
+		cooldown: 90,
+		ammo: ITEM_AMMO,
+		color: "#333333",
+		length: 1.2,
+		width: 0.9,
+		sound: "data/sfx/gunshot_1.mp3",
+		action: (g, p, v) => {
+			let spread = 150;
+			let dx = (v.tx - v.sx) + (Math.random() - 0.5) * spread;
+			let dy = (v.ty - v.sy) + (Math.random() - 0.5) * spread;
+			let mainColor = "#FFD700";
+			let secondaryColor = "#333";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "black";
+				secondaryColor = "#FFD700";
+			}
+			bullet_create(g, p.body.position.x, p.body.position.y, dx,
+				dy, 22,
+				0.22 * 5.5 * BALANCE_FACTOR * (1000 / 200) *
+				weapon_damage_from_tier(ENEMY_TIER_SNOW),
+				false, 5, 1200, mainColor, secondaryColor);
+		}
+	},
+	[ITEM_MOSIN_RIFLE]: {
+		cooldown: 650,
+		ammo: ITEM_AMMO,
+		color: "#4e2f15",
+		length: 1.7,
+		width: 0.7,
+		sound: "data/sfx/shotgun_1.mp3",
+		action: (g, p, v) => {
+			let mainColor = "#FFD700";
+			let secondaryColor = "#333";
+			let tile = g.assigned_tiles[g.visited_levels.indexOf(p
+				.want_level)];
+			if (Math.floor(tile / 200) === 1) {
+				mainColor = "black";
+				secondaryColor = "#FFD700";
+			}
+			bullet_create(g, p.body.position.x, p.body
+				.position.y, v.tx - v.sx, v.ty - v.sy, 35,
+				1.3 * 5.8 * BALANCE_FACTOR * (1000 / 200) *
+				weapon_damage_from_tier(ENEMY_TIER_SNOW),
+				false, 5, 1800, mainColor, secondaryColor)
+		}
+	},
+	[ITEM_ROCKET_PISTOL]: {
+		cooldown: 450,
+		ammo: ITEM_ROCKET,
+		color: "#7a7a7a",
+		length: 0.8,
+		width: 1.1,
+		sound: "data/sfx/rocketlauncher_1.mp3",
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			rocket_create(g, p.body.position.x + Math.cos(theta) * p.w,
+				p.body.position.y + Math.sin(theta) * p.h,
+				v.tx - v.sx, v.ty - v.sy, 6, null,
+				35 * BALANCE_FACTOR * weapon_damage_from_tier(
+					ENEMY_TIER_USHANKA),
+				p.max_health, false, 15);
+		}
+	},
+	[ITEM_FLAMETHROWER]: {
+		cooldown: 45,
+		ammo: ITEM_RED_PLASMA,
+		color: "#cc5500",
+		length: 1.4,
+		width: 1.2,
+		sound: "data/sfx/spray_1.mp3",
+		action: (g, p, v) => {
+			let colors = ["#ff4500", "#ff8c00", "#ffd700"];
+			let s = (Math.random() - 0.5) * 250;
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			let startX = p.body.position.x + Math.cos(theta) * p.w;
+			let startY = p.body.position.y + Math.sin(theta) * p.w;
+			bullet_create(g, startX, startY, (v.tx - v.sx) + s, (v.ty -
+					v.sy) + s, 7,
+				0.15 * BALANCE_FACTOR * (1000 / 70) *
+				weapon_damage_from_tier(ENEMY_TIER_USHANKA),
+				false, 12, 600, colors[Math.floor(Math.random() *
+					colors.length)], "orange", false, false, "red",
+				true, false);
+		}
+	},
+	[ITEM_TESLA_GUN]: {
+		cooldown: 130,
+		ammo: ITEM_PLASMA,
+		color: "#00008b",
+		sound: "data/sfx/red_pistols_1.mp3",
+		length: 1.3,
+		width: 1.0,
+		action: (g, p, v) => {
+			let dx = (v.tx - v.sx) + (Math.random() - 0.5) * 20;
+			let dy = (v.ty - v.sy) + (Math.random() - 0.5) * 20;
+			bullet_create(g, p.body.position.x, p.body.position.y, dx,
+				dy, 25,
+				0.6 * 2.14 * BALANCE_FACTOR * (1000 / 150) *
+				weapon_damage_from_tier(ENEMY_TIER_USHANKA),
+				false, 7, 1000, "#00ffff", "#0000ff", false, false,
+				"#00ffff", false, false, true);
+		}
+	},
+	[ITEM_SNOWBALL_GUN]: {
+		cooldown: 250,
+		ammo: ITEM_SNOWBALL,
+		color: "#ffffff",
+		sound: "data/sfx/gunshot_1.mp3",
+		length: 0.9,
+		width: 1.1,
+		action: (g, p, v) => bullet_create(g, p.body.position.x, p.body
+			.position.y, v.tx - v.sx, v.ty - v.sy, 18,
+			0.5 * BALANCE_FACTOR * (1000 / 30) *
+			weapon_damage_from_tier(ENEMY_TIER_SNOWMAN),
+			false, 10, 1200, "white", "cyan")
+	},
+	[ITEM_FREEZE_GUN]: {
+		cooldown: 50,
+		ammo: ITEM_PLASMA,
+		color: "#add8e6",
+		length: 1.4,
+		width: 1.1,
+		sound: "data/sfx/spray_1.mp3",
+		action: (g, p, v) => {
+			let colors = ["#ffffff", "#e0ffff", "#00ffff"];
+			let s = (Math.random() - 0.5) * 150;
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			let startX = p.body.position.x + Math.cos(theta) * p.w;
+			let startY = p.body.position.y + Math.sin(theta) * p.w;
+			bullet_create(g, startX, startY, (v.tx - v.sx) + s, (v.ty -
+					v.sy) + s, 9,
+				0.08 * BALANCE_FACTOR * (1000 / (160 * 7)) * (1000 /
+					30) * weapon_damage_from_tier(
+					ENEMY_TIER_SNOWMAN),
+				false, 14, 500, colors[Math.floor(Math.random() *
+					colors.length)], "cyan", false, false, "white",
+				false, true);
+		}
+	},
+	[ITEM_BLIZZARD_STAFF]: {
+		cooldown: 60,
+		ammo: ITEM_PLASMA,
+		color: "#ffffff",
+		length: 1.8,
+		width: 0.8,
+		sound: "data/sfx/red_pistols_1.mp3",
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			for (let i = 0; i < 4; i++) {
+				let offsetSide = (Math.random() - 0.5) * (p.w * 2.25);
+				let startX = p.body.position.x + Math.cos(theta) * p.w -
+					Math.sin(theta) * offsetSide;
+				let startY = p.body.position.y + Math.sin(theta) * p.w +
+					Math.cos(theta) * offsetSide;
+				bullet_create(g, startX, startY, Math.cos(theta + (Math
+						.random() - 0.5) * 0.1), Math.sin(theta + (
+						Math.random() - 0.5) * 0.1),
+					20, 0.05 * BALANCE_FACTOR * (1000 / 60) *
+					weapon_damage_from_tier(ENEMY_TIER_SNOWMAN),
+					false, 5, 900, "white", "cyan", false, false);
+			}
+			return true;
+		}
+	},
+	[ITEM_PUMPKIN_GUN]: {
+		cooldown: 250,
+		ammo: ITEM_PUMPKIN,
+		color: "#ff7518",
+		length: 1.8,
+		width: 3.0,
+		sound: "data/sfx/shotgun_1.mp3",
+		chance: 0.02,
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			[0, Math.PI / 10, -Math.PI / 10].forEach(angleOffset => {
+				let finalAngle = theta + angleOffset;
+				trash_bullet_create(
+					g,
+					p.body.position.x + Math.cos(theta) * p
+					.w * 1.5,
+					p.body.position.y + Math.sin(theta) * p
+					.w * 1.5,
+					Math.cos(finalAngle),
+					Math.sin(finalAngle),
+					22,
+					(20 + 10 * Math.random()) * 0.01 *
+					BALANCE_FACTOR * 1000 / 155 * 10 *
+					weapon_damage_from_tier(
+						ENEMY_TIER_PUMPKIN_SKELETON),
+					false,
+					60,
+					[ITEM_PUMPKIN]
+				);
+			});
+			return true;
+		}
+	},
+	[ITEM_PRESENT_LAUNCHER]: {
+		cooldown: 250,
+		ammo: ITEM_PRESENT,
+		color: "#ff0000",
+		length: 1.6,
+		width: 2.8,
+		sound: "data/sfx/shotgun_1.mp3",
+		chance: 0.01,
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			[0, Math.PI / 8, -Math.PI / 8].forEach(angleOffset => {
+				let finalAngle = theta + angleOffset;
+				trash_bullet_create(g, p.body.position.x + Math
+					.cos(theta) * p.w * 1.5,
+					p.body.position.y + Math.sin(theta) * p
+					.w * 1.5,
+					Math.cos(finalAngle), Math.sin(
+						finalAngle), 25,
+					(15 + 15 * Math.random()) * 0.01 *
+					BALANCE_FACTOR * 1000 / 155 * 10 *
+					weapon_damage_from_tier(
+						ENEMY_TIER_KRAMPUS),
+					false, 45, ITEMS_TOYS);
+			});
+			return true;
+		}
+	},
+	[ITEM_KRAMPUS_CHAIN]: {
+		isMelee: true,
+		isContinuous: true,
+		color: "#222222",
+		swordLength: 220,
+		action: (g, p, v, dt) => {
+			if (!p.whip_segments) {
+				p.whip_segments = [];
+				p.whip_timer = 0;
+				const numSegments = 10;
+				for (let i = 0; i < numSegments; i++) {
+					p.whip_segments.push({
+						x: p.body.position.x,
+						y: p.body.position.y
+					});
+				}
+			}
+			if (Date.now() - (p.last_whip_update || 0) > 100) {
+				p.whip_segments.forEach(seg => {
+					seg.x = p.body.position.x;
+					seg.y = p.body.position.y;
+				});
+				p.whip_timer = 0;
+			}
+			p.last_whip_update = Date.now();
+			p.whip_timer += dt;
+			const strikeCycle = 800;
+			const strikeProgress = (p.whip_timer % strikeCycle) /
+				strikeCycle;
+			if (strikeProgress < 0.1 && !p.whip_sound_played) {
+				audio_play("data/sfx/sword_1.mp3", 0.3);
+				p.whip_sound_played = true;
+			}
+			if (strikeProgress > 0.5) {
+				p.whip_sound_played = false;
+			}
+			const numSegments = p.whip_segments.length;
+			const segmentLen = (p.w * 0.8);
+			const targetAngle = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			p.whip_segments[0].x = p.body.position.x;
+			p.whip_segments[0].y = p.body.position.y;
+			for (let i = 1; i < numSegments; i++) {
+				let prev = p.whip_segments[i - 1];
+				let curr = p.whip_segments[i];
+				let p_norm = i / numSegments;
+				let wave = Math.sin(strikeProgress * Math.PI * 2) * (1 -
+					p_norm) * (p.w * 3);
+				let bend = Math.sin(p_norm * Math.PI) * wave;
+				let currentAngle = targetAngle + (bend / (p.w * 0.8));
+				let tx = prev.x + Math.cos(currentAngle) * segmentLen;
+				let ty = prev.y + Math.sin(currentAngle) * segmentLen;
+				curr.x += (tx - curr.x) * 0.5;
+				curr.y += (ty - curr.y) * 0.5;
+			}
+			if (strikeProgress > 0.4 && strikeProgress < 0.7) {
+				let hitObjects = new Set();
+				p.whip_segments.forEach((seg, index) => {
+					let isHook = (index === numSegments - 1);
+					let hitRadius = isHook ? p.w * 1.8 : p.w *
+						1.0;
+					let hitRadiusSq = hitRadius * hitRadius;
+					g.objects.forEach(obj => {
+						if (obj.destroyed || hitObjects
+							.has(obj)) return;
+						if (!["animal", "enemy",
+								"trashcan", "car",
+								"rocket"
+							].includes(obj.name))
+							return;
+						if (obj.name === "car" && obj
+							.data.is_tank) return;
+						let dx = obj.data.body.position
+							.x - seg.x;
+						let dy = obj.data.body.position
+							.y - seg.y;
+						let distSq = dx * dx + dy * dy;
+						if (distSq < hitRadiusSq) {
+							let damage_dealt = (isHook ?
+									2.0 : 1.0) * dt *
+								0.15 * 250 *
+								BALANCE_FACTOR * (0.4 /
+									1.5) *
+								weapon_damage_from_tier(
+									ENEMY_TIER_KRAMPUS);
+							obj.data.health -=
+								damage_dealt;
+							obj.data.hit_by_player =
+								true;
+							hitObjects.add(obj);
+							if (["animal", "enemy"]
+								.includes(obj.name)) {
+								if (isHook || Math
+									.random() < 0.3) {
+									blood_splash_create(
+										g,
+										seg.x,
+										seg.y,
+										isHook ? 6 :
+										2,
+										isHook ? 5 :
+										3,
+										"#990000",
+										1.2
+									);
+								}
+							}
+							let force = isHook ? 0.04 :
+								0.015;
+							Matter.Body.applyForce(obj
+								.data.body, obj.data
+								.body.position, {
+									x: Math.cos(
+											targetAngle
+										) *
+										force,
+									y: Math.sin(
+											targetAngle
+										) *
+										force
+								});
+							let w = ITEM_KRAMPUS_CHAIN;
+							if (!g.dps_history[w]) g
+								.dps_history[w] = [];
+							g.dps_history[w].push({
+								dmg: damage_dealt,
+								time: Date.now()
+							});
+						}
+					});
+				});
+			}
+			p.drawing_whip = true;
+		}
+	},
 	[ITEM_MUMMY_PISTOLS]: {
 		cooldown: 100,
 		ammo: ITEM_PLASMA,
@@ -21,9 +385,9 @@ const WEAPON_DEFS = {
 					.cos(theta + off), p.body.position.y + p
 					.w * Math.sin(theta + off), v.tx - v.sx,
 					v.ty - v.sy, 30, (0.4 + 0.8 * Math
-						.random()) * 1.84 * BALANCE_FACTOR *
-					1000 / 435 *
-					weapon_damage_from_tier(5.75),
+						.random()) * 2.04 * BALANCE_FACTOR *
+					1000 / 579 * weapon_damage_from_tier(
+						ENEMY_TIER_MUMMY),
 					false, 6, 1500,
 					COLORS_DEFAULT.weapons.special
 					.mummy_bullet,
@@ -35,7 +399,7 @@ const WEAPON_DEFS = {
 		}
 	},
 	[ITEM_MUMMY_SHOTGUN]: {
-		cooldown: 200,
+		cooldown: 500,
 		ammo: ITEM_PLASMA,
 		chance: 0.001,
 		sound: "data/sfx/red_pistols_1.mp3",
@@ -51,9 +415,9 @@ const WEAPON_DEFS = {
 						theta - (0.5 * N - i) * Math.PI / N), p.body
 					.position.y + 2 * p.w * Math.sin(theta - (0.5 * N -
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 30,
-					(2.5 + 0.5 * Math.random()) * 3.52 *
-					BALANCE_FACTOR * 1000 / 544 * (1000 / 6500) *
-					weapon_damage_from_tier(5.75),
+					(2.5 + 0.5 * Math.random()) * 0.62 *
+					BALANCE_FACTOR * 1000 / 705 * (1000 / 400) *
+					weapon_damage_from_tier(ENEMY_TIER_MUMMY),
 					false, 6, 1500,
 					COLORS_DEFAULT.weapons.special.mummy_bullet,
 					COLORS_DEFAULT.weapons.special.mummy_bullet_outline,
@@ -81,7 +445,9 @@ const WEAPON_DEFS = {
 					Math.cos(angle), Math.sin(angle),
 					10, 2.0 * 166.6 * BALANCE_FACTOR * 1000 / 141 *
 					(1000 /
-						150000) * weapon_damage_from_tier(7), false,
+						150000) * weapon_damage_from_tier(
+						ENEMY_TIER_SHADOW),
+					false,
 					12, 1200,
 					COLORS_DEFAULT.weapons.energy.void_core,
 					COLORS_DEFAULT.weapons.common.black
@@ -114,16 +480,61 @@ const WEAPON_DEFS = {
 					14 + 6 * Math.random(),
 					(5 + 10 * Math.random()) * 4.85 *
 					BALANCE_FACTOR * 1000 / 369 * (1000 / 85000) *
-					weapon_damage_from_tier(7),
+					weapon_damage_from_tier(ENEMY_TIER_SHADOW),
 					false, 8, 900,
 					COLORS_DEFAULT.weapons.special
 					.shadow_dual_bullet,
 					COLORS_DEFAULT.weapons.common.black,
-					false, true
+					false, false
 				);
 			}
 			p.shadow_alt = !p.shadow_alt;
 			p.shot_cooldown = p.shadow_alt ? 150 : 800;
+			return true;
+		}
+	},
+	[ITEM_FIRE_STAFF]: {
+		name: "Inferno Staff",
+		name_rus: "Посох Преисподней",
+		desc: "Channels the raw heat of the underworld. Incinerates everything in its path.",
+		desc_rus: "Проводит чистый жар преисподней. Испепеляет всё на своём пути.",
+		cooldown: 40,
+		ammo: ITEM_RED_PLASMA,
+		sound: "data/sfx/spray_1.mp3",
+		color: "#ff4500",
+		length: 1.8,
+		width: 0.9,
+		action: (g, p, v, dt) => {
+			let colors = ["#ff4500", "#ff8c00", "#ffd700"];
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			for (let i = 0; i < 3; i++) {
+				let offsetSide = (Math.random() - 0.5) * (p.w * 1.5);
+				let startX = p.body.position.x + Math.cos(theta) * (p
+					.w * 1.2) - Math.sin(theta) * offsetSide;
+				let startY = p.body.position.y + Math.sin(theta) * (p
+					.w * 1.2) + Math.cos(theta) * offsetSide;
+				let spread = (Math.random() - 0.5) * 0.25;
+				let speed = 12 + Math.random() * 8;
+				bullet_create(
+					g,
+					startX, startY,
+					Math.cos(theta + spread), Math.sin(theta +
+						spread),
+					speed,
+					0.18 * BALANCE_FACTOR * (1000 / 70) *
+					weapon_damage_from_tier(ENEMY_TIER_DEVIL),
+					false,
+					10 + Math.random() * 6,
+					500 + Math.random() * 300,
+					colors[Math.floor(Math.random() * colors
+						.length)],
+					"orange",
+					false, false,
+					"red",
+					true,
+					false
+				);
+			}
 			return true;
 		}
 	},
@@ -161,11 +572,52 @@ const WEAPON_DEFS = {
 					.sin(streamAngle),
 					speed, (10 + 15 * Math.random()) * 4.52 *
 					BALANCE_FACTOR * 1000 / 500 * (1000 / 150000) *
-					weapon_damage_from_tier(8),
+					weapon_damage_from_tier(ENEMY_TIER_ANUBIS),
 					false, Math.random() * 3 + 4, 700 + Math
 					.random() * 300, mainColor, secondaryColor,
-					false, true
+					false, false
 				);
+			}
+			return true;
+		}
+	},
+	[ITEM_NECROMANCER_STAFF]: {
+		cooldown: 400,
+		ammo: ITEM_PLASMA,
+		chance: 0.002,
+		sound: "data/sfx/plasmagun_1.mp3",
+		vol: 0.1,
+		color: "#9b59b6",
+		length: 1.8,
+		width: 0.8,
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			let angles = [-0.25, 0, 0.25];
+			let startX = p.body.position.x + Math.cos(theta) * p.w;
+			let startY = p.body.position.y + Math.sin(theta) * p.w;
+			angles.forEach(offset => {
+				let finalAngle = theta + offset;
+				bullet_create(
+					g,
+					startX,
+					startY,
+					Math.cos(finalAngle),
+					Math.sin(finalAngle),
+					15,
+					(0.8 + 0.4 * Math.random()) * 25.0 *
+					BALANCE_FACTOR * 1000 / 209 * (1000 /
+						10000) *
+					weapon_damage_from_tier(
+						ENEMY_TIER_NECROMANCER),
+					false,
+					10,
+					2000,
+					"#3498db",
+					"#e066ff"
+				);
+			});
+			if (typeof smoke_create === "function") {
+				smoke_create(g, startX, startY, 5, "purple", 0.5);
 			}
 			return true;
 		}
@@ -193,7 +645,8 @@ const WEAPON_DEFS = {
 					17.5, (0.75 + 0.5 * Math.random()) *
 					29.4 * BALANCE_FACTOR * 1000 / 209 * (
 						1000 / 10000) *
-					weapon_damage_from_tier(8),
+					weapon_damage_from_tier(
+						ENEMY_TIER_ANUBIS),
 					false, 12.5, 1500,
 					COLORS_DEFAULT.weapons.special
 					.anubis_bullet_red,
@@ -229,7 +682,7 @@ const WEAPON_DEFS = {
 					speed, (10 + 15 * Math.random()) * 4.44 *
 					BALANCE_FACTOR * 1000 / 569 * 1.5 * (1000 /
 						200000) *
-					weapon_damage_from_tier(11),
+					weapon_damage_from_tier(ENEMY_TIER_ANIMALS),
 					false, Math.random() * 3 + 4, 700 + Math
 					.random() * 300,
 					COLORS_DEFAULT.weapons.special.snake_bullet,
@@ -264,7 +717,8 @@ const WEAPON_DEFS = {
 					14 + 6 * Math.random(),
 					(5 + 10 * Math.random()) * 0.24 *
 					BALANCE_FACTOR * 1000 / 340 * (1000 / 4000) *
-					weapon_damage_from_tier(11) * 0.75,
+					weapon_damage_from_tier(ENEMY_TIER_ANIMALS) *
+					0.75,
 					false, 8, 900,
 					COLORS_DEFAULT.player.lime,
 					COLORS_DEFAULT.decorations.nature
@@ -369,11 +823,43 @@ const WEAPON_DEFS = {
 				secondaryColor = COLORS_DEFAULT.player.yellow;
 			}
 			bullet_create(g, p.body.position.x, p.body
-				.position.y, v.tx - v.sx, v.ty - v.sy, 20, 0.25 *
-				5.49 *
-				BALANCE_FACTOR * 1000 / 90 *
-				weapon_damage_from_tier(1),
+				.position.y, v.tx - v.sx, v.ty - v.sy, 20, 15 *
+				BALANCE_FACTOR * weapon_damage_from_tier(0),
 				false, 6, 1500, mainColor, secondaryColor)
+		}
+	},
+	[ITEM_CANDY_GUN]: {
+		cooldown: 130,
+		ammo: ITEMS_CANDIES,
+		chance: 0.0025,
+		sound: "data/sfx/gunshot_1.mp3",
+		vol: 0.2,
+		color: "#ff0044",
+		length: 1.4,
+		width: 1.1,
+		action: (g, p, v) => {
+			let spread = 25;
+			let dx = (v.tx - v.sx) + (Math.random() - 0.5) * spread;
+			let dy = (v.ty - v.sy) + (Math.random() - 0.5) * spread;
+			let dist = Math.sqrt(dx * dx + dy * dy);
+			let ndx = dx / dist;
+			let ndy = dy / dist;
+			trash_bullet_create(
+				g,
+				p.body.position.x + ndx * p.w * 1.2,
+				p.body.position.y + ndy * p.w * 1.2,
+				ndx,
+				ndy,
+				22,
+				(0.5 + 0.5 * Math.random()) * 2.14 *
+				BALANCE_FACTOR * 1000 / 193 *
+				weapon_damage_from_tier(
+					ENEMY_TIER_PUMPKIN_SKELETON),
+				false,
+				45,
+				ITEMS_CANDIES
+			);
+			return true;
 		}
 	},
 	[ITEM_KALASHNIKOV]: {
@@ -403,7 +889,7 @@ const WEAPON_DEFS = {
 				g, p.body.position.x, p.body.position.y, dx, dy,
 				22, (0.5 + 0.5 * Math.random()) * 2.14 *
 				BALANCE_FACTOR * 1000 / 193 *
-				weapon_damage_from_tier(5), false,
+				weapon_damage_from_tier(ENEMY_TIER_DESERT), false,
 				7, 1500, mainColor, secondaryColor
 			);
 		}
@@ -430,7 +916,7 @@ const WEAPON_DEFS = {
 				.position.y, v.tx - v.sx, v.ty - v.sy, 32, 1.2 *
 				5.68 *
 				BALANCE_FACTOR * 1000 / 175 *
-				weapon_damage_from_tier(1),
+				weapon_damage_from_tier(0),
 				false, 6, 1500, mainColor, secondaryColor)
 		}
 	},
@@ -459,7 +945,7 @@ const WEAPON_DEFS = {
 				25, (3 + 2 * Math.random()) * 4.93 *
 				BALANCE_FACTOR * 1000 / 93 * (
 					1000 / 9000) * 2 * weapon_damage_from_tier(
-					5.25),
+					ENEMY_TIER_DESERT),
 				false, 6, 1500, mainColor, secondaryColor)
 		}
 	},
@@ -486,7 +972,8 @@ const WEAPON_DEFS = {
 					0.5 *
 					Math
 					.random()) * 1.91 * BALANCE_FACTOR * 1000 / 76 *
-				weapon_damage_from_tier(3.25), false, 6, 1500,
+				weapon_damage_from_tier(ENEMY_TIER_SHOOTING), false,
+				6, 1500,
 				mainColor, secondaryColor)
 		}
 	},
@@ -518,7 +1005,7 @@ const WEAPON_DEFS = {
 						0.95 + 0.1 * Math.random()) * v.ty - v.sy, Math
 					.random() * 10 + 10, (0.06 + 0.16 * Math.random()) *
 					6.74 * BALANCE_FACTOR * 1000 / 182 *
-					weapon_damage_from_tier(2),
+					weapon_damage_from_tier(ENEMY_TIER_REGULAR),
 					false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
@@ -551,7 +1038,7 @@ const WEAPON_DEFS = {
 				.random() * 10 + 10, (0.1 + 0.1 * Math.random()) *
 				7.15 *
 				BALANCE_FACTOR * 1000 / 328 *
-				weapon_damage_from_tier(2),
+				weapon_damage_from_tier(ENEMY_TIER_REGULAR),
 				false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
@@ -575,12 +1062,13 @@ const WEAPON_DEFS = {
 						finalAngle), 25,
 					(15 + 15 * Math.random()) * 0.01 *
 					BALANCE_FACTOR * 1000 / 155 * 10 *
-					weapon_damage_from_tier(10),
+					weapon_damage_from_tier(
+						ENEMY_TIER_ANIMALS),
 					false, 45);
 			});
 			return true;
 		},
-		chance: 0.25
+		chance: 0.05
 	},
 	[ITEM_PLASMA_LAUNCHER]: {
 		cooldown: 400,
@@ -595,7 +1083,7 @@ const WEAPON_DEFS = {
 			.position.y, v.tx - v.sx, v.ty - v.sy, 17.5, (0.75 + 0.5 *
 				Math.random()) * 4.15 * BALANCE_FACTOR * 1000 / 70 * (
 				1000 / 2500) *
-			weapon_damage_from_tier(3.25),
+			weapon_damage_from_tier(ENEMY_TIER_SHOOTING),
 			false, 12.5, 1500,
 			COLORS_DEFAULT.weapons.energy.plasma,
 			COLORS_DEFAULT.player.blue)
@@ -615,7 +1103,9 @@ const WEAPON_DEFS = {
 				1.75, p.body.position.y + Math.sin(theta) * p.h *
 				1.75, v.tx - v.sx, v.ty - v.sy, Math.min(0.25 * p.w,
 					10), null, (9 + 18 * Math.random()) * 0.2 *
-				BALANCE_FACTOR * 7.5 * weapon_damage_from_tier(7), p
+				BALANCE_FACTOR * 7.5 * weapon_damage_from_tier(
+					ENEMY_TIER_SHOOTING_ROCKET),
+				p
 				.max_health,
 				false, 20);
 		}
@@ -648,12 +1138,39 @@ const WEAPON_DEFS = {
 					.cos(theta + off), p.body.position.y + p
 					.w * Math.sin(theta + off), v.tx - v.sx,
 					v.ty - v.sy, 30, (0.4 + 0.8 * Math
-						.random()) * 2.04 * BALANCE_FACTOR *
-					1000 / 579 *
-					weapon_damage_from_tier(5),
+						.random()) * 1.84 * BALANCE_FACTOR *
+					1000 / 435 * weapon_damage_from_tier(
+						ENEMY_TIER_SHOOTING_RED),
 					false, 6, 1500, mainColor,
 					secondaryColor);
 			});
+		}
+	},
+	[ITEM_BAT_BLASTER]: {
+		cooldown: 350,
+		ammo: ITEM_ROCKET,
+		color: "#1a1a1a",
+		length: 1.0,
+		width: 1.2,
+		sound: "data/sfx/rocketlauncher_1.mp3",
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			rocket_create(
+				g,
+				p.body.position.x + Math.cos(theta) * p.w,
+				p.body.position.y + Math.sin(theta) * p.h,
+				v.tx - v.sx,
+				v.ty - v.sy,
+				8,
+				null,
+				2.75 * 7.5 * BALANCE_FACTOR *
+				weapon_damage_from_tier(ENEMY_TIER_VAMPIRE),
+				p.max_health,
+				false,
+				14,
+				3000,
+				"bat"
+			);
 		}
 	},
 	[ITEM_ROCKET_SHOTGUN]: {
@@ -674,13 +1191,15 @@ const WEAPON_DEFS = {
 					.position.y + 2 * p.w * Math.sin(theta - (0.5 * N -
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 6,
 					null, (3 + 6 * Math.random()) * 0.62 *
-					BALANCE_FACTOR * 1.5 * weapon_damage_from_tier(7), p
+					BALANCE_FACTOR * 1.5 * weapon_damage_from_tier(
+						ENEMY_TIER_SHOOTING_ROCKET),
+					p
 					.max_health, false,
 					20, 1500);
 		}
 	},
 	[ITEM_RED_SHOTGUN]: {
-		cooldown: 500,
+		cooldown: 200,
 		ammo: ITEM_RED_PLASMA,
 		chance: 0.005,
 		sound: "data/sfx/red_pistols_1.mp3",
@@ -707,9 +1226,9 @@ const WEAPON_DEFS = {
 						theta - (0.5 * N - i) * Math.PI / N), p.body
 					.position.y + 2 * p.w * Math.sin(theta - (0.5 * N -
 						i) * Math.PI / N), v.tx - v.sx, v.ty - v.sy, 30,
-					(2.5 + 0.5 * Math.random()) * 0.62 *
-					BALANCE_FACTOR * 1000 / 705 * (1000 / 400) *
-					weapon_damage_from_tier(5),
+					(2.5 + 0.5 * Math.random()) * 3.52 *
+					BALANCE_FACTOR * 1000 / 544 * (1000 / 6500) *
+					weapon_damage_from_tier(ENEMY_TIER_SHOOTING_RED),
 					false, 6, 1500, mainColor, secondaryColor);
 		}
 	},
@@ -741,7 +1260,8 @@ const WEAPON_DEFS = {
 							.laser_direction)) {
 						let damage_dealt = 0.33 * dt * 0.2 *
 							BALANCE_FACTOR * 1000 / 1326 * 20 *
-							weapon_damage_from_tier(9);
+							weapon_damage_from_tier(
+								ENEMY_TIER_SHOOTING_LASER);
 						obj.data.health -= damage_dealt;
 						obj.data.hit_by_player = true;
 						let w = ITEM_LASER_GUN;
@@ -765,7 +1285,7 @@ const WEAPON_DEFS = {
 		action: (g, p, v, dt) => {
 			player_handle_melee(g, p, v, dt, 0.02, 10.0 * 1.04 *
 				BALANCE_FACTOR * 1000 / 2000 * 2 *
-				weapon_damage_from_tier(6),
+				weapon_damage_from_tier(ENEMY_TIER_SWORD),
 				7.0, Math.PI / 8, 1500, 500);
 		}
 	},
@@ -777,7 +1297,8 @@ const WEAPON_DEFS = {
 		action: (g, p, v, dt) => {
 			player_handle_melee(g, p, v, dt, 0.04, 80.0 *
 				BALANCE_FACTOR * (1000.0 / 8000) *
-				weapon_damage_from_tier(10), 0, Math.PI / 4,
+				weapon_damage_from_tier(ENEMY_TIER_ANIMALS), 0, Math
+				.PI / 4,
 				15000, 5000);
 		}
 	},
@@ -805,7 +1326,7 @@ const WEAPON_DEFS = {
 				Math.random() * 10 + 20, (1.5 + 0.375 * Math
 					.random()) * 1.04 * BALANCE_FACTOR * 1000 /
 				323 *
-				weapon_damage_from_tier(6),
+				weapon_damage_from_tier(ENEMY_TIER_SWORD),
 				false, 6, 1500, mainColor, secondaryColor);
 			if (p.shield_green_health > 0) {
 				p.shield_green_health -= 0.05 * dt;
@@ -852,21 +1373,21 @@ const WEAPON_DEFS = {
 				sfx = "red_pistols_1";
 				chance = 0.001;
 				dmgBase = 2.0 * 0.2 * BALANCE_FACTOR * 2 *
-					weapon_damage_from_tier(9);
+					weapon_damage_from_tier(ENEMY_TIER_SHOOTING_LASER);
 			}
 			else if (ammoType === ITEM_RED_PLASMA) {
 				c1 = COLORS_DEFAULT.player.red;
 				c2 = COLORS_DEFAULT.enemies.shooting_red.bullet_alt;
 				sfx = "red_pistols_1";
 				dmgBase = 1.75 * 0.2 * BALANCE_FACTOR * 2 *
-					weapon_damage_from_tier(9);
+					weapon_damage_from_tier(ENEMY_TIER_SHOOTING_LASER);
 			}
 			else if (ammoType === ITEM_PLASMA) {
 				c1 = COLORS_DEFAULT.weapons.energy.plasma;
 				c2 = COLORS_DEFAULT.player.blue;
 				sfx = "red_pistols_1";
 				dmgBase = 1.5 * 0.2 * BALANCE_FACTOR * 2 *
-					weapon_damage_from_tier(9);
+					weapon_damage_from_tier(ENEMY_TIER_SHOOTING_LASER);
 			}
 			if (ammoType !== ITEM_ROCKET || ammoType ===
 				ITEM_RAINBOW_AMMO) {
@@ -890,7 +1411,8 @@ const WEAPON_DEFS = {
 						v.ty - v.sy, 0.15 * p.w, null, (
 							0.8 + 1.6 * Math.random()) *
 						0.2 * BALANCE_FACTOR * 2 *
-						weapon_damage_from_tier(9), p
+						weapon_damage_from_tier(
+							ENEMY_TIER_SHOOTING_LASER), p
 						.max_health,
 						false, 20);
 				});
@@ -898,6 +1420,106 @@ const WEAPON_DEFS = {
 			}
 			if (Math.random() < chance) inventory_clear_item(p
 				.inventory_element, ammoType, 1);
+			return true;
+		}
+	},
+	[ITEM_BLOOD_PISTOL]: {
+		cooldown: 250,
+		ammo: ITEM_RED_PLASMA,
+		chance: 0.005,
+		sound: "data/sfx/gunshot_1.mp3",
+		vol: 0.3,
+		color: "#880000",
+		length: 0.9,
+		width: 1.0,
+		action: (g, p, v) => {
+			let mainColor = "#ff0000";
+			let secondaryColor = "#4a0404";
+			bullet_create(
+				g, p.body.position.x, p.body.position.y,
+				v.tx - v.sx, v.ty - v.sy,
+				25,
+				15 * BALANCE_FACTOR * weapon_damage_from_tier(
+					ENEMY_TIER_BLOOD),
+				false, 7, 1200, mainColor, secondaryColor
+			);
+		}
+	},
+	[ITEM_BLOOD_DUAL_SHOTGUNS]: {
+		cooldown: 180,
+		ammo: ITEM_RED_PLASMA,
+		chance: 0.002,
+		sound: "data/sfx/shotgun_1.mp3",
+		vol: 0.4,
+		color: "#660000",
+		length: 1.1,
+		width: 1.3,
+		hasSecondary: true,
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			if (p.blood_alt === undefined) p.blood_alt = false;
+			let off = p.blood_alt ? Math.PI / 5 : -Math.PI / 5;
+			let sx = p.body.position.x + p.w * Math.cos(theta + off);
+			let sy = p.body.position.y + p.w * Math.sin(theta + off);
+			for (let i = 0; i < 6; i++) {
+				bullet_create(
+					g, sx, sy,
+					(0.9 + 0.2 * Math.random()) * v.tx - v.sx,
+					(0.9 + 0.2 * Math.random()) * v.ty - v.sy,
+					15 + 5 * Math.random(),
+					(4 + 8 * Math.random()) * BALANCE_FACTOR * (1 /
+						4.5) *
+					weapon_damage_from_tier(ENEMY_TIER_BLOOD),
+					false, 8, 800,
+					"#ff0000",
+					"#2a0000",
+					false, false
+				);
+			}
+			p.blood_alt = !p.blood_alt;
+			p.shot_cooldown = p.blood_alt ? 180 : 900;
+			return true;
+		}
+	},
+	[ITEM_LIFESTEAL_STAFF]: {
+		cooldown: 150,
+		length: 1.8,
+		width: 0.8,
+		sound: "data/sfx/spray_1.mp3",
+		ammo: ITEM_RED_PLASMA,
+		chance: 0.01,
+		action: (g, p, v, dt) => {
+			const rangeSq = 1000 * 1000;
+			const pPos = p.body.position;
+			let foundAny = false;
+			const baseDamage = 39 / 37.5 * 6 * dt *
+				weapon_damage_from_tier(ENEMY_TIER_VAMPIRE);
+			for (let i = 0; i < g.objects.length; i++) {
+				let obj = g.objects[i];
+				if (!obj || obj.destroyed || !obj.data || !obj.data
+					.body) continue;
+				if (obj.name === "enemy" || (obj.name === "rocket" &&
+						obj.data.enemy) || obj.name === "animal") {
+					let ePos = obj.data.body.position;
+					let dx = ePos.x - pPos.x;
+					let dy = ePos.y - pPos.y;
+					if (dx * dx + dy * dy < rangeSq) {
+						let percentDamage = obj.data.health * 0.25;
+						let finalDamage = Math.min(percentDamage,
+							baseDamage);
+						finalDamage = Math.max(0.1, finalDamage);
+						obj.data.health = Math.max(0, obj.data.health -
+							finalDamage);
+						obj.data.hit_by_player = true;
+						if (obj.data.health < 0.001 * obj.data
+							.max_health)
+							obj.data.health = 0;
+						lifesteal_particle_create(g, ePos.x, ePos.y, g
+							.player_object);
+						foundAny = true;
+					}
+				}
+			}
 			return true;
 		}
 	},

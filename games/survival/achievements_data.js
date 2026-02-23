@@ -261,93 +261,10 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		req: "outside the box",
 		draw: (ctx, x, y, w, h, p) => {
-			ctx.save();
-			ctx.translate(x + w * 0.5, y + h * 0.45);
-			let cw = w * 0.7;
-			let ch = h * 0.4;
 			ctx.fillStyle = p.c5;
-			ctx.strokeStyle = "#000";
-			ctx.lineWidth = 2;
-			roundRect(ctx, -cw / 2, -ch / 2, cw, ch, 12, true, true);
-			ctx.fillStyle = "#111";
-			let ww = cw * 0.18,
-				wh = ch * 0.15;
-			ctx.fillRect(cw * 0.2, -ch / 2 - wh, ww, wh);
-			ctx.fillRect(cw * 0.2, ch / 2, ww, wh);
-			ctx.fillRect(-cw * 0.35, -ch / 2 - wh, ww, wh);
-			ctx.fillRect(-cw * 0.35, ch / 2, ww, wh);
-			ctx.fillStyle = p.c28;
-			ctx.strokeStyle = "#222";
-			ctx.lineWidth = 1;
-			ctx.fillRect(cw * 0.1, -ch * 0.35, cw * 0.15, ch * 0.7);
-			ctx.strokeRect(cw * 0.1, -ch * 0.35, cw * 0.15, ch * 0.7);
-			ctx.restore();
-			ctx.save();
-			let kx = x + 0.1 * w,
-				ky = y + 0.1 * h,
-				kw = 0.26 * w,
-				kh = 0.26 * h;
-			ctx.fillStyle = "#ddd";
-			ctx.fillRect(kx, ky, kw, kh);
-			ctx.strokeStyle = "#000";
-			ctx.lineWidth = 2;
-			ctx.strokeRect(kx, ky, kw, kh);
-			ctx.fillStyle = "rgba(0,0,0,0.1)";
-			ctx.fillRect(kx + kw * 0.1, ky + kh * 0.7, kw * 0.8, kh *
-				0.15);
-			ctx.strokeStyle = "#000";
-			ctx.lineWidth = 0.04 * w;
-			ctx.lineCap = "square";
-			ctx.beginPath();
-			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
-			ctx.lineTo(kx + 0.3 * kw, ky + 0.75 * kh);
-			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
-			ctx.lineTo(kx + 0.7 * kw, ky + 0.25 * kh);
-			ctx.moveTo(kx + 0.3 * kw, ky + 0.5 * kh);
-			ctx.lineTo(kx + 0.6 * kw, ky + 0.5 * kh);
-			ctx.stroke();
-			ctx.lineWidth = 1;
-			let sx = x + 0.2 * w,
-				sy = y + 0.82 * h,
-				sw = 0.6 * w,
-				sh = 0.12 * h;
-			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-			ctx.fillRect(sx, sy, sw, sh);
-			ctx.strokeRect(sx, sy, sw, sh);
-			let ox = sx + 0.1 * sw;
-			ctx.beginPath();
-			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.5 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ctx.lineTo(ox, sy + 0.7 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
-			ctx.lineTo(ox, sy + 0.5 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox + 0.04 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ctx.moveTo(ox + 0.02 * sw, sy + 0.55 * sh);
-			ctx.lineTo(ox + 0.06 * sw, sy + 0.55 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ctx.moveTo(ox, sy + 0.5 * sh);
-			ctx.lineTo(ox + 0.06 * sw, sy + 0.5 * sh);
-			ctx.stroke();
-			ctx.restore();
+			ctx.fillRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
+			ctx.strokeStyle = p.c8;
+			ctx.strokeRect(x + 0.3 * w, y + 0.1 * h, 0.4 * w, 0.8 * h);
 		}
 	},
 	"pick an item": {
@@ -371,90 +288,19 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		req: "outside the box",
 		draw: (ctx, x, y, w, h, p) => {
-			ctx.fillStyle = p.c25;
-			ctx.beginPath();
-			ctx.ellipse(x + 0.5 * w, y + 0.55 * h, 0.24 * w, 0.24 * h,
-				0, 0, Math.PI * 2);
-			ctx.fill();
-			ctx.strokeStyle = "#440000";
-			ctx.lineWidth = 0.03 * w;
-			ctx.stroke();
-			drawLine(ctx, x + 0.5 * w, y + 0.35 * h, x + 0.5 * w, y +
-				0.15 * h, p.c26, 0.04 * w);
-			ctx.fillStyle = p.c27;
-			ctx.beginPath();
-			ctx.ellipse(x + 0.6 * w, y + 0.22 * h, 0.1 * w, 0.05 * w, -
-				Math.PI / 4, 0, Math.PI * 2);
-			ctx.fill();
-			ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-			ctx.beginPath();
-			ctx.ellipse(x + 0.4 * w, y + 0.45 * h, 0.07 * w, 0.07 * w,
-				0, 0, Math.PI * 2);
-			ctx.fill();
-			let kx = x + 0.37 * w,
-				ky = y + 0.4 * h,
-				kw = 0.26 * w,
-				kh = 0.26 * h;
-			ctx.fillStyle = "#ddd";
-			ctx.fillRect(kx, ky, kw, kh);
-			ctx.strokeStyle = "#000";
-			ctx.lineWidth = 2;
-			ctx.strokeRect(kx, ky, kw, kh);
-			ctx.fillStyle = "rgba(0,0,0,0.1)";
-			ctx.fillRect(kx + kw * 0.1, ky + kh * 0.7, kw * 0.8, kh *
-				0.15);
-			ctx.strokeStyle = "#000";
-			ctx.lineWidth = 0.04 * w;
-			ctx.lineCap = "square";
-			ctx.beginPath();
-			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
-			ctx.lineTo(kx + 0.3 * kw, ky + 0.75 * kh);
-			ctx.moveTo(kx + 0.3 * kw, ky + 0.25 * kh);
-			ctx.lineTo(kx + 0.7 * kw, ky + 0.25 * kh);
-			ctx.moveTo(kx + 0.3 * kw, ky + 0.5 * kh);
-			ctx.lineTo(kx + 0.6 * kw, ky + 0.5 * kh);
-			ctx.stroke();
-			ctx.lineWidth = 1;
-			let sx = x + 0.2 * w,
-				sy = y + 0.82 * h,
-				sw = 0.6 * w,
-				sh = 0.12 * h;
-			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-			ctx.fillRect(sx, sy, sw, sh);
-			ctx.strokeRect(sx, sy, sw, sh);
-			let ox = sx + 0.1 * sw;
-			ctx.beginPath();
-			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.5 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ctx.lineTo(ox, sy + 0.7 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.5 * sh);
-			ctx.lineTo(ox, sy + 0.5 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox + 0.04 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ctx.moveTo(ox + 0.02 * sw, sy + 0.55 * sh);
-			ctx.lineTo(ox + 0.06 * sw, sy + 0.55 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ox += 0.12 * sw;
-			ctx.moveTo(ox + 0.08 * sw, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.3 * sh);
-			ctx.lineTo(ox, sy + 0.7 * sh);
-			ctx.lineTo(ox + 0.08 * sw, sy + 0.7 * sh);
-			ctx.moveTo(ox, sy + 0.5 * sh);
-			ctx.lineTo(ox + 0.06 * sw, sy + 0.5 * sh);
-			ctx.stroke();
+			let N = 4;
+			for (let i = 0; i < N; i++) {
+				ctx.fillStyle = p.c1;
+				ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y +
+					0.25 * h, 0.5 * w / N, 0.5 * h);
+				ctx.fillStyle = p.c6;
+				ctx.fillRect(x + i * w / N + 0.5 * 0.5 * w / N, y +
+					0.25 * h, 0.5 * w / N, 0.125 * h);
+				ctx.strokeStyle = p.c6;
+				ctx.lineWidth = 0.01 * w;
+				ctx.strokeRect(x + i * w / N + 0.5 * 0.5 * w / N, y +
+					0.25 * h, 0.5 * w / N, 0.5 * h);
+			}
 		}
 	},
 	"yummy": {
@@ -478,23 +324,10 @@ let ACHIEVEMENT_REGISTRY = {
 		},
 		req: "pick an item",
 		draw: (ctx, x, y, w, h, p) => {
-			drawLine(ctx, x + 0.5 * w, y + 0.6 * h, x + 0.5 * w, y +
-				0.85 * h, "#eeeeee", 0.08 * w);
-			drawCircle(ctx, x + 0.45 * w, y + 0.85 * h, 0.05 * w,
-				"#eeeeee", "#cccccc", 0.01 * w);
-			drawCircle(ctx, x + 0.55 * w, y + 0.85 * h, 0.05 * w,
-				"#eeeeee", "#cccccc", 0.01 * w);
-			ctx.fillStyle = p.c23;
-			ctx.beginPath();
-			ctx.ellipse(x + 0.5 * w, y + 0.4 * h, 0.2 * w, 0.28 * h, 0,
-				0, Math.PI * 2);
-			ctx.fill();
-			ctx.fillStyle = p.c24;
-			ctx.beginPath();
-			ctx.ellipse(x + 0.45 * w, y + 0.35 * h, 0.12 * w, 0.18 * h,
-				0, 0, Math.PI * 2);
-			ctx.fill();
-			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
+			ctx.fillStyle = p.c10;
+			ctx.fillRect(x + w * 0.1, y + h * 0.3, w * 0.8, h * 0.4);
+			ctx.fillStyle = p.c11;
+			ctx.fillRect(x + w * 0.1, y + h * 0.4, w * 0.8, h * 0.2);
 		}
 	},
 	"stay hydrated": {
@@ -522,7 +355,6 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.fillRect(x + w * 0.2, y + h * 0.1, w * 0.6, h * 0.8);
 			ctx.fillStyle = p.c12;
 			ctx.fillRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
 		}
 	},
 	"healthy lifestyle": {
@@ -553,7 +385,6 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.fillRect(x + w * 0.3, y + h * 0.4, w * 0.4, h * 0.2);
 			ctx.strokeStyle = p.c13;
 			ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
-			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
 		}
 	},
 	"fuel up": {
@@ -582,6 +413,7 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.05, h * 0.2);
 			ctx.fillRect(x + w * 0.4, y + h * 0.1, w * 0.05, h * 0.2);
 			ctx.fillRect(x + w * 0.25, y + h * 0.1, w * 0.2, h * 0.05);
+			ctx.lineWidth = 0.01 * w;
 			ctx.strokeStyle = p.c9;
 			ctx.strokeRect(x + w * 0.2, y + h * 0.2, w * 0.6, h * 0.6);
 			ctx.fillStyle = p.c1;
@@ -592,7 +424,6 @@ let ACHIEVEMENT_REGISTRY = {
 				0.7, p.c16, 0.05 * w);
 			ctx.fillStyle = p.c16;
 			ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
-			drawMouse(ctx, x + 0.6 * w, y + 0.45 * h, w, h);
 		}
 	},
 	"get a gun": {
@@ -1125,169 +956,287 @@ let ACHIEVEMENT_REGISTRY = {
 			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
 		}
 	},
-	"lord of the horns": {
+	"christmas is cancelled": {
 		grid: {
-			x: 4,
+			x: 9,
+			y: 3
+		},
+		name: {
+			en: "christmas is cancelled",
+			ru: "рождество отменяется"
+		},
+		desc: {
+			en: "kill the boss Krampus",
+			ru: "убейте истинного Крампуса"
+		},
+		req: "naughty list",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = "#1a0f0a";
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = "#8b0000";
+			ctx.lineWidth = 4;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
+	"taiga biome": {
+		grid: {
+			x: 1,
+			y: 5
+		},
+		name: {
+			en: "taiga",
+			ru: "тайга"
+		},
+		desc: {
+			en: "discover the taiga biome",
+			ru: "найдите биом тайги"
+		},
+		req: "sand lord",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c28;
+			ctx.fillRect(x + 0.1 * w, y + 0.7 * h, 0.8 * w, 0.1 * h);
+			ctx.fillStyle = p.c14;
+			const drawTree = (tx, ty, ts) => {
+				ctx.beginPath();
+				ctx.moveTo(tx, ty);
+				ctx.lineTo(tx - 0.15 * w * ts, ty + 0.3 * h * ts);
+				ctx.lineTo(tx + 0.15 * w * ts, ty + 0.3 * h * ts);
+				ctx.closePath();
+				ctx.fill();
+			};
+			drawTree(x + 0.35 * w, y + 0.35 * h, 1.2);
+			drawTree(x + 0.65 * w, y + 0.45 * h, 0.9);
+			ctx.strokeStyle = p.c12;
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(x + 0.3 * w, y + 0.55 * h);
+			ctx.lineTo(x + 0.4 * w, y + 0.55 * h);
+			ctx.stroke();
+			ctx.fillStyle = p.c13;
+			ctx.beginPath();
+			ctx.arc(x + 0.2 * w, y + 0.25 * h, 0.08 * w, 0, Math.PI *
+				2);
+			ctx.fill();
+		}
+	},
+	"cold welcome": {
+		grid: {
+			x: 8,
+			y: 0
+		},
+		name: {
+			en: "cold welcome",
+			ru: "снежный гость"
+		},
+		desc: {
+			en: "kill one snow infected",
+			ru: "убейте одного снежного заражённого"
+		},
+		req: "taiga biome",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c12;
+			ctx.fillRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+			ctx.strokeStyle = p.c13;
+			ctx.lineWidth = 2;
+			ctx.strokeRect(x + 0.2 * w, y + 0.2 * h, 0.6 * w, 0.6 * h);
+		}
+	},
+	"big snow guy": {
+		grid: {
+			x: 9,
+			y: 0
+		},
+		name: {
+			en: "big snow guy",
+			ru: "большой сугроб"
+		},
+		desc: {
+			en: "kill the snow boss",
+			ru: "убейте босса снежных заражённых"
+		},
+		req: "cold welcome",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c12;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c22;
+			ctx.lineWidth = 3;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
+	"ear protection": {
+		grid: {
+			x: 8,
+			y: 1
+		},
+		name: {
+			en: "ear protection",
+			ru: "уши в тепле"
+		},
+		desc: {
+			en: "kill one infected in ushanka",
+			ru: "убейте одного заражённого в ушанке"
+		},
+		req: "big snow guy",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c5;
+			ctx.fillRect(x + 0.2 * w, y + 0.3 * h, 0.6 * w, 0.3 * h);
+			ctx.fillRect(x + 0.15 * w, y + 0.3 * h, 0.15 * w, 0.4 * h);
+			ctx.fillRect(x + 0.7 * w, y + 0.3 * h, 0.15 * w, 0.4 * h);
+			ctx.fillStyle = p.c0;
+			ctx.fillRect(x + 0.45 * w, y + 0.4 * h, 0.1 * w, 0.1 * h);
+		}
+	},
+	"general ushanka": {
+		grid: {
+			x: 9,
+			y: 1
+		},
+		name: {
+			en: "general ushanka",
+			ru: "генерал ушанка"
+		},
+		desc: {
+			en: "kill the boss in ushanka",
+			ru: "убейте элитного заражённого в ушанке"
+		},
+		req: "ear protection",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c12;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c5;
+			ctx.lineWidth = 4;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
+	"meltdown": {
+		grid: {
+			x: 8,
+			y: 2
+		},
+		name: {
+			en: "meltdown",
+			ru: "оттепель"
+		},
+		desc: {
+			en: "kill one evil snowman",
+			ru: "убейте одного проклятого снеговика"
+		},
+		req: "general ushanka",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c28;
+			ctx.fillRect(x + 0.35 * w, y + 0.5 * h, 0.3 * w, 0.3 * h);
+			ctx.fillRect(x + 0.4 * w, y + 0.3 * h, 0.2 * w, 0.2 * h);
+			ctx.fillStyle = p.c6;
+			ctx.fillRect(x + 0.55 * w, y + 0.35 * h, 0.2 * w, 0.05 * h);
+		}
+	},
+	"true winter": {
+		grid: {
+			x: 9,
+			y: 2
+		},
+		name: {
+			en: "true winter",
+			ru: "настоящая зима"
+		},
+		desc: {
+			en: "kill the boss snowman",
+			ru: "убейте снеговика-босса"
+		},
+		req: "meltdown",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c28;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c4;
+			ctx.lineWidth = 3;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+		}
+	},
+	"naughty list": {
+		grid: {
+			x: 8,
+			y: 3
+		},
+		name: {
+			en: "naughty list",
+			ru: "список плохишей"
+		},
+		desc: {
+			en: "defeat Krampus",
+			ru: "одолейте Крампуса"
+		},
+		req: "true winter",
+		draw: (ctx, x, y, w, h, p) => {
+			ctx.fillStyle = p.c16;
+			ctx.fillRect(x + 0.2 * w, y + 0.3 * h, 0.6 * w, 0.5 * h);
+			ctx.fillStyle = p.c11;
+			ctx.fillRect(x + 0.3 * w, y + 0.2 * h, 0.4 * w, 0.2 * h);
+			ctx.strokeStyle = p.c11;
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(x + 0.3 * w, y + 0.2 * h);
+			ctx.lineTo(x + 0.2 * w, y + 0.1 * h);
+			ctx.moveTo(x + 0.7 * w, y + 0.2 * h);
+			ctx.lineTo(x + 0.8 * w, y + 0.1 * h);
+			ctx.stroke();
+		}
+	},
+	"blood forest biome": {
+		grid: {
+			x: 1,
 			y: 6
 		},
 		name: {
-			en: "lord of the horns",
-			ru: "повелитель рогов"
+			en: "blood forest",
+			ru: "кровавый лес"
 		},
 		desc: {
-			en: "defeat the boss deer",
-			ru: "победите босса-оленя"
+			en: "discover the blood forest biome",
+			ru: "найдите биом кровавого леса"
 		},
-		req: "huge rainbow guy",
+		req: "big snow guy",
 		draw: (ctx, x, y, w, h, p) => {
-			let cx = x + w * 0.5;
-			let cy = y + h * 0.5;
-			let aw = w * 0.5;
-			ctx.strokeStyle = p.c22;
-			ctx.lineWidth = 0.05 * w;
-			const drawAntler = (side) => {
+			ctx.fillStyle = p.c22;
+			ctx.fillRect(x + 0.1 * w, y + 0.75 * h, 0.8 * w, 0.15 * h);
+			const drawDeadTree = (tx, ty, height) => {
+				ctx.strokeStyle = p.c25;
+				ctx.lineWidth = 3;
 				ctx.beginPath();
-				ctx.moveTo(cx + side * 0.25 * aw, cy - 0.25 * aw);
-				ctx.lineTo(cx + side * 0.3 * aw, cy - 0.5 * aw);
-				ctx.lineTo(cx + side * 0.6 * aw, cy - 0.7 * aw);
-				ctx.moveTo(cx + side * 0.3 * aw, cy - 0.5 * aw);
-				ctx.lineTo(cx + side * 0.1 * aw, cy - 0.75 * aw);
+				ctx.moveTo(tx, ty);
+				ctx.lineTo(tx, ty - height);
+				ctx.lineTo(tx - 0.1 * w, ty - height - 0.1 * h);
+				ctx.moveTo(tx, ty - height);
+				ctx.lineTo(tx + 0.1 * w, ty - height - 0.05 * h);
 				ctx.stroke();
 			};
-			drawAntler(-1);
-			drawAntler(1);
-			ctx.fillStyle = p.c6;
-			ctx.fillRect(cx - aw * 0.5, cy - aw * 0.5, aw, aw);
-			ctx.strokeStyle = p.c8;
-			ctx.lineWidth = 2;
-			ctx.strokeRect(cx - aw * 0.5, cy - aw * 0.5, aw, aw);
-		}
-	},
-	"junk master": {
-		grid: {
-			x: 5,
-			y: 6
-		},
-		name: {
-			en: "junk master",
-			ru: "мастер хлама"
-		},
-		desc: {
-			en: "defeat the boss raccoon",
-			ru: "победите босса-енота"
-		},
-		req: "huge rainbow guy",
-		draw: (ctx, x, y, w, h, p) => {
-			let cx = x + w * 0.5;
-			let cy = y + h * 0.5;
-			let rw = w * 0.5;
-			let rh = h * 0.5;
-			ctx.fillStyle = p.c14;
-			ctx.beginPath();
-			ctx.moveTo(cx - rw * 0.4, cy - rh * 0.5);
-			ctx.lineTo(cx - rw * 0.6, cy - rh * 0.9);
-			ctx.lineTo(cx - rw * 0.1, cy - rh * 0.5);
-			ctx.moveTo(cx + rw * 0.4, cy - rh * 0.5);
-			ctx.lineTo(cx + rw * 0.6, cy - rh * 0.9);
-			ctx.lineTo(cx + rw * 0.1, cy - rh * 0.5);
-			ctx.fill();
-			ctx.fillStyle = p.c21;
-			ctx.fillRect(cx - rw * 0.5, cy - rh * 0.5, rw, rh);
-			ctx.strokeStyle = p.c0;
-			ctx.lineWidth = 2;
-			ctx.strokeRect(cx - rw * 0.5, cy - rh * 0.5, rw, rh);
-			ctx.fillStyle = p.c9;
-			ctx.fillRect(cx - rw * 0.5, cy - rh * 0.25, rw, rh * 0.4);
+			drawDeadTree(x + 0.4 * w, y + 0.8 * h, 0.4 * h);
+			drawDeadTree(x + 0.7 * w, y + 0.8 * h, 0.3 * h);
 			ctx.fillStyle = p.c0;
 			ctx.beginPath();
-			ctx.arc(cx - rw * 0.25, cy - rh * 0.05, rw * 0.12, 0, Math
-				.PI * 2);
-			ctx.arc(cx + rw * 0.25, cy - rh * 0.05, rw * 0.12, 0, Math
-				.PI * 2);
+			ctx.arc(x + 0.3 * w, y + 0.3 * h, 0.12 * w, 0, Math.PI * 2);
 			ctx.fill();
 		}
 	},
-	"venomous king": {
+	"christmas is cancelled": {
 		grid: {
-			x: 6,
-			y: 4
+			x: 9,
+			y: 3
 		},
 		name: {
-			en: "venomous king",
-			ru: "король яда"
+			en: "christmas is cancelled",
+			ru: "рождество отменяется"
 		},
 		desc: {
-			en: "defeat the boss scorpion",
-			ru: "победите босса-скорпиона"
+			en: "kill the boss Krampus",
+			ru: "убейте истинного Крампуса"
 		},
-		req: "huge rainbow guy",
+		req: "naughty list",
 		draw: (ctx, x, y, w, h, p) => {
-			let cx = x + w * 0.5;
-			let cy = y + h * 0.5;
-			let sw = w * 0.6;
-			ctx.strokeStyle = p.c9;
-			ctx.lineWidth = w * 0.05;
-			ctx.beginPath();
-			ctx.moveTo(cx - sw * 0.3, cy);
-			ctx.quadraticCurveTo(cx - sw * 0.6, cy - sw * 0.6, cx, cy -
-				sw * 0.4);
-			ctx.stroke();
-			ctx.fillStyle = p.c9;
-			for (let i = 0; i < 3; i++) {
-				ctx.beginPath();
-				ctx.ellipse(cx - sw * 0.2 + i * sw * 0.2, cy, sw * 0.15,
-					sw * 0.25, 0, 0, Math.PI * 2);
-				ctx.fill();
-				ctx.strokeStyle = p.c10;
-				ctx.lineWidth = 1;
-				ctx.stroke();
-			}
-			ctx.strokeStyle = p.c9;
-			ctx.beginPath();
-			ctx.moveTo(cx + sw * 0.2, cy - sw * 0.1);
-			ctx.lineTo(cx + sw * 0.5, cy - sw * 0.3);
-			ctx.moveTo(cx + sw * 0.2, cy + sw * 0.1);
-			ctx.lineTo(cx + sw * 0.5, cy + sw * 0.3);
-			ctx.stroke();
-			ctx.fillStyle = p.c0;
-			ctx.fillRect(cx + sw * 0.35, cy - sw * 0.1, sw * 0.05, sw *
-				0.05);
-			ctx.fillRect(cx + sw * 0.35, cy + sw * 0.05, sw * 0.05, sw *
-				0.05);
-		}
-	},
-	"emerald dragon": {
-		grid: {
-			x: 7,
-			y: 4
-		},
-		name: {
-			en: "nightshade serpent",
-			ru: "змей ночного света",
-		},
-		desc: {
-			en: "defeat the boss giant serpent",
-			ru: "победите босса — гигантского змея"
-		},
-		req: "huge rainbow guy",
-		draw: (ctx, x, y, w, h, p) => {
-			let cx = x + w * 0.5;
-			let cy = y + h * 0.5;
-			ctx.fillStyle = p.c9;
-			for (let i = 0; i < 8; i++) {
-				let wave = Math.sin(i * 0.8) * (h * 0.15);
-				let posX = cx + (4 - i) * (w * 0.08);
-				let s = (w * 0.12) * (1 - i * 0.08);
-				ctx.fillRect(posX - s / 2, cy + wave - s / 2, s, s);
-				if (i === 0) {
-					ctx.fillStyle = p.c0;
-					ctx.fillRect(posX + s / 4, cy + wave - s / 3, s / 4,
-						s / 4);
-					ctx.fillRect(posX + s / 4, cy + wave + s / 10, s /
-						4, s / 4);
-					ctx.fillStyle = p.c9;
-				}
-			}
+			ctx.fillStyle = p.c11;
+			ctx.fillRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
+			ctx.strokeStyle = p.c16;
+			ctx.lineWidth = 4;
+			ctx.strokeRect(x + 0.1 * w, y + 0.1 * h, 0.8 * w, 0.8 * h);
 		}
 	},
 };

@@ -1,11 +1,20 @@
 function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 	size = 6, lifetime = 1500, color_fill = COLORS_DEFAULT.bullets.default_fill,
 	color_outline = COLORS_DEFAULT.bullets.default_outline,
-	invisible = false, poisoned = false, glowColor = null) {
+	invisible = false, poisoned = false, glowColor = null, fire = false, ice =
+	false, electric = false, fired_by = null, gives_regen = false) {
 	let width = size,
 		height = size;
 	let d = Math.sqrt(dx * dx + dy * dy);
 	let invD = 1.0 / d;
+	let chance = Math.random();
+	let hasGlow = false;
+	if (enemy) {
+		if (chance < 0.25) hasGlow = true;
+	}
+	else {
+		if (chance < 0.5) hasGlow = true;
+	}
 	let b = {
 		lifetime: lifetime,
 		damage: damage,
@@ -22,7 +31,11 @@ function bullet_create(g, x, y, dx, dy, speed = 20, damage = 0.5, enemy = false,
 		can_hit: true,
 		poisoned: poisoned,
 		color_glow: glowColor,
-		damaged: false
+		has_glow_effect: hasGlow,
+		damaged: false,
+		fire: fire,
+		ice: ice,
+		electric: electric
 	};
 	if (b.enemy) {
 		b.body.collisionFilter.category = 4;
@@ -77,7 +90,7 @@ function bullet_draw(bullet_object, ctx) {
 	if (bullet_object.data.invisible || !bullet_object.data.body) return;
 	let b = bullet_object.data;
 	ctx.save();
-	if (b.color_glow) {
+	if (b.color_glow && b.has_glow_effect) {
 		ctx.shadowBlur = 10;
 		ctx.shadowColor = b.color_glow;
 	}

@@ -130,3 +130,19 @@ const drawMouse = (ctx, mx, my, w, h) => {
 	ctx.roundRect(mx, my, mw * 0.5, mh * 0.4, MOUSE_RADII_POOL);
 	ctx.fill();
 }
+
+function game_round(value) {
+	let s = Math.round(value).toString();
+	let result = 0;
+	for (let i = 0; i < s.length; i++) {
+		let digit = 0;
+		if (i < 2) {
+			digit = parseInt(s[i], 10);
+		}
+		else if (i === 2) {
+			digit = parseInt(s[i], 10) > 4 ? 5 : 0;
+		}
+		result = result * 10 + digit;
+	}
+	return result;
+}

@@ -1493,7 +1493,7 @@ const WEAPON_DEFS = {
 			const pPos = p.body.position;
 			let foundAny = false;
 			const baseDamage = 39 / 37.5 * 6 * dt *
-				weapon_damage_from_tier(ENEMY_TIER_VAMPIRE) * 0.5;
+				weapon_damage_from_tier(ENEMY_TIER_VAMPIRE);
 			for (let i = 0; i < g.objects.length; i++) {
 				let obj = g.objects[i];
 				if (!obj || obj.destroyed || !obj.data || !obj.data

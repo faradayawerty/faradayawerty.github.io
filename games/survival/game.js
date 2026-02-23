@@ -7,6 +7,7 @@ let DO_AUTOSAVES = false;
 let DEBUG_AMOUNTS = false;
 let INTEROLATION = true;
 let SHOW_DPS = false;
+let SHOW_ENEMY_DPS = false;
 let BULLET_LIMIT = 200;
 
 function game_create(input_, engine_, audios_) {
@@ -34,9 +35,20 @@ function game_create(input_, engine_, audios_) {
 		totalCreations: {},
 		objectsInFrame: {},
 		current_dps: 0,
+		current_enemy_dps: 0,
 		dps_sessions: [],
 		dps_history: {},
 		dps_stats: {},
+		enemy_dps_history: [],
+		enemy_dps_stats: {
+			sessions: [],
+			min: 0,
+			max: 0,
+			avg: 0,
+			median: 0,
+			mode: 0,
+			last_second: Date.now()
+		},
 		last_dps_second: 0,
 		current_weapon: 0,
 		is_player_shooting: false,
@@ -63,7 +75,9 @@ function game_create(input_, engine_, audios_) {
 				"show enemy hunger": true,
 				"show car health": true,
 				"show car fuel": true,
-				"show rocket health": false
+				"show rocket health": false,
+				"show blood": true,
+				"show damage numbers": true
 			},
 			auto_pickup: {
 				"automatically pickup food and drinks": false,
@@ -108,6 +122,104 @@ function game_create(input_, engine_, audios_) {
 	return g;
 }
 
+function game_update_dps_counter(g) {
+	let now = Date.now();
+	let weapon = g.current_weapon;
+	if (!g.dps_history[weapon]) g.dps_history[weapon] = [];
+	if (!g.dps_stats[weapon]) {
+		g.dps_stats[weapon] = {
+			sessions: [],
+			min: 0,
+			max: 0,
+			avg: 0,
+			median: 0,
+			mode: 0,
+			last_second: now
+		};
+	}
+	let history = g.dps_history[weapon];
+	let stats = g.dps_stats[weapon];
+	let one_second_ago = now - 1000;
+	g.dps_history[weapon] = history.filter(hit => hit.time > one_second_ago);
+	let total_damage = g.dps_history[weapon].reduce((sum, hit) => sum + hit.dmg,
+		0);
+	g.current_dps = Math.round(total_damage);
+	if (now - stats.last_second >= 1000) {
+		if (g.current_dps > 0 || g.is_player_shooting) {
+			stats.sessions.push(g.current_dps);
+			if (stats.sessions.length > 100) stats.sessions.shift();
+			let s = [...stats.sessions].sort((a, b) => a - b);
+			let sum = s.reduce((a, b) => a + b, 0);
+			stats.min = s[0];
+			stats.max = s[s.length - 1];
+			stats.avg = Math.round(sum / s.length);
+			stats.median = s[Math.floor(s.length / 2)];
+			let counts = {};
+			let mVal = s[0],
+				mCount = 0;
+			s.forEach(v => {
+				counts[v] = (counts[v] || 0) + 1;
+				if (counts[v] > mCount) {
+					mCount = counts[v];
+					mVal = v;
+				}
+			});
+			stats.mode = mVal;
+		}
+		stats.last_second = now;
+	}
+	g.enemy_dps_history = g.enemy_dps_history.filter(hit => hit.time >
+		one_second_ago);
+	let total_enemy_damage = g.enemy_dps_history.reduce((sum, hit) => sum + hit
+		.dmg, 0);
+	g.current_enemy_dps = Math.round(total_enemy_damage);
+	let eStats = g.enemy_dps_stats;
+	if (now - eStats.last_second >= 1000) {
+		if (g.current_enemy_dps > 0) {
+			eStats.sessions.push(g.current_enemy_dps);
+			if (eStats.sessions.length > 100) eStats.sessions.shift();
+			let s = [...eStats.sessions].sort((a, b) => a - b);
+			let sum = s.reduce((a, b) => a + b, 0);
+			eStats.min = s[0];
+			eStats.max = s[s.length - 1];
+			eStats.avg = Math.round(sum / s.length);
+			eStats.median = s[Math.floor(s.length / 2)];
+			let counts = {};
+			let mVal = s[0],
+				mCount = 0;
+			s.forEach(v => {
+				counts[v] = (counts[v] || 0) + 1;
+				if (counts[v] > mCount) {
+					mCount = counts[v];
+					mVal = v;
+				}
+			});
+			eStats.mode = mVal;
+		}
+		eStats.last_second = now;
+	}
+}
+
+function game_draw_dps(g, ctx) {
+	if (!SHOW_DPS && !SHOW_ENEMY_DPS) return;
+	game_update_dps_counter(g);
+	if (SHOW_DPS) {
+		let w = g.current_weapon;
+		let s = g.dps_stats[w];
+		if (s) {
+			let log =
+				`Player Weapon ${w} | DPS: ${g.current_dps} | AVG: ${s.avg} | MAX: ${s.max} | MED: ${s.median}`;
+			g.debug_console.unshift(log);
+		}
+	}
+	if (SHOW_ENEMY_DPS) {
+		let s = g.enemy_dps_stats;
+		let log =
+			`Enemy | DPS: ${g.current_enemy_dps} | AVG: ${s.avg} | MAX: ${s.max} | MED: ${s.median}`;
+		g.debug_console.unshift(log);
+	}
+}
+
 function game_new(g, force_clean = false) {
 	if (!force_clean) {
 		let loaded = game_autoload(g);
@@ -147,8 +259,8 @@ const GAME_OBJECT_WEIGHTS = {
 	"car": 13,
 	"trashcan": 14,
 	"bullet": 15,
-	"bloodsplash": 16.5,
 	"trashbullet": 16,
+	"bloodsplash": 16.5,
 	"decorative_wall": 17,
 	"decorative": 18,
 	"decorative_grass": 19,
@@ -859,66 +971,6 @@ function game_has_player(g) {
 	return g.objects.some(obj => obj.name === "player" && !obj.destroyed);
 }
 
-function game_update_dps_counter(g) {
-	let now = Date.now();
-	let weapon = g.current_weapon;
-	if (!g.dps_history[weapon]) g.dps_history[weapon] = [];
-	if (!g.dps_stats[weapon]) {
-		g.dps_stats[weapon] = {
-			sessions: [],
-			min: 0,
-			max: 0,
-			avg: 0,
-			median: 0,
-			mode: 0,
-			last_second: now
-		};
-	}
-	let history = g.dps_history[weapon];
-	let stats = g.dps_stats[weapon];
-	let one_second_ago = now - 1000;
-	g.dps_history[weapon] = history.filter(hit => hit.time > one_second_ago);
-	let total_damage = g.dps_history[weapon].reduce((sum, hit) => sum + hit.dmg,
-		0);
-	g.current_dps = Math.round(total_damage);
-	if (now - stats.last_second >= 1000) {
-		if (g.current_dps > 0 || g.is_player_shooting) {
-			stats.sessions.push(g.current_dps);
-			if (stats.sessions.length > 100) stats.sessions.shift();
-			let s = [...stats.sessions].sort((a, b) => a - b);
-			let sum = s.reduce((a, b) => a + b, 0);
-			stats.min = s[0];
-			stats.max = s[s.length - 1];
-			stats.avg = Math.round(sum / s.length);
-			stats.median = s[Math.floor(s.length / 2)];
-			let counts = {};
-			let mVal = s[0],
-				mCount = 0;
-			s.forEach(v => {
-				counts[v] = (counts[v] || 0) + 1;
-				if (counts[v] > mCount) {
-					mCount = counts[v];
-					mVal = v;
-				}
-			});
-			stats.mode = mVal;
-		}
-		stats.last_second = now;
-	}
-}
-
-function game_draw_dps(g, ctx) {
-	if (!SHOW_DPS) return;
-	game_update_dps_counter(g);
-	let w = g.current_weapon;
-	let s = g.dps_stats[w];
-	if (s) {
-		let log =
-			`Weapon ${w} | DPS: ${g.current_dps} | AVG: ${s.avg} | MAX: ${s.max} | MED: ${s.median}`;
-		g.debug_console.unshift(log);
-	}
-}
-
 function game_object_find_closest(g, x, y, name, radius, filter_func = null) {
 	if (name === "player" && g.player_object && !g.player_object.destroyed && g
 		.player_object.data && g.player_object.data.body) {
@@ -1009,8 +1061,10 @@ function game_autosave(g) {
 		}
 	}
 	try {
-		localStorage.setItem("faw_survival_autosave_1", JSON.stringify(objs));
+		const jsonString = JSON.stringify(objs);
+		localStorage.setItem("faw_survival_autosave_1", jsonString);
 		console.log("Игра автоматически сохранена");
+		objs = null;
 	}
 	catch (e) {
 		console.error("Ошибка при записи автосохранения:", e);

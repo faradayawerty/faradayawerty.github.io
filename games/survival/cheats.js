@@ -9,18 +9,7 @@ function cheat_all_weapons() {
 		targetX = plr.data.body.position.x;
 		targetY = plr.data.body.position.y;
 	}
-	const weapons = [
-		ITEM_GUN, ITEM_DESERT_EAGLE, ITEM_SHOTGUN,
-		ITEM_MINIGUN, ITEM_REVOLVER, ITEM_KALASHNIKOV,
-		ITEM_PLASMA_LAUNCHER, ITEM_PLASMA_PISTOL, ITEM_RED_PISTOLS,
-		ITEM_RED_SHOTGUN, ITEM_GREEN_GUN, ITEM_SWORD, ITEM_ROCKET_LAUNCHER,
-		ITEM_ROCKET_SHOTGUN, ITEM_RAINBOW_PISTOLS, ITEM_LASER_GUN,
-		ITEM_HORN, ITEM_JUNK_CANNON, ITEM_VENOM_DUAL_SHOTGUNS,
-		ITEM_SNAKE_STAFF, ITEM_MUMMY_PISTOLS, ITEM_MUMMY_SHOTGUN,
-		ITEM_SHADOW_STAFF, ITEM_SHADOW_DUAL_SHOTGUNS,
-		ITEM_ANUBIS_SANDSTORM_STAFF,
-		ITEM_ANUBIS_PUNISHER_ROD
-	];
+	const weapons = ITEMS_GUNS;
 	weapons.forEach(id => {
 		item_create(game1, id, targetX, targetY, false, false);
 	});
@@ -34,15 +23,7 @@ function cheat_all_ammo() {
 		targetX = plr.data.body.position.x;
 		targetY = plr.data.body.position.y;
 	}
-	const ammo = [
-		ITEM_AMMO,
-		ITEM_PLASMA,
-		ITEM_RED_PLASMA,
-		ITEM_ROCKET,
-		ITEM_RAINBOW_AMMO,
-		ITEM_FISH_BONE,
-		ITEM_VENOM
-	];
+	const ammo = ITEMS_AMMOS;
 	ammo.forEach(id => {
 		item_create(game1, id, targetX, targetY, false, false);
 	});
