@@ -83,6 +83,59 @@ ITEMS_DATA[ITEM_FUEL] = {
 		ctx.fillRect(x + w * 0.45, y + h * 0.45, w * 0.1, h * 0.1);
 	}
 };
+ITEMS_DATA[ITEM_PUMPKIN_SHIELD] = {
+	name: "Pumpkin Shield",
+	desc: "A spectral aura of autumn malevolence that wards off strikes.",
+	name_rus: "Тыквенный щит",
+	desc_rus: "Призрачная аура осенней злобы, отражающая вражеские удары.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const pumpkinBody = "#E67E22";
+		const pumpkinStroke = "#A04000";
+		const fireColor = "#FFD700";
+		const pulse = 1;
+		drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.25 * w, pumpkinBody,
+			pumpkinStroke, 0.05 * w);
+		ctx.save();
+		ctx.translate(x + w * 0.5, y + h * 0.5);
+		ctx.scale(0.7, 0.7);
+		ctx.translate(-(x + w * 0.5), -(y + h * 0.5));
+		ctx.fillStyle = fireColor;
+		ctx.shadowBlur = (w * 0.1) + pulse;
+		ctx.shadowColor = fireColor;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.3, y + h * 0.35);
+		ctx.lineTo(x + w * 0.48, y + h * 0.45);
+		ctx.lineTo(x + w * 0.32, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.7, y + h * 0.35);
+		ctx.lineTo(x + w * 0.52, y + h * 0.45);
+		ctx.lineTo(x + w * 0.68, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.5, y + h * 0.48);
+		ctx.lineTo(x + w * 0.46, y + h * 0.55);
+		ctx.lineTo(x + w * 0.54, y + h * 0.55);
+		ctx.fill();
+		let mouthOffset = -0.1 * h;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.25, y + mouthOffset + h * 0.65);
+		ctx.lineTo(x + w * 0.35, y + mouthOffset + h * 0.75);
+		ctx.lineTo(x + w * 0.42, y + mouthOffset + h * 0.67);
+		ctx.lineTo(x + w * 0.5, y + mouthOffset + h * 0.77);
+		ctx.lineTo(x + w * 0.58, y + mouthOffset + h * 0.67);
+		ctx.lineTo(x + w * 0.65, y + mouthOffset + h * 0.75);
+		ctx.lineTo(x + w * 0.75, y + mouthOffset + h * 0.65);
+		ctx.lineTo(x + w * 0.65, y + mouthOffset + h * 0.83);
+		ctx.lineTo(x + w * 0.58, y + mouthOffset + h * 0.73);
+		ctx.lineTo(x + w * 0.5, y + mouthOffset + h * 0.9);
+		ctx.lineTo(x + w * 0.42, y + mouthOffset + h * 0.73);
+		ctx.lineTo(x + w * 0.35, y + mouthOffset + h * 0.83);
+		ctx.closePath();
+		ctx.fill();
+		ctx.restore();
+	}
+};
 ITEMS_DATA[ITEM_SHIELD] = {
 	name: "Energy Shield",
 	desc: "Provides temporary protection.",
@@ -554,57 +607,6 @@ ITEMS_DATA[ITEM_BEER] = {
 		ctx.moveTo(x + w * 0.35, y + h * 0.35);
 		ctx.lineTo(x + w * 0.35, y + h * 0.8);
 		ctx.stroke();
-	}
-};
-ITEMS_DATA[ITEM_PUMPKIN_JUICE] = {
-	name: "Spooky Pumpkin Juice",
-	desc: "It's staring back at you.",
-	name_rus: "Зловещий тыквенный сок",
-	desc_rus: "Он смотрит прямо в душу.",
-	render: (ctx, x, y, w, h) => {
-		const orange = "#FF8C00";
-		const lightOrange = "#FFB366";
-		const pumpkinBlack = "#1a1a1a";
-		const stemGreen = "#2E7D32";
-		ctx.fillStyle = lightOrange;
-		ctx.fillRect(x + w * 0.25, y + h * 0.2, w * 0.5, h * 0.35);
-		ctx.fillStyle = orange;
-		ctx.fillRect(x + w * 0.25, y + h * 0.55, w * 0.5, h * 0.35);
-		ctx.fillStyle = stemGreen;
-		ctx.fillRect(x + w * 0.42, y + h * 0.1, w * 0.16, h * 0.1);
-		ctx.fillStyle = pumpkinBlack;
-		ctx.beginPath();
-		ctx.moveTo(x + w * 0.3, y + h * 0.35);
-		ctx.lineTo(x + w * 0.48, y + h * 0.45);
-		ctx.lineTo(x + w * 0.32, y + h * 0.5);
-		ctx.closePath();
-		ctx.fill();
-		ctx.beginPath();
-		ctx.moveTo(x + w * 0.7, y + h * 0.35);
-		ctx.lineTo(x + w * 0.52, y + h * 0.45);
-		ctx.lineTo(x + w * 0.68, y + h * 0.5);
-		ctx.closePath();
-		ctx.fill();
-		ctx.beginPath();
-		ctx.moveTo(x + w * 0.5, y + h * 0.48);
-		ctx.lineTo(x + w * 0.46, y + h * 0.55);
-		ctx.lineTo(x + w * 0.54, y + h * 0.55);
-		ctx.fill();
-		ctx.beginPath();
-		ctx.moveTo(x + w * 0.28, y + h * 0.6);
-		ctx.lineTo(x + w * 0.35, y + h * 0.7);
-		ctx.lineTo(x + w * 0.42, y + h * 0.62);
-		ctx.lineTo(x + w * 0.5, y + h * 0.72);
-		ctx.lineTo(x + w * 0.58, y + h * 0.62);
-		ctx.lineTo(x + w * 0.65, y + h * 0.7);
-		ctx.lineTo(x + w * 0.72, y + h * 0.6);
-		ctx.lineTo(x + w * 0.65, y + h * 0.78);
-		ctx.lineTo(x + w * 0.58, y + h * 0.68);
-		ctx.lineTo(x + w * 0.5, y + h * 0.85);
-		ctx.lineTo(x + w * 0.42, y + h * 0.68);
-		ctx.lineTo(x + w * 0.35, y + h * 0.78);
-		ctx.closePath();
-		ctx.fill();
 	}
 };
 ITEMS_DATA[ITEM_PUMPKIN_JUICE] = {

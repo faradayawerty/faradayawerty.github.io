@@ -1,4 +1,70 @@
 let ITEMS_DATA = {
+	[ITEM_PUMPKIN]: {
+		name: "Pumpkin",
+		name_rus: "Тыква",
+		desc: "The grin is wider than any human's, and the stench of rotting soul lingers within.",
+		desc_rus: "Ухмылка шире человеческой, а изнутри доносится тяжелый запах тлеющей души.",
+		render: (ctx, x, y, w, h) => {
+			const pumpkinBody = "#E67E22";
+			const pumpkinStroke = "#A04000";
+			const pumpkinBlack = "#1a1a1a";
+			const stemGreen = "#2E7D32";
+			const stemStroke = "#1B5E20";
+			const strokeWidth = w * 0.04;
+			ctx.save();
+			ctx.fillStyle = stemGreen;
+			ctx.strokeStyle = stemStroke;
+			ctx.lineWidth = strokeWidth;
+			ctx.beginPath();
+			ctx.rect(x + w * 0.45, y + h * 0.1, w * 0.1, h * 0.15);
+			ctx.fill();
+			ctx.stroke();
+			ctx.fillStyle = pumpkinBody;
+			ctx.strokeStyle = pumpkinStroke;
+			ctx.beginPath();
+			ctx.ellipse(x + w * 0.5, y + h * 0.55, w * 0.35, h * 0.3, 0,
+				0, Math.PI * 2);
+			ctx.fill();
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.ellipse(x + w * 0.5, y + h * 0.55, w * 0.15, h * 0.3, 0,
+				0, Math.PI * 2);
+			ctx.stroke();
+			ctx.fillStyle = pumpkinBlack;
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.3, y + h * 0.35);
+			ctx.lineTo(x + w * 0.48, y + h * 0.45);
+			ctx.lineTo(x + w * 0.32, y + h * 0.5);
+			ctx.fill();
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.7, y + h * 0.35);
+			ctx.lineTo(x + w * 0.52, y + h * 0.45);
+			ctx.lineTo(x + w * 0.68, y + h * 0.5);
+			ctx.fill();
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.5, y + h * 0.48);
+			ctx.lineTo(x + w * 0.46, y + h * 0.55);
+			ctx.lineTo(x + w * 0.54, y + h * 0.55);
+			ctx.fill();
+			y = y - 0.1 * h;
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.25, y + h * 0.65);
+			ctx.lineTo(x + w * 0.35, y + h * 0.75);
+			ctx.lineTo(x + w * 0.42, y + h * 0.67);
+			ctx.lineTo(x + w * 0.5, y + h * 0.77);
+			ctx.lineTo(x + w * 0.58, y + h * 0.67);
+			ctx.lineTo(x + w * 0.65, y + h * 0.75);
+			ctx.lineTo(x + w * 0.75, y + h * 0.65);
+			ctx.lineTo(x + w * 0.65, y + h * 0.83);
+			ctx.lineTo(x + w * 0.58, y + h * 0.73);
+			ctx.lineTo(x + w * 0.5, y + h * 0.9);
+			ctx.lineTo(x + w * 0.42, y + h * 0.73);
+			ctx.lineTo(x + w * 0.35, y + h * 0.83);
+			ctx.closePath();
+			ctx.fill();
+			ctx.restore();
+		}
+	},
 	[ITEM_SHIELD_GRAY]: {
 		name: "Gray shield",
 		desc: "technical item. not in the game",
@@ -394,3 +460,57 @@ let ITEMS_DATA = {
 		}
 	},
 };
+const renderCandy = (color1, color2) => (ctx, x, y, w, h) => {
+	ctx.fillStyle = color1;
+	ctx.beginPath();
+	ctx.moveTo(x + 0.2 * w, y + 0.4 * h);
+	ctx.lineTo(x + 0.8 * w, y + 0.6 * h);
+	ctx.lineTo(x + 0.8 * w, y + 0.4 * h);
+	ctx.lineTo(x + 0.2 * w, y + 0.6 * h);
+	ctx.fill();
+	drawCircle(ctx, x + 0.5 * w, y + 0.5 * h, 0.15 * w, color2);
+};
+Object.assign(ITEMS_DATA, {
+	[ITEM_CANDY]: {
+		name: "Candy",
+		desc: "Sugar rush or a dental nightmare?",
+		name_rus: "Конфета",
+		desc_rus: "Сахарный бум или кошмар стоматолога?",
+		render: renderCandy("#8e44ad", "#d291ff")
+	},
+	[ITEM_CANDY_RED]: {
+		name: "Red Candy",
+		desc: "Strawberry flavored chaos.",
+		name_rus: "Красная конфета",
+		desc_rus: "Клубничный хаос.",
+		render: renderCandy("#c0392b", "#ff7675")
+	},
+	[ITEM_CANDY_GREEN]: {
+		name: "Green Candy",
+		desc: "Sour apple shock.",
+		name_rus: "Зеленая конфета",
+		desc_rus: "Кислое яблочное потрясение.",
+		render: renderCandy("#27ae60", "#a2e08e")
+	},
+	[ITEM_CANDY_BLUE]: {
+		name: "Blue Candy",
+		desc: "Cool mint refreshment.",
+		name_rus: "Синяя конфета",
+		desc_rus: "Ледяная мятная свежесть.",
+		render: renderCandy("#2980b9", "#81ecec")
+	},
+	[ITEM_CANDY_CYAN]: {
+		name: "Cyan Candy",
+		desc: "Electric blueberry blast.",
+		name_rus: "Голубая конфета",
+		desc_rus: "Электрический черничный взрыв.",
+		render: renderCandy("#16a085", "#55efc4")
+	},
+	[ITEM_CANDY_MAGENTA]: {
+		name: "Magenta Candy",
+		desc: "Grape-infused magic.",
+		name_rus: "Пурпурная конфета",
+		desc_rus: "Виноградная магия.",
+		render: renderCandy("#9b59b6", "#fd79ae")
+	}
+});

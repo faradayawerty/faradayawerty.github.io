@@ -128,6 +128,7 @@ const ITEM_BEHAVIORS = {
 			p.shield_green_health = 0;
 			p.shield_rainbow_health = 0;
 			p.shield_shadow_health = 0;
+			p.shield_pumpkin_health = 0;
 			p.shield_anubis_health = 0;
 			return true;
 		}
@@ -137,6 +138,7 @@ const ITEM_BEHAVIORS = {
 		action: (p) => {
 			p.shield_blue_health = 0;
 			p.shield_green_health = p.shield_green_health_max;
+			p.shield_pumpkin_health = 0;
 			p.shield_rainbow_health = 0;
 			p.shield_shadow_health = 0;
 			p.shield_anubis_health = 0;
@@ -148,6 +150,7 @@ const ITEM_BEHAVIORS = {
 		action: (p) => {
 			p.shield_blue_health = 0;
 			p.shield_green_health = 0;
+			p.shield_pumpkin_health = 0;
 			p.shield_shadow_health = p.shield_shadow_health_max;
 			p.shield_rainbow_health = 0;
 			p.shield_anubis_health = 0;
@@ -161,6 +164,7 @@ const ITEM_BEHAVIORS = {
 			p.shield_green_health = 0;
 			p.shield_rainbow_health = p.shield_rainbow_health_max;
 			p.shield_shadow_health = 0;
+			p.shield_pumpkin_health = 0;
 			p.shield_anubis_health = 0;
 			return true;
 		}
@@ -170,9 +174,22 @@ const ITEM_BEHAVIORS = {
 		action: (p) => {
 			p.shield_blue_health = 0;
 			p.shield_green_health = 0;
+			p.shield_pumpkin_health = 0;
 			p.shield_rainbow_health = 0;
 			p.shield_shadow_health = 0;
 			p.shield_anubis_health = p.shield_anubis_health_max;
+			return true;
+		}
+	},
+	[ITEM_PUMPKIN_SHIELD]: {
+		sfx: "data/sfx/shield_1.mp3",
+		action: (p) => {
+			p.shield_blue_health = 0;
+			p.shield_green_health = 0;
+			p.shield_pumpkin_health = p.shield_pumpkin_health_max;
+			p.shield_rainbow_health = 0;
+			p.shield_shadow_health = 0;
+			p.shield_anubis_health = 0;
 			return true;
 		}
 	},

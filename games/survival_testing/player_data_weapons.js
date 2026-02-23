@@ -174,6 +174,39 @@ const WEAPON_DEFS = {
 			return true;
 		}
 	},
+	[ITEM_PUMPKIN_GUN]: {
+		cooldown: 250,
+		ammo: ITEM_PUMPKIN,
+		color: "#ff7518",
+		length: 1.8,
+		width: 3.0,
+		sound: "data/sfx/shotgun_1.mp3",
+		chance: 0.02,
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			[0, Math.PI / 10, -Math.PI / 10].forEach(angleOffset => {
+				let finalAngle = theta + angleOffset;
+				trash_bullet_create(
+					g,
+					p.body.position.x + Math.cos(theta) * p
+					.w * 1.5,
+					p.body.position.y + Math.sin(theta) * p
+					.w * 1.5,
+					Math.cos(finalAngle),
+					Math.sin(finalAngle),
+					22,
+					(20 + 10 * Math.random()) * 0.01 *
+					BALANCE_FACTOR * 1000 / 155 * 10 *
+					weapon_damage_from_tier(
+						ENEMY_TIER_PUMPKIN_SKELETON),
+					false,
+					60,
+					[ITEM_PUMPKIN]
+				);
+			});
+			return true;
+		}
+	},
 	[ITEM_PRESENT_LAUNCHER]: {
 		cooldown: 250,
 		ammo: ITEM_PRESENT,
@@ -230,6 +263,13 @@ const WEAPON_DEFS = {
 			const strikeCycle = 800;
 			const strikeProgress = (p.whip_timer % strikeCycle) /
 				strikeCycle;
+			if (strikeProgress < 0.1 && !p.whip_sound_played) {
+				audio_play("data/sfx/sword_1.mp3", 0.3);
+				p.whip_sound_played = true;
+			}
+			if (strikeProgress > 0.5) {
+				p.whip_sound_played = false;
+			}
 			const numSegments = p.whip_segments.length;
 			const segmentLen = (p.w * 0.8);
 			const targetAngle = Math.atan2(v.ty - v.sy, v.tx - v.sx);
@@ -453,6 +493,51 @@ const WEAPON_DEFS = {
 			return true;
 		}
 	},
+	[ITEM_FIRE_STAFF]: {
+		name: "Inferno Staff",
+		name_rus: "Посох Преисподней",
+		desc: "Channels the raw heat of the underworld. Incinerates everything in its path.",
+		desc_rus: "Проводит чистый жар преисподней. Испепеляет всё на своём пути.",
+		cooldown: 40,
+		ammo: ITEM_RED_PLASMA,
+		sound: "data/sfx/spray_1.mp3",
+		color: "#ff4500",
+		length: 1.8,
+		width: 0.9,
+		action: (g, p, v, dt) => {
+			let colors = ["#ff4500", "#ff8c00", "#ffd700"];
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			for (let i = 0; i < 3; i++) {
+				let offsetSide = (Math.random() - 0.5) * (p.w * 1.5);
+				let startX = p.body.position.x + Math.cos(theta) * (p
+					.w * 1.2) - Math.sin(theta) * offsetSide;
+				let startY = p.body.position.y + Math.sin(theta) * (p
+					.w * 1.2) + Math.cos(theta) * offsetSide;
+				let spread = (Math.random() - 0.5) * 0.25;
+				let speed = 12 + Math.random() * 8;
+				bullet_create(
+					g,
+					startX, startY,
+					Math.cos(theta + spread), Math.sin(theta +
+						spread),
+					speed,
+					0.18 * BALANCE_FACTOR * (1000 / 70) *
+					weapon_damage_from_tier(ENEMY_TIER_DEVIL),
+					false,
+					10 + Math.random() * 6,
+					500 + Math.random() * 300,
+					colors[Math.floor(Math.random() * colors
+						.length)],
+					"orange",
+					false, false,
+					"red",
+					true,
+					false
+				);
+			}
+			return true;
+		}
+	},
 	[ITEM_ANUBIS_SANDSTORM_STAFF]: {
 		cooldown: 60,
 		ammo: ITEM_RED_PLASMA,
@@ -492,6 +577,47 @@ const WEAPON_DEFS = {
 					.random() * 300, mainColor, secondaryColor,
 					false, false
 				);
+			}
+			return true;
+		}
+	},
+	[ITEM_NECROMANCER_STAFF]: {
+		cooldown: 400,
+		ammo: ITEM_PLASMA,
+		chance: 0.002,
+		sound: "data/sfx/plasmagun_1.mp3",
+		vol: 0.1,
+		color: "#9b59b6",
+		length: 1.8,
+		width: 0.8,
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			let angles = [-0.25, 0, 0.25];
+			let startX = p.body.position.x + Math.cos(theta) * p.w;
+			let startY = p.body.position.y + Math.sin(theta) * p.w;
+			angles.forEach(offset => {
+				let finalAngle = theta + offset;
+				bullet_create(
+					g,
+					startX,
+					startY,
+					Math.cos(finalAngle),
+					Math.sin(finalAngle),
+					15,
+					(0.8 + 0.4 * Math.random()) * 25.0 *
+					BALANCE_FACTOR * 1000 / 209 * (1000 /
+						10000) *
+					weapon_damage_from_tier(
+						ENEMY_TIER_NECROMANCER),
+					false,
+					10,
+					2000,
+					"#3498db",
+					"#e066ff"
+				);
+			});
+			if (typeof smoke_create === "function") {
+				smoke_create(g, startX, startY, 5, "purple", 0.5);
 			}
 			return true;
 		}
@@ -700,6 +826,40 @@ const WEAPON_DEFS = {
 				.position.y, v.tx - v.sx, v.ty - v.sy, 20, 15 *
 				BALANCE_FACTOR * weapon_damage_from_tier(0),
 				false, 6, 1500, mainColor, secondaryColor)
+		}
+	},
+	[ITEM_CANDY_GUN]: {
+		cooldown: 130,
+		ammo: ITEMS_CANDIES,
+		chance: 0.0025,
+		sound: "data/sfx/gunshot_1.mp3",
+		vol: 0.2,
+		color: "#ff0044",
+		length: 1.4,
+		width: 1.1,
+		action: (g, p, v) => {
+			let spread = 25;
+			let dx = (v.tx - v.sx) + (Math.random() - 0.5) * spread;
+			let dy = (v.ty - v.sy) + (Math.random() - 0.5) * spread;
+			let dist = Math.sqrt(dx * dx + dy * dy);
+			let ndx = dx / dist;
+			let ndy = dy / dist;
+			trash_bullet_create(
+				g,
+				p.body.position.x + ndx * p.w * 1.2,
+				p.body.position.y + ndy * p.w * 1.2,
+				ndx,
+				ndy,
+				22,
+				(0.5 + 0.5 * Math.random()) * 2.14 *
+				BALANCE_FACTOR * 1000 / 193 *
+				weapon_damage_from_tier(
+					ENEMY_TIER_PUMPKIN_SKELETON),
+				false,
+				45,
+				ITEMS_CANDIES
+			);
+			return true;
 		}
 	},
 	[ITEM_KALASHNIKOV]: {
@@ -984,6 +1144,33 @@ const WEAPON_DEFS = {
 					false, 6, 1500, mainColor,
 					secondaryColor);
 			});
+		}
+	},
+	[ITEM_BAT_BLASTER]: {
+		cooldown: 350,
+		ammo: ITEM_ROCKET,
+		color: "#1a1a1a",
+		length: 1.0,
+		width: 1.2,
+		sound: "data/sfx/rocketlauncher_1.mp3",
+		action: (g, p, v) => {
+			let theta = Math.atan2(v.ty - v.sy, v.tx - v.sx);
+			rocket_create(
+				g,
+				p.body.position.x + Math.cos(theta) * p.w,
+				p.body.position.y + Math.sin(theta) * p.h,
+				v.tx - v.sx,
+				v.ty - v.sy,
+				8,
+				null,
+				2.75 * 7.5 * BALANCE_FACTOR *
+				weapon_damage_from_tier(ENEMY_TIER_VAMPIRE),
+				p.max_health,
+				false,
+				14,
+				3000,
+				"bat"
+			);
 		}
 	},
 	[ITEM_ROCKET_SHOTGUN]: {
@@ -1291,6 +1478,48 @@ const WEAPON_DEFS = {
 			}
 			p.blood_alt = !p.blood_alt;
 			p.shot_cooldown = p.blood_alt ? 180 : 900;
+			return true;
+		}
+	},
+	[ITEM_LIFESTEAL_STAFF]: {
+		cooldown: 150,
+		length: 1.8,
+		width: 0.8,
+		sound: "data/sfx/spray_1.mp3",
+		ammo: ITEM_RED_PLASMA,
+		chance: 0.01,
+		action: (g, p, v, dt) => {
+			const rangeSq = 1000 * 1000;
+			const pPos = p.body.position;
+			let foundAny = false;
+			const baseDamage = 39 / 37.5 * 6 * dt *
+				weapon_damage_from_tier(ENEMY_TIER_VAMPIRE) * 0.5;
+			for (let i = 0; i < g.objects.length; i++) {
+				let obj = g.objects[i];
+				if (!obj || obj.destroyed || !obj.data || !obj.data
+					.body) continue;
+				if (obj.name === "enemy" || (obj.name === "rocket" &&
+						obj.data.enemy) || obj.name === "animal") {
+					let ePos = obj.data.body.position;
+					let dx = ePos.x - pPos.x;
+					let dy = ePos.y - pPos.y;
+					if (dx * dx + dy * dy < rangeSq) {
+						let percentDamage = obj.data.health * 0.25;
+						let finalDamage = Math.min(percentDamage,
+							baseDamage);
+						finalDamage = Math.max(0.1, finalDamage);
+						obj.data.health = Math.max(0, obj.data.health -
+							finalDamage);
+						obj.data.hit_by_player = true;
+						if (obj.data.health < 0.001 * obj.data
+							.max_health)
+							obj.data.health = 0;
+						lifesteal_particle_create(g, ePos.x, ePos.y, g
+							.player_object);
+						foundAny = true;
+					}
+				}
+			}
 			return true;
 		}
 	},

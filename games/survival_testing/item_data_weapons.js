@@ -45,6 +45,20 @@ ITEMS_DATA[ITEM_FREEZE_GUN] = {
 		}
 	}
 };
+ITEMS_DATA[ITEM_PUMPKIN_GUN] = {
+	name: "Pumpkin Blaster",
+	desc: "Warning: May cause explosive squash damage.",
+	name_rus: "Тыквострел",
+	desc_rus: "Внимание: может нанести взрывной урон мякотью.",
+	render: (ctx, x, y, w, h) => {
+		ctx.fillStyle = "#5d4037";
+		ctx.fillRect(x + 0.1 * w, y + 0.5 * h, 0.3 * w, 0.15 * h);
+		ctx.fillStyle = "#2c3e50";
+		ctx.fillRect(x + 0.4 * w, y + 0.45 * h, 0.4 * w, 0.12 * h);
+		ctx.fillStyle = "#e67e22";
+		drawCircle(ctx, x + 0.5 * w, y + 0.4 * h, 0.1 * w, "#e67e22");
+	}
+};
 ITEMS_DATA[ITEM_TESLA_GUN] = {
 	name: "Tesla Gun",
 	desc: "High-voltage heavy discharge projector.",
@@ -94,6 +108,26 @@ ITEMS_DATA[ITEM_TESLA_GUN] = {
 		ctx.fillRect(x + w * 0.21, y + h * 0.48, w * 0.33 * (0.75 +
 			0.25 * pulse), h * 0.03);
 		ctx.restore();
+	}
+};
+ITEMS_DATA[ITEM_PUMPKIN_GUN] = {
+	name: "Pumpkin Launcher",
+	desc: "Spooky season is here. High explosive gourds included.",
+	name_rus: "Тыквомёт",
+	desc_rus: "Сезон ужасов настал. Взрывоопасные тыквы прилагаются.",
+	render: (ctx, x, y, w, h) => {
+		ctx.fillStyle = CW.common.metal_dark;
+		ctx.fillRect(x + 0.2 * w, y + 0.6 * h, 0.15 * w, 0.2 * h);
+		ctx.fillStyle = "#2d4c1e";
+		ctx.fillRect(x + 0.1 * w, y + 0.4 * h, 0.8 * w, 0.25 * h);
+		ctx.fillStyle = "#ffcc00";
+		ctx.fillRect(x + 0.1 * w, y + 0.5 * h, 0.8 * w, 0.03 * h);
+		ctx.fillStyle = "#ff7518";
+		ctx.beginPath();
+		ctx.arc(x + 0.5 * w, y + 0.4 * h, 0.22 * w, 0, Math.PI, true);
+		ctx.fill();
+		ctx.fillStyle = "#4a7023";
+		ctx.fillRect(x + 0.47 * w, y + 0.13 * h, 0.06 * w, 0.05 * h);
 	}
 };
 ITEMS_DATA[ITEM_PRESENT_LAUNCHER] = {
@@ -1040,6 +1074,84 @@ ITEMS_DATA[ITEM_SHADOW_DUAL_SHOTGUNS] = {
 		drawVoidShotgun(x + w * 0.4, y + h * 0.5, 1.1);
 	}
 };
+ITEMS_DATA[ITEM_NECROMANCER_STAFF] = {
+	name: "Soul-Reaper Staff",
+	desc: "Harnesses the essence of the fallen. Shoots spectral bolts in a wide arc.",
+	name_rus: "Посох Жнеца Душ",
+	desc_rus: "Использует эссенцию павших. Выпускает спектральные заряды веером.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const scale = 0.85;
+		const cx = x + w * 0.5;
+		const cy = y + h * 0.5;
+		const hh = h * scale;
+		const ww = w * scale;
+		const hover = Math.sin(t * 0.1) * (hh * 0.03);
+		const pulse = Math.sin(t * 0.2) * 0.5 + 0.5;
+		const woodColor = "#2d1b0d";
+		const skullColor = "#e0e0e0";
+		const magicColor = "#9b59b6";
+		const glowColor = "#e066ff";
+		ctx.save();
+		ctx.lineCap = "round";
+		ctx.lineWidth = ww * 0.06;
+		ctx.strokeStyle = woodColor;
+		ctx.beginPath();
+		ctx.moveTo(cx, y + h * 0.9);
+		ctx.lineTo(cx, y + h * 0.35);
+		ctx.stroke();
+		const skY = y + h * 0.35;
+		const skSize = ww * 0.12;
+		ctx.fillStyle = skullColor;
+		ctx.strokeStyle = "#1a1a1a";
+		ctx.lineWidth = 1;
+		ctx.beginPath();
+		ctx.arc(cx, skY, skSize, Math.PI * 1.1, Math.PI * 1.9);
+		ctx.lineTo(cx + skSize * 0.6, skY + skSize * 1.2);
+		ctx.lineTo(cx - skSize * 0.6, skY + skSize * 1.2);
+		ctx.closePath();
+		ctx.fill();
+		ctx.stroke();
+		ctx.fillStyle = "#1a1a1a";
+		ctx.beginPath();
+		ctx.arc(cx - skSize * 0.4, skY + skSize * 0.25, skSize * 0.3, 0,
+			Math.PI * 2);
+		ctx.arc(cx + skSize * 0.4, skY + skSize * 0.25, skSize * 0.3, 0,
+			Math.PI * 2);
+		ctx.fill();
+		ctx.fillStyle = glowColor;
+		ctx.globalAlpha = 0.4 + pulse * 0.6;
+		ctx.beginPath();
+		ctx.arc(cx - skSize * 0.4, skY + skSize * 0.25, skSize * 0.1, 0,
+			Math.PI * 2);
+		ctx.arc(cx + skSize * 0.4, skY + skSize * 0.25, skSize * 0.1, 0,
+			Math.PI * 2);
+		ctx.fill();
+		ctx.globalAlpha = 1.0;
+		const orbY = skY - hh * 0.18 + hover;
+		const orbRadius = ww * 0.15;
+		ctx.shadowBlur = 10 * pulse;
+		ctx.shadowColor = glowColor;
+		let orbGrad = ctx.createRadialGradient(cx, orbY, 0, cx, orbY,
+			orbRadius);
+		orbGrad.addColorStop(0, "#ffffff");
+		orbGrad.addColorStop(0.4, magicColor);
+		orbGrad.addColorStop(1, "transparent");
+		ctx.fillStyle = orbGrad;
+		ctx.beginPath();
+		ctx.arc(cx, orbY, orbRadius, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.shadowBlur = 0;
+		ctx.fillStyle = "#fff";
+		for (let i = 0; i < 3; i++) {
+			const angle = t * 0.15 + (i * Math.PI * 2 / 3);
+			const px = cx + Math.cos(angle) * (orbRadius * 1.4);
+			const py = orbY + Math.sin(angle) * (orbRadius * 0.8);
+			ctx.fillRect(px - 0.5, py - 0.5, 1.5, 1.5);
+		}
+		ctx.restore();
+	}
+};
 ITEMS_DATA[ITEM_ANUBIS_SANDSTORM_STAFF] = {
 	name: "Sandstorm Staff",
 	desc: "Summons a devastating golden vortex of sand. Requires red plasma.",
@@ -1063,6 +1175,49 @@ ITEMS_DATA[ITEM_ANUBIS_SANDSTORM_STAFF] = {
 			ctx.fillStyle = CW.special.anubis_orange_transp;
 			ctx.fillRect(px, py, s, s);
 		}
+	}
+};
+ITEMS_DATA[ITEM_CANDY_GUN] = {
+	name: "Candy Cannon",
+	desc: "Sugary overload. Shoots hardened candy canes and peppermint rounds.",
+	name_rus: "Конфетная пушка",
+	desc_rus: "Сахарный передоз. Стреляет твердыми леденцами и мятными дисками.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const pulse = Math.sin(t * 0.2) * 0.5 + 0.5;
+		const candyRed = "#ff0044";
+		const candyWhite = "#ffffff";
+		const stickBrown = "#634133";
+		ctx.save();
+		ctx.fillStyle = stickBrown;
+		ctx.fillRect(x + w * 0.15, y + h * 0.55, w * 0.1, h * 0.2);
+		ctx.fillStyle = candyWhite;
+		ctx.fillRect(x + w * 0.1, y + h * 0.42, w * 0.8, h * 0.16);
+		ctx.fillStyle = candyRed;
+		for (let i = 0; i < 6; i++) {
+			ctx.beginPath();
+			let ox = x + w * (0.15 + i * 0.12);
+			ctx.moveTo(ox, y + h * 0.42);
+			ctx.lineTo(ox + w * 0.05, y + h * 0.42);
+			ctx.lineTo(ox + w * 0.1, y + h * 0.58);
+			ctx.lineTo(ox + w * 0.05, y + h * 0.58);
+			ctx.closePath();
+			ctx.fill();
+		}
+		ctx.shadowBlur = 8 * pulse;
+		ctx.shadowColor = candyRed;
+		ctx.fillStyle = "#ffcccc";
+		ctx.fillRect(x + w * 0.85, y + h * 0.4, w * 0.08, h * 0.2);
+		for (let i = 0; i < 2; i++) {
+			let spark = Math.cos(t * 0.3 + i) * 4;
+			ctx.fillStyle = i % 2 === 0 ? candyRed : candyWhite;
+			ctx.globalAlpha = 0.6 + Math.random() * 0.4;
+			ctx.beginPath();
+			ctx.arc(x + w * (0.8 + Math.random() * 0.15), y + h * 0.5 +
+				spark, w * 0.02, 0, Math.PI * 2);
+			ctx.fill();
+		}
+		ctx.restore();
 	}
 };
 ITEMS_DATA[ITEM_ANUBIS_PUNISHER_ROD] = {
@@ -1201,5 +1356,174 @@ ITEMS_DATA[ITEM_BLOOD_DUAL_SHOTGUNS] = {
 		};
 		drawBloodShotgun(x + w * 0.1, y + h * 0.15, 1.05);
 		drawBloodShotgun(x + w * 0.35, y + h * 0.55, 1.05);
+	}
+};
+ITEMS_DATA[ITEM_BAT_BLASTER] = {
+	name: "Dracula's Heart",
+	name_rus: "Сердце Дракулы",
+	desc: "Double-barreled gothic relic. Launches a coordinated swarm of predator bats.",
+	desc_rus: "Двуствольная готическая реликвия. Выпускает слаженную стаю хищных мышей.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const pulse = Math.sin(Date.now() * 0.002) * 0.3 + 0.7;
+		const darkBody = "#151515";
+		const metal = "#333333";
+		const ruby = "#880000";
+		const silver = "#9ca3af";
+		ctx.save();
+		ctx.fillStyle = "#0a0a0a";
+		ctx.fillRect(x + w * 0.15, y + h * 0.55, w * 0.08, h * 0.25);
+		ctx.fillRect(x + w * 0.45, y + h * 0.55, w * 0.07, h * 0.18);
+		ctx.fillStyle = darkBody;
+		ctx.fillRect(x + w * 0.05, y + h * 0.4, w * 0.7, h * 0.16);
+		ctx.fillStyle = metal;
+		for (let i = 0; i < 3; i++) {
+			ctx.fillRect(x + w * (0.1 + i * 0.25), y + h * 0.38, w *
+				0.04, h * 0.2);
+		}
+		const rx = x + w * 0.42;
+		const ry = y + h * 0.48;
+		const rw = w * 0.18;
+		const rh = h * 0.24;
+		ctx.fillStyle = "#220000";
+		ctx.beginPath();
+		ctx.moveTo(rx, ry - rh / 2);
+		ctx.lineTo(rx + rw / 2, ry);
+		ctx.lineTo(rx, ry + rh / 2);
+		ctx.lineTo(rx - rw / 2, ry);
+		ctx.closePath();
+		ctx.fill();
+		ctx.shadowBlur = 8 * pulse;
+		ctx.shadowColor = "#ff0000";
+		ctx.fillStyle = ruby;
+		ctx.beginPath();
+		ctx.moveTo(rx, ry - rh / 3);
+		ctx.lineTo(rx + rw / 3, ry);
+		ctx.lineTo(rx, ry + rh / 3);
+		ctx.lineTo(rx - rw / 3, ry);
+		ctx.closePath();
+		ctx.fill();
+		ctx.shadowBlur = 0;
+		ctx.fillStyle = silver;
+		[-1, 1].forEach(side => {
+			let ty = y + h * 0.48 + side * (h * 0.05);
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.75, ty - h * 0.03);
+			ctx.lineTo(x + w * 0.95, ty - h * 0.01);
+			ctx.lineTo(x + w * 0.95, ty + h * 0.01);
+			ctx.lineTo(x + w * 0.75, ty + h * 0.03);
+			ctx.closePath();
+			ctx.fill();
+		});
+		ctx.fillStyle = "rgba(255,255,255,0.1)";
+		ctx.fillRect(x + w * 0.05, y + h * 0.4, w * 0.7, h * 0.02);
+		ctx.restore();
+	}
+};
+ITEMS_DATA[ITEM_LIFESTEAL_STAFF] = {
+	name: "Vampiric Scepter",
+	desc: "Feasts on the life force of the living. A relic of the night.",
+	name_rus: "Вампирский скипетр",
+	desc_rus: "Пирует жизненной силой живых. Реликвия вечной ночи.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const bloodRed = "#ff0033";
+		const darkCrimson = "#660011";
+		const staffBody = "#1a0505";
+		ctx.save();
+		ctx.fillStyle = staffBody;
+		ctx.fillRect(x + w * 0.47, y + h * 0.3, w * 0.06, h * 0.6);
+		ctx.strokeStyle = staffBody;
+		ctx.lineWidth = w * 0.04;
+		ctx.lineCap = "round";
+		ctx.beginPath();
+		ctx.arc(x + w * 0.42, y + h * 0.28, w * 0.1, 0.2 * Math.PI,
+			0.8 * Math.PI, true);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.arc(x + w * 0.58, y + h * 0.28, w * 0.1, 0.8 * Math.PI,
+			0.2 * Math.PI, true);
+		ctx.stroke();
+		const pulse = Math.sin(t * 0.12) * 0.1 + 0.9;
+		const centerX = x + w * 0.5;
+		const centerY = y + h * 0.22;
+		ctx.translate(centerX, centerY);
+		ctx.shadowBlur = w * 0.15 * pulse;
+		ctx.shadowColor = bloodRed;
+		const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, w * 0.1);
+		grad.addColorStop(0, bloodRed);
+		grad.addColorStop(1, darkCrimson);
+		ctx.fillStyle = grad;
+		ctx.beginPath();
+		ctx.arc(0, 0, w * 0.09 * pulse, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.shadowBlur = 0;
+		for (let i = 0; i < 3; i++) {
+			ctx.rotate((Math.PI * 2) / 3 + t * 0.05);
+			let offset = ((t * 0.5 + i * 10) % 20) / 20;
+			let dist = w * 0.25 * (1 - offset);
+			ctx.fillStyle = bloodRed;
+			ctx.globalAlpha = offset;
+			ctx.beginPath();
+			ctx.arc(dist, 0, w * 0.02, 0, Math.PI * 2);
+			ctx.fill();
+		}
+		ctx.restore();
+	}
+};
+ITEMS_DATA[ITEM_FIRE_STAFF] = {
+	name: "Inferno Staff",
+	name_rus: "Посох Преисподней",
+	desc: "Channels the raw heat of the underworld. Incinerates everything in its path.",
+	desc_rus: "Проводит чистый жар преисподней. Испепеляет всё на своём пути.",
+	render: (ctx, x, y, w, h, animstate) => {
+		const t = animstate || 0;
+		const fireOrange = "#ff4500";
+		const hellRed = "#990000";
+		const charcoal = "#1a0a0a";
+		ctx.save();
+		ctx.fillStyle = charcoal;
+		ctx.fillRect(x + w * 0.46, y + h * 0.3, w * 0.08, h * 0.6);
+		ctx.strokeStyle = charcoal;
+		ctx.lineWidth = w * 0.05;
+		ctx.lineCap = "round";
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.5, y + h * 0.3);
+		ctx.lineTo(x + w * 0.5, y + h * 0.1);
+		ctx.stroke();
+		[-1, 1].forEach(side => {
+			ctx.beginPath();
+			ctx.moveTo(x + w * 0.5, y + h * 0.35);
+			ctx.quadraticCurveTo(
+				x + w * (0.5 + side * 0.25), y + h * 0.3,
+				x + w * (0.5 + side * 0.2), y + h * 0.15
+			);
+			ctx.stroke();
+		});
+		const pulse = Math.sin(t * 0.15) * 0.1 + 0.9;
+		const centerX = x + w * 0.5;
+		const centerY = y + h * 0.28;
+		ctx.shadowBlur = w * 0.2 * pulse;
+		ctx.shadowColor = fireOrange;
+		let fireGrad = ctx.createRadialGradient(centerX, centerY, 0,
+			centerX, centerY, w * 0.12);
+		fireGrad.addColorStop(0, "#fff700");
+		fireGrad.addColorStop(0.4, fireOrange);
+		fireGrad.addColorStop(1, "transparent");
+		ctx.fillStyle = fireGrad;
+		ctx.beginPath();
+		ctx.arc(centerX, centerY, w * 0.12 * pulse, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.shadowBlur = 0;
+		for (let i = 0; i < 5; i++) {
+			let orbit = t * 0.1 + i;
+			let distH = Math.cos(orbit) * (w * 0.15);
+			let distV = Math.sin(orbit * 0.5) * (h * 0.1);
+			ctx.fillStyle = i % 2 === 0 ? "#ffcc00" : charcoal;
+			ctx.globalAlpha = 0.6;
+			ctx.fillRect(centerX + distH, centerY + distV, w * 0.03, w *
+				0.03);
+		}
+		ctx.restore();
 	}
 };

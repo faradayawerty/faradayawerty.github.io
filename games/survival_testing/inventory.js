@@ -233,6 +233,18 @@ function inventory_draw_item_popup(ctx, game, item_id, x, y) {
 			ammoInfo = isRus ? "Требуется для стрельбы: Игрок" :
 				"Consumes: The Player";
 		}
+		if (item_id === ITEM_JUNK_CANNON) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Мусор" :
+				"Consumes: Junk";
+		}
+		if (item_id === ITEM_PRESENT_LAUNCHER) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Подарки" :
+				"Consumes: Presents";
+		}
+		if (item_id === ITEM_CANDY_GUN) {
+			ammoInfo = isRus ? "Требуется для стрельбы: Конфеты" :
+				"Consumes: Candies";
+		}
 		else if (weaponDef.ammo) {
 			let ammoData = ITEMS_DATA[weaponDef.ammo];
 			if (ammoData) {
@@ -311,7 +323,7 @@ function inventory_get_item_weight(id) {
 	if (id === ITEM_SHIELD || id === ITEM_SHIELD_GREEN || id ===
 		ITEM_SHIELD_RAINBOW ||
 		id === ITEM_SHIELD_GRAY || id === ITEM_SHADOW_SHIELD || id ===
-		ITEM_ANUBIS_REGEN_SHIELD) return 3;
+		ITEM_ANUBIS_REGEN_SHIELD || id === ITEM_PUMPKIN_SHIELD) return 3;
 	if (id === ITEM_HEALTH || id === ITEM_HEALTH_GREEN) return 4;
 	if (ITEMS_FOODS.includes(id)) return 5;
 	if (ITEMS_DRINKS.includes(id)) return 6;
@@ -334,8 +346,9 @@ function inventory_sort(inventory_element) {
 	shield_power[ITEM_SHIELD] = 1;
 	shield_power[ITEM_SHIELD_GREEN] = 2;
 	shield_power[ITEM_SHADOW_SHIELD] = 3;
-	shield_power[ITEM_SHIELD_RAINBOW] = 4;
+	shield_power[ITEM_PUMPKIN_SHIELD] = 4;
 	shield_power[ITEM_ANUBIS_REGEN_SHIELD] = 5;
+	shield_power[ITEM_SHIELD_RAINBOW] = 6;
 	shield_power[ITEM_SHIELD_GRAY] = 1;
 	let temp_shields = [];
 	let other_items = [];
@@ -345,7 +358,8 @@ function inventory_sort(inventory_element) {
 			if (id === 0) continue;
 			let is_shield = (id === ITEM_SHIELD || id === ITEM_SHIELD_GREEN ||
 				id === ITEM_SHIELD_RAINBOW || id === ITEM_SHIELD_GRAY ||
-				id === ITEM_SHADOW_SHIELD || id === ITEM_ANUBIS_REGEN_SHIELD
+				id === ITEM_SHADOW_SHIELD || id ===
+				ITEM_ANUBIS_REGEN_SHIELD || id === ITEM_PUMPKIN_SHIELD
 			);
 			if (is_shield) {
 				temp_shields.push(id);

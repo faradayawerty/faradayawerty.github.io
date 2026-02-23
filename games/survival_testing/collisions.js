@@ -48,6 +48,13 @@ function collisions_handle_pair(g, self, other, dt) {
 	const oData = other.data;
 	if (sName === "bullet" || sName === "trashbullet") {
 		if (sData.damaged) return;
+		if (oName === "rocket") {
+			if (sData.enemy === oData.enemy) return;
+			collisions_apply_damage_to_object(g, other, sData.damage, dt, !sData
+				.enemy);
+			sData.damaged = true;
+			return;
+		}
 		if (sData.enemy) {
 			if (oName === "player") {
 				if (oData.car_object) {
@@ -63,8 +70,6 @@ function collisions_handle_pair(g, self, other, dt) {
 		}
 		else {
 			if (COLLISION_TARGETS_BULLET.has(oName)) {
-				if (sName === "trashbullet" && oName === "rocket") return;
-				if (oName === "rocket" && !oData.enemy) return;
 				if (oName === "enemy" || oName === "animal") {
 					if (g.settings.indicators["show blood"]) {
 						blood_splash_create(g, oData.body.position.x, oData.body
@@ -88,24 +93,17 @@ function collisions_handle_pair(g, self, other, dt) {
 				collisions_apply_damage_to_object(g, other, sData.damage, dt,
 					true);
 				sData.damaged = true;
-				if (oName === "rocket") {
-					if (oData.damaged) return;
-					let rocketDmg = Math.round(sData.damage * dt);
-					oData.health -= rocketDmg;
-					if (oData.health < 0) oData.health = 0;
-					oData.target_object = null;
-					oData.bounce_ticks = 10;
-					oData.damaged = true;
-					oData.body.collisionFilter.mask = 0;
-				}
 			}
 		}
 	}
 	else if (sName === "rocket") {
 		if (sData.enemy && oName === "enemy") return;
 		if (oName === "rocket" && sData.enemy === oData.enemy) return;
-		if (!sData.enemy && (oName === "player" || (oName === "car" && !oData
-				.enemy))) return;
+		let playerObj = game_object_find_closest(g, sData.body.position.x, sData
+			.body.position.y, "player", 1);
+		let isCurrentPlayerCar = (playerObj && playerObj.data.car_object &&
+			playerObj.data.car_object.data.body === oData.body);
+		if (!sData.enemy && (oName === "player" || isCurrentPlayerCar)) return;
 		if (COLLISION_TARGETS_ROCKET.has(oName)) {
 			if (sData.damaged) return;
 			if (oName === "player" && sData.enemy) {
@@ -131,11 +129,13 @@ function collisions_handle_pair(g, self, other, dt) {
 			}
 			let selfRocketDmg = Math.round(10 * sData.damage * dt);
 			sData.health -= selfRocketDmg;
-			if (sData.health < 0) sData.health = 0;
+			if (sData.health <= 0) {
+				sData.health = 0;
+				sData.damaged = true;
+				sData.body.collisionFilter.mask = 0;
+			}
 			sData.target_object = null;
 			sData.bounce_ticks = 10;
-			sData.damaged = true;
-			sData.body.collisionFilter.mask = 0;
 		}
 	}
 	else if (sName === "enemy") {
@@ -239,7 +239,7 @@ function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 			totalDmg);
 		if (g.settings.indicators["show damage numbers"]) {
 			damage_text_create(g, p.body.position.x, p.body.position.y - 20,
-				finalShieldDmg, "#555555");
+				finalShieldDmg, "#dd44ff");
 		}
 		p.shield_shadow_health -= finalShieldDmg;
 		if (p.shield_shadow_health < 0) p.shield_shadow_health = 0;
@@ -265,6 +265,17 @@ function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 		}
 		p.shield_anubis_health -= finalShieldDmg;
 		if (p.shield_anubis_health < 0) p.shield_anubis_health = 0;
+		return;
+	}
+	if (p.shield_pumpkin_health > 0) {
+		let finalShieldDmg = Math.round((source === "enemy" ? 0.25 : 0.75) *
+			totalDmg);
+		if (g.settings.indicators["show damage numbers"]) {
+			damage_text_create(g, p.body.position.x, p.body.position.y - 20,
+				finalShieldDmg, "orange");
+		}
+		p.shield_pumpkin_health -= finalShieldDmg;
+		if (p.shield_pumpkin_health < 0) p.shield_pumpkin_health = 0;
 		return;
 	}
 	if (g.settings.indicators["show damage numbers"]) {
@@ -307,7 +318,7 @@ function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 function collisions_apply_damage_to_object(g, obj, damage, dt, isFromPlayer) {
 	let d = obj.data;
 	let rawDmg = damage * dt;
-	if (obj.name === "car" && d.is_tank && !d.enemy) {
+	if (obj.name === "car" && d.is_tank) {
 		rawDmg *= 0.0125;
 	}
 	let finalDmg = Math.round(rawDmg);
@@ -318,14 +329,15 @@ function collisions_apply_damage_to_object(g, obj, damage, dt, isFromPlayer) {
 	}
 	d.health -= finalDmg;
 	if (d.health < 0) d.health = 0;
-	if (!isFromPlayer && (obj.name === "car" && !d.enemy)) {
+	if (!isFromPlayer && obj.name === "car") {
 		let eDpsEntry = enemyDpsEntryPool[enemyDpsPoolIndex];
 		eDpsEntry.dmg = finalDmg;
 		eDpsEntry.time = Date.now();
 		g.enemy_dps_history.push(eDpsEntry);
 		enemyDpsPoolIndex = (enemyDpsPoolIndex + 1) % enemyDpsEntryPool.length;
 	}
-	if (isFromPlayer && (obj.name === "enemy" || obj.name === "rocket")) {
+	if (isFromPlayer && (obj.name === "enemy" || obj.name === "rocket" || obj
+			.name === "car")) {
 		d.hit_by_player = true;
 		let w = g.current_weapon;
 		if (!g.dps_history[w]) g.dps_history[w] = [];

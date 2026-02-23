@@ -36,12 +36,14 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		shield_blue_health_max: 100,
 		shield_green_health: 0,
 		shield_green_health_max: 500,
-		shield_rainbow_health: 0,
-		shield_rainbow_health_max: 3000,
 		shield_shadow_health: 0,
 		shield_shadow_health_max: 1000,
+		shield_pumpkin_health: 0,
+		shield_pumpkin_health_max: 2000,
 		shield_anubis_health: 0,
-		shield_anubis_health_max: 2000,
+		shield_anubis_health_max: 3000,
+		shield_rainbow_health: 0,
+		shield_rainbow_health_max: 5000,
 		shadow_jump_lock: false,
 		shadow_jump_delay: 0,
 		shadow_jump_time: 0,
@@ -56,6 +58,7 @@ function player_create(g, x, y, respawn = false, ai_controlled = false) {
 		shooting_laser: false,
 		laser_sound_has_played: false,
 		last_melee_angle_sound: 0,
+		regen_delay: 0
 	};
 	p.achievements_element = g.gui_elements[achievements_create(g)];
 	p.achievements_shower_element = g.gui_elements[achievements_shower_create(g,
@@ -248,6 +251,7 @@ function player_update(player_object, dt) {
 		_update_const.tempPos.y = -limit;
 		Matter.Body.setPosition(p.body, _update_const.tempPos, false);
 	}
+	if (p.regen_delay > 0) p.regen_delay -= dt;
 	if (p.shot_cooldown > 0) p.shot_cooldown -= dt;
 	if (p.shotgun_cooldown > 0) p.shotgun_cooldown -= dt;
 	if (p.minigun_cooldown > 0) p.minigun_cooldown -= dt;
@@ -255,6 +259,7 @@ function player_update(player_object, dt) {
 	if (p.shield_blue_health > 0) p.shield_blue_health -= 0.00075 * dt;
 	if (p.shield_green_health > 0) p.shield_green_health -= 0.00075 * dt;
 	if (p.shield_shadow_health > 0) p.shield_shadow_health -= 0.00075 * dt;
+	if (p.shield_pumpkin_health > 0) p.shield_pumpkin_health -= 0.00075 * dt;
 	if (p.shield_rainbow_health > 0) p.shield_rainbow_health -= 0.00075 * dt;
 	if (p.shield_anubis_health > 0) p.shield_anubis_health -= 0.00075 * dt;
 	if (DEBUG_PLAYER && p.saved_health - p.health > 1) {
@@ -303,7 +308,8 @@ function player_update(player_object, dt) {
 	p.speed = p.max_speed;
 	if (p.thirst < 0.33 * p.max_thirst) p.speed *= 0.875;
 	if (p.hunger < 0.11 * p.max_hunger) p.speed *= 0.75;
-	if (p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst)
+	if (p.hunger > 0.75 * p.max_hunger && p.thirst > 0.75 * p.max_thirst && p
+		.regen_delay <= 0)
 		p.health = Math.min(p.max_health, p.health + 0.0025 * dt);
 	if (p.want_level == null) {
 		if (!level_visible(g, "0x0", player_object)) levels_set(g, "0x0");
@@ -652,7 +658,8 @@ function drawStat(ctx, posX, posY, pw, ph, val, max, offset, type) {
 	ctx.restore();
 }
 
-function renderShield(ctx, posX, posY, pw, ph, health, max, fill, stroke, c) {
+function renderShield(ctx, posX, posY, pw, ph, health, max, fill, stroke, c,
+	isPumpkin) {
 	if (health <= 0) return;
 	const fontSize = pw * 0.275;
 	const perc = Math.max(0, health / max);
@@ -683,8 +690,59 @@ function renderShield(ctx, posX, posY, pw, ph, health, max, fill, stroke, c) {
 	ctx.fillText(text, posX, yPos);
 	ctx.restore();
 	ctx.save();
-	ctx.globalAlpha = 0.25;
+	if (isPumpkin) {
+		ctx.globalAlpha = 0.65;
+	}
+	else {
+		ctx.globalAlpha = 0.25;
+	}
 	drawCircle(ctx, posX, posY, 1.5 * pw, fill, stroke, 0.05 * pw);
+	if (isPumpkin) {
+		ctx.save();
+		ctx.globalAlpha = 1.0;
+		ctx.fillStyle = "#FFD700";
+		ctx.shadowBlur = (pw * 0.3);
+		ctx.shadowColor = "#FFD700";
+		ctx.translate(posX, posY);
+		ctx.scale(3.8, 3.8);
+		ctx.translate(-posX, -posY);
+		const w = pw;
+		const h = ph;
+		const x = posX - w * 0.5;
+		const y = posY - h * 0.55;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.3, y + h * 0.35);
+		ctx.lineTo(x + w * 0.48, y + h * 0.45);
+		ctx.lineTo(x + w * 0.32, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.7, y + h * 0.35);
+		ctx.lineTo(x + w * 0.52, y + h * 0.45);
+		ctx.lineTo(x + w * 0.68, y + h * 0.5);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.5, y + h * 0.48);
+		ctx.lineTo(x + w * 0.46, y + h * 0.55);
+		ctx.lineTo(x + w * 0.54, y + h * 0.55);
+		ctx.fill();
+		let mY = y - 0.1 * h;
+		ctx.beginPath();
+		ctx.moveTo(x + w * 0.25, mY + h * 0.65);
+		ctx.lineTo(x + w * 0.35, mY + h * 0.75);
+		ctx.lineTo(x + w * 0.42, mY + h * 0.67);
+		ctx.lineTo(x + w * 0.5, mY + h * 0.77);
+		ctx.lineTo(x + w * 0.58, mY + h * 0.67);
+		ctx.lineTo(x + w * 0.65, mY + h * 0.75);
+		ctx.lineTo(x + w * 0.75, mY + h * 0.65);
+		ctx.lineTo(x + w * 0.65, mY + h * 0.83);
+		ctx.lineTo(x + w * 0.58, mY + h * 0.73);
+		ctx.lineTo(x + w * 0.5, mY + h * 0.9);
+		ctx.lineTo(x + w * 0.42, mY + h * 0.73);
+		ctx.lineTo(x + w * 0.35, mY + h * 0.83);
+		ctx.closePath();
+		ctx.fill();
+		ctx.restore();
+	}
 	ctx.restore();
 }
 
@@ -983,6 +1041,9 @@ function player_draw(player_object, ctx) {
 	renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p.shield_anubis_health, p
 		.shield_anubis_health_max, c.items.aegis.body, c.items.aegis.gold, c
 	);
+	renderShield(ctx, posX, posY - ph * 0.25, pw, ph, p.shield_pumpkin_health, p
+		.shield_pumpkin_health_max, "#E67E22", "#A04000", c, true
+	);
 	if (p.shield_rainbow_health > 0) {
 		let anim = 0.1 * p.item_animstate;
 		let r = Math.floor(Math.pow(Math.cos(anim) * 15, 2));
@@ -1268,4 +1329,34 @@ function player_show_note(p, title, content) {
 		p.inventory_element.shown = false;
 		return true;
 	}
+}
+
+function create_lifesteal_particle(g, sx, sy, targetBody) {
+	game_object_create(g, "vfx_drain", {
+		x: sx,
+		y: sy,
+		target: targetBody,
+		life: 1.0,
+		speed: 0.005
+	}, (obj, dt) => {
+		let d = obj.data;
+		d.life -= 0.002 * dt;
+		if (d.life <= 0) {
+			obj.destroyed = true;
+			return;
+		}
+		const tPos = d.target.position;
+		d.x += (tPos.x - d.x) * d.speed * dt;
+		d.y += (tPos.y - d.y) * d.speed * dt;
+		d.speed += 0.0001 * dt;
+	}, (obj, ctx) => {
+		let d = obj.data;
+		ctx.fillStyle = "#ff0000";
+		ctx.beginPath();
+		ctx.moveTo(d.x, d.y - 4);
+		ctx.lineTo(d.x + 4, d.y);
+		ctx.lineTo(d.x, d.y + 4);
+		ctx.lineTo(d.x - 4, d.y);
+		ctx.fill();
+	});
 }

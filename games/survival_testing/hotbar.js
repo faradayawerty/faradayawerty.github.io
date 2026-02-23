@@ -207,6 +207,12 @@ function hotbar_draw(hotbar_object, ctx) {
 			sIcon = ITEM_SHIELD;
 			sColor = HB_COLS.resources.shield_default;
 		}
+		else if (p.shield_pumpkin_health > 0) {
+			sVal = p.shield_pumpkin_health;
+			sMax = p.shield_pumpkin_health_max;
+			sIcon = ITEM_PUMPKIN_SHIELD;
+			sColor = "orange";
+		}
 		_hotbar_drawIndicator(ctx, res_x_base + res_step_x * 3, res_y_base +
 			res_step_y * 3, s, sVal, sMax, HB_COLS.resources.shield_empty,
 			sColor, sIcon, 'shield', hb, isMobile);
@@ -438,7 +444,7 @@ function hotbar_update(hotbar_element, dt) {
 	if (inv_el && !hb.has_shield_button) {
 		let hasShieldInInv = inventory_has_item_from_list(inv_el, [ITEM_SHIELD,
 			ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW, ITEM_SHADOW_SHIELD,
-			ITEM_ANUBIS_REGEN_SHIELD
+			ITEM_ANUBIS_REGEN_SHIELD, ITEM_PUMPKIN_SHIELD
 		]) !== -1;
 		if (hasShieldInInv) hb.has_shield_button = true;
 	}
@@ -589,7 +595,8 @@ function hotbar_update(hotbar_element, dt) {
 					[ITEM_HEALTH_GREEN, ITEM_HEALTH]);
 				else if (overShield) itm = inventory_has_item_from_list(inv_el,
 					[ITEM_SHIELD, ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW,
-						ITEM_SHADOW_SHIELD, ITEM_ANUBIS_REGEN_SHIELD
+						ITEM_SHADOW_SHIELD, ITEM_ANUBIS_REGEN_SHIELD,
+						ITEM_PUMPKIN_SHIELD
 					]);
 				else if (overFuel) itm = inventory_has_item_from_list(inv_el, [
 					ITEM_FUEL

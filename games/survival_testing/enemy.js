@@ -426,6 +426,11 @@ function enemy_update(enemy_object, dt) {
 									t.shield_anubis_health -= finalDmg;
 									color = "#ffd700";
 								}
+								else if (t.shield_pumpkin_health > 0) {
+									finalDmg = Math.round(0.05 * rawDamage);
+									t.shield_pumpkin_health -= finalDmg;
+									color = "orange";
+								}
 								else {
 									finalDmg = Math.round(1.6 * rawDamage);
 									t.health -= finalDmg;

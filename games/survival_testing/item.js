@@ -83,6 +83,7 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			.includes("mummy") && tile_theme === THEME_DESERT)) {
 		available_guns.push(ITEM_KALASHNIKOV);
 		available_ammos.push(ITEM_PLASMA);
+		available_shields.push(ITEM_SHIELD);
 	}
 	if (enemy_type == "shadow" || (enemy_type == null && g.available_enemies
 			.includes("shadow") && tile_theme === THEME_DESERT)) {
@@ -95,11 +96,19 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 		available_ammos.push(ITEM_RED_PLASMA);
 		available_shields.push(ITEM_ANUBIS_REGEN_SHIELD);
 	}
+	if (enemy_type == "snow regular" || (enemy_type == null && g
+			.available_enemies
+			.includes("snow regular") && tile_theme === THEME_TAIGA)) {
+		available_ammos.push(ITEM_AMMO);
+		available_ammos.push(ITEM_PLASMA);
+		available_shields.push(ITEM_SHIELD);
+	}
 	if (enemy_type == "ushanka" || (enemy_type == null && g.available_enemies
 			.includes("ushanka") && tile_theme === THEME_TAIGA)) {
 		available_guns.push(ITEM_PP_SH);
 		available_guns.push(ITEM_MOSIN_RIFLE);
 		available_ammos.push(ITEM_PLASMA, ITEM_RED_PLASMA, ITEM_ROCKET);
+		available_shields.push(ITEM_SHIELD);
 	}
 	if (enemy_type == "snowman" || (enemy_type == null && g.available_enemies
 			.includes("snowman") && tile_theme === THEME_TAIGA)) {
@@ -118,6 +127,32 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 		available_drinks = [ITEM_PUMPKIN_JUICE];
 		available_ammos = [ITEM_RED_PLASMA];
 	}
+	if (enemy_type == "pumpkin skeleton") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos = [ITEM_PUMPKIN, ITEM_PUMPKIN, ITEM_PUMPKIN,
+			ITEM_PUMPKIN, ITEM_PUMPKIN
+		].concat(ITEMS_CANDIES);
+	}
+	if (enemy_type == "vampire") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos.push(ITEM_RED_PLASMA, ITEM_ROCKET)
+	}
+	if (enemy_type == "necromancer") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos = [ITEM_PLASMA];
+	}
+	if (enemy_type == "devil") {
+		available_food = [ITEM_EYEBALL_SOUP];
+		available_shields = [ITEM_PUMPKIN_SHIELD];
+		available_drinks = [ITEM_PUMPKIN_JUICE];
+		available_ammos = [ITEM_RED_PLASMA];
+	}
 	let chance_ammo = 1;
 	let chance_health = 1;
 	let chance_shield = 1;
@@ -127,9 +162,9 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 	let chance_fuel = 1;
 	if (enemy_type != null) {
 		chance_fuel = 5;
-		chance_ammo = 25;
+		chance_ammo = 30;
 		chance_health = 0;
-		chance_shield = 15;
+		chance_shield = 10;
 		chance_food = 10;
 		chance_drink = 10;
 		if (enemy_type == "blood") {
@@ -148,9 +183,22 @@ function item_spawn(g, x, y, enemy_type = null, tile = null, car_type = null,
 			chance_food = 0;
 			chance_drink = 0;
 		}
-		if (enemy_type == "shooting") chance_health = 5;
+		if (enemy_type == "pumpkin skeleton") {
+			chance_health = 0;
+			chance_gun = 0.1;
+			chance_fuel = 1;
+			chance_food = 2.5;
+			chance_drink = 2.5;
+			chance_shield = 15;
+			chance_ammo = 30;
+		}
+		if (enemy_type == "shooting") {
+			chance_health = 5;
+			chance_shield = 15;
+		}
 		if (enemy_type == "sword") {
 			chance_health = 15;
+			chance_shield = 15;
 			chance_food = 0;
 			chance_drink = 0;
 		}

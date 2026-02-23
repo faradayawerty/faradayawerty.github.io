@@ -7,7 +7,7 @@ let DO_AUTOSAVES = false;
 let DEBUG_AMOUNTS = false;
 let INTEROLATION = true;
 let SHOW_DPS = false;
-let SHOW_ENEMY_DPS = true;
+let SHOW_ENEMY_DPS = false;
 let BULLET_LIMIT = 200;
 
 function game_create(input_, engine_, audios_) {
