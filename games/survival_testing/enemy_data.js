@@ -2562,7 +2562,7 @@ const ENEMY_TYPES = {
 					const targetY = prevY + Math.sin(
 						targetAngle) * segmentLen;
 					const followSpeed = 0.5 + (spawnRatio *
-					0.3);
+						0.3);
 					seg.x += (targetX - seg.x) * followSpeed;
 					seg.y += (targetY - seg.y) * followSpeed;
 					const dx = seg.x - prevX;
@@ -2570,9 +2570,9 @@ const ENEMY_TYPES = {
 					const dist = Math.hypot(dx, dy);
 					if (dist > 0) {
 						seg.x = prevX + (dx / dist) *
-						segmentLen;
+							segmentLen;
 						seg.y = prevY + (dy / dist) *
-						segmentLen;
+							segmentLen;
 					}
 					ctx.beginPath();
 					ctx.moveTo(prevX, prevY);
@@ -2614,9 +2614,9 @@ const ENEMY_TYPES = {
 						bullet_create(
 							obj.game,
 							e.body.position.x + Math.cos(
-							finalAngle) * spawnDist,
+								finalAngle) * spawnDist,
 							e.body.position.y + Math.sin(
-							finalAngle) * spawnDist,
+								finalAngle) * spawnDist,
 							Math.cos(finalAngle), Math.sin(
 								finalAngle),
 							pSpeed, e.damage * 0.15,
@@ -2659,9 +2659,9 @@ const ENEMY_TYPES = {
 			ctx.fill();
 			ctx.fillStyle = "#ff0000";
 			ctx.fillRect(x + w * 0.43, y + h * 0.63, w * 0.04, h *
-			0.04);
+				0.04);
 			ctx.fillRect(x + w * 0.53, y + h * 0.63, w * 0.04, h *
-			0.04);
+				0.04);
 		},
 	},
 };
