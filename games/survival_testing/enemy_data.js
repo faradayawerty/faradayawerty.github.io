@@ -1144,11 +1144,7 @@ const ENEMY_TYPES = {
 						1 ? vars.ndx * (-sinA) + vars.ndy *
 						cosA : vars.ndx * sinA + vars.ndy *
 						cosA);
-					trash_bullet_create(obj.game, e.body
-						.position.x, e.body.position.y,
-						finalX, finalY, 24, e.damage, true,
-						e.w * 0.5, E_COLS.raccoon_boss
-						.trash_bullet);
+					trash_bullet_create(obj.game, e.body .position.x, e.body.position.y, finalX, finalY, 24, e.damage, true, e.w * 0.5);
 				});
 				e.shooting_delay = 0;
 			}
