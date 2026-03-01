@@ -18,7 +18,7 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 		max_health: 1000,
 		fuel: (fuel !== null) ? fuel : Math.max(0, 200 * Math.random() -
 			150),
-		max_fuel: 200,
+		max_fuel: 300,
 		speed: 20,
 		max_speed: 20,
 		ridable: true,
@@ -43,7 +43,7 @@ function car_create(g, x, y, color_, is_tank = false, unique = true, type =
 	switch (type) {
 		case "tank":
 			c.max_health = 10000;
-			c.max_fuel = 40000;
+			c.max_fuel = 1000;
 			c.speed = 15;
 			c.max_speed = 15;
 			break;
@@ -215,10 +215,10 @@ function car_update(car_object, dt) {
 			p.body.position.y + 0.5 * p.w * Math.sin(theta),
 			dx, dy, 60,
 			(15 + 10 * Math.random()) * BALANCE_FACTOR *
-			weapon_damage_from_tier(7), false, 12.5, 3500
+			weapon_damage_from_tier(ENEMY_TIER_SHOOTING_ROCKET), false, 12.5, 3500
 		);
 		p.shot_cooldown = 0;
-		audio_play("data/sfx/revolver_1.mp3", 0.3);
+		audio_play("data/sfx/revolver_1.mp3", 0.1);
 	}
 	if (p.health <= 0) {
 		let N = Math.random() * 4 - 1;

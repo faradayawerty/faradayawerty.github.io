@@ -176,7 +176,7 @@ function collisions_handle_pair(g, self, other, dt) {
 					blood_splash_create(g, sData.body.position.x, sData.body
 						.position.y, 10, 4, "#bc0000", 1.3);
 				}
-				let crushDamage = Math.round(100 * sData.damage * dt);
+				let crushDamage = Math.round(weapon_damage_from_tier(ENEMY_TIER_SHOOTING_ROCKET) * dt);
 				sData.health -= crushDamage;
 				if (sData.health < 0) sData.health = 0;
 				sData.hit_by_player = true;
@@ -318,9 +318,6 @@ function collisions_apply_damage_to_player(p, damage, dt, source, g) {
 function collisions_apply_damage_to_object(g, obj, damage, dt, isFromPlayer) {
 	let d = obj.data;
 	let rawDmg = damage * dt;
-	if (obj.name === "car" && d.is_tank) {
-		rawDmg *= 0.0125;
-	}
 	let finalDmg = Math.round(rawDmg);
 	if (finalDmg >= 1 && g.settings.indicators["show damage numbers"]) {
 		const textX = d.body ? d.body.position.x : (d.x || 0);

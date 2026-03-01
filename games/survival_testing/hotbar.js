@@ -18,11 +18,12 @@ function hotbar_create(g, inv, attached_to_object = null) {
 		animation_state: 0,
 		mouse_over: false,
 		has_shield_button: false,
-		did_want_menu: false,
 		leftButtonClickable: false,
 		hovered_btn: null,
 		_consume_lock: false,
-		_mob_toggle_lock: false
+		_inv_pressed: false,
+		_menu_pressed: false,
+		_ach_pressed: false
 	};
 	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update,
 		hotbar_draw, hotbar_destroy);
@@ -469,6 +470,8 @@ function hotbar_update(hotbar_element, dt) {
 	let start_x = 40;
 
 	let freeTouch = isMobile ? input.touch.find(t => t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) : null;
+	
+	let ach_el = g.gui_elements.find(e => e.name === "achievements");
 
 	for (let pIdx = 0; pIdx < pointsCount; pIdx++) {
 		let pt = _HB_POINTS[pIdx];
@@ -514,15 +517,30 @@ function hotbar_update(hotbar_element, dt) {
 		if (overFuel) { hb.mouse_over = true; hb.hovered_btn = 'fuel'; }
 
 		if (isMobile) {
-			if (freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_inv_x, b_inv_y, s, s)) {
-				if (!hb._mob_toggle_lock && inv_el) {
-					inv_el.shown = !inv_el.shown;
-					hb._mob_toggle_lock = true;
-				}
+			// LOGIC FOR MOBILE: CLICK ON RELEASE (mouseup)
+			let touchingInv = freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_inv_x, b_inv_y, s, s);
+			let touchingMenu = freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_menu_x, b_menu_y, s, s);
+			let touchingAch = freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_ach_x, b_ach_y, s, s);
+
+			if (touchingInv) hb._inv_pressed = true;
+			else if (hb._inv_pressed) {
+				if (inv_el) inv_el.shown = !inv_el.shown;
+				hb._inv_pressed = false;
 			}
 			
-			if (freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_menu_x, b_menu_y, s, s)) {
-				if (!hb.did_want_menu) { g.want_menu = true; hb.did_want_menu = true; }
+			if (touchingMenu) hb._menu_pressed = true;
+			else if (hb._menu_pressed) {
+				g.want_menu = true;
+				hb._menu_pressed = false;
+			}
+
+			if (touchingAch) hb._ach_pressed = true;
+			else if (hb._ach_pressed) {
+				if (ach_el) {
+					ach_el.shown = !ach_el.shown;
+					if (inv_el) inv_el.shown = false;
+				}
+				hb._ach_pressed = false;
 			}
 
 			if (freeTouch && (overHealth || overWater || overFood || overShield || overFuel)) {
@@ -539,10 +557,19 @@ function hotbar_update(hotbar_element, dt) {
 				}
 			}
 		} else {
+			// LOGIC FOR PC: CLICK ON RELEASE (mouseup)
 			if (pcActionTriggered && hb.hovered_btn === 'inv') {
 				if (inv_el) inv_el.shown = !inv_el.shown;
 			}
 			if (pcActionTriggered && hb.hovered_btn === 'menu') g.want_menu = true;
+			
+			if (pcActionTriggered && hb.hovered_btn === 'ach') {
+				if (ach_el) {
+					ach_el.shown = !ach_el.shown;
+					if (inv_el) inv_el.shown = false;
+				}
+			}
+
 			if (pcActionTriggered && (overHealth || overWater || overFood || overShield || overFuel)) {
 				let player = hb.attached_to_object;
 				let itm = -1;
@@ -557,8 +584,10 @@ function hotbar_update(hotbar_element, dt) {
 	}
 	
 	if (isMobile && !freeTouch) {
-		hb._mob_toggle_lock = false;
 		hb._consume_lock = false;
-		hb.did_want_menu = false;
+		// Reset pressed states if finger is lifted outside
+		hb._menu_pressed = false;
+		hb._ach_pressed = false;
+		hb._inv_pressed = false;
 	}
 }

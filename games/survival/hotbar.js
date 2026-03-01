@@ -18,10 +18,12 @@ function hotbar_create(g, inv, attached_to_object = null) {
 		animation_state: 0,
 		mouse_over: false,
 		has_shield_button: false,
-		did_want_menu: false,
 		leftButtonClickable: false,
 		hovered_btn: null,
-		_consume_lock: false
+		_consume_lock: false,
+		_inv_pressed: false,
+		_menu_pressed: false,
+		_ach_pressed: false
 	};
 	let ihotbar = game_gui_element_create(g, "hotbar", hb, hotbar_update,
 		hotbar_draw, hotbar_destroy);
@@ -420,26 +422,30 @@ function hotbar_update(hotbar_element, dt) {
 	let scale = get_scale();
 	hb.animation_state += 0.02 * dt;
 	if (hb.attached_to_object.data.ai_controlled) hotbar_element.shown = false;
+	
 	for (let i = 0; i < 9; i++) {
 		if (isKeyDown(input, (i + 1).toString(), true)) hb.iselected = i;
 	}
 	if (isMouseWheelUp(input)) hb.iselected = (hb.iselected + 1) % 9;
 	if (isMouseWheelDown(input)) hb.iselected = (hb.iselected - 1 + 9) % 9;
+
 	hb.mouse_over = false;
 	hb.hovered_btn = null;
+
+	let isMobile = g.mobile;
 	let pointsCount = 0;
 	if (!isScreenTouched(input)) {
 		_HB_POINTS[0].x = input.mouse.x / scale;
 		_HB_POINTS[0].y = input.mouse.y / scale;
 		pointsCount = 1;
-	}
-	else {
+	} else {
 		pointsCount = Math.min(input.touch.length, 10);
 		for (let i = 0; i < pointsCount; i++) {
 			_HB_POINTS[i].x = input.touch[i].x / scale;
 			_HB_POINTS[i].y = input.touch[i].y / scale;
 		}
 	}
+
 	let inv_el = hb.attached_to_object.data.inventory_element;
 	if (inv_el && !hb.has_shield_button) {
 		let hasShieldInInv = inventory_has_item_from_list(inv_el, [ITEM_SHIELD,
@@ -448,7 +454,7 @@ function hotbar_update(hotbar_element, dt) {
 		]) !== -1;
 		if (hasShieldInInv) hb.has_shield_button = true;
 	}
-	let isMobile = g.mobile;
+
 	let pcActionTriggered = false;
 	if (!isMobile) {
 		if (input.mouse.leftButtonPressed) hb.leftButtonClickable = true;
@@ -457,165 +463,131 @@ function hotbar_update(hotbar_element, dt) {
 			hb.leftButtonClickable = false;
 		}
 	}
-	let anyPointOverConsumeButtons = false;
+
 	let s = isMobile ? 97 : hb.slot_size;
 	let step = s * 1.05;
 	let start_y = 40;
 	let start_x = 40;
+
+	let freeTouch = isMobile ? input.touch.find(t => t.id !== input.joystick.left.id && t.id !== input.joystick.right.id) : null;
+	
+	let ach_el = g.gui_elements.find(e => e.name === "achievements");
+
 	for (let pIdx = 0; pIdx < pointsCount; pIdx++) {
 		let pt = _HB_POINTS[pIdx];
 		for (let i = 0; i < hb.row.length; i++) {
 			let sx = start_x + step * i;
-			if ((isMobile || input.mouse.leftButtonPressed) && doRectsCollide(pt
-					.x, pt.y, 0, 0, sx, start_y, s, s)) {
+			if ((isMobile || input.mouse.leftButtonPressed) && doRectsCollide(pt.x, pt.y, 0, 0, sx, start_y, s, s)) {
 				hb.mouse_over = true;
 				hb.iselected = i;
 			}
 		}
-		let b_menu_x, b_menu_y, b_inv_x, b_inv_y, b_ach_x, b_ach_y, r_x, r_y,
-			r_sx, r_sy;
+
+		let b_menu_x, b_menu_y, b_inv_x, b_inv_y, b_ach_x, b_ach_y, r_x, r_y, r_sx, r_sy;
 		if (isMobile) {
 			let col_res_x = start_x + step * hb.row.length;
 			let col_sys_x = col_res_x + step;
-			b_menu_x = col_sys_x;
-			b_menu_y = start_y;
-			b_inv_x = col_sys_x;
-			b_inv_y = start_y + step;
-			b_ach_x = col_sys_x;
-			b_ach_y = start_y + step * 2;
-			r_x = col_res_x;
-			r_y = start_y;
-			r_sx = 0;
-			r_sy = step;
-		}
-		else {
+			b_menu_x = col_sys_x; b_menu_y = start_y;
+			b_inv_x = col_sys_x; b_inv_y = start_y + step;
+			b_ach_x = col_sys_x; b_ach_y = start_y + step * 2;
+			r_x = col_res_x; r_y = start_y; r_sx = 0; r_sy = step;
+		} else {
 			let offset_x = start_x + step * hb.row.length + (step * 0.5);
-			b_menu_x = offset_x;
-			b_menu_y = start_y;
-			b_inv_x = offset_x + step;
-			b_inv_y = start_y;
-			b_ach_x = offset_x + step * 2;
-			b_ach_y = start_y;
-			r_x = offset_x + step * 3.5;
-			r_y = start_y;
-			r_sx = step;
-			r_sy = 0;
+			b_menu_x = offset_x; b_menu_y = start_y;
+			b_inv_x = offset_x + step; b_inv_y = start_y;
+			b_ach_x = offset_x + step * 2; b_ach_y = start_y;
+			r_x = offset_x + step * 3.5; r_y = start_y; r_sx = step; r_sy = 0;
 		}
-		if (doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s, s)) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'menu';
-		}
-		if (doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s, s)) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'inv';
-		}
-		if (doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s, s)) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'ach';
-		}
+
+		if (doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s, s)) { hb.mouse_over = true; hb.hovered_btn = 'menu'; }
+		if (doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s, s)) { hb.mouse_over = true; hb.hovered_btn = 'inv'; }
+		if (doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s, s)) { hb.mouse_over = true; hb.hovered_btn = 'ach'; }
+
 		let overFood = doRectsCollide(pt.x, pt.y, 0, 0, r_x, r_y, s, s);
-		let overWater = doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx, r_y + r_sy,
-			s, s);
-		let overHealth = doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx * 2, r_y +
-			r_sy * 2, s, s);
-		let overShield = hb.has_shield_button && doRectsCollide(pt.x, pt.y, 0,
-			0, r_x + r_sx * 3, r_y + r_sy * 3, s, s);
+		let overWater = doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx, r_y + r_sy, s, s);
+		let overHealth = doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx * 2, r_y + r_sy * 2, s, s);
+		let overShield = hb.has_shield_button && doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx * 3, r_y + r_sy * 3, s, s);
 		let fuelIndex = hb.has_shield_button ? 4 : 3;
-		let overFuel = hb.attached_to_object.data.car_object && doRectsCollide(
-			pt.x, pt.y, 0, 0, r_x + r_sx * fuelIndex, r_y + r_sy *
-			fuelIndex, s, s);
-		if (overFood) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'food';
-		}
-		if (overWater) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'water';
-		}
-		if (overHealth) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'health';
-		}
-		if (overShield) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'shield';
-		}
-		if (overFuel) {
-			hb.mouse_over = true;
-			hb.hovered_btn = 'fuel';
-		}
-		let isAction = isMobile ? isScreenTouched(input) : pcActionTriggered;
-		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_menu_x, b_menu_y, s,
-				s)) {
-			if (isMobile) {
-				if (!hb.did_want_menu) {
-					g.want_menu = true;
-					hb.did_want_menu = true;
+		let overFuel = hb.attached_to_object.data.car_object && doRectsCollide(pt.x, pt.y, 0, 0, r_x + r_sx * fuelIndex, r_y + r_sy * fuelIndex, s, s);
+
+		if (overFood) { hb.mouse_over = true; hb.hovered_btn = 'food'; }
+		if (overWater) { hb.mouse_over = true; hb.hovered_btn = 'water'; }
+		if (overHealth) { hb.mouse_over = true; hb.hovered_btn = 'health'; }
+		if (overShield) { hb.mouse_over = true; hb.hovered_btn = 'shield'; }
+		if (overFuel) { hb.mouse_over = true; hb.hovered_btn = 'fuel'; }
+
+		if (isMobile) {
+			// LOGIC FOR MOBILE: CLICK ON RELEASE (mouseup)
+			let touchingInv = freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_inv_x, b_inv_y, s, s);
+			let touchingMenu = freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_menu_x, b_menu_y, s, s);
+			let touchingAch = freeTouch && doRectsCollide(freeTouch.x / scale, freeTouch.y / scale, 0, 0, b_ach_x, b_ach_y, s, s);
+
+			if (touchingInv) hb._inv_pressed = true;
+			else if (hb._inv_pressed) {
+				if (inv_el) inv_el.shown = !inv_el.shown;
+				hb._inv_pressed = false;
+			}
+			
+			if (touchingMenu) hb._menu_pressed = true;
+			else if (hb._menu_pressed) {
+				g.want_menu = true;
+				hb._menu_pressed = false;
+			}
+
+			if (touchingAch) hb._ach_pressed = true;
+			else if (hb._ach_pressed) {
+				if (ach_el) {
+					ach_el.shown = !ach_el.shown;
+					if (inv_el) inv_el.shown = false;
+				}
+				hb._ach_pressed = false;
+			}
+
+			if (freeTouch && (overHealth || overWater || overFood || overShield || overFuel)) {
+				if (!hb._consume_lock) {
+					let player = hb.attached_to_object;
+					let itm = -1;
+					if (overFood) itm = inventory_has_item_from_list(inv_el, ITEMS_FOODS);
+					else if (overWater) itm = inventory_has_item_from_list(inv_el, ITEMS_DRINKS);
+					else if (overHealth) itm = inventory_has_item_from_list(inv_el, [ITEM_HEALTH_GREEN, ITEM_HEALTH]);
+					else if (overShield) itm = inventory_has_item_from_list(inv_el, [ITEM_SHIELD, ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW, ITEM_SHADOW_SHIELD, ITEM_ANUBIS_REGEN_SHIELD, ITEM_PUMPKIN_SHIELD]);
+					else if (overFuel) itm = inventory_has_item_from_list(inv_el, [ITEM_FUEL]);
+					if (itm !== -1) player_item_consume(player, itm, true);
+					hb._consume_lock = true;
 				}
 			}
-			else {
-				g.want_menu = true;
+		} else {
+			// LOGIC FOR PC: CLICK ON RELEASE (mouseup)
+			if (pcActionTriggered && hb.hovered_btn === 'inv') {
+				if (inv_el) inv_el.shown = !inv_el.shown;
 			}
-		}
-		else if (isMobile) {
-			hb.did_want_menu = false;
-		}
-		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_inv_x, b_inv_y, s,
-				s)) {
-			if (inv_el && !inv_el._mob_toggle_lock) {
-				let ash = g.gui_elements.find(e => e.name ==
-					"achievements shower");
-				achievement_do(hb.attached_to_object.data.achievements_element
-					.data.achievements, "discovering inventory", ash);
-				inv_el.shown = !inv_el.shown;
-				if (isMobile) inv_el._mob_toggle_lock = true;
+			if (pcActionTriggered && hb.hovered_btn === 'menu') g.want_menu = true;
+			
+			if (pcActionTriggered && hb.hovered_btn === 'ach') {
+				if (ach_el) {
+					ach_el.shown = !ach_el.shown;
+					if (inv_el) inv_el.shown = false;
+				}
 			}
-		}
-		if (isAction && doRectsCollide(pt.x, pt.y, 0, 0, b_ach_x, b_ach_y, s,
-				s)) {
-			let ach_el = hb.attached_to_object.data.achievements_element;
-			if (ach_el) {
-				let ash = g.gui_elements.find(e => e.name ==
-					"achievements shower");
-				achievement_do(ach_el.data.achievements, "achievements", ash);
-				ach_el.shown = true;
-			}
-		}
-		if (isAction && (overHealth || overWater || overFood || overShield ||
-				overFuel)) {
-			anyPointOverConsumeButtons = true;
-			if (!hb._consume_lock) {
+
+			if (pcActionTriggered && (overHealth || overWater || overFood || overShield || overFuel)) {
 				let player = hb.attached_to_object;
 				let itm = -1;
-				if (overFood) itm = inventory_has_item_from_list(inv_el,
-					ITEMS_FOODS);
-				else if (overWater) itm = inventory_has_item_from_list(inv_el,
-					ITEMS_DRINKS);
-				else if (overHealth) itm = inventory_has_item_from_list(inv_el,
-					[ITEM_HEALTH_GREEN, ITEM_HEALTH]);
-				else if (overShield) itm = inventory_has_item_from_list(inv_el,
-					[ITEM_SHIELD, ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW,
-						ITEM_SHADOW_SHIELD, ITEM_ANUBIS_REGEN_SHIELD,
-						ITEM_PUMPKIN_SHIELD
-					]);
-				else if (overFuel) itm = inventory_has_item_from_list(inv_el, [
-					ITEM_FUEL
-				]);
+				if (overFood) itm = inventory_has_item_from_list(inv_el, ITEMS_FOODS);
+				else if (overWater) itm = inventory_has_item_from_list(inv_el, ITEMS_DRINKS);
+				else if (overHealth) itm = inventory_has_item_from_list(inv_el, [ITEM_HEALTH_GREEN, ITEM_HEALTH]);
+				else if (overShield) itm = inventory_has_item_from_list(inv_el, [ITEM_SHIELD, ITEM_SHIELD_GREEN, ITEM_SHIELD_RAINBOW, ITEM_SHADOW_SHIELD, ITEM_ANUBIS_REGEN_SHIELD, ITEM_PUMPKIN_SHIELD]);
+				else if (overFuel) itm = inventory_has_item_from_list(inv_el, [ITEM_FUEL]);
 				if (itm !== -1) player_item_consume(player, itm, true);
-				hb._consume_lock = true;
 			}
 		}
 	}
-	if (!anyPointOverConsumeButtons) hb._consume_lock = false;
-	if (inv_el && inv_el._mob_toggle_lock && isMobile) {
-		let stillTouchingInv = false;
-		for (let i = 0; i < pointsCount; i++) {
-			let pt = _HB_POINTS[i];
-			let check_x = 40 + step * (hb.row.length + 1);
-			let check_y = 40 + step;
-			if (doRectsCollide(pt.x, pt.y, 0, 0, check_x, check_y, s, s))
-				stillTouchingInv = true;
-		}
-		if (!stillTouchingInv) inv_el._mob_toggle_lock = false;
+	
+	if (isMobile && !freeTouch) {
+		hb._consume_lock = false;
+		// Reset pressed states if finger is lifted outside
+		hb._menu_pressed = false;
+		hb._ach_pressed = false;
+		hb._inv_pressed = false;
 	}
 }
