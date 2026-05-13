@@ -744,7 +744,7 @@
 		action_history.shift();
 		if((currentMode === 'drag') && last_action[0] == "swap") {
 			swapPieces(last_action[1], last_action[2]);
-			redo_history.push(["swap", last_action[1], last_action[2]]);
+			redo_history.unshift(["swap", last_action[1], last_action[2]]);
 		}
 		checkSolved();
 	}
@@ -754,7 +754,7 @@
 		redo_history.shift();
 		if((currentMode === 'drag') && last_redo[0] == "swap") {
 			swapPieces(last_redo[1], last_redo[2]);
-			action_history.push(["swap", last_redo[1], last_redo[2]]);
+			action_history.unshift(["swap", last_redo[1], last_redo[2]]);
 		}
 		checkSolved();
 	}
