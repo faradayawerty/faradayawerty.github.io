@@ -742,7 +742,7 @@
 	function actionUndo() {
 		last_action = action_history[0];
 		action_history.shift();
-		if((currentMode === 'drag' || currentMode === 'mixed') && last_action[0] == "swap") {
+		if((currentMode === 'drag') && last_action[0] == "swap") {
 			swapPieces(last_action[1], last_action[2]);
 			redo_history.push(["swap", last_action[1], last_action[2]]);
 		}
@@ -751,7 +751,7 @@
 	function actionRedo() {
 		last_redo = redo_history[0];
 		redo_history.shift();
-		if((currentMode === 'drag' || currentMode === 'mixed') && last_redo[0] == "swap") {
+		if((currentMode === 'drag') && last_redo[0] == "swap") {
 			swapPieces(last_redo[1], last_redo[2]);
 			action_history.push(["swap", last_redo[1], last_redo[2]]);
 		}
