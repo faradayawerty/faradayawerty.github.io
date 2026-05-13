@@ -736,8 +736,9 @@
 	function actionUndo() {
 		last_action = action_history[0];
 		action_history.shift();
-		if((currentMode === 'drag') && last_action[0] == "swap")
+		if((currentMode === 'drag') && last_action[0] == "swap") {
 			swapPieces(last_action[1], last_action[2]);
+		}
 		checkSolved();
 	}
 
