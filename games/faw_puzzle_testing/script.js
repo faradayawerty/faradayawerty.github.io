@@ -746,6 +746,7 @@
 			swapPieces(last_action[1], last_action[2]);
 			redo_history.push(["swap", last_action[1], last_action[2]]);
 		}
+		checkSolved();
 	}
 
 	function actionRedo() {
@@ -755,6 +756,7 @@
 			swapPieces(last_redo[1], last_redo[2]);
 			action_history.push(["swap", last_redo[1], last_redo[2]]);
 		}
+		checkSolved();
 	}
 
 	function handleImageUpload(file) {
