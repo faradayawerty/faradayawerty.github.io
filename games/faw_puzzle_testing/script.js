@@ -23,7 +23,6 @@
 	let fullSizePx;
 	let cropper;
 	let action_history = [];
-	let redo_history = [];
 
 	const controls = document.getElementById('controls');
 
@@ -541,7 +540,6 @@
 		timer = 0;
 		timerDisplay.textContent = formatTime(timer);
 		action_history.splice(0, action_history.length);
-		redo_history.splice(0, redo_history.length);
 	}
 
 	function resetPuzzle() {
@@ -566,7 +564,6 @@
 		}
 
 		action_history.splice(0, action_history.length);
-		redo_history.splice(0, redo_history.length);
 
 		timer = 0;
 		timerDisplay.textContent = formatTime(timer);
@@ -732,30 +729,15 @@
 	window.addEventListener('keydown', function(event) {
 		if ((event.ctrlKey || event.metaKey) && event.code === 'KeyZ') {
 			event.preventDefault();
-			if (event.shiftKey)
-				actionRedo();
-			else
-				actionUndo();
+			actionUndo();
 		}
 	});
 
 	function actionUndo() {
 		last_action = action_history[0];
 		action_history.shift();
-		if((currentMode === 'drag') && last_action[0] == "swap") {
+		if((currentMode === 'drag') && last_action[0] == "swap")
 			swapPieces(last_action[1], last_action[2]);
-			redo_history.unshift(["swap", last_action[1], last_action[2]]);
-		}
-		checkSolved();
-	}
-
-	function actionRedo() {
-		last_redo = redo_history[0];
-		redo_history.shift();
-		if((currentMode === 'drag') && last_redo[0] == "swap") {
-			swapPieces(last_redo[1], last_redo[2]);
-			action_history.unshift(["swap", last_redo[1], last_redo[2]]);
-		}
 		checkSolved();
 	}
 
@@ -854,7 +836,6 @@
 		if (!target || target === selectedPiece)
 			return;
 		swapPieces(selectedPiece, target);
-		redo_history.splice(0, redo_history.length);
 		action_history.unshift(["swap", selectedPiece, target]);
 		selectedPiece.style.outline = '';
 		selectedPiece = null;
@@ -879,7 +860,6 @@
 				selectedPiece = null;
 			} else {
 				swapPieces(selectedPiece, target);
-				redo_history.splice(0, redo_history.length);
 				action_history.unshift(["swap", selectedPiece, target]);
 				selectedPiece.style.outline = '';
 				selectedPiece = null;
